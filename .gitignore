@@ -17,3 +17,4 @@ yarn-error.log*
 .npm/
 yarn.lock
 .next
+*/__pycache__/*
