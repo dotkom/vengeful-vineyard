@@ -1,0 +1,7 @@
+#lint
+black==19.10b0
+
+# Test
+pytest==5.3.5
+pytest-cov==2.8.1
+pytest-django==3.8.0
