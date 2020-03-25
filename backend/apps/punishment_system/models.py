@@ -12,7 +12,7 @@ class PunishmentType(models.Model):
         return f'Name: {self.name} Value: {self.value}'
 
 class VineyardGroup(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
     users = models.ManyToManyField(to=User)
     def __str__(self):
         return self.name

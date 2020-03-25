@@ -4,22 +4,25 @@ from .models import PunishmentType, Punishment, VineyardGroup
 from vengeful_vineyard.serializers import UserSerializer, GroupSerializer
 
 class PunishmentSerializer(serializers.HyperlinkedModelSerializer):
-    to = UserSerializer()
-    giver = UserSerializer()
-    group = GroupSerializer()
-
+    to = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    #giver = serializers.PrimaryKeyRelatedField(read_only=True)              once authentication scheme is set, giver can be set to request.user,
+    giver = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())# but is manually set so far.
+    group = serializers.SlugRelatedField(slug_field='name', queryset=VineyardGroup.objects.all())
+    type = serializers.PrimaryKeyRelatedField(queryset=PunishmentType.objects.all())
     class Meta:
         model = Punishment
-        fields = ['url', 'type', 'to', 'giver', 'group', 'reason', 'date']
+        fields = ['type', 'to', 'giver', 'group', 'reason', 'date']
+
+
 
 class PunishmentTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PunishmentType
-        fields = ['url','name','value']
+        fields = ['name','value']
 
 class VineyardGroupSerializer(serializers.HyperlinkedModelSerializer):
-    users = UserSerializer()
+    users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = VineyardGroup
         fields = ['name', 'users']
-
+        lookup_field = 'name'

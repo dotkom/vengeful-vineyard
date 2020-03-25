@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from apps.punishment_system.models import PunishmentType, Punishment
 from vengeful_vineyard.serializers import UserSerializer, GroupSerializer
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
@@ -11,7 +11,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
