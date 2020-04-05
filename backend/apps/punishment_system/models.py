@@ -1,9 +1,31 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser, UserManager
+from django.db.models import Prefetch, Sum, Case, When, F, DecimalField
+
+class LeaderBoardManager(models.Manager):
+
+    def of_group(self, group_name):
+        punishments_in_group = Punishment.objects.filter(group__name=group_name)
+        users_in_group = self.filter(vineyardgroup__name=group_name)
+        user_punishments_in_group = users_in_group.prefetch_related(models.Prefetch("punishments", queryset=punishments_in_group) #remove not relevant punishments (punishments not in group)
+        ).annotate(punishment_in_group_sum=Sum(                                                 #for each user, annotate the sum of punishments to the attribute "punishment_in_group_sum"
+            Case(
+                When(punishments__group__name=group_name, then=F('punishments__type__value')),  #for each relevant punishment, add its value to the sum
+                default=0,                                                                      #for each irrelevant punishment, add 0 to the sum
+                output_field=DecimalField()))
+        ).order_by("punishment_in_group_sum")
+        return user_punishments_in_group
+
+#.annotate(punishment_in_group_sum=models.Sum("relevant_punishments__type__value")
+# Create your models here.
+
+class VineyardUser(AbstractUser):
+    objects = UserManager()
+    leaderboard = LeaderBoardManager()
 
 User = get_user_model()
 
-# Create your models here.
 class PunishmentType(models.Model):
     name = models.CharField(max_length=50)
     value = models.DecimalField(max_digits=6, decimal_places=2, default=0)

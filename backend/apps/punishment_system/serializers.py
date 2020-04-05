@@ -1,7 +1,11 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import PunishmentType, Punishment, VineyardGroup
 from vengeful_vineyard.serializers import UserSerializer, GroupSerializer
+
+User = get_user_model()
+
 
 class PunishmentSerializer(serializers.HyperlinkedModelSerializer):
     to = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
