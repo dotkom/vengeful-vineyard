@@ -9,7 +9,7 @@ class LeaderBoardManager(models.Manager):
         punishments_in_group = Punishment.objects.filter(group__name=group_name)
         users_in_group = self.filter(vineyardgroup__name=group_name)
         user_punishments_in_group = users_in_group.prefetch_related(models.Prefetch("punishments", queryset=punishments_in_group) #remove not relevant punishments (punishments not in group)
-        ).annotate(punishment_in_group_sum=Sum(                                                 #for each user, annotate the sum of punishments to the attribute "punishment_in_group_sum"
+        ).annotate(punishments_in_group_sum=Sum(                                                 #for each user, annotate the sum of punishments to the attribute "punishment_in_group_sum"
             Case(
                 When(punishments__group__name=group_name, then=F('punishments__type__value')),  #for each relevant punishment, add its value to the sum
                 default=0,                                                                      #for each irrelevant punishment, add 0 to the sum
@@ -23,7 +23,9 @@ class LeaderBoardManager(models.Manager):
 class VineyardUser(AbstractUser):
     objects = UserManager()
     leaderboard = LeaderBoardManager()
-
+    @property
+    def name(self):
+        return self.first_name + " " + self.last_name
 User = get_user_model()
 
 class PunishmentType(models.Model):
