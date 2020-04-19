@@ -34,5 +34,6 @@ class VineyardGroupViewSet(viewsets.ModelViewSet):
 class LeaderboardViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     serializer_class = LeaderboardSerializer
     def get_queryset(self):
+        active_only = self.request.query_params.get("active_only", "True").capitalize()
         group = self.kwargs['VineyardGroup']
-        return User.leaderboard.of_group(group)
+        return User.leaderboard.of_group(group, active_only)

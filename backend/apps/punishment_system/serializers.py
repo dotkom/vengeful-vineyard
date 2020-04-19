@@ -19,7 +19,7 @@ class PunishmentSerializer(serializers.HyperlinkedModelSerializer):
     type = serializers.PrimaryKeyRelatedField(queryset=PunishmentType.objects.all())
     class Meta:
         model = Punishment
-        fields = ['type', 'to', 'giver', 'group', 'reason', 'date']
+        fields = ['type', 'to', 'giver', 'group', 'reason', 'date', 'active']
 
 
 
@@ -38,10 +38,10 @@ class VineyardGroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class LeaderboardSerializer(serializers.HyperlinkedModelSerializer):
     punishments = PunishmentSerializer(many=True)
-    punishment_in_group_sum = serializers.SerializerMethodField("get_punishment_in_group_sum")
+    punishments_in_group_sum = serializers.SerializerMethodField("get_punishments_in_group_sum")
     class Meta:
         model = User
-        fields = ['id', 'name', 'punishment_in_group_sum', 'punishments']
+        fields = ['id', 'name', 'punishments_in_group_sum', 'punishments']
 
-    def get_punishment_in_group_sum(self, obj):
+    def get_punishments_in_group_sum(self, obj):
         return obj.punishments_in_group_sum
