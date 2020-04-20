@@ -1,20 +1,24 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser, UserManager
-from django.db.models import Prefetch, Sum, Case, When, F, Q, DecimalField
+from django.db.models import Prefetch, Sum, Case, When, F, Q, DecimalField, FilteredRelation
 
 class LeaderBoardManager(models.Manager):
 
     def of_group(self, group_name, active_only=True):
-        punishments_in_group = Punishment.objects.filter(group__name=group_name)
+        punishments_in_group = Punishment.objects.filter((Q(active=True) | Q(active = active_only)), group__name=group_name)
         users_in_group = self.filter(vineyardgroup__name=group_name)
-        user_punishments_in_group = users_in_group.prefetch_related(Prefetch("punishments", queryset=punishments_in_group)                         #remove not relevant punishments (punishments not in group)
+        user_punishments_in_group = users_in_group.prefetch_related(Prefetch("punishments", queryset=punishments_in_group)                         #remove not relevant punishments from the attribute (not field) "punishments"(punishments not in group)
         ).annotate(punishments_in_group_sum=Sum(                                                                                                                           #for each user, annotate the sum of punishments to the attribute "punishments_in_group_sum"
-            Case(                                                            #expression below works, but is disgusting
+            Case(
                 When(Q(punishments__group__name=group_name) & (Q(punishments__active=True) | Q(punishments__active = active_only)), then=F('punishments__type__value')),   #for each relevant punishment, add its value to the sum
                 default=0,                                                                                                                                                 #for each irrelevant punishment, add 0 to the sum
                 output_field=DecimalField()))
         ).order_by("punishments_in_group_sum")
+
+        #the "(Q(punishments__active=True) | Q(punishments__active = active_only))"-expression is disgusting, but it works:
+        #if active_only is True then it becomes:  (Q(punishments__active=True) | (Q(punishments__active=True)))  == Q(punishments__active=True)
+        #if active_only is False then it becomes: (Q(punishments__active=True) | (Q(punishments__active=False))) == Q(True)
 
         return user_punishments_in_group
 

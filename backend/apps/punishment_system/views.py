@@ -15,7 +15,6 @@ class VineyardUserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VineyardUserSerializer
 
 class PunishmentTypeViewSet(viewsets.ModelViewSet, mixins.RetrieveModelMixin):
-
     queryset = PunishmentType.objects.all().order_by('value')
     serializer_class = PunishmentTypeSerializer
 
