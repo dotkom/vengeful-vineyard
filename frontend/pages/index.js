@@ -1,7 +1,11 @@
+import React from "react";
+//import ReactDOM from "react-dom";
+import App from "./_app";
+
 export default function Index() {
   return (
     <div>
-      <p>Hello 2insjers</p>
+      <App />
     </div>
   );
 }
