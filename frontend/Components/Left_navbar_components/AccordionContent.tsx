@@ -6,18 +6,18 @@ const AccordionContent = () => {
       <label>
         Vis:
         <br />
-        <label for="vis">
+        <label htmlFor="vis">
           <input
             type="radio"
             className="radioButton"
             id="naavaarende"
             name="vis"
-            checked="checked"
+            defaultChecked={true}
           />
           Nåværende medlemmer
         </label>
         <br />
-        <label for="vis">
+        <label htmlFor="vis">
           <input
             type="radio"
             className="radioButton"
@@ -37,12 +37,12 @@ const AccordionContent = () => {
           className="radioButton"
           id="flest"
           name="sort"
-          checked="checked"
+          defaultChecked={true}
         />
-        <label for="vis">Flest straffer (verdi)</label>
+        <label htmlFor="vis">Flest straffer (verdi)</label>
         <br />
         <input type="radio" className="radioButton" id="minst" name="sort" />
-        <label for="vis">Færrest straffer (verdi)</label>
+        <label htmlFor="vis">Færrest straffer (verdi)</label>
       </label>
     </div>
   );

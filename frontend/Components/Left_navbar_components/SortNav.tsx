@@ -4,7 +4,7 @@ import ChoosePunishments from "./ChoosePunishments";
 
 import { getCurrentGroup } from "../Top_group_picker_components/GroupLogos";
 
-const SortNav = (props) => {
+const SortNav = () => {
   return (
     <div className="sortNav">
       <div className="committeeName">

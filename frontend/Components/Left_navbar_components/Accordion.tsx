@@ -1,13 +1,21 @@
 import React, { useState, useRef } from "react";
 
-const Accordion = (props) => {
+type Props = {
+  title: string;
+  content: any;
+}
+
+const Accordion = (props : Props) => {
   const [setActive, setActiveState] = useState("");
   const [setHeight, setHeightState] = useState("0px");
 
-  const content = useRef(null);
+  const content = useRef<HTMLDivElement>(null);
 
   const toggleAccordion = () => {
     setActiveState(setActive === "" ? "active" : "");
+    if (null === content.current) {
+      return;
+    }
     setHeightState(
       setActive === "active" ? "0px" : `${content.current.scrollHeight}px`
     );
@@ -15,14 +23,17 @@ const Accordion = (props) => {
     //changeStyle(setHeight);
   };
 
-  const changeStyle = (setHeight) => {
+  const changeStyle = (setHeight : number) => {
+    const accordion = document.querySelector<HTMLElement>('.accordion');
+    if (null === accordion) {
+      console.log("Could not find accordion");
+      return;
+    }
     if (setHeight > 0) {
-      document.getElementsByClassName("accordion").style.color.setState =
-        "#0f2d5c";
+      accordion.style.color = "#0f2d5c";
       console.log("changed color");
     } else {
-      document.getElementsByClassName("accordion").style.color.setState =
-        "#153c79";
+      accordion.style.color = "#153c79";
     }
   };
 
