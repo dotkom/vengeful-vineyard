@@ -4,8 +4,8 @@ import users from "../../FakeData/MOCK_DATA.json";
 
 let chosenGroup = "";
 
-const changeActive = (path) => {
-  let currentGroup = users.filter((user) => user.group_logo === path);
+const changeActive = (path : string) => {
+  const currentGroup = users.filter((user) => user.group_logo === path);
 
   console.log(currentGroup[1].group);
   updateGroup(currentGroup[1].group);
@@ -13,7 +13,7 @@ const changeActive = (path) => {
   return currentGroup[1].group;
 };
 
-const updateGroup = (newGroup) => {
+const updateGroup = (newGroup : string) => {
   chosenGroup = newGroup;
   console.log("Group updated");
   console.log(chosenGroup);
@@ -39,7 +39,7 @@ const GroupLogos = () => {
           type="image"
           className="groupBtn"
           src={e}
-          onClick={(path) => changeActive(e)}
+          onClick={() => changeActive(e)}
           alt="groupLogo"
         ></input>
       ))}{" "}

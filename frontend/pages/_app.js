@@ -1,7 +1,7 @@
 import React from "react";
 import SortNav from "../Components/Left_navbar_components/SortNav";
 import GroupPickerContainer from "../Components/Top_group_picker_components/GroupPickerContainer";
-import PunishmentContainer from "../Components/PunishmentDisplay/PunismentContainer";
+import PunishmentContainer from "../Components/PunishmentDisplay/PunishmentContainer";
 
 import { getCurrentGroup } from "../Components/Top_group_picker_components/GroupLogos";
 

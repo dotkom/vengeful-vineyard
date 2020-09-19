@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { createStore, createHooks, Provider } from "react-global-hook";
-
-import users from "../FakeData/MOCK_DATA.json";
+import { useState, useEffect } from "react";
 
 const listeners = new Set();
 
