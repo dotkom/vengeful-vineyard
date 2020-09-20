@@ -1,4 +1,4 @@
-[
+let users = [
   {
     "id": 1,
     "first_name": "Hurlee",
@@ -165,3 +165,5 @@
     "group_logo": "https://i.ibb.co/tJrB8kn/dotkom.png"
   }
 ]
+
+export default users;
