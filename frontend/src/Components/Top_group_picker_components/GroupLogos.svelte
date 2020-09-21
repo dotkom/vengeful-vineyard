@@ -1,21 +1,23 @@
 <script lang="ts">
+import users from "../../FakeData/MOCK_DATA";
+let currentGroup = "";
 
-  import users from "../../FakeData/MOCK_DATA";
-  let currentGroup = "";
+const changeActive = () => {
+  const currentGroup = users.filter((user) => user.group_logo === "TODO");
+  updateGroup(currentGroup[1].group);
+  return currentGroup[1].group;
+};
 
-  const changeActive = () => {
-    const currentGroup = users.filter((user) => user.group_logo === "TODO");
-    updateGroup(currentGroup[1].group);
-    return currentGroup[1].group;
-  };
+const updateGroup = (newGroup: string) => {
+  currentGroup = newGroup;
+};
 
-  const updateGroup = (newGroup : string) => {
-    currentGroup = newGroup;
-  };
-
-  let group_urls : string[] = users
-                  .map((user) => user.group_logo)
-                  .filter((url : string, i : number, allGroups : string[]) => allGroups.indexOf(url) === i);
+let group_urls: string[] = users
+  .map((user) => user.group_logo)
+  .filter(
+    (url: string, i: number, allGroups: string[]) =>
+      allGroups.indexOf(url) === i
+  );
 </script>
 
 <div class="groupLogosContainer">
@@ -23,10 +25,10 @@
     <input
       type="image"
       class="groupBtn"
-      src={url}
-      on:click={changeActive}
+      src="{url}"
+      on:click="{changeActive}"
       alt="groupLogo"
-    >
+    />
   {/each}
 </div>
 
