@@ -1,13 +1,11 @@
 <script lang="ts">
-  import users from "../../FakeData/MOCK_DATA.json";
+
+  import users from "../../FakeData/MOCK_DATA";
   let currentGroup = "";
 
-  const changeActive = (path : string) => {
-    const currentGroup = users.filter((user) => user.group_logo === path);
-
-    console.log(currentGroup[1].group);
+  const changeActive = () => {
+    const currentGroup = users.filter((user) => user.group_logo === "TODO");
     updateGroup(currentGroup[1].group);
-    getCurrentGroup();
     return currentGroup[1].group;
   };
 
@@ -15,9 +13,9 @@
     currentGroup = newGroup;
   };
 
-  let group_urls = users
+  let group_urls : string[] = users
                   .map((user) => user.group_logo)
-                  .filter((url, i, allGroups) => allGroups.indexOf(url) === i);
+                  .filter((url : string, i : number, allGroups : string[]) => allGroups.indexOf(url) === i);
 </script>
 
 <div class="groupLogosContainer">
@@ -31,3 +29,26 @@
     >
   {/each}
 </div>
+
+<style>
+.groupLogosContainer {
+  margin: 0 auto;
+}
+
+.groupBtn {
+  height: 80px;
+  border-radius: 100%;
+  background-color: #ffffff;
+  margin: 5px;
+  box-shadow: 0 8px #c9c9c9;
+  transition: background-color 0.6s ease;
+}
+
+.groupBtn:hover {
+  background-color: #ffb84b;
+}
+
+.groupBtn:active {
+  background-color: #e2941f;
+}
+</style>

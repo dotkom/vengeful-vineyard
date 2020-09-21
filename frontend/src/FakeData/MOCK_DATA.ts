@@ -1,4 +1,16 @@
-let users = [
+interface User {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  ol_straffer: number;
+  vin_straffer: number;
+  sprit_straffer: number;
+  group: string;
+  group_logo: string;
+}
+
+let users : User[] = [
   {
     "id": 1,
     "first_name": "Hurlee",

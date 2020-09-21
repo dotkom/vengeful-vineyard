@@ -11,3 +11,15 @@
     <PunishmentContainer />
   </div>
 </div>
+
+<style>
+.body_content {
+  display: flex;
+  margin: 0 auto;
+}
+
+.content {
+  background-color: #f2f2f2;
+}
+
+</style>
