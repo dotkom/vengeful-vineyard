@@ -1,5 +1,6 @@
 <script lang="ts">
-import users from "../../FakeData/MOCK_DATA";
+import UserStore from "../../store.ts";
+const users = $UserStore;
 let currentGroup = "";
 
 const changeActive = () => {

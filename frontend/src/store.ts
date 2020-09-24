@@ -1,3 +1,4 @@
+import { writable } from "svelte/store";
 interface User {
   id: number;
   first_name: string;
@@ -10,7 +11,7 @@ interface User {
   group_logo: string;
 }
 
-let users: User[] = [
+const mock: User[] = [
   {
     id: 1,
     first_name: "Hurlee",
@@ -178,4 +179,5 @@ let users: User[] = [
   },
 ];
 
-export default users;
+const UserStore = writable(mock);
+export default UserStore;

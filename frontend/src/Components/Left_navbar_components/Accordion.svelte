@@ -1,5 +1,6 @@
 <script lang="ts">
 export let title: string;
+export let color: string = "#153c79";
 let height: number = 0;
 let open: boolean = false;
 
@@ -10,7 +11,13 @@ const toggleAccordion = () => {
 </script>
 
 <div class="accordion__section">
-  <div class="accordion" on:click="{toggleAccordion}">{title}</div>
+  <div
+    class="accordion"
+    style="background-color: {color}"
+    on:click="{toggleAccordion}"
+  >
+    {title}
+  </div>
   <div class="accordion__content" style="max-height: {height}px">
     <div class="accordion__text">
       <slot />
@@ -41,7 +48,7 @@ const toggleAccordion = () => {
   border: none;
   outline: none;
   margin-bottom: 2px;
-  transition: background-color 0.6s ease;
+  transition: background-color 0.2s ease;
   -webkit-box-shadow: 0px 4px 8px -1px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: 0px 4px 8px -1px rgba(0, 0, 0, 0.75);
   box-shadow: 0px 4px 8px -1px rgba(0, 0, 0, 0.75);
