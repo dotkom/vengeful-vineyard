@@ -2,10 +2,11 @@
   <h1>vv logo? elns</h1>
 </div>
 
-<style>
+<style lang="less">
+  @import "../../variables.less";
   .leftLogo {
     left: 2%;
     top: 2%;
-    background-color: #ffffff;
+    background-color: @white;
   }
 </style>

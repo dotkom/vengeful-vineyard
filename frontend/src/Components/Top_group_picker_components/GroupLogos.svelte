@@ -1,57 +1,26 @@
 <script lang="ts">
-  import UserStore from "../../store.ts";
-  const users = $UserStore;
-  let currentGroup = "";
+  import UserStore from "../../stores/users";
+  import GroupStore from "../../stores/groups";
+  import GroupButton from "./GroupButton.svelte";
+  import type { User } from "../../stores/users";
+  import * as R from 'ramda';
 
-  const changeActive = () => {
-    const currentGroup = users.filter((user) => user.group_logo === "TODO");
-    updateGroup(currentGroup[1].group);
-    return currentGroup[1].group;
-  };
-
-  const updateGroup = (newGroup: string) => {
-    currentGroup = newGroup;
-  };
-
-  let group_urls: string[] = users
-    .map((user) => user.group_logo)
-    .filter(
-      (url: string, i: number, allGroups: string[]) =>
-        allGroups.indexOf(url) === i
-    );
+  const users : User[] = $UserStore;
+  const groups: any = users
+    .map((user : User) => { return {url: user.group_logo, group: user.group} });
+  const uniqueGroups = R.uniqBy((a : {url: string, group: string}) => a.url, groups);
+  $GroupStore.currentGroup = uniqueGroups[0].group;
 </script>
 
 <div class="groupLogosContainer">
-  {#each group_urls as url}
-    <input
-      type="image"
-      class="groupBtn"
-      src="{url}"
-      on:click="{changeActive}"
-      alt="groupLogo"
-    />
+  {#each uniqueGroups as {url, group}}
+    <GroupButton url={url} group={group}/>
   {/each}
 </div>
 
-<style>
+<style lang="less">
+  @import "../../variables.less";
   .groupLogosContainer {
     margin: 0 auto;
-  }
-
-  .groupBtn {
-    height: 80px;
-    border-radius: 100%;
-    background-color: #ffffff;
-    margin: 5px;
-    box-shadow: 0 8px #c9c9c9;
-    transition: background-color 0.6s ease;
-  }
-
-  .groupBtn:hover {
-    background-color: #ffb84b;
-  }
-
-  .groupBtn:active {
-    background-color: #e2941f;
   }
 </style>

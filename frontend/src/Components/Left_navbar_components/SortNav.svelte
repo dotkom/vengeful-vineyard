@@ -1,11 +1,12 @@
 <script lang="ts">
   import SortAccordions from "./SortAccordions.svelte";
   import ChoosePunishments from "./ChoosePunishments.svelte";
+  import GroupStore from "../../stores/groups";
 </script>
 
 <div class="sortNav">
   <div class="committeeName">
-    <h2 class="groupTitle">Noe</h2>
+    <h2 class="groupTitle">{$GroupStore.currentGroup}</h2>
     <hr />
   </div>
 

@@ -12,7 +12,8 @@
   </div>
 </div>
 
-<style>
+<style lang="less">
+  @import "variables.less";
   .body_content {
     display: flex;
     margin: 0 auto;
