@@ -1,12 +1,14 @@
 <script lang="ts">
-import Accordion from "../Left_navbar_components/Accordion.svelte";
-import UserStore from "../../store.ts";
+  import Accordion from "../Left_navbar_components/Accordion.svelte";
+  import UserStore from "../../store.ts";
 
-const punishmentSum = (user) => {
-  return (
-    user.ol_straffer * 33 + user.vin_straffer * 100 + user.sprit_straffer * 300
-  );
-};
+  const punishmentSum = (user) => {
+    return (
+      user.ol_straffer * 33 +
+      user.vin_straffer * 100 +
+      user.sprit_straffer * 300
+    );
+  };
 </script>
 
 <div class="punishmentContainer">
@@ -23,10 +25,10 @@ const punishmentSum = (user) => {
 </div>
 
 <style>
-.punishmentContainer {
-  display: flex;
-  flex-direction: column;
-  width: 70%;
-  margin: 0 auto;
-}
+  .punishmentContainer {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    margin: 0 auto;
+  }
 </style>

@@ -3,9 +3,9 @@
 </div>
 
 <style>
-.leftLogo {
-  left: 2%;
-  top: 2%;
-  background-color: #ffffff;
-}
+  .leftLogo {
+    left: 2%;
+    top: 2%;
+    background-color: #ffffff;
+  }
 </style>

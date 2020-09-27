@@ -1,7 +1,7 @@
 <script lang="ts">
-import GroupPickerContainer from "./Components/Top_group_picker_components/GroupPickerContainer.svelte";
-import SortNav from "./Components/Left_navbar_components/SortNav.svelte";
-import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContainer.svelte";
+  import GroupPickerContainer from "./Components/Top_group_picker_components/GroupPickerContainer.svelte";
+  import SortNav from "./Components/Left_navbar_components/SortNav.svelte";
+  import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContainer.svelte";
 </script>
 
 <div class="content">
@@ -13,12 +13,12 @@ import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContai
 </div>
 
 <style>
-.body_content {
-  display: flex;
-  margin: 0 auto;
-}
+  .body_content {
+    display: flex;
+    margin: 0 auto;
+  }
 
-.content {
-  background-color: #f2f2f2;
-}
+  .content {
+    background-color: #f2f2f2;
+  }
 </style>
