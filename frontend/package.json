@@ -1,20 +1,33 @@
 {
-  "name": "frontend",
+  "name": "svelte-app",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "next",
-    "build": "next build",
-    "start": "next start"
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public",
+    "validate": "svelte-check"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^14.0.0",
+    "@rollup/plugin-node-resolve": "^8.0.0",
+    "@rollup/plugin-typescript": "^4.0.0",
+    "@tsconfig/svelte": "^1.0.0",
+    "@types/ramda": "^0.27.19",
+    "less": "^3.12.2",
+    "prettier": "^2.1.2",
+    "prettier-plugin-svelte": "^1.4.0",
+    "rollup": "^2.28.2",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^6.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.28.0",
+    "svelte-check": "^1.0.52",
+    "svelte-preprocess": "^4.3.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.3"
+  },
   "dependencies": {
-    "next": "^9.2.1",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "ramda": "^0.27.1",
+    "sirv-cli": "^1.0.0"
   }
 }
