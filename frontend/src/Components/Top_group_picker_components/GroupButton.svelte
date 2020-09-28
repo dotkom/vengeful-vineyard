@@ -11,10 +11,10 @@
 <input
   type="image"
   class="groupBtn"
-  class:active={$GroupStore.currentGroup === group}
+  class:active="{$GroupStore.currentGroup === group}"
   src="{url}"
   on:click="{changeActive}"
-  alt={group}
+  alt="{group}"
 />
 
 <style lang="less">
