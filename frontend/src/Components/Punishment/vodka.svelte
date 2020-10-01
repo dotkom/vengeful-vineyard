@@ -2,6 +2,6 @@
 
 <style lang="less">
   img {
-    width: 2em;
+    height: 5em;
   }
 </style>
