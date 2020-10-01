@@ -1,9 +1,11 @@
 <script lang="ts">
+  import GroupStore from "../../stores/groups";
+  import UserStore from "../../stores/users";
+  import type { User } from "../../stores/users";
+
   import Accordion from "../Left_navbar_components/Accordion.svelte";
   import Punishment from "../Punishment/punishment.svelte";
-  import UserStore from "../../stores/users";
-  import GroupStore from "../../stores/groups";
-  import type { User } from "../../stores/users";
+  import AddPunishment from "../Punishment/addpunishment.svelte";
 
   const punishmentSum = (user: User) => {
     return (
@@ -34,6 +36,7 @@
         {#each { length: user.ol_straffer } as _}
           <Punishment type="Øl"/>
         {/each}
+        <AddPunishment/>
       </div>
     </Accordion>
   {/each}
