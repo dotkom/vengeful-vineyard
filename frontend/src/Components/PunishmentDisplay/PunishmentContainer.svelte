@@ -1,6 +1,8 @@
 <script lang="ts">
   import Accordion from "../Left_navbar_components/Accordion.svelte";
   import Vodka from "../Punishment/vodka.svelte";
+  import Wine from "../Punishment/wine.svelte";
+  import Beer from "../Punishment/beer.svelte";
   import UserStore from "../../stores/users";
   import GroupStore from "../../stores/groups";
   import type { User } from "../../stores/users";
@@ -27,6 +29,12 @@
         NOK<br />
         {#each { length: user.sprit_straffer } as _}
           <Vodka />
+        {/each}
+        {#each { length: user.vin_straffer } as _}
+          <Wine />
+        {/each}
+        {#each { length: user.ol_straffer } as _}
+          <Beer />
         {/each}
       </div>
     </Accordion>

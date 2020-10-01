@@ -1,4 +1,4 @@
-<img alt="Dworekstraff" src="assets/vodka.svg" />
+<img alt="Ølstraff" src="assets/beer.svg" />
 
 <style lang="less">
   img {
