@@ -1,30 +1,22 @@
 <script lang="ts">
-  let type : string = "";
-  let reason : string = "";
-  let price : number = 0;
+  export let punishmentTypes: string[] = [];
+
+  let type: string = "";
+  let reason: string = "";
 
   const addpunish = () => {
-    alert("Added " + type + "straff with price " + price + " because " + reason);
-  }
+    alert("Added " + type + "straff because " + reason);
+  };
 </script>
 
-<form on:submit|preventDefault={addpunish}>
-  <label>
-    <input type="radio" bind:group={type} value="Øl">
-    Øl
-  </label>
-
-  <label>
-    <input type="radio" bind:group={type} value="Vin">
-    Vin
-  </label>
-
-  <label>
-    <input type="radio" bind:group={type} value="Sprit">
-    Sprit
-  </label>
-  <input type="text" bind:value={reason} placeholder="Reason..."/>
-  <input type="number" bind:value={price} placeholder="Price..."/>
+<form on:submit|preventDefault="{addpunish}">
+  {#each punishmentTypes as punishmentType}
+    <label>
+      <input type="radio" bind:group="{type}" value="{punishmentType}" />
+      {punishmentType}
+    </label>
+  {/each}
+  <input type="text" bind:value="{reason}" placeholder="Reason..." />
   <button>Add punishment</button>
 </form>
 

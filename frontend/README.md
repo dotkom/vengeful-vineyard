@@ -9,11 +9,10 @@ npm install
 ## Run dev server
 
 ```bash
-npm run dev
+npm run build
 ```
 
-Navigate to [localhost:5000](http://localhost:5000).
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+Then start the [API mock](api_mock).
 
 ## Building and running in production mode
 

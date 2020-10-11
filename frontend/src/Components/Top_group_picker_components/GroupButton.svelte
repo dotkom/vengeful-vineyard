@@ -1,20 +1,20 @@
 <script lang="ts">
-  export let url = "";
-  export let group = "";
+  export let logoUrl = "";
+  export let name = "";
   import GroupStore from "../../stores/groups";
 
   const changeActive = () => {
-    $GroupStore.currentGroup = group;
+    $GroupStore.currentGroup = name;
   };
 </script>
 
 <input
   type="image"
   class="groupBtn"
-  class:active="{$GroupStore.currentGroup === group}"
-  src="{url}"
+  class:active="{$GroupStore.currentGroup === name}"
+  src="{logoUrl}"
   on:click="{changeActive}"
-  alt="{group}"
+  alt="{name}"
 />
 
 <style lang="less">
