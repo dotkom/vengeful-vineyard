@@ -1,6 +1,14 @@
 <script lang="ts">
   import VvLogo from "./VvLogo.svelte";
   import GroupLogos from "./GroupLogos.svelte";
+  import GroupStore from "../../stores/groups";
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    const res = await fetch("http://localhost:8080/groups");
+    const json = await res.json();
+    $GroupStore = { currentGroup: json[0].name, groups: json };
+  });
 </script>
 
 <div class="group_picker_container">

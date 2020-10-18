@@ -6,7 +6,7 @@
 
   const toggleAccordion = () => {
     open = !open;
-    open ? (height = 300) : (height = 0);
+    open ? (height = 3000) : (height = 0);
   };
 </script>
 

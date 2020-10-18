@@ -1,16 +1,25 @@
 <script lang="ts">
-  export let type : string = "";
+  export let imageurl: string;
+  export let price: number;
+  export let reason: string;
+  export let verifiedBy: string | null;
+  export let verifiedTime: string | null;
+  export let givenBy: string;
+  export let givenTime: string;
+
+  const ISO8601toString = (time: string) => {
+    return time.replace("T", " ");
+  };
 </script>
 
-{#if type == "Vin"}
-  <img alt="Vinstraff" src="assets/wine.svg" />
-{:else if type == "Øl"}
-  <img alt="Ølstraff" src="assets/beer.svg" />
-{:else if type == "Sprit"}
-  <img alt="Dworekstraff" src="assets/vodka.svg" />
-{:else}
-  throw new Error;
+<img alt="Straff" src="{imageurl}" />
+<p>Begrunnelse: {reason}</p>
+<p>Beløp: {price}</p>
+<p>Gitt av {givenBy} ({ISO8601toString(givenTime)})</p>
+{#if verifiedBy !== null && verifiedTime !== null}
+  <p>Verifisert utbetalt: {verifiedBy} ({ISO8601toString(verifiedTime)})</p>
 {/if}
+<br />
 
 <style lang="less">
   img {

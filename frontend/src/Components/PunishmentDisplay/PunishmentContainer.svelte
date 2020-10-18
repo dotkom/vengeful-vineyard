@@ -1,42 +1,21 @@
 <script lang="ts">
   import GroupStore from "../../stores/groups";
-  import UserStore from "../../stores/users";
-  import type { User } from "../../stores/users";
 
   import Accordion from "../Left_navbar_components/Accordion.svelte";
   import Punishment from "../Punishment/punishment.svelte";
   import AddPunishment from "../Punishment/addpunishment.svelte";
-
-  const punishmentSum = (user: User) => {
-    return (
-      user.ol_straffer * 33 +
-      user.vin_straffer * 100 +
-      user.sprit_straffer * 300
-    );
-  };
 </script>
 
 <div class="punishmentContainer">
-  {#each $UserStore.filter((s) => s.group == $GroupStore.currentGroup) as user (user.id)}
-    <Accordion
-      title="{user.first_name} {user.last_name} - Øl: {user.ol_straffer} - Vin: {user.vin_straffer} - Sprit: {user.sprit_straffer}"
-      color="#223333"
-    >
+  {#each $GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].users as user (user.id)}
+    <Accordion title="{user.name}" color="#223333">
       <div class="accordion__content">
-        Komité:
-        {user.group}<br />Stafftotal:
-        {punishmentSum(user)}
-        NOK<br />
-        {#each { length: user.sprit_straffer } as _}
-          <Punishment type="Sprit"/>
+        {#each user.punishments as punish}
+          <Punishment {...punish} />
         {/each}
-        {#each { length: user.vin_straffer } as _}
-          <Punishment type="Vin"/>
-        {/each}
-        {#each { length: user.ol_straffer } as _}
-          <Punishment type="Øl"/>
-        {/each}
-        <AddPunishment/>
+        <AddPunishment
+          punishmentTypes="{$GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].validPunishments}"
+        />
       </div>
     </Accordion>
   {/each}
