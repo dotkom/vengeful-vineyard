@@ -4,7 +4,7 @@
   export let variant: "normal" | "outline" = "normal";
 </script>
 
-<button class:disabled class="{color} {variant}">
+<button on:click class:disabled class="{color} {variant}">
   <slot />
 </button>
 

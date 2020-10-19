@@ -1,13 +1,13 @@
 <script lang="ts">
-  export let showModal = true;
+  export let active = true;
 
-  const hideModal = () => {
-    showModal = false;
+  const toggleModal = () => {
+    active = !active;
   };
 </script>
 
-{#if showModal}
-  <div class="modal" on:click|self="{hideModal}">
+{#if active}
+  <div class="modal" on:click|self="{toggleModal}">
     <div class="modal_content">
       <slot />
     </div>
@@ -18,6 +18,8 @@
   .modal {
     position: fixed;
     z-index: 1; /* Decides the stack order */
+    left: 0;
+    top: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     background-color: rgba(224, 211, 211, 0.541);
