@@ -13,7 +13,7 @@
   };
 
   async function postPunishment() {
-    const punishment = {"type": type, "reason": reason, "name": "test"};
+    const punishment = {"type": type, "reason": reason, "name": name};
     const res = await fetch("http://localhost:8080/punishment", {"method": "POST", "body": JSON.stringify(punishment)});
     const json = await res.json();
 
@@ -35,7 +35,7 @@
       </label>
     {/each}
     <input type="text" bind:value="{reason}" placeholder="Reason..." />
-    <Button on:click="{postPunishment}">Whip!</Button>
+    <Button on:click="{postPunishment}">Legg til</Button>
   </form>
 </Modal>
 

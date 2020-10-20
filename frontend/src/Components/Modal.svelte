@@ -22,7 +22,7 @@
     top: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
-    background-color: rgba(224, 211, 211, 0.541);
+    background-color: rgba(0, 0, 0, 0.7);
   }
   .modal_content {
     background-color: white;
