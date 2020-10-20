@@ -12,11 +12,15 @@
     showAdd = true;
   };
 
-  const postPunishment = () => {
+  async function postPunishment() {
+    const punishment = {"type": type, "reason": reason, "name": "test"};
+    const res = await fetch("http://localhost:8080/punishment", {"method": "POST", "body": JSON.stringify(punishment)});
+    const json = await res.json();
+
     type = "";
     reason = "";
     showAdd = false;
-    alert("Whipped!");
+    alert(json);
   };
 </script>
 

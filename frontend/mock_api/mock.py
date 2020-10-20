@@ -343,7 +343,14 @@ async def getGroups(request):
     return web.json_response(groups)
 
 
+async def handlePunishment(request):
+    data = await request.text()
+    print(data)
+    return web.json_response(data)
+
+
 app = web.Application()
 app.add_routes([web.get("/groups", getGroups)])
+app.add_routes([web.post("/punishment", handlePunishment)])
 app.add_routes([web.static("/", "../public", show_index=True, append_version=True)])
 web.run_app(app)
