@@ -237,6 +237,12 @@ PUNISHMENTS = [
     "Gapestokk",
     "Betinget fengsel",
     "Pryling",
+    "Vanntortur",
+    "Pisking",
+    "Kokes levende",
+    "Syrebad",
+    "Brennmerking",
+    "Flåing",
 ]
 
 
@@ -297,7 +303,7 @@ def randomPunishment():
 
 def randomPunishments():
     punishments = []
-    for _ in range(random.randint(0, 20)):
+    for _ in range(random.randint(0, 4)):
         punishments.append(randomPunishment())
     return sorted(punishments, key=lambda x: x["givenTime"], reverse=True)
 
@@ -313,7 +319,7 @@ def getGroup():
         "rulesUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         "users": getUsers(),
         "logoUrl": GROUPIMAGES[name],
-        "validPunishments": random.sample(PUNISHMENTS, 4),
+        "validPunishments": random.sample(PUNISHMENTS, 10),
     }
 
 
@@ -343,7 +349,7 @@ async def getGroups(request):
     return web.json_response(groups)
 
 
-async def handlePunishment(request):
+async def acceptAndReflect(request):
     data = await request.text()
     print(data)
     return web.json_response(data)
@@ -351,6 +357,6 @@ async def handlePunishment(request):
 
 app = web.Application()
 app.add_routes([web.get("/groups", getGroups)])
-app.add_routes([web.post("/punishment", handlePunishment)])
+app.add_routes([web.post("/punishment", acceptAndReflect)])
 app.add_routes([web.static("/", "../public", show_index=True, append_version=True)])
 web.run_app(app)
