@@ -2,7 +2,7 @@
 
 ## Description
 
-Welcome to :wine_glass: Vengeful Vineyard :angry:. This project was created for the sole purpose of :boom: punishing members in the student organization Online Linjeforening whenever they fail to perform their respective tasks. While we already have a functioning page called [RedWine](https://online.ntnu.no/redwine/), this page is old and outdated, and does not provide all the functions we wish it had - hence the need for an updated system.
+Welcome to Vengeful Vineyard :angry: :wine-glass:. <br> This project was created for the sole purpose of :boom: punishing members in the student organization Online Linjeforening whenever they fail to perform their respective tasks. While we already have a functioning page called [RedWine](https://online.ntnu.no/redwine/), this page is old and outdated, and does not provide all the functions we wish it had - hence the need for an updated system.
 
 ## Installation - git repository and setup
 
@@ -17,7 +17,7 @@ cd vengeful-vineyard
 
 You need npm, pip and Python3 installed on your computer.
 
-A separate README.md for installation can be found inside frontend/ and (coming soon<sup>tm</sup>) backend/.
+A separate README.md for installation can be found inside frontend/ and backend/(coming soon<sup>tm</sup>).
 For now, we have a mock API as our backend which can be found inside frontend/mock_api.
 
 ## Contributing
