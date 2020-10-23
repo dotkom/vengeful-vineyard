@@ -2,7 +2,7 @@
 
 ## Description
 
-Welcome to Vengeful Vineyard :angry: :wine-glass:
+:wine_glass: Welcome to Vengeful Vineyard :angry:
 
 This project was created for the sole purpose of :boom: punishing members in the student organization <i>Online Linjeforening</i> whenever they fail to perform their respective tasks. Their failure shall be documented on this page as a 'vinstraff'(wine punishment). While we already have a functioning page called [RedWine](https://online.ntnu.no/redwine/), this page is old and outdated, and does not provide all the functions we wish it had - hence the need for an updated system.
 
