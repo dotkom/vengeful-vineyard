@@ -14,6 +14,7 @@
           <Punishment {...punish} />
         {/each}
         <AddPunishment
+          name="{user.name}"
           punishmentTypes="{$GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].validPunishments}"
         />
       </div>
