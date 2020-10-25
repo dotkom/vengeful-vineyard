@@ -9,14 +9,20 @@
 <div class="punishmentContainer">
   {#each $GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].users as user (user.id)}
     <Accordion title="{user.name}" color="#223333">
-      <div class="accordion__content">
-        {#each user.punishments as punish}
-          <Punishment {...punish} />
-        {/each}
+      <div slot="title">
+        <p>Utestående: {user.debt}</p>
+        <p>Totalt betalt: {user.totalPaid}</p>
+      </div>
+      <div slot="content" class="accordion__content">
         <AddPunishment
           name="{user.name}"
           punishmentTypes="{$GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].validPunishments}"
         />
+        <br />
+        <br />
+        {#each user.punishments as punish}
+          <Punishment {...punish} />
+        {/each}
       </div>
     </Accordion>
   {/each}

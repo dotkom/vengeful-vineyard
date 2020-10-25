@@ -16,11 +16,14 @@
     style="background-color: {color}"
     on:click="{toggleAccordion}"
   >
-    {title}
+    <div class="accordion__title">
+      <p>{title}</p>
+      <slot name="title"/>
+    </div>
   </div>
   <div class="accordion__content" style="max-height: {height}px">
     <div class="accordion__text">
-      <slot />
+      <slot name="content"/>
     </div>
   </div>
 </div>

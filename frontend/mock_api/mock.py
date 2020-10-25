@@ -223,6 +223,7 @@ LAST_NAMES = [
 
 UserID = -1
 GroupID = -1
+PunishmentID = -1
 
 PUNISHMENTS = [
     "Øl",
@@ -284,13 +285,16 @@ def punishmentType(amount):
 
 
 def randomPunishment():
+    global PunishmentID
+    PunishmentID += 1
     price = random.randint(33, 500)
-    if chance():
-        verifiedBy = None
-    else:
+    if chance(25):
         verifiedBy = name()
+    else:
+        verifiedBy = None
 
     return {
+        "id": PunishmentID,
         "imageurl": punishmentType(price),
         "price": price,
         "reason": randomWords(random.randint(3, 15)),
@@ -303,7 +307,7 @@ def randomPunishment():
 
 def randomPunishments():
     punishments = []
-    for _ in range(random.randint(0, 4)):
+    for _ in range(random.randint(0, 10)):
         punishments.append(randomPunishment())
     return sorted(punishments, key=lambda x: x["givenTime"], reverse=True)
 
@@ -326,10 +330,15 @@ def getGroup():
 def randomUser():
     global UserID
     UserID += 1
+    punishments = randomPunishments()
+    debt = sum(p["price"] for p in punishments if p["verifiedBy"] is None)
+    totalPaid = sum(p["price"] for p in punishments if p["verifiedBy"] is not None)
     user = {
         "id": UserID,
         "name": name(),
-        "punishments": randomPunishments(),
+        "punishments": punishments,
+        "debt": debt,
+        "totalPaid": totalPaid,
         "active": chance(75),
     }
     return user
@@ -351,6 +360,7 @@ async def getGroups(request):
 
 async def acceptAndReflect(request):
     data = await request.text()
+    print(request)
     print(data)
     return web.json_response(data)
 
@@ -358,5 +368,7 @@ async def acceptAndReflect(request):
 app = web.Application()
 app.add_routes([web.get("/groups", getGroups)])
 app.add_routes([web.post("/punishment", acceptAndReflect)])
+app.add_routes([web.post("/validatePunishment/{number}", acceptAndReflect)])
+app.add_routes([web.delete("/validatePunishment/{number}", acceptAndReflect)])
 app.add_routes([web.static("/", "../public", show_index=True, append_version=True)])
 web.run_app(app)
