@@ -3,6 +3,7 @@
   import GroupLogos from "./GroupLogos.svelte";
   import GroupStore from "../../stores/groups";
   import { onMount } from "svelte";
+  import AddGroup from "./AddGroup.svelte";
 
   onMount(async () => {
     const res = await fetch("http://localhost:8080/groups");
@@ -14,6 +15,7 @@
 <div class="group_picker_container">
   <VvLogo />
   <GroupLogos />
+  <AddGroup />
 </div>
 
 <style lang="less">
