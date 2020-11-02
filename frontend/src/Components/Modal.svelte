@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let active = true;
+  export let active: boolean = true;
 
   const toggleModal = () => {
     active = !active;

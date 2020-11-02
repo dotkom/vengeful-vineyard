@@ -12,6 +12,8 @@ export interface User {
   id: number;
   name: string;
   punishments: Punishment[];
+  debt: number;
+  totalPaid: number;
   active: boolean;
 }
 

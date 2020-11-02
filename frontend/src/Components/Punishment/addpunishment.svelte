@@ -4,7 +4,12 @@
   export let punishmentTypes: string[] = [];
   export let name: string;
 
-  let punishments = [];
+  interface Punishment {
+    name: string;
+    number: number;
+  }
+
+  let punishments: Punishment[] = [];
   let reason: string = "";
   let showAdd: boolean = false;
   let selected: string;
@@ -22,7 +27,7 @@
     numberOfPunishments = 1;
   };
 
-  const removePunishment = (index) => {
+  const removePunishment = (index: number) => {
     punishments.splice(index, 1);
     punishments = punishments;
   };
@@ -38,7 +43,6 @@
     reason = "";
     showAdd = false;
     punishments = [];
-    alert(json);
   }
 </script>
 
