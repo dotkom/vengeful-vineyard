@@ -4,15 +4,15 @@
   import FooterGithub from "./FooterGithub.svelte";
 </script>
 
-<div class="footer">
+<footer>
   <FooterSign />
   <FooterGithub />
   <OnlineLogoFooter />
-</div>
+</footer>
 
 <style lang="less">
   @import "../../variables.less";
-  .footer {
+  footer {
     background: rgb(242, 242, 242);
     height: 220px;
     margin-top: 1em;
