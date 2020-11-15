@@ -1,7 +1,3 @@
-<script>
-  import Accordion from "../Left_navbar_components/Accordion.svelte";
-</script>
-
 <div class="leftLogo">
   <img src="assets/logo.svg" alt="vv logo" width="250" height="100" />
 </div>
