@@ -1,6 +1,3 @@
-<script lang="ts">
-</script>
-
 <div class="footer_sign">
   Fra
   <a href="mailto:dotkom@online.ntnu.no">Dotkom</a>

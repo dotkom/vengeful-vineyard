@@ -1,6 +1,3 @@
-<script lang="ts">
-</script>
-
 <div class="footer_logo">
   <a href="https://online.ntnu.no/">
     <img src="assets/online_logo.svg" alt="Online logo" />
