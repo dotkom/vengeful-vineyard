@@ -1,5 +1,5 @@
 <div class="leftLogo">
-  <h1>vv logo? elns</h1>
+  <img src="assets/logo.svg" alt="vv logo" width="250" height="100" />
 </div>
 
 <style lang="less">
@@ -7,6 +7,5 @@
   .leftLogo {
     left: 2%;
     top: 2%;
-    background-color: @white;
   }
 </style>
