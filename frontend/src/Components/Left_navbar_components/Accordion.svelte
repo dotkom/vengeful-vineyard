@@ -18,12 +18,12 @@
   >
     <div class="accordion__title">
       <p>{title}</p>
-      <slot name="title"/>
+      <slot name="title" />
     </div>
   </div>
   <div class="accordion__content" style="max-height: {height}px">
     <div class="accordion__text">
-      <slot name="content"/>
+      <slot name="content" />
     </div>
   </div>
 </div>
