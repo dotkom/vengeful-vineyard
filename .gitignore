@@ -1,5 +1,6 @@
 node_modules/*
 frontend/node_modules/*
+.mypy_cache
 
 .idea/
 .vscode/
@@ -7,6 +8,7 @@ node_modules/
 build
 .DS_Store
 *.tgz
+*.nix
 my-app*
 template/src/__tests__/__snapshots__/
 lerna-debug.log

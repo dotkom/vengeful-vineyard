@@ -15,6 +15,13 @@ class PunishmentSerializer(serializers.HyperlinkedModelSerializer):
     )
     type = serializers.PrimaryKeyRelatedField(queryset=PunishmentType.objects.all())
 
+    def validate(self, data):
+        group = VineyardGroup.objects.get(name=data["group"])
+        groupMembers = group.users.all()
+        if data["giver"] not in groupMembers or data["to"] not in groupMembers:
+            raise serializers.ValidationError("Giver and receiver of punishments must be in the same group!")
+        return data
+
     class Meta:
         model = Punishment
         fields = [
@@ -27,7 +34,6 @@ class PunishmentSerializer(serializers.HyperlinkedModelSerializer):
             "verifier",
             "verifiedDate",
         ]
-
 
 class PunishmentTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
