@@ -8,6 +8,6 @@
     background-color: @primary;
     height: 100%;
     margin-top: 30%;
-    border: 4px solid black;
+    //border: 4px solid black;
   }
 </style>
