@@ -32,13 +32,9 @@
     punishments = punishments;
   };
 
-  async function postPunishment() {
+  async function createPunishments() {
     const punishment = { punishments: punishments, reason: reason, name: name };
-    const res = await fetch("http://localhost:8080/punishment", {
-      method: "POST",
-      body: JSON.stringify(punishment),
-    });
-    const json = await res.json();
+    const json = postPunishment(punishments);
 
     reason = "";
     showAdd = false;
@@ -84,7 +80,7 @@
     <br />
     <br />
     <input type="text" bind:value="{reason}" placeholder="Begrunnelse" />
-    <Button on:click="{postPunishment}">Send straffer</Button>
+    <Button on:click="{createPunishments}">Send straffer</Button>
   </form>
 </Modal>
 
