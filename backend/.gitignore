@@ -87,4 +87,4 @@ __pycache__/
 local_settings.py
 
 .env
-database.db
+*.db
