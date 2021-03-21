@@ -1,2 +1,9 @@
-Django==3.0.7
-djangorestframework==3.11.0
+fastapi[all]
+uvicorn[standard]
+sqlalchemy
+black
+pytest-asyncio
+httpx
+pydantic
+mypy==0.812
+sqlalchemy-stubs

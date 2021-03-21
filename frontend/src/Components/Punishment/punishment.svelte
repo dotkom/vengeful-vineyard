@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from "../Button.svelte";
+  import { deletePunishment, postValidatePunishment } from "../../api.ts";
 
   export let id: number;
   export let imageurl: string;
@@ -20,24 +21,12 @@
     // Post request
     verifiedBy = "MyUsername";
     verifiedTime = "2020-10-25T17:12:04";
-
-    const res = await fetch(
-      "http://localhost:8080/validatePunishment/" + id.toString(),
-      {
-        method: "POST",
-      }
-    );
+    const res = postValidatePunishment(id);
   };
 
-  const deletePunishment = async () => {
+  const removePunishment = async () => {
     showPunishment = false;
-
-    const res = await fetch(
-      "http://localhost:8080/validatePunishment/" + id.toString(),
-      {
-        method: "DELETE",
-      }
-    );
+    const res = deletePunishment(id);
   };
 </script>
 
@@ -52,7 +41,7 @@
     <Button on:click="{validatePunishment}" color="success">
       Marker som betalt
     </Button>
-    <Button on:click="{deletePunishment}" color="danger">Slett</Button>
+    <Button on:click="{removePunishment}" color="danger">Slett</Button>
   {/if}
   <br />
   <br />

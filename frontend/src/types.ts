@@ -8,6 +8,13 @@ export interface Punishment {
   givenTime: string;
 }
 
+export interface PunishmentType {
+  id: number;
+  name: string;
+  value: number;
+  imageurl: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -22,6 +29,12 @@ export interface Group {
   name: string;
   rulesUrl: string;
   logoUrl: string;
-  validPunishments: string[];
-  users: User[];
+  punishmentTypes: PunishmentType[];
+  members: User[];
+}
+
+export interface CreatePunishment {
+  name: string;
+  reason: string;
+  punishments: Punishment[];
 }

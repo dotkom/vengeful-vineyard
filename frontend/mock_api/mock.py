@@ -5,7 +5,7 @@ import random
 import string
 from datetime import datetime
 
-from aiohttp import web
+from aiohttp import web, BasicAuth, ClientSession
 
 GROUPIMAGES = {
     "Dotkom": "https://i.ibb.co/tJrB8kn/dotkom.png",
@@ -226,24 +226,24 @@ GroupID = -1
 PunishmentID = -1
 
 PUNISHMENTS = [
-    "Øl",
-    "Vin",
-    "Sprit",
-    "Vaffel",
-    "Kake",
-    "Dworek",
-    "Absithe",
-    "Karaffel",
-    "Ubetinget fengsel",
-    "Gapestokk",
-    "Betinget fengsel",
-    "Pryling",
-    "Vanntortur",
-    "Pisking",
-    "Kokes levende",
-    "Syrebad",
-    "Brennmerking",
-    "Flåing",
+    {"id": 1, "name": "Øl"},
+    {"id": 2, "name": "Vin"},
+    {"id": 3, "name": "Sprit"},
+    {"id": 4, "name": "Vaffel"},
+    {"id": 5, "name": "Kake"},
+    {"id": 6, "name": "Dworek"},
+    {"id": 7, "name": "Absithe"},
+    {"id": 8, "name": "Karaffel"},
+    {"id": 9, "name": "Ubetinget fengsel"},
+    {"id": 10, "name": "Gapestokk"},
+    {"id": 11, "name": "Betinget fengsel"},
+    {"id": 12, "name": "Pryling"},
+    {"id": 13, "name": "Vanntortur"},
+    {"id": 14, "name": "Pisking"},
+    {"id": 15, "name": "Kokes levende"},
+    {"id": 16, "name": "Syrebad"},
+    {"id": 17, "name": "Brennmerking"},
+    {"id": 18, "name": "Flåing"},
 ]
 
 
@@ -323,7 +323,7 @@ def getGroup():
         "rulesUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         "users": getUsers(),
         "logoUrl": GROUPIMAGES[name],
-        "validPunishments": random.sample(PUNISHMENTS, 10),
+        "punishmentTypes": random.sample(PUNISHMENTS, 10),
     }
 
 
@@ -352,11 +352,15 @@ def getUsers():
 
 
 async def getGroups(request):
-    groups = []
-    for _ in range(random.randint(3, 6)):
-        groups.append(getGroup())
-    return web.json_response(groups)
-
+    #admin = BasicAuth('admin', 'admin')
+    async with ClientSession() as session:
+        async with session.get("http://localhost:8888/group") as resp:
+            r = await resp.json()
+            return web.json_response(r)
+    #groups = []
+    #for _ in range(random.randint(3, 6)):
+    #    groups.append(getGroup())
+    #return web.json_response(groups)
 
 async def acceptAndReflect(request):
     data = await request.text()

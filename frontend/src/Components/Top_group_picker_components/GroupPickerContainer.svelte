@@ -4,11 +4,11 @@
   import GroupStore from "../../stores/groups";
   import { onMount } from "svelte";
   import AddGroup from "./AddGroup.svelte";
+  import { getGroups } from "../../api.ts";
 
   onMount(async () => {
-    const res = await fetch("http://localhost:8080/groups");
-    const json = await res.json();
-    $GroupStore = { currentGroup: json[0].name, groups: json };
+    const groups = await getGroups()
+    $GroupStore = { currentGroup: groups[0].name, groups: groups };
   });
 </script>
 
