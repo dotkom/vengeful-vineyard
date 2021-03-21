@@ -1,9 +1,10 @@
 <script lang="ts">
   import GroupPickerContainer from "./Components/Top_group_picker_components/GroupPickerContainer.svelte";
   import SortNav from "./Components/Left_navbar_components/SortNav.svelte";
-  import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContainer.svelte";
+  import PunishmentGrid from "./Components/PunishmentDisplay/PunishmentGrid.svelte";
   import SideBar from "./Components/Left_navbar_components/SideBar.svelte";
 </script>
+
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
 <link
@@ -22,12 +23,15 @@
     <SideBar />
     <div class="punishments">
       <h1 class="title">Straffer</h1>
-      <PunishmentContainer />
+      <PunishmentGrid />
     </div>
   </div>
 </div>
 
-<style lang="less">
+<style lang="less" global>
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
   @import "variables.less";
   .body_content {
     display: flex;

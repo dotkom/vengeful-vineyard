@@ -12,20 +12,24 @@
     "@rollup/plugin-node-resolve": "^8.0.0",
     "@rollup/plugin-typescript": "^4.0.0",
     "@tsconfig/svelte": "^1.0.0",
-    "less": "^3.12.2",
-    "prettier": "^2.1.2",
-    "prettier-plugin-svelte": "^1.4.1",
-    "rollup": "^2.32.0",
+    "autoprefixer": "^10.2.5",
+    "less": "^3.13.1",
+    "postcss": "^8.2.7",
+    "postcss-load-config": "^3.0.1",
+    "prettier": "^2.2.1",
+    "prettier-plugin-svelte": "^1.4.2",
+    "rollup": "^2.40.0",
     "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^6.0.0",
+    "rollup-plugin-svelte": "^6.1.1",
     "rollup-plugin-terser": "^7.0.0",
-    "svelte": "^3.29.0",
-    "svelte-check": "^1.0.60",
-    "svelte-preprocess": "^4.5.1",
-    "tslib": "^2.0.3",
-    "typescript": "^3.9.3"
+    "svelte": "^3.35.0",
+    "svelte-check": "^1.2.3",
+    "svelte-preprocess": "^4.6.9",
+    "tailwindcss": "^2.0.3",
+    "tslib": "^2.1.0",
+    "typescript": "^3.9.9"
   },
   "dependencies": {
-    "sirv-cli": "^1.0.7"
+    "sirv-cli": "^1.0.11"
   }
 }
