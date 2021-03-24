@@ -49,8 +49,9 @@
     height: 50px;
     background-color: @primary;
     padding: 5px;
-    color: @secondary;
+    color: white;
     cursor: pointer;
+    font-family: "Montserrat", sans-serif;
     display: flex;
     align-items: center;
     border: none;
