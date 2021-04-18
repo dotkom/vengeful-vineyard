@@ -1,6 +1,7 @@
 <script lang="ts">
   import GroupStore from "../../stores/groups";
   import GroupButton from "./GroupButton.svelte";
+  //import { getGroups } from "../../api";
 </script>
 
 <div class="groupLogosContainer">
