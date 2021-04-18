@@ -79,7 +79,7 @@ def create_punishment_type(
 
 @app.post("/group/{group_id}/{user_id}", tags=["Group"])
 def add_user_to_group(
-    user_id: int, group_id: int, db: Session = Depends(get_db)
+    user_id: int, group_id: int, admin: bool = False, db: Session = Depends(get_db)
 ) -> models.UserGroupLink:
     db_group = crud.get_group(db, group_id=group_id)
     if db_group is None:
@@ -97,39 +97,55 @@ def add_user_to_group(
         .first()
     )
     if not userInGroup:
-        return crud.add_user_to_group(db, db_user, db_group)
+        return crud.add_user_to_group(db, db_user, db_group, admin)
     raise HTTPException(status_code=400, detail="User is already in group")
 
 
 @app.post(
-    "/group/{group_id}/{user_id}/punishment",
+    "/punishment",
     response_model=schemas.Punishment,
     tags=["Punishment"],
 )
 def create_punishment_for_user(
-    user_id: int,
-    group_id: int,
-    punishment: schemas.PunishmentCreate,
+    punishment: schemas.PunishmentBase,
     db: Session = Depends(get_db),
 ) -> models.Punishment:
     return crud.create_user_punishment(
-        db=db, punishment=punishment, user_id=user_id, group_id=group_id
+        db=db,
+        punishment=punishment,
+        user_id=punishment.givenTo_id,
+        group_id=punishment.group_id,
     )
 
 
 @app.post(
-    "/group/{group_id}/{user_id}/punishment/{punishment_id}/validate",
+    "/punishment/{punishment_id}/verify",
+    response_model=schemas.Punishment,
     tags=["Punishment"],
 )
-def validate_punishment_for_user(
-    user_id: int, group_id: int, punishment_id: int, db: Session = Depends(get_db)
+def verify_punishment_for_user(
+    punishment_id: int, db: Session = Depends(get_db)
 ) -> models.Punishment:
-    db_user = crud.get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="user not found")
-    db_user.punishments[punishment_id].verifiedTime = datetime.now()
-    save(db_user)
-    pass
+    punishment = crud.get_punishment(db, punishment_id)
+    if not punishment:
+        raise HTTPException(status_code=400, detail="Punishment does not exist")
+    if punishment.verifiedTime is None:
+        punishment.verifiedTime = datetime.now()
+        db.commit()
+        return punishment
+    raise HTTPException(status_code=400, detail="Punishment is already verified")
+
+
+@app.delete(
+    "/punishment/{punishment_id}",
+    tags=["Punishment"],
+)
+def delete_punishment(punishment_id: int, db: Session = Depends(get_db)):
+    punishment = crud.get_punishment(db, punishment_id)
+    if not punishment:
+        raise HTTPException(status_code=400, detail="Punishment does not exist")
+    db.query(models.Punishment).filter_by(id=punishment_id).delete()
+    db.commit()
 
 
 if __name__ == "__main__":
