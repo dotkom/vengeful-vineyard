@@ -11,6 +11,20 @@ module.exports = {
   },
   darkMode: false, // or 'media' or 'class'
   theme: {
+    colors: {
+      primary: {
+        100: "#73A8CC",
+        250: "#4C90BF",
+        500: "#0060A3",
+        750: "#00528B",
+        1000:"#004372",
+      },
+      secondary: "#FAA21B",
+      warning: "#FFC000",
+      error: "#DF2020",
+      success: "#09AA09",
+      info: "#0A94C2",
+    },
     extend: {},
   },
   variants: {
