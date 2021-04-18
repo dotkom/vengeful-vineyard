@@ -74,15 +74,18 @@
   }
 
   /* Style the accordion chevron icon */
-  .accordion__icon {
+  /* .accordion__icon {
     margin-left: auto;
     transition: transform 0.6s ease;
   }
+  */
 
   /* Style to rotate icon when state is active */
+  /*
   .rotate {
     transform: rotate(90deg);
   }
+  */
 
   /* Style the accordion content panel. Note: hidden by default */
   .accordion__content {

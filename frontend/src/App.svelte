@@ -2,7 +2,7 @@
   import Navbar from "./Components/Top_group_picker_components/Navbar.svelte";
   //import SortNav from "./Components/Left_navbar_components/SortNav.svelte";
   import PunishmentGrid from "./Components/PunishmentDisplay/PunishmentGrid.svelte";
-  import SideBar from "./Components/Left_navbar_components/SideBar.svelte";
+  import SideBar from "./Components/Left_navbar_components/SideBar2.svelte";
   import GroupLogos from "./Components/Top_group_picker_components/GroupLogos.svelte";
 </script>
 
