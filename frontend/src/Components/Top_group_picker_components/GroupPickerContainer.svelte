@@ -2,11 +2,15 @@
   import VvLogo from "./VvLogo.svelte";
   import GroupStore from "../../stores/groups";
   import { onMount } from "svelte";
+<<<<<<< HEAD
+=======
+  import AddGroup from "./AddGroup.svelte";
+  import { getGroups } from "../../api.ts";
+>>>>>>> 5adb33e0b4c1a35dcf5c86fb9e5cbf690a324686
 
   onMount(async () => {
-    const res = await fetch("http://localhost:8080/groups");
-    const json = await res.json();
-    $GroupStore = { currentGroup: json[0].name, groups: json };
+    const groups = await getGroups()
+    $GroupStore = { currentGroup: groups[0].name, groups: groups };
   });
 </script>
 
