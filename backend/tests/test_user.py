@@ -103,3 +103,47 @@ class TestUserInGroup:
         assert response.json()[0]["punishmentTypes"] == [
             {"name": "Vin", "value": 100, "logoUrl": "http://example.com", "id": 1}
         ]
+
+    @pytest.mark.asyncio
+    async def test_create_punishment_on_user(self, client):
+        async with client:
+            response = await client.post(
+                "/punishment",
+                json={
+                    "reason": "Good",
+                    "type_id": 1,
+                    "givenTo_id": 1,
+                    "group_id": 1,
+                },
+            )
+        assert response.status_code == 200
+        assert response.json()["reason"] == "Good"
+
+    @pytest.mark.asyncio
+    async def test_verify_punishment(self, client):
+        async with client:
+            response = await client.post("/punishment/1/verify")
+        assert response.status_code == 200
+        assert response.json()["verifiedTime"] is not None
+
+    @pytest.mark.asyncio
+    async def test_get_user_with_punishment(self, client):
+        async with client:
+            response = await client.get("/user")
+        assert response.status_code == 200
+        punishments = response.json()[0]["punishments"]
+        assert len(punishments) == 1
+        assert punishments[0]["verifiedTime"] is not None
+
+    @pytest.mark.asyncio
+    async def test_delete_punishment(self, client):
+        async with client:
+            response = await client.delete("/punishment/1")
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_verify_deleted_punishment(self, client):
+        async with client:
+            response = await client.get("/user")
+        punishments = response.json()[0]["punishments"]
+        assert len(punishments) == 0

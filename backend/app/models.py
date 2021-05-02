@@ -43,13 +43,13 @@ class Punishment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     reason = Column(String)
-    givenBy = Column(Integer, ForeignKey("users.id"), nullable=True)
+    givenBy_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     givenTo_id = Column(Integer, ForeignKey("users.id"))
     group_id = Column(Integer, ForeignKey("groups.id"))
     givenTime = Column(DateTime, server_default=func.now())
-    verifiedBy = Column(Integer, ForeignKey("users.id"), nullable=True)
+    verifiedBy_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     verifiedTime = Column(DateTime, nullable=True)
-    type = Column(Integer, ForeignKey("punishment_types.id"))
+    type_id = Column(Integer, ForeignKey("punishment_types.id"))
 
 
 class PunishmentType(Base):
