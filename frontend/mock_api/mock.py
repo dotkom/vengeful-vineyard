@@ -363,15 +363,10 @@ async def createPunishment(request):
 
 
 async def getGroups(request):
-    #admin = BasicAuth('admin', 'admin')
-    #async with ClientSession() as session:
-    #    async with session.get("http://localhost:8888/group") as resp:
-    #        r = await resp.json()
-    #        return web.json_response(r)
-    groups = []
-    for _ in range(random.randint(3, 6)):
-        groups.append(getGroup())
-    return web.json_response(groups)
+    async with ClientSession() as session:
+        async with session.get(f"{APIURL}/group") as resp:
+            r = await resp.json()
+            return web.json_response(r)
 
 async def acceptAndReflect(request):
     data = await request.text()
