@@ -1,7 +1,6 @@
 <script lang="ts">
   import Button from "../Button.svelte";
-  import { deletePunishment, postValidatePunishment } from "../../api.ts";
-
+  import { deletePunishment, postValidatePunishment } from "../../api.ts";
   export let id: number;
   export let imageurl: string;
   export let price: number;
@@ -10,20 +9,16 @@
   export let verifiedTime: string | null;
   export let givenBy: string;
   export let givenTime: string;
-
   let showPunishment: boolean = true;
-
   const ISO8601toString = (time: string) => {
     return time.replace("T", " ");
   };
-
   const validatePunishment = async () => {
     // Post request
     verifiedBy = "MyUsername";
     verifiedTime = "2020-10-25T17:12:04";
     const res = postValidatePunishment(id);
   };
-
   const removePunishment = async () => {
     showPunishment = false;
     const res = deletePunishment(id);

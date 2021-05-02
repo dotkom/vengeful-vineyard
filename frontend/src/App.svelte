@@ -5,6 +5,7 @@
   import SideBar from "./Components/Left_navbar_components/SideBar.svelte";
   import GroupLogos from "./Components/Top_group_picker_components/GroupLogos.svelte";
   import Footer from "./Components/Footer/Footer.svelte";
+import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContainer.svelte";
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -24,7 +25,11 @@
     <SideBar />
     <div class="punishments">
       <GroupLogos />
+<<<<<<< HEAD
       <PunishmentContainer />
+=======
+      <PunishmentContainer/>
+>>>>>>> 1793c66 (removes excess cols)
     </div>
   </div>
   <Footer />

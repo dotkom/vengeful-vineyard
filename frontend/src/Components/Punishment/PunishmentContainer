@@ -1,0 +1,8 @@
+<script>
+    import Punishment from "PunishmentContainer.svelte";
+</script>
+
+
+<style lang="less">
+
+</style>

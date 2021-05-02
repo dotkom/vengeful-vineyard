@@ -1,6 +1,5 @@
 <script lang="ts">
   import GroupStore from "../../stores/groups";
-
   import Accordion from "../Left_navbar_components/Accordion.svelte";
   import Punishment from "../Punishment/punishment.svelte";
   import AddPunishment from "../Punishment/addpunishment.svelte";
