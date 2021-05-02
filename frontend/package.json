@@ -1,31 +1,26 @@
 {
-  "name": "svelte-app",
+  "name": "Vengeful vineyard",
   "version": "1.0.0",
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "start": "sirv public",
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview",
     "validate": "svelte-check"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^14.0.0",
-    "@rollup/plugin-node-resolve": "^8.0.0",
-    "@rollup/plugin-typescript": "^4.0.0",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.7",
     "@tsconfig/svelte": "^1.0.0",
     "less": "^3.12.2",
     "prettier": "^2.1.2",
     "prettier-plugin-svelte": "^1.4.1",
-    "rollup": "^2.32.0",
-    "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^6.0.0",
-    "rollup-plugin-terser": "^7.0.0",
-    "svelte": "^3.29.0",
+    "svelte": "^3.37.0",
     "svelte-check": "^1.0.60",
-    "svelte-preprocess": "^4.5.1",
+    "svelte-preprocess": "^4.7.2",
     "tslib": "^2.0.3",
-    "typescript": "^3.9.3"
+    "typescript": "^4.2.4",
+    "vite": "^2.2.3"
   },
   "dependencies": {
-    "sirv-cli": "^1.0.7"
+    "pnpm": "^6.2.3"
   }
 }
