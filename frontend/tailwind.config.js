@@ -24,11 +24,14 @@ module.exports = {
       error: "#DF2020",
       success: "#09AA09",
       info: "#0A94C2",
+      grey: "#E0E0E0",
     },
     extend: {},
   },
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/custom-forms'),
+  ],
 }

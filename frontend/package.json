@@ -11,6 +11,7 @@
     "@rollup/plugin-commonjs": "^14.0.0",
     "@rollup/plugin-node-resolve": "^8.0.0",
     "@rollup/plugin-typescript": "^4.0.0",
+    "@tailwindcss/custom-forms": "^0.2.1",
     "@tsconfig/svelte": "^1.0.0",
     "autoprefixer": "^10.2.5",
     "less": "^3.13.1",
