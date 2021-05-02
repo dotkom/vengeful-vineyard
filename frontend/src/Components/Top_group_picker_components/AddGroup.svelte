@@ -6,7 +6,6 @@
 
   const toggleGroupAddModal = () => {
     showAdd = true;
-    console.log(showAdd);
   };
 
   const addGroup = () => {

@@ -5,6 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "start": "vite preview",
+    "watch": "vite build --watch",
     "validate": "svelte-check"
   },
   "devDependencies": {
