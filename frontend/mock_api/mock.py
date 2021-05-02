@@ -7,6 +7,9 @@ from datetime import datetime
 
 from aiohttp import web, BasicAuth, ClientSession
 
+
+APIURL="http://localhost:8888"
+
 GROUPIMAGES = {
     "Dotkom": "https://i.ibb.co/tJrB8kn/dotkom.png",
     "Arrkom": "https://i.ibb.co/pWdSC2w/arrkom.png",
@@ -344,14 +347,23 @@ def randomUser():
     return user
 
 
-def getUsers():
-    users = []
-    for _ in range(random.randint(10, 30)):
-        users.append(randomUser())
-    return users
+async def getUsers(request):
+    async with ClientSession() as session:
+        async with session.get(f"{APIURL}/user") as resp:
+            r = await resp.json()
+            return web.json_response(r)
+
+
+async def createPunishment(request):
+    async with ClientSession() as session:
+        j = await request.json()
+        async with session.post(f"{APIURL}/punishment", json=j) as resp:
+            r = await resp.json()
+            return web.json_response(r)
 
 
 async def getGroups(request):
+<<<<<<< HEAD
     #admin = BasicAuth('admin', 'admin')
     #async with ClientSession() as session:
     #    async with session.get("http://localhost:8888/group") as resp:
@@ -361,6 +373,12 @@ async def getGroups(request):
     for _ in range(random.randint(3, 6)):
         groups.append(getGroup())
     return web.json_response(groups)
+=======
+    async with ClientSession() as session:
+        async with session.get(f"{APIURL}/group") as resp:
+            r = await resp.json()
+            return web.json_response(r)
+>>>>>>> 55ebf3066d2cb9f16a6ddb3754bb3e7edd32bc01
 
 async def acceptAndReflect(request):
     data = await request.text()
@@ -370,9 +388,10 @@ async def acceptAndReflect(request):
 
 
 app = web.Application()
-app.add_routes([web.get("/groups", getGroups)])
-app.add_routes([web.post("/punishment", acceptAndReflect)])
+app.add_routes([web.get("/group", getGroups)])
+app.add_routes([web.get("/user", getUsers)])
+app.add_routes([web.post("/punishment", createPunishment)])
 app.add_routes([web.post("/validatePunishment/{number}", acceptAndReflect)])
 app.add_routes([web.delete("/validatePunishment/{number}", acceptAndReflect)])
-app.add_routes([web.static("/", "../public", show_index=True, append_version=True)])
+app.add_routes([web.static("/", "../dist", show_index=True, append_version=True)])
 web.run_app(app)

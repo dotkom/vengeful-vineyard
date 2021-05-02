@@ -25,14 +25,18 @@ def create_user(db: Session, user: schemas.UserCreate) -> models.User:
     return db_user
 
 
+def delete_user_punishment(db: Session, punishment_id: int) -> models.Punishment:
+    return db_punish
+
+
 def create_user_punishment(
-    db: Session, punishment: schemas.PunishmentCreate, user_id: int, group_id: int
+    db: Session, punishment: schemas.PunishmentBase, user_id: int, group_id: int
 ) -> models.Punishment:
     db_punish = models.Punishment(
         reason=punishment.reason,
-        givenTo_id=user_id,
-        type=punishment.punishmentType_id,
-        group_id=group_id,
+        givenTo_id=punishment.givenTo_id,
+        type_id=punishment.type_id,
+        group_id=punishment.group_id,
     )
     db.add(db_punish)
     db.commit()
@@ -61,9 +65,9 @@ def create_group(db: Session, group: schemas.GroupCreate) -> models.Group:
 
 
 def add_user_to_group(
-    db: Session, user: schemas.User, group: schemas.Group
+    db: Session, user: models.User, group: models.Group, admin: bool
 ) -> models.UserGroupLink:
-    db_link = models.UserGroupLink(user_id=user.id, group_id=group.id)
+    db_link = models.UserGroupLink(user_id=user.id, group_id=group.id, admin=admin)
     db.add(db_link)
     db.commit()
     db.refresh(db_link)
@@ -73,6 +77,14 @@ def add_user_to_group(
 def get_punishment_types(db: Session) -> List[models.PunishmentType]:
     return db.query(models.PunishmentType).all()
 
+def create_default_punishment_types(db: Session, group_id: int):
+    beer = models.PunishmentType(name="Øl", value=33, logoUrl="http://link.com", group_id=group_id)
+    wine = models.PunishmentType(name="Vin", value=100, logoUrl="http://link.com", group_id=group_id)
+    vodka = models.PunishmentType(name="Dworek", value=300, logoUrl="http://link.com", group_id=group_id)
+    db.add(beer)
+    db.add(wine)
+    db.add(vodka)
+    db.commit()
 
 def create_punishment_type(
     db: Session, group_id: int, item: schemas.PunishmentTypeCreate
@@ -84,7 +96,11 @@ def create_punishment_type(
     return db_item
 
 
-def validate_punishment(db: Session, item: schemas.Punishment) -> models.Punishment:
+def get_punishment(db: Session, punishment_id: int) -> Optional[models.Punishment]:
+    return db.query(models.Punishment).filter_by(id=punishment_id).first()
+
+
+def verify_punishment(db: Session, item: schemas.Punishment) -> models.Punishment:
     db_item = models.Punishment(**item.dict())
     db.commit()
     db.refresh(db_item)

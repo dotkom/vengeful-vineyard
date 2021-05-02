@@ -22,18 +22,16 @@ class PunishmentType(PunishmentTypeBase):
 
 
 class PunishmentBase(BaseModel):
+    givenTo_id: int
+    group_id: int
     reason: str
-
-
-class PunishmentCreate(PunishmentBase):
-    punishmentType_id: int
+    type_id: int
 
 
 class Punishment(PunishmentBase):
     id: int
-    givenTo_id: int
     verifiedBy: Optional[int]
-    verifiedTime: Optional[str]
+    verifiedTime: Optional[datetime]
     givenTime: datetime
 
     class Config:
