@@ -5,8 +5,8 @@
   import { getGroups } from "../../api";
 
   onMount(async () => {
-    const groups = await getGroups();
-    $GroupStore = { currentGroup: groups[0].name, groups: groups };
+    const json = await getGroups();
+    $GroupStore = { currentGroup: json[0].name, groups: json };
   });
 </script>
 

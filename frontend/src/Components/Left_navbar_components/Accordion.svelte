@@ -1,8 +1,8 @@
 <script lang="ts">
   export let title: string;
-  export let color: string = "#0d5474";
+  export let color: string = "#004372";
+  export let open: boolean = false;
   let height: number = 0;
-  let open: boolean = false;
 
   const toggleAccordion = () => {
     open = !open;
@@ -18,12 +18,12 @@
   >
     <div class="accordion__title">
       <p>{title}</p>
-      <slot name="title"/>
+      <slot name="title" />
     </div>
   </div>
   <div class="accordion__content" style="max-height: {height}px">
     <div class="accordion__text">
-      <slot name="content"/>
+      <slot name="content" />
     </div>
   </div>
 </div>
@@ -47,16 +47,18 @@
   .accordion {
     width: 100%;
     height: 50px;
-    background-color: @primary;
     padding: 5px;
-    color: @secondary;
+    color: white;
     cursor: pointer;
+    font-family: "Montserrat", sans-serif;
     display: flex;
     align-items: center;
     border: none;
     outline: none;
     margin-bottom: 2px;
     transition: background-color 0.2s ease;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 6px;
   }
 
   /* Adds a background color to the button if it is clicked on and when you move the mouse over it */
@@ -73,15 +75,17 @@
   }
 
   /* Style the accordion chevron icon */
+  /*
   .accordion__icon {
     margin-left: auto;
     transition: transform 0.6s ease;
-  }
+  }*/
 
   /* Style to rotate icon when state is active */
+  /*
   .rotate {
     transform: rotate(90deg);
-  }
+  }*/
 
   /* Style the accordion content panel. Note: hidden by default */
   .accordion__content {

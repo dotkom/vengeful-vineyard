@@ -4,10 +4,11 @@
 </script>
 
 <div>
-  <Accordion title="Filtre">
+  <Accordion title="Bytt gruppe" />
+  <Accordion title="Sorter etter">
     <AccordionContent />
   </Accordion>
-  <Accordion title="Wall of Shame" />
-  <Accordion title="Enda flere options" />
-  <Accordion title="Flere?? options?? Pog" />
+  <Accordion title="Mine straffer" />
+  <Accordion title="Legg til straff" />
+  <Accordion title="Legg til flere typer straffer" />
 </div>
