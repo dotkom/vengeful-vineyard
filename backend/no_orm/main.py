@@ -84,3 +84,18 @@ async def get_group(group_id: int):
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
     return dbToGroup(group)
+
+
+@app.get("/user/{user_id}/group", tags=["User"])
+async def get_user_groups(user_id: int):
+    groups = cur.execute(
+        """SELECT name from group_members
+           INNER JOIN users on users.user_id = group_members.user_id
+           INNER JOIN groups on groups.group_id = group_members.group_id
+           where group_members.user_id = :user_id""",
+        {"user_id": user_id},
+    )
+    groups = groups.fetchall()
+    if not groups:
+        raise HTTPException(status_code=404, detail="User groups could not be found")
+    return {"groups": list(groups)}
