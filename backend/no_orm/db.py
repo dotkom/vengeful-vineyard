@@ -3,7 +3,7 @@ from typing import Dict
 
 from fastapi import HTTPException
 
-from models import User
+from models import Group, User
 
 con = sqlite3.connect("example.db")
 cur = con.cursor()
@@ -21,6 +21,17 @@ async def insertUser(user: User) -> Dict[str, int]:
         f"INSERT INTO users(first_name, last_name, age, phone) VALUES (?, ?, ?, ?)"
     )
     values = (user.first_name, user.last_name, user.age, user.phone)
+    try:
+        cur.execute(statement, values)
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=400, detail="Database integrity violated")
+    con.commit()
+    return {"id": cur.lastrowid}
+
+
+async def insertGroup(group: Group) -> Dict[str, int]:
+    statement = f"INSERT INTO groups(name, rules) VALUES (?, ?)"
+    values = (group.name, group.rules)
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError:

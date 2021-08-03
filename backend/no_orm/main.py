@@ -55,10 +55,16 @@ async def get_group(group_id: int) -> Group:
     return dbToGroup(group)
 
 
+@app.post("/group", tags=["Group"])
+async def post_group(group: Group) -> Dict[str, int]:
+    # TODO: Validation
+    return await db.insertGroup(group)
+
+
 @app.get("/user/{user_id}/group", tags=["User"])
-async def get_user_groups(user_id: int) -> Dict[str, List[str]]:
+async def get_user_groups(user_id: int) -> Dict[str, Any]:
     groups = db.cur.execute(
-        """SELECT name from group_members
+        """SELECT group_members.group_id, name from group_members
            INNER JOIN users on users.user_id = group_members.user_id
            INNER JOIN groups on groups.group_id = group_members.group_id
            where group_members.user_id = :user_id""",
@@ -66,4 +72,5 @@ async def get_user_groups(user_id: int) -> Dict[str, List[str]]:
     ).fetchall()
     if not groups:
         raise HTTPException(status_code=404, detail="User groups could not be found")
-    return {"groups": list(groups)}
+
+    return {"groups": list(map(lambda x: {"id": x[0], "group": x[1]}, groups))}
