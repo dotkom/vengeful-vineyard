@@ -61,6 +61,11 @@ async def post_group(group: Group) -> Dict[str, int]:
     return await db.insertGroup(group)
 
 
+@app.post("/group/{group_id}/{user_id}", tags=["Group"])
+async def add_user_to_group(group_id: int, user_id: int) -> Dict[str, int]:
+    return await db.insertUserInGroup(group_id, user_id)
+
+
 @app.get("/user/{user_id}/group", tags=["User"])
 async def get_user_groups(user_id: int) -> Dict[str, Any]:
     groups = db.cur.execute(
