@@ -1,72 +1,41 @@
-# No ORM version
 import sqlite3
+from typing import Any, Dict, List, Tuple
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+
+import db
+from models import Group, User
+
+db.loadSchema("schema.sql")
 
 
-class Group(BaseModel):
-    id: int
-    name: str
-    rules: str
-
-
-class User(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    age: int
-    phone: str
-
-
-con = sqlite3.connect("example.db")
-cur = con.cursor()
-with open("schema.sql", "r") as f:
-    schema = f.readlines()
-    schema = "".join([line.strip() for line in schema])
-cur.executescript(schema)
-
-
-def dbToGroup(dbGroup) -> Group:
+def dbToGroup(dbGroup: sqlite3.Cursor) -> Group:
     return Group(**dict(zip(Group.__fields__.keys(), dbGroup)))
 
 
-def dbToUser(dbUser) -> User:
+def dbToUser(dbUser: sqlite3.Cursor) -> User:
     return User(**dict(zip(User.__fields__.keys(), dbUser)))
-
-
-def insertUser(user: User):
-    statement = (
-        f"INSERT INTO users(first_name, last_name, age, phone) VALUES (?, ?, ?, ?)"
-    )
-    values = (user.first_name, user.last_name, user.age, user.phone)
-    try:
-        cur.execute(statement, values)
-    except sqlite3.IntegrityError:
-        raise HTTPException(status_code=400, detail="Database integrity violated")
-    con.commit()
-    return {"id": cur.lastrowid}
 
 
 app = FastAPI()
 
 
 @app.get("/user", tags=["User"])
-async def get_users():
-    users = cur.execute("""SELECT * FROM users""")
+async def get_users() -> Dict[str, List[Any]]:
+    users = db.cur.execute("""SELECT * FROM users""")
     return {"users": list(map(dbToUser, users))}
 
 
 @app.post("/user", tags=["User"])
-async def post_user(user: User):
+async def post_user(user: User) -> Dict[str, int]:
     if user.age <= 18:
         raise HTTPException(status_code=400, detail="User is too young!")
-    return insertUser(user)
+    return await db.insertUser(user)
 
 
 @app.get("/user/{user_id}", tags=["User"])
-async def get_user(user_id: int):
-    user = cur.execute(
+async def get_user(user_id: int) -> User:
+    user = db.cur.execute(
         """SELECT * FROM users where user_id = :user_id""", {"user_id": user_id}
     )
     user = user.fetchone()
@@ -76,8 +45,8 @@ async def get_user(user_id: int):
 
 
 @app.get("/group/{group_id}", tags=["Group"])
-async def get_group(group_id: int):
-    group = cur.execute(
+async def get_group(group_id: int) -> Group:
+    group = db.cur.execute(
         """SELECT * FROM groups where group_id = :group_id""", {"group_id": group_id}
     )
     group = group.fetchone()
@@ -87,15 +56,14 @@ async def get_group(group_id: int):
 
 
 @app.get("/user/{user_id}/group", tags=["User"])
-async def get_user_groups(user_id: int):
-    groups = cur.execute(
+async def get_user_groups(user_id: int) -> Dict[str, List[str]]:
+    groups = db.cur.execute(
         """SELECT name from group_members
            INNER JOIN users on users.user_id = group_members.user_id
            INNER JOIN groups on groups.group_id = group_members.group_id
            where group_members.user_id = :user_id""",
         {"user_id": user_id},
-    )
-    groups = groups.fetchall()
+    ).fetchall()
     if not groups:
         raise HTTPException(status_code=404, detail="User groups could not be found")
     return {"groups": list(groups)}
