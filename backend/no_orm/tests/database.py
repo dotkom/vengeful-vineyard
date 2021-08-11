@@ -1,0 +1,19 @@
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
+
+from app.main import app
+from app.db import reconnect
+
+import pytest
+import os
+
+
+@pytest.fixture(scope="class")
+def client():
+    reconnect()
+    # try:
+    #    os.remove("test.db")
+    # except Exception:
+    #    pass
+    c = AsyncClient(app=app, base_url="http://test")
+    return c

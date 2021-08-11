@@ -1,0 +1,4 @@
+pytest-asyncio
+httpx
+mypy
+black

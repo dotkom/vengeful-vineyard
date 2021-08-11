@@ -1,19 +1,38 @@
 import sqlite3
+import os
 from typing import Dict
 
 from fastapi import HTTPException
 
-from models import Group, User
+from app.models import Group, User
 
-con = sqlite3.connect("example.db")
-cur = con.cursor()
+con = None
+cur = None
+schemaFile = ""
 
 
 def loadSchema(file: str) -> None:
+    global schemaFile
+    schemaFile = file
     with open(file, "r") as f:
         schema = f.readlines()
         schemaStr = "".join([line.strip() for line in schema])
     cur.executescript(schemaStr)
+
+
+def reconnect():
+    global con
+    global cur
+
+    con = sqlite3.connect(os.environ.get("VENGEFUL_DATABASE"))
+    cur = con.cursor()
+    try:
+        loadSchema(schemaFile)
+    except:
+        pass
+
+
+reconnect()
 
 
 async def insertUser(user: User) -> Dict[str, int]:
@@ -41,7 +60,9 @@ async def insertGroup(group: Group) -> Dict[str, int]:
 
 
 async def insertUserInGroup(group_id: int, user_id: int) -> Dict[str, int]:
-    statement = f"INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
+    statement = (
+        f"INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
+    )
     values = (group_id, user_id)
     try:
         cur.execute(statement, values)

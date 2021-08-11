@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple
 
 from fastapi import FastAPI, HTTPException
 
-import db
-from models import Group, User
+from app import db
+from app.models import Group, User
 
 db.loadSchema("schema.sql")
 
@@ -75,7 +75,7 @@ async def get_user_groups(user_id: int) -> Dict[str, Any]:
            where group_members.user_id = :user_id""",
         {"user_id": user_id},
     ).fetchall()
-    if not groups:
-        raise HTTPException(status_code=404, detail="User groups could not be found")
+    if groups is None:
+        raise HTTPException(status_code=500, detail="User groups could not be found")
 
     return {"groups": list(map(lambda x: {"id": x[0], "group": x[1]}, groups))}
