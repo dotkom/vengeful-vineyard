@@ -6,13 +6,13 @@ from tests.database import client
 
 class TestGroup:
     @pytest.mark.asyncio
-    async def test_no_group(self, client):
+    async def test_no_group(self, client) -> None:
         async with client:
             response = await client.get("/group/1000")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_create_group(self, client):
+    async def test_create_group(self, client) -> None:
         async with client:
             response = await client.post(
                 "/group", json={"group_id": 0, "name": "dotkom", "rules": "myrules"}
@@ -20,7 +20,7 @@ class TestGroup:
             assert response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_create_group_duplicate_fail(self, client):
+    async def test_create_group_duplicate_fail(self, client) -> None:
         async with client:
             response = await client.post(
                 "/group", json={"group_id": 0, "name": "dotkom", "rules": "myrules2"}
@@ -28,7 +28,7 @@ class TestGroup:
             assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_get_group(self, client):
+    async def test_get_group(self, client) -> None:
         async with client:
             response = await client.get(f"/group/1")
         assert response.status_code == 200
@@ -44,7 +44,7 @@ class TestPunishmentType:
     group_id = 1
 
     @pytest.mark.asyncio
-    async def test_create_punishmentType(self, client):
+    async def test_create_punishmentType(self, client) -> None:
         await TestGroup.test_create_group(self, client)
         async with client:
             response = await client.post(
@@ -54,7 +54,7 @@ class TestPunishmentType:
         assert response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_create_punishmentType_duplicate(self, client):
+    async def test_create_punishmentType_duplicate(self, client) -> None:
         async with client:
             response = await client.post(
                 f"/group/{self.group_id}/punishmentType",
@@ -63,7 +63,7 @@ class TestPunishmentType:
         assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_get_group_with_punishmentType(self, client):
+    async def test_get_group_with_punishmentType(self, client) -> None:
         async with client:
             response = await client.get("/group/1")
         assert response.status_code == 200
