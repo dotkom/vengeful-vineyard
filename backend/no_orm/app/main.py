@@ -1,5 +1,6 @@
 import sqlite3
 from typing import Any, Dict, List, Tuple
+from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 
 from fastapi import FastAPI, HTTPException
 
@@ -43,7 +44,7 @@ async def post_user(user: CreateUser) -> Dict[str, int]:
 
 
 @app.get("/user/{user_id}", tags=["User"])
-async def get_user(user_id: int) -> User:
+async def get_user(user_id: UserId) -> User:
     user = db.cur.execute(
         """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
     )
@@ -54,7 +55,7 @@ async def get_user(user_id: int) -> User:
 
 
 @app.get("/group/{group_id}", tags=["Group"])
-async def get_group(group_id: int) -> Group:
+async def get_group(group_id: GroupId) -> Group:
     group = db.cur.execute(
         """SELECT * FROM groups
            WHERE groups.group_id = :group_id""",
@@ -79,25 +80,25 @@ async def post_group(group: CreateGroup) -> Dict[str, int]:
 
 @app.post("/group/{group_id}/punishmentType", tags=["Group"])
 async def add_punishment_type_to_group(
-    group_id: int, type: CreatePunishmentType
+    group_id: GroupId, type: CreatePunishmentType
 ) -> Dict[str, int]:
     return await db.insertPunishmentType(group_id, type)
 
 
 @app.post("/group/{group_id}/user/{user_id}", tags=["Group"])
-async def add_user_to_group(group_id: int, user_id: int) -> Dict[str, int]:
+async def add_user_to_group(group_id: GroupId, user_id: UserId) -> Dict[str, int]:
     return await db.insertUserInGroup(group_id, user_id)
 
 
 @app.post("/group/{group_id}/user/{user_id}/punishment", tags=["Group"])
 async def add_punishment(
-    group_id: int, user_id: int, punishments: List[CreatePunishment]
+    group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
 ) -> Dict[str, int]:
     return await db.insertPunishments(group_id, user_id, punishments)
 
 
 @app.get("/user/{user_id}/group", tags=["User"])
-async def get_user_groups(user_id: int) -> Dict[str, Any]:
+async def get_user_groups(user_id: UserId) -> Dict[str, Any]:
     groups = db.cur.execute(
         """SELECT group_members.group_id, name from group_members
            INNER JOIN users on users.user_id = group_members.user_id

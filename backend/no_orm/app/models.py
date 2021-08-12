@@ -1,6 +1,38 @@
+from datetime import datetime
 from typing import List
 
 from pydantic import BaseModel
+
+from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
+
+"""
+Create* are used to describe the JSON body of POST requests
+Without "Create" describes the response from GET requests
+"""
+
+
+class CreatePunishmentType(BaseModel):
+    name: str
+    value: int
+    logo_url: str
+
+
+class PunishmentType(CreatePunishmentType):
+    punishment_type_id: PunishmentTypeId
+
+
+class CreatePunishment(BaseModel):
+    punishment_type: PunishmentTypeId
+    reason: str
+
+
+class Punishment(CreatePunishment):
+    punishment_id: PunishmentId
+    group_id: GroupId
+    user_id: UserId
+    verifiedTime: datetime
+    verifiedBy: UserId
+    createdTime: datetime
 
 
 class CreateUser(BaseModel):
@@ -11,28 +43,8 @@ class CreateUser(BaseModel):
 
 
 class User(CreateUser):
-    user_id: int
-
-
-class CreatePunishmentType(BaseModel):
-    name: str
-    value: int
-    logo_url: str
-
-
-class PunishmentType(CreatePunishmentType):
-    punishment_type_id: int
-
-
-class CreatePunishment(BaseModel):
-    punishment_type: int
-    reason: str
-
-
-class Punishment(CreatePunishment):
-    punishment_id: int
-    group_id: int
-    user_id: int
+    user_id: UserId
+    punishments: List[Punishment]
 
 
 class CreateGroup(BaseModel):
@@ -41,5 +53,5 @@ class CreateGroup(BaseModel):
 
 
 class Group(CreateGroup):
-    group_id: int
+    group_id: GroupId
     punishment_types: List[PunishmentType]

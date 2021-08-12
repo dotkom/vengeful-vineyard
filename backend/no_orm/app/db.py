@@ -14,8 +14,9 @@ from app.models import (
     User,
 )
 
-con = None
-cur = None
+con = sqlite3.connect(os.environ.get("VENGEFUL_DATABASE"))
+con.row_factory = sqlite3.Row
+cur = con.cursor()
 schemaFile = ""
 
 
@@ -28,7 +29,7 @@ def loadSchema(file: str) -> None:
     cur.executescript(schemaStr)
 
 
-def reconnect():
+def reconnect_db() -> None:
     global con
     global cur
 
@@ -41,7 +42,7 @@ def reconnect():
         pass
 
 
-reconnect()
+reconnect_db()
 
 
 async def getPunishmentTypes(group_id: int) -> List[Dict[str, Any]]:

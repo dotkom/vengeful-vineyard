@@ -17,3 +17,6 @@ prod-reqs:
 
 dev-reqs:
 	pip install --user -r requirements-dev.txt
+
+mypy:
+	mypy --strict app/*.py
