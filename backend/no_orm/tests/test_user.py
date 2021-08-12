@@ -7,12 +7,15 @@ createdUserReturn = {
     "id": 1,
 }
 
-createdUser = {
-    "user_id": 1,
+createUser = {
     "first_name": "Joakim",
     "last_name": "Fremstad",
+    "email": "email@example.com",
     "active": True,
 }
+
+createdUser = createUser
+createdUser["user_id"] = 1
 
 
 class TestUser:
@@ -28,7 +31,7 @@ class TestUser:
         async with client:
             response = await client.post(
                 "/user",
-                json={"first_name": "Joakim", "last_name": "Fremstad", "active": True},
+                json=createUser,
             )
         assert response.status_code == 200
         assert response.json() == createdUserReturn
@@ -38,7 +41,7 @@ class TestUser:
         async with client:
             response = await client.post(
                 "/user",
-                json={"first_name": "Joakim", "last_name": "Fremstad", "active": True},
+                json=createUser,
             )
         assert response.status_code == 400
 
@@ -112,7 +115,7 @@ class TestUserInGroup:
                 "name": "Vin",
                 "value": 100,
                 "logo_url": "http://example.com",
-                "group_id": 1,
+                "punishment_type_id": 1,
             }
         ]
 

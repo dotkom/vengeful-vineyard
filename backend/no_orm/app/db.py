@@ -54,8 +54,10 @@ async def getPunishmentTypes(group_id: int) -> List[Dict[str, Any]]:
 
 
 async def insertUser(user: CreateUser) -> Dict[str, int]:
-    statement = f"INSERT INTO users(first_name, last_name, active) VALUES (?, ?, ?)"
-    values = (user.first_name, user.last_name, user.active)
+    statement = (
+        f"INSERT INTO users(first_name, last_name, email, active) VALUES (?, ?, ?, ?)"
+    )
+    values = (user.first_name, user.last_name, user.email, user.active)
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as e:
