@@ -21,14 +21,14 @@ class CreatePunishmentType(BaseModel):
 
 class PunishmentType(CreatePunishmentType):
     punishment_type_id: int
-    group_id: int
 
 
 class CreatePunishment(BaseModel):
     punishment_type: int
+    reason: str
 
 
-class Punishment(PunishmentType):
+class Punishment(CreatePunishment):
     punishment_id: int
     group_id: int
     user_id: int

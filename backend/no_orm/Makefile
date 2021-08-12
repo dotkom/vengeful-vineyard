@@ -9,6 +9,9 @@ dev:
 test:
 	VENGEFUL_DATABASE=":memory:" pytest
 
+testv:
+	VENGEFUL_DATABASE=":memory:" pytest -v
+
 prod-reqs:
 	pip install --user -r requirements.txt
 

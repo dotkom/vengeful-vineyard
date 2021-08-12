@@ -33,6 +33,7 @@ class TestGroup:
             "group_id": 1,
             "name": "dotkom",
             "rules": "myrules",
+            "punishment_types": [],
         }
 
 
@@ -43,28 +44,26 @@ class TestPunishmentType:
         async with client:
             response = await client.post(
                 "/group/1/punishmentType",
-                json={"name": "Vin", "value": 100, "logo_url": "http://example.com"},
+                json={"name": "Vin", "value": 123, "logo_url": "http://example.com"},
             )
         assert response.status_code == 200
 
     @pytest.mark.asyncio
     async def test_get_group_with_punishmentType(self, client):
         async with client:
-            response = await client.get("/group")
+            response = await client.get("/group/1")
         assert response.status_code == 200
-        assert response.json() == [
-            {
-                "name": "dotkom",
-                "logoUrl": "http://example.com",
-                "group_id": 1,
-                # "members": [],
-                "punishment_types": [
-                    {
-                        "name": "Vin",
-                        "value": 100,
-                        "logo_url": "http://example.com",
-                        "punishment_type_id": 1,
-                    }
-                ],
-            }
-        ]
+        assert response.json() == {
+            "name": "dotkom",
+            "rules": "myrules",
+            "group_id": 1,
+            # "members": [],
+            "punishment_types": [
+                {
+                    "name": "Vin",
+                    "value": 123,
+                    "logo_url": "http://example.com",
+                    "punishment_type_id": 1,
+                }
+            ],
+        }

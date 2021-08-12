@@ -33,5 +33,6 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	punishment_id INTEGER PRIMARY KEY,
 	group_id INTEGER NOT NULL references groups(group_id),
 	user_id INTEGER NOT NULL references users(user_id),
-	punishment_type INTEGER NOT NULL references punishment_types(user_id)
+	punishment_type INTEGER NOT NULL references punishment_types(user_id),
+  reason TEXT NOT NULL
 );

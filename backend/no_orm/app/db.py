@@ -1,11 +1,17 @@
 import os
 import sqlite3
-from typing import Dict
+from typing import Any, Dict, List
 
 from fastapi import HTTPException
 
-from app.models import (CreateGroup, CreatePunishmentType, CreateUser, Group,
-                        User)
+from app.models import (
+    CreateGroup,
+    CreatePunishmentType,
+    CreateUser,
+    Group,
+    PunishmentType,
+    User,
+)
 
 con = None
 cur = None
@@ -35,6 +41,15 @@ def reconnect():
 
 
 reconnect()
+
+
+async def getPunishmentTypes(group_id: int) -> List[Dict[str, Any]]:
+    punishment_types = cur.execute(
+        """SELECT * FROM punishment_types
+           WHERE group_id = :group_id""",
+        {"group_id": group_id},
+    )
+    return list(map(lambda x: PunishmentType(**dict(x)), punishment_types.fetchall()))
 
 
 async def insertUser(user: CreateUser) -> Dict[str, int]:

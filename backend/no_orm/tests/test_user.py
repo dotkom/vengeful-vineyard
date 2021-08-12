@@ -80,9 +80,9 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_user_in_group(self, client):
         async with client:
-            response = await client.get("/group")
+            response = await client.get("/group/1")
         assert response.status_code == 200
-        assert response.json()[0]["members"][0]["name"] == "Joakim"
+        assert response.json()["members"][0]["first_name"] == "Joakim"
 
     @pytest.mark.asyncio
     async def test_create_punishmentType(self, client):
@@ -97,10 +97,15 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_get_group_with_punishmentType(self, client):
         async with client:
-            response = await client.get("/group")
+            response = await client.get("/group/1")
         assert response.status_code == 200
-        assert response.json()[0]["punishmentTypes"] == [
-            {"name": "Vin", "value": 100, "logo_url": "http://example.com", "id": 1}
+        assert response.json()["punishment_types"] == [
+            {
+                "name": "Vin",
+                "value": 100,
+                "logo_url": "http://example.com",
+                "group_id": 1,
+            }
         ]
 
     @pytest.mark.asyncio
