@@ -1,14 +1,17 @@
 import pytest
+
 from app.main import app
 from tests.database import client
 
-createdUser = {
+createdUserReturn = {
     "id": 1,
-    "name": "Joakim",
+}
+
+createdUser = {
+    "user_id": 1,
+    "first_name": "Joakim",
+    "last_name": "Fremstad",
     "active": True,
-    "debt": 0,
-    "punishments": [],
-    "totalPaid": 0,
 }
 
 
@@ -18,19 +21,25 @@ class TestUser:
         async with client:
             response = await client.get("/user")
         assert response.status_code == 200
-        assert response.json() == []
+        assert response.json() == {"users": []}
 
     @pytest.mark.asyncio
     async def test_create_user(self, client):
         async with client:
-            response = await client.post("/user", json={"name": "Joakim"})
+            response = await client.post(
+                "/user",
+                json={"first_name": "Joakim", "last_name": "Fremstad", "active": True},
+            )
         assert response.status_code == 200
-        assert response.json() == createdUser
+        assert response.json() == createdUserReturn
 
     @pytest.mark.asyncio
     async def test_create_sameuser(self, client):
         async with client:
-            response = await client.post("/user", json={"name": "Joakim"})
+            response = await client.post(
+                "/user",
+                json={"first_name": "Joakim", "last_name": "Fremstad", "active": True},
+            )
         assert response.status_code == 400
 
     @pytest.mark.asyncio
@@ -49,25 +58,15 @@ class TestUser:
 
 class TestUserInGroup:
     @pytest.mark.asyncio
-    async def test_create_user(self, client):
-        async with client:
-            response = await client.post("/user", json={"name": "Joakim"})
-        assert response.status_code == 200
-        assert response.json() == createdUser
-
-    @pytest.mark.asyncio
     async def test_create_group(self, client):
+        await TestUser.test_create_user(self, client)
         async with client:
             response = await client.post(
-                "/group", json={"name": "dotkom", "logoUrl": "http://example.com"}
+                "/group", json={"name": "dotkom", "rules": "http://example.com"}
             )
         assert response.status_code == 200
         assert response.json() == {
             "id": 1,
-            "name": "dotkom",
-            "logoUrl": "http://example.com",
-            "members": [],
-            "punishmentTypes": [],
         }
 
     @pytest.mark.asyncio
@@ -90,10 +89,10 @@ class TestUserInGroup:
         async with client:
             response = await client.post(
                 "/group/1/punishmentType",
-                json={"name": "Vin", "value": 100, "logoUrl": "http://example.com"},
+                json={"name": "Vin", "value": 100, "logo_url": "http://example.com"},
             )
         assert response.status_code == 200
-        assert response.json()["name"] == "Vin"
+        assert response.json() == {"id": 1}
 
     @pytest.mark.asyncio
     async def test_get_group_with_punishmentType(self, client):
@@ -101,7 +100,7 @@ class TestUserInGroup:
             response = await client.get("/group")
         assert response.status_code == 200
         assert response.json()[0]["punishmentTypes"] == [
-            {"name": "Vin", "value": 100, "logoUrl": "http://example.com", "id": 1}
+            {"name": "Vin", "value": 100, "logo_url": "http://example.com", "id": 1}
         ]
 
     @pytest.mark.asyncio

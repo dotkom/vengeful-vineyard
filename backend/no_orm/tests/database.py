@@ -1,11 +1,11 @@
+import os
+
+import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
-from app.main import app
 from app.db import reconnect
-
-import pytest
-import os
+from app.main import app
 
 
 @pytest.fixture(scope="class")

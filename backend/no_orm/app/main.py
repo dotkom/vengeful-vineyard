@@ -4,17 +4,18 @@ from typing import Any, Dict, List, Tuple
 from fastapi import FastAPI, HTTPException
 
 from app import db
-from app.models import Group, User
+from app.models import (CreateGroup, CreatePunishment, CreatePunishmentType,
+                        CreateUser, Group, Punishment, PunishmentType, User)
 
 db.loadSchema("schema.sql")
 
 
 def dbToGroup(dbGroup: sqlite3.Cursor) -> Group:
-    return Group(**dict(zip(Group.__fields__.keys(), dbGroup)))
+    return Group(**dict(dbGroup))
 
 
 def dbToUser(dbUser: sqlite3.Cursor) -> User:
-    return User(**dict(zip(User.__fields__.keys(), dbUser)))
+    return User(**dict(dbUser))
 
 
 app = FastAPI()
@@ -27,9 +28,9 @@ async def get_users() -> Dict[str, List[Any]]:
 
 
 @app.post("/user", tags=["User"])
-async def post_user(user: User) -> Dict[str, int]:
-    if user.age <= 18:
-        raise HTTPException(status_code=400, detail="User is too young!")
+async def post_user(user: CreateUser) -> Dict[str, int]:
+    if not user.active:
+        raise HTTPException(status_code=400, detail="User must be active")
     return await db.insertUser(user)
 
 
@@ -52,18 +53,43 @@ async def get_group(group_id: int) -> Group:
     group = group.fetchone()
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
+    # TODO: Join with table to get this info
+    group = dict(group)
+    group["punishment_types"] = [
+        PunishmentType(
+            punishment_type_id=1,
+            group_id=1,
+            name="Vin",
+            value=100,
+            logo_url="example.com",
+        )
+    ]
     return dbToGroup(group)
 
 
 @app.post("/group", tags=["Group"])
-async def post_group(group: Group) -> Dict[str, int]:
+async def post_group(group: CreateGroup) -> Dict[str, int]:
     # TODO: Validation
     return await db.insertGroup(group)
+
+
+@app.post("/group/{group_id}/punishmentType", tags=["Group"])
+async def add_punishment_type_to_group(
+    group_id: int, type: CreatePunishmentType
+) -> Dict[str, int]:
+    return await db.insertPunishmentType(group_id, type)
 
 
 @app.post("/group/{group_id}/{user_id}", tags=["Group"])
 async def add_user_to_group(group_id: int, user_id: int) -> Dict[str, int]:
     return await db.insertUserInGroup(group_id, user_id)
+
+
+@app.post("/group/{group_id}/{user_id}/punishment", tags=["Group"])
+async def add_user_to_group(
+    group_id: int, user_id: int, punishments: List[CreatePunishment]
+) -> Dict[str, int]:
+    return await db.insertPunishments(group_id, user_id)
 
 
 @app.get("/user/{user_id}/group", tags=["User"])

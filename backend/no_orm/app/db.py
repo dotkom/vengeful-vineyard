@@ -1,10 +1,11 @@
-import sqlite3
 import os
+import sqlite3
 from typing import Dict
 
 from fastapi import HTTPException
 
-from app.models import Group, User
+from app.models import (CreateGroup, CreatePunishmentType, CreateUser, Group,
+                        User)
 
 con = None
 cur = None
@@ -25,6 +26,7 @@ def reconnect():
     global cur
 
     con = sqlite3.connect(os.environ.get("VENGEFUL_DATABASE"))
+    con.row_factory = sqlite3.Row
     cur = con.cursor()
     try:
         loadSchema(schemaFile)
@@ -35,11 +37,9 @@ def reconnect():
 reconnect()
 
 
-async def insertUser(user: User) -> Dict[str, int]:
-    statement = (
-        f"INSERT INTO users(first_name, last_name, age, phone) VALUES (?, ?, ?, ?)"
-    )
-    values = (user.first_name, user.last_name, user.age, user.phone)
+async def insertUser(user: CreateUser) -> Dict[str, int]:
+    statement = f"INSERT INTO users(first_name, last_name, active) VALUES (?, ?, ?)"
+    values = (user.first_name, user.last_name, user.active)
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as e:
@@ -48,7 +48,7 @@ async def insertUser(user: User) -> Dict[str, int]:
     return {"id": cur.lastrowid}
 
 
-async def insertGroup(group: Group) -> Dict[str, int]:
+async def insertGroup(group: CreateGroup) -> Dict[str, int]:
     statement = f"INSERT INTO groups(name, rules) VALUES (?, ?)"
     values = (group.name, group.rules)
     try:
@@ -64,6 +64,19 @@ async def insertUserInGroup(group_id: int, user_id: int) -> Dict[str, int]:
         f"INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
     )
     values = (group_id, user_id)
+    try:
+        cur.execute(statement, values)
+    except sqlite3.IntegrityError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    con.commit()
+    return {"id": cur.lastrowid}
+
+
+async def insertPunishmentType(
+    group_id: int, type: CreatePunishmentType
+) -> Dict[str, int]:
+    statement = f"INSERT INTO punishment_types(group_id, name, value, logo_url) VALUES (?, ?, ?, ?)"
+    values = (group_id, type.name, type.value, type.logo_url)
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as e:
