@@ -19,10 +19,13 @@ class TestGroup:
             )
             assert response.status_code == 200
 
-            response2 = await client.post(
+    @pytest.mark.asyncio
+    async def test_create_group_duplicate_fail(self, client):
+        async with client:
+            response = await client.post(
                 "/group", json={"group_id": 0, "name": "dotkom", "rules": "myrules2"}
             )
-            assert response2.status_code == 400
+            assert response.status_code == 400
 
     @pytest.mark.asyncio
     async def test_get_group(self, client):
@@ -38,15 +41,26 @@ class TestGroup:
 
 
 class TestPunishmentType:
+    group_id = 1
+
     @pytest.mark.asyncio
     async def test_create_punishmentType(self, client):
         await TestGroup.test_create_group(self, client)
         async with client:
             response = await client.post(
-                "/group/1/punishmentType",
+                f"/group/{self.group_id}/punishmentType",
                 json={"name": "Vin", "value": 123, "logo_url": "http://example.com"},
             )
         assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_create_punishmentType_duplicate(self, client):
+        async with client:
+            response = await client.post(
+                f"/group/{self.group_id}/punishmentType",
+                json={"name": "Vin", "value": 100, "logo_url": "http://example.com"},
+            )
+        assert response.status_code == 400
 
     @pytest.mark.asyncio
     async def test_get_group_with_punishmentType(self, client):

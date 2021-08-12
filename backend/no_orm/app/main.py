@@ -84,16 +84,16 @@ async def add_punishment_type_to_group(
     return await db.insertPunishmentType(group_id, type)
 
 
-@app.post("/group/{group_id}/{user_id}", tags=["Group"])
+@app.post("/group/{group_id}/user/{user_id}", tags=["Group"])
 async def add_user_to_group(group_id: int, user_id: int) -> Dict[str, int]:
     return await db.insertUserInGroup(group_id, user_id)
 
 
-@app.post("/group/{group_id}/{user_id}/punishment", tags=["Group"])
+@app.post("/group/{group_id}/user/{user_id}/punishment", tags=["Group"])
 async def add_punishment(
     group_id: int, user_id: int, punishments: List[CreatePunishment]
 ) -> Dict[str, int]:
-    return await db.insertPunishments(group_id, user_id)
+    return await db.insertPunishments(group_id, user_id, punishments)
 
 
 @app.get("/user/{user_id}/group", tags=["User"])

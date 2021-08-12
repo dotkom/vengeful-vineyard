@@ -34,7 +34,7 @@ class TestUser:
         assert response.json() == createdUserReturn
 
     @pytest.mark.asyncio
-    async def test_create_sameuser(self, client):
+    async def test_create_user_duplicate(self, client):
         async with client:
             response = await client.post(
                 "/user",
@@ -43,23 +43,26 @@ class TestUser:
         assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_read_user(self, client):
+    async def test_get_user(self, client):
         async with client:
             response = await client.get("/user/1")
         assert response.status_code == 200
         assert response.json() == createdUser
 
     @pytest.mark.asyncio
-    async def test_read_baduser(self, client):
+    async def test_get_nonexisting_user(self, client):
         async with client:
             response = await client.get("/user/10")
         assert response.status_code == 404
 
 
 class TestUserInGroup:
+    group_id = 1
+    user_id = 1
+    punishment_id = 1
+
     @pytest.mark.asyncio
     async def test_create_group(self, client):
-        await TestUser.test_create_user(self, client)
         async with client:
             response = await client.post(
                 "/group", json={"name": "dotkom", "rules": "http://example.com"}
@@ -71,14 +74,19 @@ class TestUserInGroup:
 
     @pytest.mark.asyncio
     async def test_add_user_to_group(self, client):
+        await TestUser.test_create_user(self, client)
         async with client:
-            response = await client.post("/group/1/1")
-            response2 = await client.post("/group/1/1")
+            response = await client.post(f"/group/{self.group_id}/user/{self.user_id}")
         assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_add_user_to_group_duplicate(self, client):
+        async with client:
+            response2 = await client.post(f"/group/{self.group_id}/user/{self.user_id}")
         assert response2.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_user_in_group(self, client):
+    async def test_check_user_in_group(self, client):
         async with client:
             response = await client.get("/group/1")
         assert response.status_code == 200
@@ -97,7 +105,7 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_get_group_with_punishmentType(self, client):
         async with client:
-            response = await client.get("/group/1")
+            response = await client.get(f"/group/{self.group_id}")
         assert response.status_code == 200
         assert response.json()["punishment_types"] == [
             {
@@ -112,21 +120,21 @@ class TestUserInGroup:
     async def test_create_punishment_on_user(self, client):
         async with client:
             response = await client.post(
-                "/punishment",
+                f"/group/{self.group_id}/user/{self.user_id}/punishment",
                 json={
+                    "punishment_type_id": 1,
                     "reason": "Good",
-                    "type_id": 1,
-                    "givenTo_id": 1,
-                    "group_id": 1,
                 },
             )
         assert response.status_code == 200
-        assert response.json()["reason"] == "Good"
+        assert response.json()["id"] == 1
 
     @pytest.mark.asyncio
     async def test_verify_punishment(self, client):
         async with client:
-            response = await client.post("/punishment/1/verify")
+            response = await client.post(
+                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}/verify"
+            )
         assert response.status_code == 200
         assert response.json()["verifiedTime"] is not None
 
@@ -142,7 +150,9 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_delete_punishment(self, client):
         async with client:
-            response = await client.delete("/punishment/1")
+            response = await client.delete(
+                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}"
+            )
         assert response.status_code == 200
 
     @pytest.mark.asyncio

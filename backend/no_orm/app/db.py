@@ -6,6 +6,7 @@ from fastapi import HTTPException
 
 from app.models import (
     CreateGroup,
+    CreatePunishment,
     CreatePunishmentType,
     CreateUser,
     Group,
@@ -98,3 +99,9 @@ async def insertPunishmentType(
         raise HTTPException(status_code=400, detail=str(e))
     con.commit()
     return {"id": cur.lastrowid}
+
+
+async def insertPunishments(
+    group_id: int, user_id: int, type: CreatePunishment
+) -> Dict[str, int]:
+    pass
