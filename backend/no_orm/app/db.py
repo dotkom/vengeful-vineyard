@@ -13,6 +13,7 @@ from app.models import (
     PunishmentType,
     User,
 )
+from app.types import GroupId, UserId
 
 con = sqlite3.connect(os.environ.get("VENGEFUL_DATABASE"))
 con.row_factory = sqlite3.Row
@@ -45,13 +46,25 @@ def reconnect_db() -> None:
 reconnect_db()
 
 
-async def getPunishmentTypes(group_id: int) -> List[Dict[str, Any]]:
+async def getPunishmentTypes(group_id: GroupId) -> List[Dict[str, Any]]:
     punishment_types = cur.execute(
         """SELECT * FROM punishment_types
            WHERE group_id = :group_id""",
         {"group_id": group_id},
     )
     return list(map(lambda x: PunishmentType(**dict(x)), punishment_types.fetchall()))
+
+
+async def getPunishments(user_id: UserId, group_id: GroupId) -> List[Dict[str, Any]]:
+    punishments = cur.execute(
+        """
+        SELECT * FROM punishments
+        WHERE group_id = :group_id
+        AND user_id = :user_id
+        """,
+        {"group_id": group_id, "user_id": user_id},
+    )
+    return list(map(lambda x: Punishment(**dict(x)), punishments.fetchall()))
 
 
 async def insertUser(user: CreateUser) -> Dict[str, int]:
@@ -78,7 +91,7 @@ async def insertGroup(group: CreateGroup) -> Dict[str, int]:
     return {"id": cur.lastrowid}
 
 
-async def insertUserInGroup(group_id: int, user_id: int) -> Dict[str, int]:
+async def insertUserInGroup(group_id: GroupId, user_id: UserId) -> Dict[str, int]:
     statement = (
         f"INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
     )
@@ -92,7 +105,7 @@ async def insertUserInGroup(group_id: int, user_id: int) -> Dict[str, int]:
 
 
 async def insertPunishmentType(
-    group_id: int, type: CreatePunishmentType
+    group_id: GroupId, type: CreatePunishmentType
 ) -> Dict[str, int]:
     statement = f"INSERT INTO punishment_types(group_id, name, value, logo_url) VALUES (?, ?, ?, ?)"
     values = (group_id, type.name, type.value, type.logo_url)
@@ -105,6 +118,6 @@ async def insertPunishmentType(
 
 
 async def insertPunishments(
-    group_id: int, user_id: int, type: CreatePunishment
+    group_id: GroupId, user_id: UserId, type: CreatePunishment
 ) -> Dict[str, int]:
     pass

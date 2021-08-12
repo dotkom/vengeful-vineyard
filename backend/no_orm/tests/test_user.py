@@ -12,6 +12,7 @@ createUser = {
     "last_name": "Fremstad",
     "email": "email@example.com",
     "active": True,
+    "punishments": [],
 }
 
 createdUser = createUser

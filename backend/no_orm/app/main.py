@@ -1,6 +1,5 @@
 import sqlite3
 from typing import Any, Dict, List, Tuple
-from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 
 from fastapi import FastAPI, HTTPException
 
@@ -15,25 +14,22 @@ from app.models import (
     PunishmentType,
     User,
 )
+from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 
 db.loadSchema("schema.sql")
-
-
-def dbToGroup(dbGroup: sqlite3.Cursor) -> Group:
-    return Group(**dict(dbGroup))
-
-
-def dbToUser(dbUser: sqlite3.Cursor) -> User:
-    return User(**dict(dbUser))
-
 
 app = FastAPI()
 
 
 @app.get("/user", tags=["User"])
 async def get_users() -> Dict[str, List[Any]]:
-    users = db.cur.execute("""SELECT * FROM users""")
-    return {"users": list(map(dbToUser, users))}
+    dbUsers = db.cur.execute("""SELECT * FROM users""")
+    users = list(map(lambda x: dict(x), dbUsers))
+    for user in users:
+        # TODO: Add punishments
+        user["punishments"] = []
+
+    return {"users": users}
 
 
 @app.post("/user", tags=["User"])
@@ -51,7 +47,10 @@ async def get_user(user_id: UserId) -> User:
     user = user.fetchone()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return dbToUser(user)
+    # TODO: Add punishments
+    user = dict(user)
+    user["punishments"] = []
+    return User(**user)
 
 
 @app.get("/group/{group_id}", tags=["Group"])
@@ -64,12 +63,9 @@ async def get_group(group_id: GroupId) -> Group:
     group = group.fetchone()
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
-    # TODO: Join with table to get this info
     group = dict(group)
-    x = await db.getPunishmentTypes(group_id)
-    print(x)
-    group["punishment_types"] = x
-    return dbToGroup(group)
+    group["punishment_types"] = await db.getPunishmentTypes(group_id)
+    return Group(**dict(group))
 
 
 @app.post("/group", tags=["Group"])
