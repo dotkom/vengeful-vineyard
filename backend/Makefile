@@ -1,17 +1,31 @@
-run: env/touchfile
-	source env/bin/activate && uvicorn app.main:app --reload --reload-dir app --host 0.0.0.0 --port 8888
+.PHONY: prod dev test prod-reqs dev-reqs activate
 
-env/touchfile: requirements.txt
-	python3 -m venv env && source env/bin/activate && pip3 install -r requirements.txt; touch env/touchfile
+env:
+	python3 -m venv env && make prod-reqs && make dev-reqs
 
-testdb:
-	rm database.db; ./scripts/populate_db.sh
+activate: env
+	. env/bin/activate
 
-test: env/touchfile
-	source env/bin/activate && pytest
+prod: activate
+	VENGEFUL_DATABASE="vengeful_vineyard.db" uvicorn app.main:app --host 0.0.0.0
 
-mypy: env/touchfile
-	source env/bin/activate && mypy --strict app
+dev: activate
+	VENGEFUL_DATABASE="dev.db" uvicorn app.main:app
 
-clean:
-	rm -rf env
+test: activate
+	VENGEFUL_DATABASE=":memory:" pytest
+
+testv: activate
+	VENGEFUL_DATABASE=":memory:" pytest -v
+
+testvv: activate
+	VENGEFUL_DATABASE=":memory:" pytest -vv
+
+prod-reqs: activate
+	pip install --user -r requirements.txt
+
+dev-reqs: activate
+	pip install --user -r requirements-dev.txt
+
+mypy: activate
+	mypy --strict .

@@ -10,12 +10,20 @@ from app.models import (
     CreatePunishmentType,
     CreateUser,
     Group,
+    Punishment,
     PunishmentType,
     User,
 )
 from app.types import GroupId, UserId
 
-con = sqlite3.connect(os.environ.get("VENGEFUL_DATABASE"))
+
+def getDbPath() -> str:
+    path = os.environ.get("VENGEFUL_DATABASE")
+    assert path is not None
+    return path
+
+
+con = sqlite3.connect(getDbPath())
 con.row_factory = sqlite3.Row
 cur = con.cursor()
 schemaFile = ""
@@ -34,7 +42,7 @@ def reconnect_db() -> None:
     global con
     global cur
 
-    con = sqlite3.connect(os.environ.get("VENGEFUL_DATABASE"))
+    con = sqlite3.connect(getDbPath())
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     try:
@@ -46,7 +54,7 @@ def reconnect_db() -> None:
 reconnect_db()
 
 
-async def getPunishmentTypes(group_id: GroupId) -> List[Dict[str, Any]]:
+async def getPunishmentTypes(group_id: GroupId) -> List[PunishmentType]:
     punishment_types = cur.execute(
         """SELECT * FROM punishment_types
            WHERE group_id = :group_id""",
@@ -55,7 +63,7 @@ async def getPunishmentTypes(group_id: GroupId) -> List[Dict[str, Any]]:
     return list(map(lambda x: PunishmentType(**dict(x)), punishment_types.fetchall()))
 
 
-async def getPunishments(user_id: UserId, group_id: GroupId) -> List[Dict[str, Any]]:
+async def getPunishments(user_id: UserId, group_id: GroupId) -> List[Punishment]:
     punishments = cur.execute(
         """
         SELECT * FROM punishments
@@ -118,6 +126,6 @@ async def insertPunishmentType(
 
 
 async def insertPunishments(
-    group_id: GroupId, user_id: UserId, type: CreatePunishment
+    group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
 ) -> Dict[str, int]:
     pass

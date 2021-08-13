@@ -1,133 +1,151 @@
+from typing import Any
+
 import pytest
+
 from app.main import app
 from tests.database import client
 
-createdUser = {
+createdUserReturn = {
     "id": 1,
-    "name": "Joakim",
-    "active": True,
-    "debt": 0,
-    "punishments": [],
-    "totalPaid": 0,
 }
+
+createUser = {
+    "first_name": "Joakim",
+    "last_name": "Fremstad",
+    "email": "email@example.com",
+    "active": True,
+    "punishments": [],
+}
+
+createdUser = createUser
+createdUser["user_id"] = 1
 
 
 class TestUser:
     @pytest.mark.asyncio
-    async def test_no_user(self, client):
+    async def test_no_user(self, client: Any) -> None:
         async with client:
             response = await client.get("/user")
         assert response.status_code == 200
-        assert response.json() == []
+        assert response.json() == {"users": []}
 
     @pytest.mark.asyncio
-    async def test_create_user(self, client):
+    async def test_create_user(self, client: Any) -> None:
         async with client:
-            response = await client.post("/user", json={"name": "Joakim"})
+            response = await client.post(
+                "/user",
+                json=createUser,
+            )
         assert response.status_code == 200
-        assert response.json() == createdUser
+        assert response.json() == createdUserReturn
 
     @pytest.mark.asyncio
-    async def test_create_sameuser(self, client):
+    async def test_create_user_duplicate(self, client: Any) -> None:
         async with client:
-            response = await client.post("/user", json={"name": "Joakim"})
+            response = await client.post(
+                "/user",
+                json=createUser,
+            )
         assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_read_user(self, client):
+    async def test_get_user(self, client: Any) -> None:
         async with client:
             response = await client.get("/user/1")
         assert response.status_code == 200
         assert response.json() == createdUser
 
     @pytest.mark.asyncio
-    async def test_read_baduser(self, client):
+    async def test_get_nonexisting_user(self, client: Any) -> None:
         async with client:
             response = await client.get("/user/10")
         assert response.status_code == 404
 
 
 class TestUserInGroup:
-    @pytest.mark.asyncio
-    async def test_create_user(self, client):
-        async with client:
-            response = await client.post("/user", json={"name": "Joakim"})
-        assert response.status_code == 200
-        assert response.json() == createdUser
+    group_id = 1
+    user_id = 1
+    punishment_id = 1
 
     @pytest.mark.asyncio
-    async def test_create_group(self, client):
+    async def test_create_group(self, client: Any) -> None:
         async with client:
             response = await client.post(
-                "/group", json={"name": "dotkom", "logoUrl": "http://example.com"}
+                "/group", json={"name": "dotkom", "rules": "http://example.com"}
             )
         assert response.status_code == 200
         assert response.json() == {
             "id": 1,
-            "name": "dotkom",
-            "logoUrl": "http://example.com",
-            "members": [],
-            "punishmentTypes": [],
         }
 
     @pytest.mark.asyncio
-    async def test_add_user_to_group(self, client):
+    async def test_add_user_to_group(self, client: Any) -> None:
+        await TestUser.test_create_user(self, client)
         async with client:
-            response = await client.post("/group/1/1")
-            response2 = await client.post("/group/1/1")
+            response = await client.post(f"/group/{self.group_id}/user/{self.user_id}")
         assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_add_user_to_group_duplicate(self, client: Any) -> None:
+        async with client:
+            response2 = await client.post(f"/group/{self.group_id}/user/{self.user_id}")
         assert response2.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_user_in_group(self, client):
+    async def test_check_user_in_group(self, client: Any) -> None:
         async with client:
-            response = await client.get("/group")
+            response = await client.get("/group/1")
         assert response.status_code == 200
-        assert response.json()[0]["members"][0]["name"] == "Joakim"
+        assert response.json()["members"][0]["first_name"] == "Joakim"
 
     @pytest.mark.asyncio
-    async def test_create_punishmentType(self, client):
+    async def test_create_punishmentType(self, client: Any) -> None:
         async with client:
             response = await client.post(
                 "/group/1/punishmentType",
-                json={"name": "Vin", "value": 100, "logoUrl": "http://example.com"},
+                json={"name": "Vin", "value": 100, "logo_url": "http://example.com"},
             )
         assert response.status_code == 200
-        assert response.json()["name"] == "Vin"
+        assert response.json() == {"id": 1}
 
     @pytest.mark.asyncio
-    async def test_get_group_with_punishmentType(self, client):
+    async def test_get_group_with_punishmentType(self, client: Any) -> None:
         async with client:
-            response = await client.get("/group")
+            response = await client.get(f"/group/{self.group_id}")
         assert response.status_code == 200
-        assert response.json()[0]["punishmentTypes"] == [
-            {"name": "Vin", "value": 100, "logoUrl": "http://example.com", "id": 1}
+        assert response.json()["punishment_types"] == [
+            {
+                "name": "Vin",
+                "value": 100,
+                "logo_url": "http://example.com",
+                "punishment_type_id": 1,
+            }
         ]
 
     @pytest.mark.asyncio
-    async def test_create_punishment_on_user(self, client):
+    async def test_create_punishment_on_user(self, client: Any) -> None:
         async with client:
             response = await client.post(
-                "/punishment",
+                f"/group/{self.group_id}/user/{self.user_id}/punishment",
                 json={
+                    "punishment_type_id": 1,
                     "reason": "Good",
-                    "type_id": 1,
-                    "givenTo_id": 1,
-                    "group_id": 1,
                 },
             )
         assert response.status_code == 200
-        assert response.json()["reason"] == "Good"
+        assert response.json()["id"] == 1
 
     @pytest.mark.asyncio
-    async def test_verify_punishment(self, client):
+    async def test_verify_punishment(self, client: Any) -> None:
         async with client:
-            response = await client.post("/punishment/1/verify")
+            response = await client.post(
+                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}/verify"
+            )
         assert response.status_code == 200
         assert response.json()["verifiedTime"] is not None
 
     @pytest.mark.asyncio
-    async def test_get_user_with_punishment(self, client):
+    async def test_get_user_with_punishment(self, client: Any) -> None:
         async with client:
             response = await client.get("/user")
         assert response.status_code == 200
@@ -136,13 +154,15 @@ class TestUserInGroup:
         assert punishments[0]["verifiedTime"] is not None
 
     @pytest.mark.asyncio
-    async def test_delete_punishment(self, client):
+    async def test_delete_punishment(self, client: Any) -> None:
         async with client:
-            response = await client.delete("/punishment/1")
+            response = await client.delete(
+                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}"
+            )
         assert response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_verify_deleted_punishment(self, client):
+    async def test_verify_deleted_punishment(self, client: Any) -> None:
         async with client:
             response = await client.get("/user")
         punishments = response.json()[0]["punishments"]

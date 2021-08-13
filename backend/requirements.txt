@@ -1,9 +1,3 @@
-fastapi[all]
-uvicorn[standard]
-sqlalchemy
-black
-pytest-asyncio
-httpx
+fastapi
+uvicorn
 pydantic
-mypy
-sqlalchemy-stubs
