@@ -30,9 +30,9 @@ class Punishment(CreatePunishment):
     punishment_id: PunishmentId
     group_id: GroupId
     user_id: UserId
-    verifiedTime: datetime
-    verifiedBy: UserId
-    createdTime: datetime
+    verified_time: datetime
+    verified_by: UserId
+    created_time: datetime
 
 
 class CreateUser(BaseModel):
