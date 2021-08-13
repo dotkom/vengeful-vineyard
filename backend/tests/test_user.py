@@ -162,6 +162,14 @@ class TestUserInGroup:
         assert response.status_code == 200
 
     @pytest.mark.asyncio
+    async def test_delete_punishment_duplicate(self, client: Any) -> None:
+        async with client:
+            response = await client.delete(
+                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}"
+            )
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
     async def test_verify_deleted_punishment(self, client: Any) -> None:
         async with client:
             response = await client.get("/user")

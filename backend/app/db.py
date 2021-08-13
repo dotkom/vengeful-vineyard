@@ -14,7 +14,7 @@ from app.models import (
     PunishmentType,
     User,
 )
-from app.types import GroupId, UserId
+from app.types import GroupId, PunishmentId, UserId
 
 
 def getDbPath() -> str:
@@ -132,3 +132,10 @@ async def insertPunishments(
     group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
 ) -> Dict[str, int]:
     pass
+
+
+async def deletePunishment(punishment_id: PunishmentId) -> None:
+    # TODO: ACL
+    statement = "DELETE FROM group_punishments WHERE punishment_id=:punishment_id"
+    cur.execute(statement, {"punishment_id": punishment_id})
+    con.commit()

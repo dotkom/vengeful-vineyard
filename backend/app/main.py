@@ -91,6 +91,13 @@ async def add_punishment(
     return await db.insertPunishments(group_id, user_id, punishments)
 
 
+@app.delete(
+    "/group/{group_id}/user/{user_id}/punishment/{punishment_id}", tags=["Group"]
+)
+async def delete_punishment(punishment_id: PunishmentId) -> None:
+    await db.deletePunishment(punishment_id)
+
+
 @app.get("/user/{user_id}/group", tags=["User"])
 async def get_user_groups(user_id: UserId) -> Dict[str, Any]:
     groups = db.cur.execute(
