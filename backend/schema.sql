@@ -1,3 +1,4 @@
+-- Check that foreign keys used actually exist
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (

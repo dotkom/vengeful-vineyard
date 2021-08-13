@@ -1,6 +1,8 @@
 # Backend
 Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 
+## See Makefile for installation and running
+
 ## Structure
 * `schema.sql`: Database schema
 * app: The application

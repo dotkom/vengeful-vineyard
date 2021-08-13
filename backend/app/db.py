@@ -34,6 +34,9 @@ def loadSchema(file: str) -> None:
     schemaFile = file
     with open(file, "r") as f:
         schema = f.readlines()
+        # Remove comments
+        schema = list(filter(lambda x: not x.startswith("--"), schema))
+        # Merge to one long string
         schemaStr = "".join([line.strip() for line in schema])
     cur.executescript(schemaStr)
 
