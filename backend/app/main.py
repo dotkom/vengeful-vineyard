@@ -10,6 +10,7 @@ from app.models import (
     CreatePunishmentType,
     CreateUser,
     Group,
+    Punishment,
     User,
 )
 from app.types import GroupId, PunishmentId, UserId
@@ -106,6 +107,13 @@ async def add_punishment(
 )
 async def delete_punishment(punishment_id: PunishmentId) -> None:
     await db.deletePunishment(punishment_id)
+
+
+@app.post(
+    "/group/{group_id}/user/{user_id}/punishment/{punishment_id}/verify", tags=["Group"]
+)
+async def verify_punishment(punishment_id: PunishmentId) -> Punishment:
+    return await db.verifyPunishment(punishment_id)
 
 
 @app.get("/user/{user_id}/group", tags=["User"])

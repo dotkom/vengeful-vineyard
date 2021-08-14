@@ -57,10 +57,21 @@ async def getPunishmentTypes(group_id: GroupId) -> List[PunishmentType]:
     return list(map(lambda x: PunishmentType(**dict(x)), punishment_types.fetchall()))
 
 
+async def getPunishment(punishment_id: PunishmentId) -> Punishment:
+    punishments = cur.execute(
+        """
+        SELECT * FROM group_punishments
+        WHERE punishment_id = :punishment_id
+        """,
+        {"punishment_id": punishment_id},
+    )
+    return Punishment(**dict(punishments.fetchone()))
+
+
 async def getPunishments(user_id: UserId, group_id: GroupId) -> List[Punishment]:
     punishments = cur.execute(
         """
-        SELECT * FROM punishments
+        SELECT * FROM group_punishments
         WHERE group_id = :group_id
         AND user_id = :user_id
         """,
@@ -125,7 +136,23 @@ async def insertPunishmentType(
 async def insertPunishments(
     group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
 ) -> Dict[str, int]:
-    pass
+    ids = []
+    for punishment in punishments:
+        statement = "INSERT INTO group_punishments(group_id, user_id, punishment_type, reason, amount) VALUES (?, ?, ?, ?, ?)"
+        values = (
+            group_id,
+            user_id,
+            punishment.punishment_type,
+            punishment.reason,
+            punishment.amount,
+        )
+        try:
+            cur.execute(statement, values)
+            ids.append(cur.lastrowid)
+        except sqlite3.IntegrityError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+    con.commit()
+    return {"ids": ids}
 
 
 async def deletePunishment(punishment_id: PunishmentId) -> None:
@@ -133,3 +160,10 @@ async def deletePunishment(punishment_id: PunishmentId) -> None:
     statement = "DELETE FROM group_punishments WHERE punishment_id=:punishment_id"
     cur.execute(statement, {"punishment_id": punishment_id})
     con.commit()
+
+
+async def verifyPunishment(punishment_id: PunishmentId) -> Punishment:
+    statement = "UPDATE group_punishments SET verified_time=datetime('now', 'localtime') WHERE punishment_id=:punishment_id"
+    cur.execute(statement, {"punishment_id": punishment_id})
+    con.commit()
+    return await getPunishment(punishment_id)

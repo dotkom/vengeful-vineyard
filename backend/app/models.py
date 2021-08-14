@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -24,15 +24,16 @@ class PunishmentType(CreatePunishmentType):
 class CreatePunishment(BaseModel):
     punishment_type: PunishmentTypeId
     reason: str
+    amount: int
 
 
 class Punishment(CreatePunishment):
     punishment_id: PunishmentId
     group_id: GroupId
     user_id: UserId
-    verified_time: datetime
-    verified_by: UserId
     created_time: datetime
+    verified_time: Optional[datetime]
+    verified_by: Optional[UserId]
 
 
 class CreateUser(BaseModel):

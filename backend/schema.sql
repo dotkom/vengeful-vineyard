@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	user_id INTEGER NOT NULL references users(user_id),
 	punishment_type INTEGER NOT NULL references punishment_types(punishment_type_id),
   reason TEXT NOT NULL,
-  verified_time DATE,
+  amount INTEGER NOT NULL,
   verified_by INTEGER references users(user_id),
+  verified_time DATE,
   created_time DATE DEFAULT (datetime('now','localtime'))
 );
