@@ -1,6 +1,5 @@
-import os
 import sqlite3
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from fastapi import HTTPException
 
@@ -10,10 +9,8 @@ from app.models import (
     CreatePunishment,
     CreatePunishmentType,
     CreateUser,
-    Group,
     Punishment,
     PunishmentType,
-    User,
 )
 from app.types import GroupId, PunishmentId, UserId
 
@@ -44,7 +41,7 @@ def reconnect_db() -> None:
     cur = con.cursor()
     try:
         loadSchema(schemaFile)
-    except:
+    except Exception:
         pass
 
 
@@ -73,49 +70,54 @@ async def getPunishments(user_id: UserId, group_id: GroupId) -> List[Punishment]
 
 
 async def insertUser(user: CreateUser) -> Dict[str, int]:
-    statement = f"INSERT INTO users(first_name, last_name, email) VALUES (?, ?, ?)"
+    statement = "INSERT INTO users(first_name, last_name, email) VALUES (?, ?, ?)"
     values = (user.first_name, user.last_name, user.email)
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     con.commit()
     return {"id": cur.lastrowid}
 
 
 async def insertGroup(group: CreateGroup) -> Dict[str, int]:
-    statement = f"INSERT INTO groups(name, rules) VALUES (?, ?)"
+    statement = "INSERT INTO groups(name, rules) VALUES (?, ?)"
     values = (group.name, group.rules)
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     con.commit()
     return {"id": cur.lastrowid}
 
 
 async def insertUserInGroup(group_id: GroupId, user_id: UserId) -> Dict[str, int]:
     statement = (
-        f"INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
+        "INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
     )
     values = (group_id, user_id)
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     con.commit()
     return {"id": cur.lastrowid}
 
 
 async def insertPunishmentType(
-    group_id: GroupId, type: CreatePunishmentType
+    group_id: GroupId, punishment_type: CreatePunishmentType
 ) -> Dict[str, int]:
-    statement = f"INSERT INTO punishment_types(group_id, name, value, logo_url) VALUES (?, ?, ?, ?)"
-    values = (group_id, type.name, type.value, type.logo_url)
+    statement = "INSERT INTO punishment_types(group_id, name, value, logo_url) VALUES (?, ?, ?, ?)"
+    values = (
+        group_id,
+        punishment_type.name,
+        punishment_type.value,
+        punishment_type.logo_url,
+    )
     try:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     con.commit()
     return {"id": cur.lastrowid}
 

@@ -32,7 +32,7 @@ class TestGroup:
     @pytest.mark.asyncio
     async def test_get_group(self, client: Any) -> None:
         async with client:
-            response = await client.get(f"/group/1")
+            response = await client.get("/group/1")
         assert response.status_code == 200
         assert response.json() == {
             "group_id": 1,

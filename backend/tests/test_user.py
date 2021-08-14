@@ -2,7 +2,6 @@ from typing import Any, Dict
 
 import pytest
 
-from app.main import app
 from tests.database import client
 
 createdUserReturn = {

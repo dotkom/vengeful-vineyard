@@ -1,6 +1,5 @@
-import sqlite3
 from timeit import default_timer as timer
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException, Request
 
@@ -11,11 +10,9 @@ from app.models import (
     CreatePunishmentType,
     CreateUser,
     Group,
-    Punishment,
-    PunishmentType,
     User,
 )
-from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
+from app.types import GroupId, PunishmentId, UserId
 
 db.loadSchema("schema.sql")
 
@@ -39,7 +36,7 @@ async def add_process_time_header(request: Request, call_next: Any) -> Any:
 @app.get("/user", tags=["User"])
 async def get_users() -> Dict[str, List[Any]]:
     dbUsers = db.cur.execute("""SELECT * FROM users""")
-    users = list(map(lambda x: dict(x), dbUsers))
+    users = list(map(dict, dbUsers))
     for user in users:
         # TODO: Add punishments
         user["punishments"] = []
@@ -87,9 +84,9 @@ async def post_group(group: CreateGroup) -> Dict[str, int]:
 
 @app.post("/group/{group_id}/punishmentType", tags=["Group"])
 async def add_punishment_type_to_group(
-    group_id: GroupId, type: CreatePunishmentType
+    group_id: GroupId, punishment_type: CreatePunishmentType
 ) -> Dict[str, int]:
-    return await db.insertPunishmentType(group_id, type)
+    return await db.insertPunishmentType(group_id, punishment_type)
 
 
 @app.post("/group/{group_id}/user/{user_id}", tags=["Group"])
