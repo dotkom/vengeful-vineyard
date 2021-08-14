@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 from fastapi import HTTPException
 
+from app.config import settings
 from app.models import (
     CreateGroup,
     CreatePunishment,
@@ -16,14 +17,7 @@ from app.models import (
 )
 from app.types import GroupId, PunishmentId, UserId
 
-
-def getDbPath() -> str:
-    path = os.environ.get("VENGEFUL_DATABASE")
-    assert path is not None
-    return path
-
-
-con = sqlite3.connect(getDbPath())
+con = sqlite3.connect(settings.vengeful_database)
 con.row_factory = sqlite3.Row
 cur = con.cursor()
 schemaFile = ""
@@ -45,7 +39,7 @@ def reconnect_db() -> None:
     global con
     global cur
 
-    con = sqlite3.connect(getDbPath())
+    con = sqlite3.connect(settings.vengeful_database)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     try:

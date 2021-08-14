@@ -1,6 +1,0 @@
-{
-  "maxPunishmentTypes": 20,
-  "maxGroupsPerUser": 20,
-  "maxActivePunishmentsPerGroup": 1000,
-  "maxGroupMembers": 100,
-}

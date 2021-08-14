@@ -7,7 +7,7 @@ Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 * `schema.sql`: Database schema
 * app: The application
   * `main.py`: Definition of endpoints and routes
-  * `config.json`: Configuration file
+  * `config.py`: Configuration file. Reads values from environment.
   * `db.py`: Database and CRUD
   * `models.py`: Pydantic models used for validation.
   * `types.py`: Custom types for better type checking.

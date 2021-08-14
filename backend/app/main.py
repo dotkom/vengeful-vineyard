@@ -21,6 +21,10 @@ db.loadSchema("schema.sql")
 
 app = FastAPI()
 
+# TODO
+# Authentication: https://fastapi.tiangolo.com/tutorial/security
+# SQL migration "framework"
+
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next: Any) -> Any:
