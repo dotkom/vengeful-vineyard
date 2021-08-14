@@ -39,11 +39,11 @@ class CreateUser(BaseModel):
     first_name: str
     last_name: str
     email: str
-    active: bool
 
 
 class User(CreateUser):
     user_id: UserId
+    active: bool
     punishments: List[Punishment]
 
 

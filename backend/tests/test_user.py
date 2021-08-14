@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 import pytest
 
@@ -13,12 +13,19 @@ createUser = {
     "first_name": "Joakim",
     "last_name": "Fremstad",
     "email": "email@example.com",
-    "active": True,
-    "punishments": [],
 }
 
-createdUser = createUser
+createdUser: Dict[str, Any] = createUser
 createdUser["user_id"] = 1
+createdUser["active"] = True
+createdUser["punishments"] = []
+
+
+fastResponse = 50  # Milliseconds
+
+
+def checkResponseTime(response: Any, max_time: float = fastResponse) -> None:
+    assert float(response.headers["Process-Time-Ms"]) <= max_time
 
 
 class TestUser:
@@ -28,6 +35,7 @@ class TestUser:
             response = await client.get("/user")
         assert response.status_code == 200
         assert response.json() == {"users": []}
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_create_user(self, client: Any) -> None:
@@ -38,6 +46,7 @@ class TestUser:
             )
         assert response.status_code == 200
         assert response.json() == createdUserReturn
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_create_user_duplicate(self, client: Any) -> None:
@@ -47,6 +56,7 @@ class TestUser:
                 json=createUser,
             )
         assert response.status_code == 400
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_get_user(self, client: Any) -> None:
@@ -54,12 +64,14 @@ class TestUser:
             response = await client.get("/user/1")
         assert response.status_code == 200
         assert response.json() == createdUser
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_get_nonexisting_user(self, client: Any) -> None:
         async with client:
             response = await client.get("/user/10")
         assert response.status_code == 404
+        checkResponseTime(response)
 
 
 class TestUserInGroup:
@@ -77,6 +89,7 @@ class TestUserInGroup:
         assert response.json() == {
             "id": 1,
         }
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_add_user_to_group(self, client: Any) -> None:
@@ -84,12 +97,14 @@ class TestUserInGroup:
         async with client:
             response = await client.post(f"/group/{self.group_id}/user/{self.user_id}")
         assert response.status_code == 200
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_add_user_to_group_duplicate(self, client: Any) -> None:
         async with client:
-            response2 = await client.post(f"/group/{self.group_id}/user/{self.user_id}")
-        assert response2.status_code == 400
+            response = await client.post(f"/group/{self.group_id}/user/{self.user_id}")
+        assert response.status_code == 400
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_check_user_in_group(self, client: Any) -> None:
@@ -97,6 +112,7 @@ class TestUserInGroup:
             response = await client.get("/group/1")
         assert response.status_code == 200
         assert response.json()["members"][0]["first_name"] == "Joakim"
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_create_punishmentType(self, client: Any) -> None:
@@ -107,6 +123,7 @@ class TestUserInGroup:
             )
         assert response.status_code == 200
         assert response.json() == {"id": 1}
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_get_group_with_punishmentType(self, client: Any) -> None:
@@ -121,6 +138,7 @@ class TestUserInGroup:
                 "punishment_type_id": 1,
             }
         ]
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_create_punishment_on_user(self, client: Any) -> None:
@@ -134,6 +152,7 @@ class TestUserInGroup:
             )
         assert response.status_code == 200
         assert response.json()["id"] == 1
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_verify_punishment(self, client: Any) -> None:
@@ -143,6 +162,7 @@ class TestUserInGroup:
             )
         assert response.status_code == 200
         assert response.json()["verifiedTime"] is not None
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_get_user_with_punishment(self, client: Any) -> None:
@@ -152,6 +172,7 @@ class TestUserInGroup:
         punishments = response.json()[0]["punishments"]
         assert len(punishments) == 1
         assert punishments[0]["verifiedTime"] is not None
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_delete_punishment(self, client: Any) -> None:
@@ -160,6 +181,7 @@ class TestUserInGroup:
                 f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}"
             )
         assert response.status_code == 200
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_delete_punishment_duplicate(self, client: Any) -> None:
@@ -168,6 +190,7 @@ class TestUserInGroup:
                 f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}"
             )
         assert response.status_code == 200
+        checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_verify_deleted_punishment(self, client: Any) -> None:
@@ -175,3 +198,4 @@ class TestUserInGroup:
             response = await client.get("/user")
         punishments = response.json()[0]["punishments"]
         assert len(punishments) == 0
+        checkResponseTime(response)

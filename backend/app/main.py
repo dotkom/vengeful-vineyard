@@ -1,7 +1,8 @@
 import sqlite3
+from timeit import default_timer as timer
 from typing import Any, Dict, List, Tuple
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 
 from app import db
 from app.models import (
@@ -21,6 +22,16 @@ db.loadSchema("schema.sql")
 app = FastAPI()
 
 
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next: Any) -> Any:
+    start_time = timer()
+    response = await call_next(request)
+    end_time = timer()
+    process_time = end_time - start_time
+    response.headers["Process-Time-Ms"] = str(round(process_time * 1000, 2))
+    return response
+
+
 @app.get("/user", tags=["User"])
 async def get_users() -> Dict[str, List[Any]]:
     dbUsers = db.cur.execute("""SELECT * FROM users""")
@@ -34,8 +45,6 @@ async def get_users() -> Dict[str, List[Any]]:
 
 @app.post("/user", tags=["User"])
 async def post_user(user: CreateUser) -> Dict[str, int]:
-    if not user.active:
-        raise HTTPException(status_code=400, detail="User must be active")
     return await db.insertUser(user)
 
 
