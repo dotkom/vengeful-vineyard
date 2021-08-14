@@ -38,10 +38,6 @@ async def add_process_time_header(request: Request, call_next: Any) -> Any:
 async def get_users() -> Dict[str, List[Any]]:
     dbUsers = db.cur.execute("""SELECT * FROM users""")
     users = list(map(dict, dbUsers))
-    for user in users:
-        # TODO: Add punishments
-        user["punishments"] = []
-
     return {"users": users}
 
 
@@ -52,15 +48,12 @@ async def post_user(user: CreateUser) -> Dict[str, int]:
 
 @app.get("/user/{user_id}", tags=["User"])
 async def get_user(user_id: UserId) -> User:
-    dbUser = db.cur.execute(
-        """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
-    ).fetchone()
-    if not dbUser:
-        raise HTTPException(status_code=404, detail="User not found")
-    # TODO: Add punishments
-    user = dict(dbUser)
-    user["punishments"] = []
-    return User(**user)
+    return await db.getUser(user_id, punishments=True)
+
+
+@app.get("/group/{group_id}/user/{user_id}", tags=["Group"])
+async def get_group_user(group_id: GroupId, user_id: UserId) -> User:
+    return await db.getGroupUser(group_id, user_id, punishments=True)
 
 
 @app.get("/group/{group_id}", tags=["Group"])
@@ -98,7 +91,7 @@ async def add_user_to_group(group_id: GroupId, user_id: UserId) -> Dict[str, int
 @app.post("/group/{group_id}/user/{user_id}/punishment", tags=["Group"])
 async def add_punishment(
     group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
-) -> Dict[str, int]:
+) -> Dict[str, List[int]]:
     return await db.insertPunishments(group_id, user_id, punishments)
 
 

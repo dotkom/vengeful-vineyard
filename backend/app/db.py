@@ -11,6 +11,7 @@ from app.models import (
     CreateUser,
     Punishment,
     PunishmentType,
+    User,
 )
 from app.types import GroupId, PunishmentId, UserId
 
@@ -46,6 +47,68 @@ def reconnect_db() -> None:
 
 
 reconnect_db()
+
+
+async def getUser(user_id: UserId, *, punishments: bool) -> User:
+    dbUser = cur.execute(
+        """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
+    ).fetchone()
+    if not dbUser:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = dict(dbUser)
+    user["punishments"] = []
+    if punishments:
+        # TODO: Create a real sql command
+        dbPunishments = cur.execute(
+            """SELECT group_members.group_id, name
+           FROM group_members
+           INNER JOIN users on users.user_id = group_members.user_id
+           INNER JOIN groups on groups.group_id = group_members.group_id
+           WHERE group_members.user_id = :user_id""",
+            {"user_id": user_id},
+        ).fetchall()
+        for dbPunishment in dbPunishments:
+            user["punishments"].append(dict(dbPunishment))
+    return User(**user)
+
+
+async def getGroupUser(
+    group_id: GroupId, user_id: UserId, *, punishments: bool
+) -> User:
+    dbUser = cur.execute(
+        """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
+    ).fetchone()
+    if not dbUser:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = dict(dbUser)
+    user["punishments"] = []
+    if punishments:
+        dbPunishments = cur.execute(
+            """SELECT punishment_id, group_id, user_id, punishment_type, reason, amount, verified_by, verified_time, created_time
+               FROM   group_punishments
+               WHERE  group_id = :group_id
+               AND    user_id = :user_id""",
+            {"user_id": user_id, "group_id": group_id},
+        ).fetchall()
+        for dbPunishment in dbPunishments:
+            user["punishments"].append(dict(dbPunishment))
+    return User(**user)
+
+
+# Todo: incomplete and not used
+async def getGroupUsers(group_id: GroupId) -> List[User]:
+    dbUsers = cur.execute(
+        """SELECT *
+           FROM users
+           INNER JOIN group_members
+           INNER JOIN group_punishments
+           WHERE group_members.group_id = :group_id
+           AND   group_punishments.group_id = :group_id""",
+        {"group_id": group_id},
+    ).fetchall()
+    for dbUser in dbUsers:
+        print(dbUser)
+    return User(**user)
 
 
 async def getPunishmentTypes(group_id: GroupId) -> List[PunishmentType]:
@@ -135,7 +198,7 @@ async def insertPunishmentType(
 
 async def insertPunishments(
     group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
-) -> Dict[str, int]:
+) -> Dict[str, List[int]]:
     ids = []
     for punishment in punishments:
         statement = "INSERT INTO group_punishments(group_id, user_id, punishment_type, reason, amount) VALUES (?, ?, ?, ?, ?)"
