@@ -38,6 +38,7 @@ class TestGroup:
             "group_id": 1,
             "name": "dotkom",
             "rules": "myrules",
+            "members": [],
             "punishment_types": [],
         }
 
@@ -73,7 +74,7 @@ class TestPunishmentType:
             "name": "dotkom",
             "rules": "myrules",
             "group_id": 1,
-            # "members": [],
+            "members": [],
             "punishment_types": [
                 {
                     "name": "Vin",

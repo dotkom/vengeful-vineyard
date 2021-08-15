@@ -1,3 +1,9 @@
+"""
+Application settings.
+
+Values can be overridden by environment variables.
+VENGEFUL_DATABASE=test.db will set vengeful_database="test.db"
+"""
 from pydantic import BaseSettings
 
 

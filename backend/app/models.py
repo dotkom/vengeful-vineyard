@@ -1,14 +1,14 @@
-from datetime import datetime
-from typing import List, Optional
-
-from pydantic import BaseModel
-
-from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
-
 """
 Create* are used to describe the JSON body of POST requests
 Without "Create" describes the response from GET requests
 """
+
+from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
+from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 
 
 class CreatePunishmentType(BaseModel):
@@ -45,7 +45,7 @@ class CreateUser(BaseModel):
 class User(CreateUser):
     user_id: UserId
     active: bool
-    punishments: List[Punishment]
+    punishments: Optional[List[Punishment]]
 
 
 class CreateGroup(BaseModel):
@@ -56,3 +56,4 @@ class CreateGroup(BaseModel):
 class Group(CreateGroup):
     group_id: GroupId
     punishment_types: List[PunishmentType]
+    members: List[User]

@@ -14,3 +14,10 @@ Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 * tests: Automatic tests
   * `database.py`: Database fixture
   * `test_*.py`: Testcases
+
+## To be done
+* Authentication: https://fastapi.tiangolo.com/tutorial/security
+* SQL migrations
+* Access control
+* Write tests for this
+

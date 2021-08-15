@@ -1,3 +1,6 @@
+"""
+Functions for interacting with the SQLite database.
+"""
 import sqlite3
 from typing import Dict, List
 
@@ -15,51 +18,51 @@ from app.models import (
 )
 from app.types import GroupId, PunishmentId, UserId
 
-con = sqlite3.connect(settings.vengeful_database)
-con.row_factory = sqlite3.Row
-cur = con.cursor()
-schemaFile = ""
+CON = sqlite3.connect(settings.vengeful_database)
+CON.row_factory = sqlite3.Row
+CUR = CON.cursor()
+SCHEMAFILE = ""
 
 
-def loadSchema(file: str) -> None:
-    global schemaFile
-    schemaFile = file
-    with open(file, "r") as f:
-        schema = f.readlines()
+def load_schema(filepath: str) -> None:
+    global SCHEMAFILE
+    SCHEMAFILE = filepath
+    with open(filepath, "r") as file:
+        schema = file.readlines()
         # Remove comments
         schema = list(filter(lambda x: not x.startswith("--"), schema))
         # Merge to one long string
-        schemaStr = "".join([line.strip() for line in schema])
-    cur.executescript(schemaStr)
+        schema_str = "".join([line.strip() for line in schema])
+    CUR.executescript(schema_str)
 
 
 def reconnect_db() -> None:
-    global con
-    global cur
+    global CON
+    global CUR
 
-    con = sqlite3.connect(settings.vengeful_database)
-    con.row_factory = sqlite3.Row
-    cur = con.cursor()
+    CON = sqlite3.connect(settings.vengeful_database)
+    CON.row_factory = sqlite3.Row
+    CUR = CON.cursor()
     try:
-        loadSchema(schemaFile)
-    except Exception:
+        load_schema(SCHEMAFILE)
+    except FileNotFoundError:
         pass
 
 
 reconnect_db()
 
 
-async def getUser(user_id: UserId, *, punishments: bool) -> User:
-    dbUser = cur.execute(
+async def get_user(user_id: UserId, *, punishments: bool) -> User:
+    db_user = CUR.execute(
         """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
     ).fetchone()
-    if not dbUser:
+    if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    user = dict(dbUser)
+    user = dict(db_user)
     user["punishments"] = []
     if punishments:
         # TODO: Create a real sql command
-        dbPunishments = cur.execute(
+        db_punishments = CUR.execute(
             """SELECT group_members.group_id, name
            FROM group_members
            INNER JOIN users on users.user_id = group_members.user_id
@@ -67,52 +70,53 @@ async def getUser(user_id: UserId, *, punishments: bool) -> User:
            WHERE group_members.user_id = :user_id""",
             {"user_id": user_id},
         ).fetchall()
-        for dbPunishment in dbPunishments:
-            user["punishments"].append(dict(dbPunishment))
+        for db_punishment in db_punishments:
+            user["punishments"].append(dict(db_punishment))
     return User(**user)
 
 
-async def getGroupUser(
+async def get_group_user(
     group_id: GroupId, user_id: UserId, *, punishments: bool
 ) -> User:
-    dbUser = cur.execute(
+    db_user = CUR.execute(
         """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
     ).fetchone()
-    if not dbUser:
+    if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    user = dict(dbUser)
+    user = dict(db_user)
     user["punishments"] = []
     if punishments:
-        dbPunishments = cur.execute(
+        db_punishments = CUR.execute(
             """SELECT punishment_id, group_id, user_id, punishment_type, reason, amount, verified_by, verified_time, created_time
                FROM   group_punishments
                WHERE  group_id = :group_id
                AND    user_id = :user_id""",
             {"user_id": user_id, "group_id": group_id},
         ).fetchall()
-        for dbPunishment in dbPunishments:
-            user["punishments"].append(dict(dbPunishment))
+        for db_punishment in db_punishments:
+            user["punishments"].append(dict(db_punishment))
     return User(**user)
 
 
-# Todo: incomplete and not used
-async def getGroupUsers(group_id: GroupId) -> List[User]:
-    dbUsers = cur.execute(
+async def get_group_users(group_id: GroupId) -> List[User]:
+    members = []
+    db_users = CUR.execute(
         """SELECT *
            FROM users
            INNER JOIN group_members
-           INNER JOIN group_punishments
            WHERE group_members.group_id = :group_id
-           AND   group_punishments.group_id = :group_id""",
+           AND   users.user_id = group_members.user_id""",
         {"group_id": group_id},
     ).fetchall()
-    for dbUser in dbUsers:
-        print(dbUser)
-    return User(**user)
+    for db_user in db_users:
+        user = dict(db_user)
+        user["punishments"] = None
+        members.append(User(**user))
+    return members
 
 
-async def getPunishmentTypes(group_id: GroupId) -> List[PunishmentType]:
-    punishment_types = cur.execute(
+async def get_punishment_types(group_id: GroupId) -> List[PunishmentType]:
+    punishment_types = CUR.execute(
         """SELECT * FROM punishment_types
            WHERE group_id = :group_id""",
         {"group_id": group_id},
@@ -120,8 +124,8 @@ async def getPunishmentTypes(group_id: GroupId) -> List[PunishmentType]:
     return list(map(lambda x: PunishmentType(**dict(x)), punishment_types.fetchall()))
 
 
-async def getPunishment(punishment_id: PunishmentId) -> Punishment:
-    punishments = cur.execute(
+async def get_punishment(punishment_id: PunishmentId) -> Punishment:
+    punishments = CUR.execute(
         """
         SELECT * FROM group_punishments
         WHERE punishment_id = :punishment_id
@@ -131,8 +135,8 @@ async def getPunishment(punishment_id: PunishmentId) -> Punishment:
     return Punishment(**dict(punishments.fetchone()))
 
 
-async def getPunishments(user_id: UserId, group_id: GroupId) -> List[Punishment]:
-    punishments = cur.execute(
+async def get_punishments(user_id: UserId, group_id: GroupId) -> List[Punishment]:
+    punishments = CUR.execute(
         """
         SELECT * FROM group_punishments
         WHERE group_id = :group_id
@@ -143,42 +147,42 @@ async def getPunishments(user_id: UserId, group_id: GroupId) -> List[Punishment]
     return list(map(lambda x: Punishment(**dict(x)), punishments.fetchall()))
 
 
-async def insertUser(user: CreateUser) -> Dict[str, int]:
+async def insert_user(user: CreateUser) -> Dict[str, int]:
     statement = "INSERT INTO users(first_name, last_name, email) VALUES (?, ?, ?)"
     values = (user.first_name, user.last_name, user.email)
     try:
-        cur.execute(statement, values)
-    except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    con.commit()
-    return {"id": cur.lastrowid}
+        CUR.execute(statement, values)
+    except sqlite3.IntegrityError as ex:
+        raise HTTPException(status_code=400, detail=str(ex)) from ex
+    CON.commit()
+    return {"id": CUR.lastrowid}
 
 
-async def insertGroup(group: CreateGroup) -> Dict[str, int]:
+async def insert_group(group: CreateGroup) -> Dict[str, int]:
     statement = "INSERT INTO groups(name, rules) VALUES (?, ?)"
     values = (group.name, group.rules)
     try:
-        cur.execute(statement, values)
-    except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    con.commit()
-    return {"id": cur.lastrowid}
+        CUR.execute(statement, values)
+    except sqlite3.IntegrityError as ex:
+        raise HTTPException(status_code=400, detail=str(ex)) from ex
+    CON.commit()
+    return {"id": CUR.lastrowid}
 
 
-async def insertUserInGroup(group_id: GroupId, user_id: UserId) -> Dict[str, int]:
+async def insert_user_in_group(group_id: GroupId, user_id: UserId) -> Dict[str, int]:
     statement = (
         "INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
     )
     values = (group_id, user_id)
     try:
-        cur.execute(statement, values)
-    except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    con.commit()
-    return {"id": cur.lastrowid}
+        CUR.execute(statement, values)
+    except sqlite3.IntegrityError as ex:
+        raise HTTPException(status_code=400, detail=str(ex)) from ex
+    CON.commit()
+    return {"id": CUR.lastrowid}
 
 
-async def insertPunishmentType(
+async def insert_punishment_type(
     group_id: GroupId, punishment_type: CreatePunishmentType
 ) -> Dict[str, int]:
     statement = "INSERT INTO punishment_types(group_id, name, value, logo_url) VALUES (?, ?, ?, ?)"
@@ -189,14 +193,14 @@ async def insertPunishmentType(
         punishment_type.logo_url,
     )
     try:
-        cur.execute(statement, values)
-    except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    con.commit()
-    return {"id": cur.lastrowid}
+        CUR.execute(statement, values)
+    except sqlite3.IntegrityError as ex:
+        raise HTTPException(status_code=400, detail=str(ex)) from ex
+    CON.commit()
+    return {"id": CUR.lastrowid}
 
 
-async def insertPunishments(
+async def insert_punishments(
     group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
 ) -> Dict[str, List[int]]:
     ids = []
@@ -210,23 +214,22 @@ async def insertPunishments(
             punishment.amount,
         )
         try:
-            cur.execute(statement, values)
-            ids.append(cur.lastrowid)
-        except sqlite3.IntegrityError as e:
-            raise HTTPException(status_code=400, detail=str(e)) from e
-    con.commit()
+            CUR.execute(statement, values)
+            ids.append(CUR.lastrowid)
+        except sqlite3.IntegrityError as ex:
+            raise HTTPException(status_code=400, detail=str(ex)) from ex
+    CON.commit()
     return {"ids": ids}
 
 
-async def deletePunishment(punishment_id: PunishmentId) -> None:
-    # TODO: ACL
+async def delete_punishment(punishment_id: PunishmentId) -> None:
     statement = "DELETE FROM group_punishments WHERE punishment_id=:punishment_id"
-    cur.execute(statement, {"punishment_id": punishment_id})
-    con.commit()
+    CUR.execute(statement, {"punishment_id": punishment_id})
+    CON.commit()
 
 
-async def verifyPunishment(punishment_id: PunishmentId) -> Punishment:
+async def verify_punishment(punishment_id: PunishmentId) -> Punishment:
     statement = "UPDATE group_punishments SET verified_time=datetime('now', 'localtime') WHERE punishment_id=:punishment_id"
-    cur.execute(statement, {"punishment_id": punishment_id})
-    con.commit()
-    return await getPunishment(punishment_id)
+    CUR.execute(statement, {"punishment_id": punishment_id})
+    CON.commit()
+    return await get_punishment(punishment_id)
