@@ -2,7 +2,8 @@
 Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 
 ## Development
-`make dev-reqs`
+* Start with: `make .dev-reqs`
+* See `make help`
 
 ## Structure
 * `schema.sql`: Database schema
