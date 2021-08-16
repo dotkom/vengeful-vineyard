@@ -27,13 +27,16 @@ class CreatePunishment(BaseModel):
     amount: int
 
 
-class Punishment(CreatePunishment):
+class PunishmentOut(CreatePunishment):
     punishment_id: PunishmentId
-    group_id: GroupId
-    user_id: UserId
     created_time: datetime
     verified_time: Optional[datetime]
     verified_by: Optional[UserId]
+
+
+class PunishmentDb(PunishmentOut):
+    group_id: GroupId
+    user_id: UserId
 
 
 class CreateUser(BaseModel):
@@ -45,7 +48,7 @@ class CreateUser(BaseModel):
 class User(CreateUser):
     user_id: UserId
     active: bool
-    punishments: Optional[List[Punishment]]
+    punishments: Optional[List[PunishmentOut]]
 
 
 class CreateGroup(BaseModel):

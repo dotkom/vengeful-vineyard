@@ -27,8 +27,10 @@ testvv: activate .dev-reqs
 .dev-reqs:
 	. env/bin/activate && pip install -r requirements-dev.txt && touch .dev-reqs
 
-mypy: activate .dev-reqs
+lint: activate .dev-reqs
+	black app tests && isort app tests
 	mypy --strict .
+	pylint app
 
 clean:
 	rm -rf env

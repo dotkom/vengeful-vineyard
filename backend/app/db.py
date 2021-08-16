@@ -12,7 +12,7 @@ from app.models import (
     CreatePunishment,
     CreatePunishmentType,
     CreateUser,
-    Punishment,
+    PunishmentDb,
     PunishmentType,
     User,
 )
@@ -61,13 +61,14 @@ async def get_user(user_id: UserId, *, punishments: bool) -> User:
     user = dict(db_user)
     user["punishments"] = []
     if punishments:
-        # TODO: Create a real sql command
         db_punishments = CUR.execute(
-            """SELECT group_members.group_id, name
-           FROM group_members
-           INNER JOIN users on users.user_id = group_members.user_id
-           INNER JOIN groups on groups.group_id = group_members.group_id
-           WHERE group_members.user_id = :user_id""",
+            """
+            SELECT punishment_id, punishment_type, reason, amount, verified_by, verified_time, created_time
+            FROM group_punishments
+            INNER JOIN groups
+            ON group_punishments.group_id = groups.group_id
+            WHERE user_id = :user_id;
+            """,
             {"user_id": user_id},
         ).fetchall()
         for db_punishment in db_punishments:
@@ -124,7 +125,7 @@ async def get_punishment_types(group_id: GroupId) -> List[PunishmentType]:
     return list(map(lambda x: PunishmentType(**dict(x)), punishment_types.fetchall()))
 
 
-async def get_punishment(punishment_id: PunishmentId) -> Punishment:
+async def get_punishment(punishment_id: PunishmentId) -> PunishmentDb:
     punishments = CUR.execute(
         """
         SELECT * FROM group_punishments
@@ -132,10 +133,10 @@ async def get_punishment(punishment_id: PunishmentId) -> Punishment:
         """,
         {"punishment_id": punishment_id},
     )
-    return Punishment(**dict(punishments.fetchone()))
+    return PunishmentDb(**dict(punishments.fetchone()))
 
 
-async def get_punishments(user_id: UserId, group_id: GroupId) -> List[Punishment]:
+async def get_punishments(user_id: UserId, group_id: GroupId) -> List[PunishmentDb]:
     punishments = CUR.execute(
         """
         SELECT * FROM group_punishments
@@ -144,7 +145,7 @@ async def get_punishments(user_id: UserId, group_id: GroupId) -> List[Punishment
         """,
         {"group_id": group_id, "user_id": user_id},
     )
-    return list(map(lambda x: Punishment(**dict(x)), punishments.fetchall()))
+    return list(map(lambda x: PunishmentDb(**dict(x)), punishments.fetchall()))
 
 
 async def insert_user(user: CreateUser) -> Dict[str, int]:
@@ -228,7 +229,7 @@ async def delete_punishment(punishment_id: PunishmentId) -> None:
     CON.commit()
 
 
-async def verify_punishment(punishment_id: PunishmentId) -> Punishment:
+async def verify_punishment(punishment_id: PunishmentId) -> PunishmentDb:
     statement = "UPDATE group_punishments SET verified_time=datetime('now', 'localtime') WHERE punishment_id=:punishment_id"
     CUR.execute(statement, {"punishment_id": punishment_id})
     CON.commit()

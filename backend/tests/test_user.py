@@ -3,6 +3,7 @@ from typing import Any, Dict
 import pytest
 
 from tests.database import client
+from tests.rest import rest_create_group, rest_create_user
 
 createdUserReturn = {
     "id": 1,
@@ -38,11 +39,7 @@ class TestUser:
 
     @pytest.mark.asyncio
     async def test_create_user(self, client: Any) -> None:
-        async with client:
-            response = await client.post(
-                "/user",
-                json=createUser,
-            )
+        response = await rest_create_user(client, createUser)
         assert response.status_code == 200
         assert response.json() == createdUserReturn
         checkResponseTime(response)
@@ -80,10 +77,7 @@ class TestUserInGroup:
 
     @pytest.mark.asyncio
     async def test_create_group(self, client: Any) -> None:
-        async with client:
-            response = await client.post(
-                "/group", json={"name": "dotkom", "rules": "http://example.com"}
-            )
+        response = await rest_create_group(client, "dotkom")
         assert response.status_code == 200
         assert response.json() == {
             "id": 1,
@@ -159,9 +153,7 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_verify_punishment(self, client: Any) -> None:
         async with client:
-            response = await client.post(
-                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}/verify"
-            )
+            response = await client.post(f"/punishment/{self.punishment_id}/verify")
         assert response.status_code == 200
         assert response.json()["verified_time"] is not None
         checkResponseTime(response)
@@ -179,18 +171,14 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_delete_punishment(self, client: Any) -> None:
         async with client:
-            response = await client.delete(
-                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}"
-            )
+            response = await client.delete(f"/punishment/{self.punishment_id}")
         assert response.status_code == 200
         checkResponseTime(response)
 
     @pytest.mark.asyncio
     async def test_delete_punishment_duplicate(self, client: Any) -> None:
         async with client:
-            response = await client.delete(
-                f"/group/{self.group_id}/user/{self.user_id}/punishment/{self.punishment_id}"
-            )
+            response = await client.delete(f"/punishment/{self.punishment_id}")
         assert response.status_code == 200
         checkResponseTime(response)
 
