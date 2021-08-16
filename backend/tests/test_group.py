@@ -1,7 +1,7 @@
+# -*- coding: utf-8 -*-
 from typing import Any
 
 import pytest
-
 from tests.database import client
 
 

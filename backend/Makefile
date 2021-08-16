@@ -1,4 +1,4 @@
-.PHONY: prod dev test testv testvv mypy activate
+.PHONY: prod dev test testv testvv mypy pylint activate clean
 
 env:
 	python3 -m venv env
@@ -21,16 +21,17 @@ testv: activate .dev-reqs
 testvv: activate .dev-reqs
 	VENGEFUL_DATABASE=":memory:" pytest -vv
 
-.prod-reqs:
+.prod-reqs: env
 	. env/bin/activate && pip install -r requirements.txt && touch .prod-reqs
 
-.dev-reqs:
-	. env/bin/activate && pip install -r requirements-dev.txt && touch .dev-reqs
+.dev-reqs: env .prod-reqs
+	. env/bin/activate && pip install -r requirements-dev.txt &&  pre-commit install && touch .dev-reqs
 
-lint: activate .dev-reqs
-	black app tests && isort app tests
-	mypy --strict .
+pylint: activate
 	pylint app
+
+mypy: activate
+	mypy --strict app tests
 
 clean:
 	rm -rf env

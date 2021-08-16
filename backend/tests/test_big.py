@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 import random
 import string
 from typing import Any
 
 import pytest
-
 from app.types import GroupId, UserId
 from tests.database import client
 from tests.rest import rest_create_group, rest_create_user, rest_join_group

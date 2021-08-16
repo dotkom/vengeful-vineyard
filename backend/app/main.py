@@ -1,11 +1,10 @@
+# -*- coding: utf-8 -*-
 """
 Definition of API
 """
 
 from timeit import default_timer as timer
 from typing import Any, Dict, List
-
-from fastapi import FastAPI, HTTPException, Request
 
 from app import db
 from app.models import (
@@ -18,6 +17,7 @@ from app.models import (
     User,
 )
 from app.types import GroupId, PunishmentId, UserId
+from fastapi import FastAPI, HTTPException, Request
 
 db.load_schema("schema.sql")
 

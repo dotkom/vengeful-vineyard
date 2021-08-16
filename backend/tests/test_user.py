@@ -1,7 +1,7 @@
+# -*- coding: utf-8 -*-
 from typing import Any, Dict
 
 import pytest
-
 from tests.database import client
 from tests.rest import rest_create_group, rest_create_user
 

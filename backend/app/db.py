@@ -1,10 +1,9 @@
+# -*- coding: utf-8 -*-
 """
 Functions for interacting with the SQLite database.
 """
 import sqlite3
 from typing import Dict, List
-
-from fastapi import HTTPException
 
 from app.config import settings
 from app.models import (
@@ -17,6 +16,7 @@ from app.models import (
     User,
 )
 from app.types import GroupId, PunishmentId, UserId
+from fastapi import HTTPException
 
 CON = sqlite3.connect(settings.vengeful_database)
 CON.row_factory = sqlite3.Row

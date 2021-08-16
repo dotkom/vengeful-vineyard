@@ -1,7 +1,8 @@
 # Backend
 Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 
-## See Makefile for installation and running
+## Development
+`make dev-reqs`
 
 ## Structure
 * `schema.sql`: Database schema
@@ -20,4 +21,3 @@ Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 * SQL migrations
 * Access control
 * Write tests for this
-

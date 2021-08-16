@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 from typing import Any
 
 import pytest
-from httpx import AsyncClient
-
 from app.db import reconnect_db
 from app.main import app
+from httpx import AsyncClient
 
 
 @pytest.fixture(scope="class")

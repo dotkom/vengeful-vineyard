@@ -149,6 +149,8 @@ disable=print-statement,
         trailing-newlines,
         line-too-long,
         too-few-public-methods,
+        import-error,
+        wrong-import-order,
         global-statement
 
 # Enable the message, report, category or checker with the given id(s). You can

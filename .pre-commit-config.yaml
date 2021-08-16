@@ -1,0 +1,50 @@
+files: backend
+exclude: backend/env
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+    -   id: check-case-conflict
+    -   id: check-docstring-first
+    -   id: check-json
+    -   id: check-merge-conflict
+    -   id: check-yaml
+    -   id: debug-statements
+    -   id: end-of-file-fixer
+    -   id: fix-byte-order-marker
+    -   id: fix-encoding-pragma
+    -   id: forbid-new-submodules
+    -   id: mixed-line-ending
+    -   id: requirements-txt-fixer
+    -   id: trailing-whitespace
+-   repo: local
+    hooks:
+    -   id: run-tests
+        name: run tests
+        entry: 'bash -c "cd backend && make test"'
+        types: [python]
+        language: system
+        always_run: true
+        pass_filenames: false
+    -   id: pylint
+        name: pylist
+        entry: bash -c "cd backend && make pylint"
+        pass_filenames: false
+        types: [python]
+        language: system
+    -   id: mypy
+        name: mypy type checking
+        entry: bash -c "cd backend && make mypy"
+        pass_filenames: false
+        types: [python]
+        language: system
+    -   id: black
+        name: autoformat (python)
+        entry: bash -c "source backend/env/bin/activate && black $@"
+        types: [python]
+        language: system
+    -   id: isort
+        name: sort imports (python)
+        entry: bash -c "source backend/env/bin/activate && isort $@"
+        types: [python]
+        language: system

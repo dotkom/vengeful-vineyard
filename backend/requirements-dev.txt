@@ -1,5 +1,5 @@
-pytest-asyncio
 httpx
-mypy
-black
 isort
+mypy
+pre-commit
+pytest-asyncio

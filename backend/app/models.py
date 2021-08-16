@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Create* are used to describe the JSON body of POST requests
 Without "Create" describes the response from GET requests
@@ -6,9 +7,8 @@ Without "Create" describes the response from GET requests
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
-
 from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
 class CreatePunishmentType(BaseModel):
