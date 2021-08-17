@@ -27,7 +27,7 @@ repos:
         always_run: true
         pass_filenames: false
     -   id: pylint
-        name: pylist
+        name: pylint
         entry: bash -c "cd backend && make pylint"
         pass_filenames: false
         types: [python]

@@ -2,7 +2,7 @@
 Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 
 ## Development
-* Start with: `make .dev-reqs`
+* Start server with: `make dev`
 * See `make help`
 
 ## Structure

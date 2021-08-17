@@ -6,38 +6,38 @@ env:
 activate: env
 	. env/bin/activate
 
-prod: activate .prod-reqs  ## Run production server (vengeful_vineyard.db)
+prod: activate .prod-reqs
 	VENGEFUL_DATABASE="vengeful_vineyard.db" uvicorn app.main:app --host 0.0.0.0
 
-dev: activate .dev-reqs    ## Run development server (dev.db)
-	VENGEFUL_DATABASE="dev.db" uvicorn app.main:app
+dev: activate .dev-reqs
+	VENGEFUL_DATABASE="dev.db" uvicorn --reload --reload-dir app app.main:app
 
-test: activate .dev-reqs  ## Run tests
+test: activate .dev-reqs
 	VENGEFUL_DATABASE=":memory:" pytest
 
-testv: activate .dev-reqs  ## Run tests (verbose)
+testv: activate .dev-reqs
 	VENGEFUL_DATABASE=":memory:" pytest -v
 
-testvv: activate .dev-reqs  ## Run tests (very verbose)
+testvv: activate .dev-reqs
 	VENGEFUL_DATABASE=":memory:" pytest -vv
 
-.prod-reqs: env            ## Install Python production requirements
+.prod-reqs: env
 	. env/bin/activate && pip install -r requirements.txt && touch .prod-reqs
 
-.dev-reqs: env .prod-reqs  ## Install Python development requirements
+.dev-reqs: env .prod-reqs
 	. env/bin/activate && pip install -r requirements-dev.txt &&  pre-commit install && touch .dev-reqs
 
-pylint: activate   ## Python linter to check for common mistakes
+pylint: activate
 	pylint app
 
-mypy: activate     ## Typecheck Python code
+mypy: activate
 	mypy --strict app tests
 
-clean:             ## Clean up Python environment
+clean:
 	rm -rf env
 	rm -f .dev-reqs .prod-reqs
 
-help:     ## Show this help.
+help:
 	@echo "Makefile commands:"
 	@echo "help:  	Show this help."
 	@echo ""
