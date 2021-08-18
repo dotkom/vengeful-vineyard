@@ -17,8 +17,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: Install dependencies
+    - name: Run commit hooks
       run: |
-        cd backend
-        make .dev-reqs
-        pre-commit run -av
+        cd backend && make .dev-reqs && pre-commit run -av
