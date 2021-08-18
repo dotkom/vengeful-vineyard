@@ -1,5 +1,8 @@
+black
 httpx
 isort
 mypy
+mypy_extensions
 pre-commit
+pylint
 pytest-asyncio
