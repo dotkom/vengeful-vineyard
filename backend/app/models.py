@@ -1,62 +1,62 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import backref, relationship
-from sqlalchemy.sql import func
+# -*- coding: utf-8 -*-
+"""
+Create* are used to describe the JSON body of POST requests
+Without "Create" describes the response from GET requests
+"""
 
-from app.database import Base
+from datetime import datetime
+from typing import List, Optional
 
-
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    active = Column(Boolean, default=True)
-    groups = relationship("Group", secondary="usergrouplink")
-    punishments = relationship("Punishment", foreign_keys="Punishment.givenTo_id")
-    debt = Column(Integer, default=0)
-    totalPaid = Column(Integer, default=0)
+from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
-class Group(Base):
-    __tablename__ = "groups"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    logoUrl = Column(String)
-    members = relationship("User", secondary="usergrouplink")
-    punishmentTypes = relationship(
-        "PunishmentType", foreign_keys="PunishmentType.group_id"
-    )
+class CreatePunishmentType(BaseModel):
+    name: str
+    value: int
+    logo_url: str
 
 
-class UserGroupLink(Base):
-    __tablename__ = "usergrouplink"
-    group_id = Column(Integer, ForeignKey("groups.id"), primary_key=True)
-    group = relationship(Group, backref=backref("user_assoc"))
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    user = relationship(User, backref=backref("group_assoc"))
-    admin = Column(Boolean, default=False)
+class PunishmentType(CreatePunishmentType):
+    punishment_type_id: PunishmentTypeId
 
 
-class Punishment(Base):
-    __tablename__ = "punishments"
-
-    id = Column(Integer, primary_key=True, index=True)
-    reason = Column(String)
-    givenBy_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    givenTo_id = Column(Integer, ForeignKey("users.id"))
-    group_id = Column(Integer, ForeignKey("groups.id"))
-    givenTime = Column(DateTime, server_default=func.now())
-    verifiedBy_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    verifiedTime = Column(DateTime, nullable=True)
-    type_id = Column(Integer, ForeignKey("punishment_types.id"))
+class CreatePunishment(BaseModel):
+    punishment_type: PunishmentTypeId
+    reason: str
+    amount: int
 
 
-class PunishmentType(Base):
-    __tablename__ = "punishment_types"
+class PunishmentOut(CreatePunishment):
+    punishment_id: PunishmentId
+    created_time: datetime
+    verified_time: Optional[datetime]
+    verified_by: Optional[UserId]
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True)
-    value = Column(Integer)
-    logoUrl = Column(String)
-    group_id = Column(Integer, ForeignKey("groups.id"))
+
+class PunishmentDb(PunishmentOut):
+    group_id: GroupId
+    user_id: UserId
+
+
+class CreateUser(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+
+
+class User(CreateUser):
+    user_id: UserId
+    active: bool
+    punishments: Optional[List[PunishmentOut]]
+
+
+class CreateGroup(BaseModel):
+    name: str
+    rules: str
+
+
+class Group(CreateGroup):
+    group_id: GroupId
+    punishment_types: List[PunishmentType]
+    members: List[User]

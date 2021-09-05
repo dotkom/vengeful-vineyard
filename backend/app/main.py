@@ -1,154 +1,120 @@
-from typing import List, Generator
+# -*- coding: utf-8 -*-
+"""
+Definition of API
+"""
 
-from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy.orm import Session
+from timeit import default_timer as timer
+from typing import Any, Dict, List
 
-from app import crud
-from app import models
-from app import schemas
-from app.database import SessionLocal, engine, Base
-from datetime import datetime
+from app import db
+from app.models import (
+    CreateGroup,
+    CreatePunishment,
+    CreatePunishmentType,
+    CreateUser,
+    Group,
+    PunishmentOut,
+    User,
+)
+from app.types import GroupId, PunishmentId, UserId
+from fastapi import FastAPI, HTTPException, Request
 
-Base.metadata.create_all(bind=engine)
+db.load_schema("schema.sql")
 
 app = FastAPI()
 
 
-# Dependency
-def get_db() -> Generator[int, int, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next: Any) -> Any:
+    start_time = timer()
+    response = await call_next(request)
+    end_time = timer()
+    process_time = end_time - start_time
+    response.headers["Process-Time-Ms"] = str(round(process_time * 1000, 2))
+    return response
 
 
-@app.post("/user", response_model=schemas.User, tags=["User"])
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)) -> models.User:
-    db_user = crud.get_user_by_name(db, name=user.name)
-    if db_user:
-        raise HTTPException(status_code=400, detail="User already exists")
-    return crud.create_user(db=db, user=user)
+@app.get("/user", tags=["User"])
+async def get_users() -> Dict[str, List[Any]]:
+    db_users = db.CUR.execute("""SELECT * FROM users""")
+    users = list(map(dict, db_users))
+    return {"users": users}
 
 
-@app.get("/user", response_model=List[schemas.User], tags=["User"])
-def read_users(db: Session = Depends(get_db)) -> List[models.User]:
-    users = crud.get_users(db)
-    return users
+@app.post("/user", tags=["User"])
+async def post_user(user: CreateUser) -> Dict[str, int]:
+    return await db.insert_user(user)
 
 
-@app.get("/user/{user_id}", response_model=schemas.User, tags=["User"])
-def read_user(user_id: int, db: Session = Depends(get_db)) -> models.User:
-    db_user = crud.get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+@app.get("/user/{user_id}", tags=["User"])
+async def get_user(user_id: UserId) -> User:
+    return await db.get_user(user_id, punishments=True)
 
 
-@app.get("/group", response_model=List[schemas.Group], tags=["Group"])
-def read_groups(db: Session = Depends(get_db)) -> List[models.Group]:
-    return crud.get_groups(db)
+@app.get("/group/{group_id}/user/{user_id}", tags=["Group"])
+async def get_group_user(group_id: GroupId, user_id: UserId) -> User:
+    return await db.get_group_user(group_id, user_id, punishments=True)
 
 
-@app.post("/group", response_model=schemas.Group, tags=["Group"])
-def create_group(
-    group: schemas.GroupCreate, db: Session = Depends(get_db)
-) -> models.Group:
-    db_group = crud.get_group_by_name(db, name=group.name)
-    if db_group:
-        raise HTTPException(status_code=400, detail="Group already exists")
-    return crud.create_group(db, group)
+@app.get("/group/{group_id}", tags=["Group"])
+async def get_group(group_id: GroupId) -> Group:
+    db_group = db.CUR.execute(
+        """SELECT * FROM groups
+           WHERE groups.group_id = :group_id""",
+        {"group_id": group_id},
+    ).fetchone()
+    if not db_group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    group = dict(db_group)
+    group["punishment_types"] = await db.get_punishment_types(group_id)
+    group["members"] = await db.get_group_users(group_id)
+    return Group(**dict(group))
 
 
-@app.get("/group/{group_id}", response_model=schemas.Group, tags=["Group"])
-def read_group(group_id: int, db: Session = Depends(get_db)) -> models.Group:
-    db_group = crud.get_group(db, group_id=group_id)
-    if db_group is None:
-        raise HTTPException(status_code=404, detail="group not found")
-    return db_group
+@app.post("/group", tags=["Group"])
+async def post_group(group: CreateGroup) -> Dict[str, int]:
+    return await db.insert_group(group)
 
 
 @app.post("/group/{group_id}/punishmentType", tags=["Group"])
-def create_punishment_type(
-    group_id: int,
-    punishmentType: schemas.PunishmentTypeCreate,
-    db: Session = Depends(get_db),
-) -> models.PunishmentType:
-    return crud.create_punishment_type(db=db, group_id=group_id, item=punishmentType)
+async def add_punishment_type_to_group(
+    group_id: GroupId, punishment_type: CreatePunishmentType
+) -> Dict[str, int]:
+    return await db.insert_punishment_type(group_id, punishment_type)
 
 
-@app.post("/group/{group_id}/{user_id}", tags=["Group"])
-def add_user_to_group(
-    user_id: int, group_id: int, admin: bool = False, db: Session = Depends(get_db)
-) -> models.UserGroupLink:
-    db_group = crud.get_group(db, group_id=group_id)
-    if db_group is None:
-        raise HTTPException(status_code=404, detail="group not found")
-    db_user = crud.get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="user not found")
-
-    userInGroup = (
-        db.query(models.UserGroupLink)
-        .filter(
-            models.UserGroupLink.user_id == user_id
-            and models.UserGroupLink.group_id == group_id
-        )
-        .first()
-    )
-    if not userInGroup:
-        return crud.add_user_to_group(db, db_user, db_group, admin)
-    raise HTTPException(status_code=400, detail="User is already in group")
+@app.post("/group/{group_id}/user/{user_id}", tags=["Group"])
+async def add_user_to_group(group_id: GroupId, user_id: UserId) -> Dict[str, int]:
+    return await db.insert_user_in_group(group_id, user_id)
 
 
-@app.post(
-    "/punishment",
-    response_model=schemas.Punishment,
-    tags=["Punishment"],
-)
-def create_punishment_for_user(
-    punishment: schemas.PunishmentBase,
-    db: Session = Depends(get_db),
-) -> models.Punishment:
-    return crud.create_user_punishment(
-        db=db,
-        punishment=punishment,
-        user_id=punishment.givenTo_id,
-        group_id=punishment.group_id,
-    )
+@app.post("/group/{group_id}/user/{user_id}/punishment", tags=["Group"])
+async def add_punishment(
+    group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
+) -> Dict[str, List[int]]:
+    return await db.insert_punishments(group_id, user_id, punishments)
 
 
-@app.post(
-    "/punishment/{punishment_id}/verify",
-    response_model=schemas.Punishment,
-    tags=["Punishment"],
-)
-def verify_punishment_for_user(
-    punishment_id: int, db: Session = Depends(get_db)
-) -> models.Punishment:
-    punishment = crud.get_punishment(db, punishment_id)
-    if not punishment:
-        raise HTTPException(status_code=400, detail="Punishment does not exist")
-    if punishment.verifiedTime is None:
-        punishment.verifiedTime = datetime.now()
-        db.commit()
-        return punishment
-    raise HTTPException(status_code=400, detail="Punishment is already verified")
+@app.delete("/punishment/{punishment_id}", tags=["Punishment"])
+async def delete_punishment(punishment_id: PunishmentId) -> None:
+    await db.delete_punishment(punishment_id)
 
 
-@app.delete(
-    "/punishment/{punishment_id}",
-    tags=["Punishment"],
-)
-def delete_punishment(punishment_id: int, db: Session = Depends(get_db)):
-    punishment = crud.get_punishment(db, punishment_id)
-    if not punishment:
-        raise HTTPException(status_code=400, detail="Punishment does not exist")
-    db.query(models.Punishment).filter_by(id=punishment_id).delete()
-    db.commit()
+@app.post("/punishment/{punishment_id}/verify", tags=["Punishment"])
+async def verify_punishment(punishment_id: PunishmentId) -> PunishmentOut:
+    return await db.verify_punishment(punishment_id)
 
 
-if __name__ == "__main__":
-    import uvicorn
+@app.get("/user/{user_id}/group", tags=["User"])
+async def get_user_groups(user_id: UserId) -> Dict[str, Any]:
+    groups = db.CUR.execute(
+        """SELECT group_members.group_id, name from group_members
+           INNER JOIN users on users.user_id = group_members.user_id
+           INNER JOIN groups on groups.group_id = group_members.group_id
+           WHERE group_members.user_id = :user_id""",
+        {"user_id": user_id},
+    ).fetchall()
+    if groups is None:
+        raise HTTPException(status_code=500, detail="User groups could not be found")
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    return {"groups": list(map(lambda x: {"id": x[0], "group": x[1]}, groups))}

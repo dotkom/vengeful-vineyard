@@ -12,7 +12,7 @@ npm install
 npm run build
 ```
 
-Then start the [API mock](api_mock).
+Start the [backend](../backend/README.md), or the [API mock](api_mock).
 
 ## Building and running in production mode
 

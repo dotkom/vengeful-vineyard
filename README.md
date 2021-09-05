@@ -4,7 +4,12 @@
 
 ## Description
 
-This project was created for the sole purpose of :boom: punishing members in the student organization <i>Online Linjeforening</i> whenever they fail to perform their respective tasks. Their failure shall be documented on our page as a 'vinstraff'(wine punishment). While we already have a functioning site called [RedWine](https://online.ntnu.no/redwine/), that page is old and outdated, and does not provide all the functions we wish it had - hence the need for an updated system.
+This project was created for the sole purpose of :boom: punishing members in the
+student organization <i>Online Linjeforening</i> whenever they fail to perform
+their respective tasks.
+
+Their failure shall be documented on our page as a 'vinstraff' (wine punishment).
+The old and outdated version can be found here: [RedWine](https://online.ntnu.no/redwine/).
 
 ## Installation - Git Repository and Setup
 
@@ -18,12 +23,10 @@ cd vengeful-vineyard
 ```
 
 ### Installation for Frontend and Backend
-
 You need npm, pip and Python3 installed on your computer.
 
-A separate README.md for installation can be found inside frontend/ and backend/.
-For now, we have a mock API as our backend that can be found inside frontend/mock_api.
+* [Frontend](frontend/README.md)
+* [Backend](backend/README.md)
 
 ## Contributing
-
 Please take a look at our issues if you want to contribute to this project. Pull requests are welcome!

@@ -86,5 +86,6 @@ target/
 __pycache__/
 local_settings.py
 
-.env
-*.db
+# Makefile
+.dev-reqs
+.prod-reqs
