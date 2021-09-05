@@ -27,7 +27,7 @@ SCHEMAFILE = ""
 def load_schema(filepath: str) -> None:
     global SCHEMAFILE
     SCHEMAFILE = filepath
-    with open(filepath, "r") as file:
+    with open(filepath, "r", encoding="utf-8") as file:
         schema = file.readlines()
         # Remove comments
         schema = list(filter(lambda x: not x.startswith("--"), schema))
