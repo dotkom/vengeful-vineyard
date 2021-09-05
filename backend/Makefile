@@ -54,6 +54,6 @@ help:
 	@echo "testvv:	Run tests (very verbose)"
 	@echo "pylint:	Python linter to check for common mistakes"
 	@echo "mypy:  	Typecheck Python code"
-	@echo "hooks:  	Run all commit hooks"
+	@echo "hooks:	Run all commit hooks"
 	@echo ""
 	@echo "clean: 	Clean up Python environment"
