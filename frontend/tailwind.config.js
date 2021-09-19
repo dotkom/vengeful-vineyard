@@ -11,7 +11,7 @@ module.exports = {
   },
   darkMode: false, // or 'media' or 'class'
   theme: {
-    colors: {
+    extend: {colors: {
       primary: {
         100: "#73A8CC",
         250: "#4C90BF",
@@ -25,8 +25,9 @@ module.exports = {
       success: "#09AA09",
       info: "#0A94C2",
       grey: "#E0E0E0",
+      white: "white",
     },
-    extend: {},
+  },
   },
   variants: {
     extend: {},
