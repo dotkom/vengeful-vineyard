@@ -97,16 +97,16 @@
       </div>
     </Accordion>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Mine straffer</p>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Legg til straff</p>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Legg til flere typer straffer</p>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Legg til gruppe</p>
   </div>
 </div>
@@ -132,23 +132,13 @@
 
   .groupTitle {
     @apply text-white text-center;
-  }
-
-  .committeeName {
-    margin-top: 10px;
-    color: white;
-    width: 100%;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  h2 {
     font-size: 25px;
     margin-bottom: 5px;
     text-align: center;
   }
-  .sidebar-btn {
+
+  .sideBarBtn {
+    @apply bg-primary-1000;
     display: flex;
     height: 60px;
     color: @white;
@@ -156,7 +146,8 @@
     filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.25));
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   }
-  .sidebar-btn > p {
+
+  .sideBarBtn > p {
     font-size: 15px;
     margin-top: auto;
     margin-bottom: auto;
