@@ -3,6 +3,7 @@ Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 
 ## Development
 * Start server with: `make dev`
+* Go to: http://localhost:8000/docs for Swagger docs
 * See `make help`
 
 ## Structure
