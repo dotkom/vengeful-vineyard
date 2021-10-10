@@ -78,7 +78,6 @@
 </div>
 
 <style lang="postcss">
-  @import "../../variables.less";
   .punishmentGrid {
     display: grid;
     box-sizing: border-box;

@@ -1,7 +1,6 @@
-module.exports = {
+const config = {
   mode: "jit",
   purge: ["./src/**/*.{html,js,svelte,ts}"],
-  darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
       colors: {
@@ -27,3 +26,5 @@ module.exports = {
   },
   plugins: [require("@tailwindcss/custom-forms")],
 };
+
+module.exports = config;
