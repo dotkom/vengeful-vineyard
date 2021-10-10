@@ -9,34 +9,28 @@
         <div
           class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
         >
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+          <table>
+            <thead >
               <tr>
                 <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                  scope="col">
                   Name
                 </th>
                 <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                  scope="col">
                   Title
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Status
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Role
                 </th>
-                <th scope="col" class="relative px-6 py-3">
+                <th scope="col" class="editTh">
                   <span class="sr-only">Edit</span>
                 </th>
               </tr>
@@ -108,4 +102,21 @@
     margin-right: auto;
     text-align: center;
   }
+
+  thead {
+    @apply bg-gray-50;
+  }
+
+  table {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+
+  th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+  }
+
+  .editTh {
+    @apply relative px-6 py-3;
+  }
+
 </style>
