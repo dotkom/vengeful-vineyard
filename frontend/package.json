@@ -14,7 +14,7 @@
     "@tsconfig/svelte": "^1.0.0",
     "autoprefixer": "^10.2.5",
     "less": "^3.12.2",
-    "postcss": "^8.2.13",
+    "postcss": "^8.3.9",
     "prettier": "^2.1.2",
     "prettier-plugin-svelte": "^1.4.1",
     "svelte": "^3.43.1",

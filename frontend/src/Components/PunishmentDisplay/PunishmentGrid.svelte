@@ -10,26 +10,12 @@
           class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
         >
           <table>
-            <thead >
+            <thead>
               <tr>
-                <th
-                  scope="col">
-                  Name
-                </th>
-                <th
-                  scope="col">
-                  Title
-                </th>
-                <th
-                  scope="col"
-                >
-                  Status
-                </th>
-                <th
-                  scope="col"
-                >
-                  Role
-                </th>
+                <th scope="col">Name</th>
+                <th scope="col">Title</th>
+                <th scope="col">Status</th>
+                <th scope="col">Role</th>
                 <th scope="col" class="editTh">
                   <span class="sr-only">Edit</span>
                 </th>
@@ -91,7 +77,7 @@
   </div>
 </div>
 
-<style lang="less">
+<style lang="postcss">
   @import "../../variables.less";
   .punishmentGrid {
     display: grid;
@@ -118,5 +104,4 @@
   .editTh {
     @apply relative px-6 py-3;
   }
-
 </style>
