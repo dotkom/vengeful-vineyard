@@ -1,97 +1,76 @@
 <script lang="ts">
   import VvLogo from "./VvLogo.svelte";
-  import GroupStore from "../../stores/groups";
-  import { onMount } from "svelte";
-  import { getGroups } from "../../api";
+  import Button from "./../Button.svelte";
+  import {
+  OidcContext,
+  LoginButton,
+  LogoutButton,
+  RefreshTokenButton,
+  authError,
+  accessToken,
+  idToken,
+  isAuthenticated,
+  isLoading,
+  login,
+  logout,
+  userInfo,
+} from '@dopry/svelte-oidc';
 
-  onMount(async () => {
-    const json = await getGroups();
-    $GroupStore = { currentGroup: json[0].name, groups: json };
-  });
+  let navElements = [
+    { link: "index.html", name: "Hjem" },
+    { link: "index2.html", name: "Wall of Shame" },
+  ];
+
+  let logIcon = "assets/LogIn.svg";
+
 </script>
 
-<header class="group_picker_container">
+<nav class="flex justify-between bg-primary-1000 mb-4 px-24 w-full">
   <VvLogo />
-  <div class="navbar-elements">
-    <a href="index.html" class="home">Home</a>
-    <a href="index.html" class="home">Wall of shame</a>
+  <ul
+    class="flex flex-row space-x-4 items-center m-0 p-0 align-baseline uppercase"
+  >
+    {#each navElements as element}
+      <li>
+        <a
+          href="{element.link}"
+          class="h-full w-full text-2xl mx-12 hover:bg-primary-750"
+          style="color: white"
+        >{element.name}</a>
+      </li>
+    {/each}
+  </ul>
+  <div class="flex flex-col justify-center items-center">
+    <a href="https://vg.no"> <img alt="Login icon" src="{logIcon}" /></a>
+  <OidcContext
+ issuer="https://online.ntnu.no/openid"
+ client_id="219919"
+ redirect_uri="http://localhost:3000"
+ post_logout_redirect_uri="http://localhost:3000"
+ scope='openid profile onlineweb4'
+ extraOptions={{
+  metadataUrl: "https://online.ntnu.no/openid/.well-known/openid-configuration",
+  filterProtocolClaims: true,
+  loadUserInfo: true,
+  silent_redirect_uri: "http://localhost:3000",
+  revokeAccessTokenOnSignout: true,
+ }}
+ >
+  <!--
+  <RefreshTokenButton>RefreshToken</RefreshTokenButton><br />
+  <pre>isLoading: {$isLoading}</pre>
+  <pre>isAuthenticated: {$isAuthenticated}</pre>
+  <pre>authToken: {$accessToken}</pre>
+  <pre>idToken: {$idToken}</pre>
+  <pre>userInfo: {JSON.stringify($userInfo, null, 2)}</pre>
+  <pre>authError: {$authError}</pre>
+  -->
+    {#if $isAuthenticated}
+    <div class="text-white" style="color: white">{$userInfo.name}</div>
+    <LogoutButton>Logout</LogoutButton>
+    {:else}
+      <LoginButton>Login</LoginButton>
+    {/if}
+</OidcContext>
   </div>
-  <div class="log-in">
-    <button class="log-in-button">
-      <img src="assets/LogIn.svg" alt="login icon" width="250" height="100" />
-    </button>
-    <div class="navbar-elements">username</div>
-  </div>
-</header>
-
-<style lang="less">
-  @import "../../variables.less";
-
-  header {
-    position: relative;
-    background-color: @primary;
-    margin-bottom: 20px;
-  }
-  a {
-    text-decoration: none;
-    color: inherit;
-    font-size: 15px;
-    padding: 10px;
-    margin: 0 5px;
-    transition: opacity 0.2s;
-  }
-  .group_picker_container {
-    display: flex;
-    width: 100%;
-    box-sizing: border-box;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 50px 10px;
-  }
-  .navbar-elements {
-    display: flex;
-    text-transform: uppercase;
-    color: #fff;
-    margin: 0px;
-    padding: 0px;
-    border: 0px;
-    font: inherit;
-    vertical-align: baseline;
-    padding-top: 5px;
-  }
-
-  .log-in {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    margin: -10px 20px -10px 0;
-    flex: 0 0 auto;
-  }
-  .log-in-button {
-    width: 50px;
-    height: 100%;
-    background-color: #fff1;
-    position: relative;
-    cursor: pointer;
-  }
-
-  button {
-    appearance: auto;
-    border: none;
-    -webkit-writing-mode: horizontal-tb !important;
-    text-rendering: auto;
-    color: -internal-light-dark(black, white);
-    letter-spacing: normal;
-    word-spacing: normal;
-    text-transform: none;
-    text-indent: 0px;
-    text-shadow: none;
-    display: inline-block;
-    text-align: center;
-    align-items: flex-start;
-  }
-  img {
-    width: 50%;
-    height: 50%;
-  }
-</style>
+</nav>
