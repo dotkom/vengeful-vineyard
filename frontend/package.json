@@ -9,7 +9,7 @@
     "validate": "svelte-check"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.7",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.27",
     "@tailwindcss/custom-forms": "^0.2.1",
     "@tsconfig/svelte": "^1.0.0",
     "autoprefixer": "^10.2.5",
@@ -17,15 +17,17 @@
     "postcss": "^8.2.13",
     "prettier": "^2.1.2",
     "prettier-plugin-svelte": "^1.4.1",
-    "svelte": "^3.37.0",
-    "svelte-check": "^1.0.60",
-    "svelte-preprocess": "^4.7.2",
+    "svelte": "^3.43.1",
+    "svelte-check": "^1.6.0",
+    "svelte-preprocess": "^4.9.8",
     "tailwindcss": "^2.1.2",
     "tslib": "^2.0.3",
-    "typescript": "^4.2.4",
+    "typescript": "^4.4.3",
     "vite": "^2.2.3"
   },
   "dependencies": {
+    "@dopry/svelte-oidc": "^1.0.1",
+    "oidc-client": "^1.11.5",
     "pnpm": "^6.2.3"
   }
 }
