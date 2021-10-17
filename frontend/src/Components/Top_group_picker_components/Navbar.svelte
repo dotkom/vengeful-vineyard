@@ -15,6 +15,7 @@
   logout,
   userInfo,
 } from '@dopry/svelte-oidc';
+import { getOnlineProfile, getMyOnlineGroups } from "../../api";
 
   let navElements = [
     { link: "index.html", name: "Hjem" },
@@ -56,18 +57,17 @@
   revokeAccessTokenOnSignout: true,
  }}
  >
-  <!--
-  <RefreshTokenButton>RefreshToken</RefreshTokenButton><br />
-  <pre>isLoading: {$isLoading}</pre>
-  <pre>isAuthenticated: {$isAuthenticated}</pre>
-  <pre>authToken: {$accessToken}</pre>
-  <pre>idToken: {$idToken}</pre>
-  <pre>userInfo: {JSON.stringify($userInfo, null, 2)}</pre>
-  <pre>authError: {$authError}</pre>
-  -->
     {#if $isAuthenticated}
     <div class="text-white" style="color: white">{$userInfo.name}</div>
     <LogoutButton>Logout</LogoutButton>
+    {#await getOnlineProfile($accessToken) then value}
+      <p>My ID: {value.id}</p>
+      {#await getMyOnlineGroups($accessToken, value.id) then value2}
+        {#each value2.results as group}
+        <p>{group.name_short}</p>
+        {/each}
+      {/await}
+    {/await}
     {:else}
       <LoginButton>Login</LoginButton>
     {/if}
