@@ -25,22 +25,22 @@
 
 </script>
 
-<nav class="flex justify-between bg-primary-1000 mb-4 px-24 w-full">
+<nav>
   <VvLogo />
   <ul
-    class="flex flex-row space-x-4 items-center m-0 p-0 align-baseline uppercase"
+    class="navContentWrapper"
   >
     {#each navElements as element}
       <li>
         <a
           href="{element.link}"
-          class="h-full w-full text-2xl mx-12 hover:bg-primary-750"
+          class="navElement"
           style="color: white"
         >{element.name}</a>
       </li>
     {/each}
   </ul>
-  <div class="flex flex-col justify-center items-center">
+  <div class="loginSection">
     <a href="https://vg.no"> <img alt="Login icon" src="{logIcon}" /></a>
   <OidcContext
  issuer="https://online.ntnu.no/openid"
@@ -74,3 +74,25 @@
 </OidcContext>
   </div>
 </nav>
+
+<style lang="postcss">
+  nav {
+    @apply flex justify-between bg-primary-1000 mb-4 px-24 w-full;
+  }
+
+  .navContentWrapper {
+    @apply flex flex-row space-x-4 items-center m-0 p-0 align-baseline uppercase;
+  }
+  .navElement {
+    @apply h-full w-full text-2xl mx-12;
+  }
+  
+  .navElement:hover {
+    @apply bg-primary-750;
+  }
+
+  .loginSection {
+    @apply flex flex-col justify-center items-center;
+  }
+
+</style>

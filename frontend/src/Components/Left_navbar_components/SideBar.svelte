@@ -5,6 +5,7 @@
   //import AccordionContent from "./AccordionContent.svelte";
 
   //let sortOptions = ["Most Punished", "Recently Punished", "Punished By Me"];
+
 </script>
 
 <link
@@ -12,11 +13,9 @@
   rel="stylesheet"
 />
 
-<div class="bg-primary-500 sortNav block justify-items-center">
-  <div class="flex flex-col text-white">
-    <h2 class="groupTitle text-white text-center">
-      {$GroupStore.currentGroup}
-    </h2>
+<div class="sideBarContainer">
+  <div class="groupNameContainer">
+    <h2 class="groupTitle">{$GroupStore.currentGroup}</h2>
   </div>
   <div class="mt-2 container">
     <Accordion title="Sorter etter (nåværende)" open="{true}">
@@ -24,7 +23,7 @@
         <div>
           <label for="mostPunished">
             <input
-              class="form-radio checked text-primary-500 shadow-inner bg-grey"
+              class="inputToggle checked"
               type="radio"
               id="mostPunished"
               name="punishments"
@@ -36,7 +35,7 @@
         <div>
           <label for="recentlyPunished"><br />
             <input
-              class="form-radio text-primary-500 shadow-inner bg-grey"
+              class="inputToggle"
               type="radio"
               id="recentlyPunished"
               name="punishments"
@@ -47,7 +46,7 @@
         <div>
           <label for="punishedByMe"><br />
             <input
-              class="form-radio text-primary-500 shadow-inner bg-grey"
+              class="inputToggle"
               type="radio"
               id="punishedByMe"
               name="punishments"
@@ -63,7 +62,7 @@
         <div>
           <label for="mostPunishedAllTime">
             <input
-              class="form-radio text-primary-500 shadow-inner bg-grey"
+              class="inputToggle"
               type="radio"
               id="mostPunishedAllTime"
               name="punishments"
@@ -75,7 +74,7 @@
         <div>
           <label for="recentlyPunishedAllTime"><br />
             <input
-              class="form-radio text-primary-500 shadow-inner bg-grey"
+              class="inputToggle"
               type="radio"
               id="recentlyPunishedAllTime"
               name="punishments"
@@ -86,7 +85,7 @@
         <div>
           <label for="punishedByMeAllTime"><br />
             <input
-              class="form-radio text-primary-500 shadow-inner bg-grey"
+              class="inputToggle"
               type="radio"
               id="punishedByMeAllTime"
               name="punishments"
@@ -98,55 +97,61 @@
       </div>
     </Accordion>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Mine straffer</p>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Legg til straff</p>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Legg til flere typer straffer</p>
   </div>
-  <div class="sidebar-btn bg-primary-1000">
+  <div class="sideBarBtn">
     <p>Legg til gruppe</p>
   </div>
 </div>
 
-<style lang="less">
+<style lang="postcss">
   @import "../../variables.less";
-  .sortNav {
+
+  .sideBarContainer {
+    @apply bg-primary-500 block justify-items-center;
     width: 20%;
     font-family: "Montserrat", sans-serif;
     border-radius: 6px;
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
   }
 
-  .committeeName {
-    margin-top: 10px;
-    color: white;
-    width: 100%;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
+  .groupNameContainer {
+    @apply flex flex-col;
   }
 
-  h2 {
+  .inputToggle {
+    @apply form-radio text-primary-500 shadow-inner bg-grey;
+  }
+
+  .groupTitle {
+    @apply text-white text-center;
     font-size: 25px;
     margin-bottom: 5px;
     text-align: center;
   }
-  .sidebar-btn {
+
+  .sideBarBtn {
+    @apply bg-primary-1000;
     display: flex;
     height: 60px;
-    color: @white;
+    color: white;
     border-radius: 6px;
     filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.25));
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   }
-  .sidebar-btn > p {
+
+  .sideBarBtn > p {
     font-size: 15px;
     margin-top: auto;
     margin-bottom: auto;
     margin-left: 15px;
   }
+
 </style>
