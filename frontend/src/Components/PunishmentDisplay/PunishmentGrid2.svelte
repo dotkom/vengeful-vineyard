@@ -33,7 +33,7 @@
                 </th>
               </tr>
             </thead>
-            {#each $GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].users as user (user.id)}
+            {#each $GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].members as user (user.id)}
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr>
                   <td class="px-6 py-4 whitespace-nowrap">

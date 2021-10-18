@@ -7,7 +7,7 @@
       class="radioButton"
       id="naavaarende"
       name="vis"
-      defaultChecked="{true}"
+      checked="{true}"
     />
     Nåværende medlemmer
   </label>
@@ -25,7 +25,7 @@
     class="radioButton"
     id="flest"
     name="sort"
-    defaultChecked="{true}"
+    checked="{true}"
   />
   <label for="vis">Flest straffer (verdi)</label>
   <br />
