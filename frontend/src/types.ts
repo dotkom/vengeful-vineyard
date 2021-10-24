@@ -1,4 +1,16 @@
 export interface Punishment {
+  name: string;
+  number: number;
+}
+
+export interface CreatePunishment {
+  name: string;
+  reason: string;
+  punishments: Punishment[];
+}
+
+export interface PunishmentInfo {
+  id: number;
   price: number;
   imageurl: string;
   reason: string;
@@ -18,7 +30,7 @@ export interface PunishmentType {
 export interface User {
   id: number;
   name: string;
-  punishments: Punishment[];
+  punishments: PunishmentInfo[];
   debt: number;
   totalPaid: number;
   active: boolean;
@@ -31,10 +43,4 @@ export interface Group {
   logoUrl: string;
   punishmentTypes: PunishmentType[];
   members: User[];
-}
-
-export interface CreatePunishment {
-  name: string;
-  reason: string;
-  punishments: Punishment[];
 }

@@ -16,7 +16,9 @@
       <div slot="content" class="accordion__content">
         <AddPunishment
           name="{user.name}"
-          punishmentTypes="{$GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].punishmentTypes.name}"
+          punishmentTypes="{$GroupStore.groups.filter(
+            (g) => g.name === $GroupStore.currentGroup
+          )[0].punishmentTypes}"
         />
         <br />
         <br />

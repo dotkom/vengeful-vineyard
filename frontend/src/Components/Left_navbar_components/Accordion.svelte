@@ -30,17 +30,10 @@
 
 <style lang="less">
   @import "../../variables.less";
-  .box_shadow {
-    -webkit-box-shadow: 0px 4px 8px -1px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 0px 4px 8px -1px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 4px 8px -1px rgba(0, 0, 0, 0.75);
-  }
-
   .accordion__section {
     display: flex;
     flex-direction: column;
     width: 100%;
-    .box_shadow;
   }
 
   /* Styles the buttons that are used to open and close the accordion panel */
