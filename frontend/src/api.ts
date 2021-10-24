@@ -41,12 +41,14 @@ async function authorizedOnlineFetch(url: string, token: string) {
   headers["Authorization"] = `Bearer ${token}`;
   request_options["headers"] = headers;
   const res = await fetch(url, request_options);
-  return await res.json()["results"];
+  var response = await res.json();
+  return response;
 }
 
 export async function getOnlineProfile(token: string) {
   var endpoint = "https://online.ntnu.no/api/v1/profile/";
-  return await authorizedOnlineFetch(endpoint, token);
+  var response = await authorizedOnlineFetch(endpoint, token);
+  return response
 }
 
 interface OWGroup {
@@ -55,5 +57,6 @@ interface OWGroup {
 
 export async function getMyOnlineGroups(token: string, id: number): OWGroup[] {
   var endpoint = `https://online.ntnu.no/api/v1/group/online-groups/?members__user=${id}`;
-  return await authorizedOnlineFetch(endpoint, token);
+  var groups = await authorizedOnlineFetch(endpoint, token)
+  return groups["results"];
 }
