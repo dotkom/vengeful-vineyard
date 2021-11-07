@@ -4,20 +4,27 @@
   let modalTitle = "Create new group";
 
   let groupName: string;
-  export let groupUsers: string[] = [];
+  let groupUsers: string[] = [];
   let groupUser: string;
 
   const validate = () => {
     //sumn
-    console.log("Valudate");
   };
 
   const addUserToGroup = (userEmail: string) => {
     console.log(userEmail);
     if (userEmail != undefined) {
-      groupUsers.push(userEmail);
+      groupUsers = [...groupUsers, userEmail];
       console.log(groupUsers);
     }
+
+    groupUser = undefined;
+  };
+
+  const removeUser = (userEmail: string) => {
+    groupUsers = groupUsers.filter(function (user) {
+      return user !== userEmail;
+    });
   };
 </script>
 
@@ -55,14 +62,28 @@
       <button
         type="button"
         class="modalBtn"
+        id="addUserInput"
         on:click="{() => addUserToGroup(groupUser)}"
       >
         Invite user to group
       </button>
     </div>
 
-    <div>
-      {groupUsers}
+    <div class="invitedUsers">
+      {#each groupUsers as user}
+        <div class="addedUser">
+          <h5 style="padding-right: 0.5rem">{user}</h5>
+
+          <img
+            width="24px"
+            height="auto"
+            alt="Red X"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Red_X.svg/64px-Red_X.svg.png"
+            on:click="{() => removeUser(user)}"
+            style="cursor: pointer;"
+          />
+        </div>
+      {/each}
     </div>
 
     <button
@@ -129,6 +150,27 @@
   .addUserContainer {
     display: flex;
     flex-direction: row;
+    margin-bottom: 0.5rem;
+  }
+
+  .invitedUsers  {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 10rem;
+    overflow: scroll;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 3rem;
+  }
+
+  .addedUser {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-align: center;
     margin-bottom: 0.5rem;
   }
 
