@@ -1,6 +1,6 @@
 <script lang="ts">
   import GroupStore from "../../stores/groups";
-import AddCustomGroup from "./AddCustomGroup.svelte";
+  import AddCustomGroup from "./AddCustomGroup.svelte";
   import GroupButton from "./GroupButton.svelte";
 </script>
 
@@ -15,8 +15,8 @@ import AddCustomGroup from "./AddCustomGroup.svelte";
   @import "../../variables.less";
   .groupLogosContainer {
     display: flex;
-      justify-content: center;
-      align-items: center;
+    justify-content: center;
+    align-items: center;
     margin: 0 auto;
   }
 </style>
