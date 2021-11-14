@@ -7,6 +7,19 @@ export async function getGroups() {
   return json;
 }
 
+export async function postGroup(name: string, rules: string) {
+  const res = await fetch("http://localhost:8000/group", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      rules,
+    }),
+  });
+  const json = await res.json();
+  return json;
+}
+
 export async function postPunishment(punishment: CreatePunishment) {
   const res = await fetch("http://localhost:8080/punishment", {
     method: "POST",
@@ -48,7 +61,7 @@ async function authorizedOnlineFetch(url: string, token: string) {
 export async function getOnlineProfile(token: string) {
   var endpoint = "https://online.ntnu.no/api/v1/profile/";
   var response = await authorizedOnlineFetch(endpoint, token);
-  return response
+  return response;
 }
 
 interface OWGroup {
@@ -57,6 +70,6 @@ interface OWGroup {
 
 export async function getMyOnlineGroups(token: string, id: number): OWGroup[] {
   var endpoint = `https://online.ntnu.no/api/v1/group/online-groups/?members__user=${id}`;
-  var groups = await authorizedOnlineFetch(endpoint, token)
+  var groups = await authorizedOnlineFetch(endpoint, token);
   return groups["results"];
 }
