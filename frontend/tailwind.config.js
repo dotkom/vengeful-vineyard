@@ -34,5 +34,11 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/custom-forms'),
+    require('daisyui'),
   ],
+
+  daisyui: {
+    themes: false,
+  },
+
 }
