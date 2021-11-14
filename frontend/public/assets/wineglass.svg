@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g id="midlertidig-bakgrun" serif:id="midlertidig bakgrun" transform="matrix(2.66667,0,0,2.66667,0,0)">
+        <rect x="0" y="0" width="24" height="24" style="fill:rgb(242,242,242);"/>
+    </g>
+    <g transform="matrix(-4.51774,5.51095e-16,-5.53263e-16,-4.50004,86.2128,53.7268)">
+        <path d="M12,4C11.908,4 11.818,4.004 11.728,4.011C9.647,4.187 8,6.355 8,9C8,9.878 8.185,10.74 8.536,11.5L15.464,11.5C15.815,10.74 16,9.878 16,9C16,6.24 14.208,4 12,4" style="fill:none;"/>
+        <clipPath id="_clip1">
+            <path d="M12,4C11.908,4 11.818,4.004 11.728,4.011C9.647,4.187 8,6.355 8,9C8,9.878 8.185,10.74 8.536,11.5L15.464,11.5C15.815,10.74 16,9.878 16,9C16,6.24 14.208,4 12,4"/>
+        </clipPath>
+        <g clip-path="url(#_clip1)">
+            <g id="vin" transform="matrix(-1,-1.22465e-16,1.22465e-16,-1,24,16)">
+                <rect x="4" y="7" width="15" height="6" style="fill:rgb(147,32,36);"/>
+            </g>
+            <g id="glass-look" serif:id="glass look" transform="matrix(-1,-1.22465e-16,1.22465e-16,-1,23.4368,15.5966)">
+                <rect x="3.167" y="3.39" width="15.575" height="8.914" style="fill:rgb(165,241,246);fill-opacity:0.09;"/>
+            </g>
+            <g transform="matrix(-0.99931,-0.03714,0.03714,-0.99931,23.7218,15.9524)">
+                <path d="M15.392,7.331C14.867,8.582 14.159,9.784 13.242,10.93C13.532,10.951 14.357,10.286 14.86,9.444C15.399,8.543 15.601,7.456 15.392,7.331Z" style="fill:white;fill-opacity:0.51;"/>
+            </g>
+        </g>
+        <path d="M12,4C11.908,4 11.818,4.004 11.728,4.011C9.647,4.187 8,6.355 8,9C8,9.878 8.185,10.74 8.536,11.5L15.464,11.5C15.815,10.74 16,9.878 16,9C16,6.24 14.208,4 12,4" style="fill:none;stroke:rgb(175,193,191);stroke-width:0.11px;"/>
+    </g>
+    <g transform="matrix(5.75431,0,0,3.81039,-37.005,-9.99811)">
+        <rect x="11.724" y="12" width="0.536" height="6.371" style="fill:rgb(175,193,191);"/>
+    </g>
+    <g transform="matrix(4.4513,0,0,7.55363,11.4627,-49.562)">
+        <path d="M7.078,14.772C7.328,14.728 7.459,14.677 7.459,14.626C7.459,14.464 6.184,14.333 4.614,14.333C3.043,14.333 1.768,14.464 1.768,14.626C1.768,14.677 1.9,14.728 2.149,14.772L7.078,14.772Z" style="fill:rgb(175,193,191);"/>
+    </g>
+</svg>

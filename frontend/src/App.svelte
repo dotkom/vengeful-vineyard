@@ -1,11 +1,9 @@
 <script lang="ts">
   import Navbar from "./Components/Top_group_picker_components/Navbar.svelte";
-  //import SortNav from "./Components/Left_navbar_components/SortNav.svelte";
-  import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContainer.svelte";
   import SideBar from "./Components/Left_navbar_components/SideBar.svelte";
   import GroupLogos from "./Components/Top_group_picker_components/GroupLogos.svelte";
   import Footer from "./Components/Footer/Footer.svelte";
-import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContainer.svelte";
+  import PunishmentGrid2 from "./Components/PunishmentDisplay/PunishmentGrid2.svelte";
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -25,11 +23,7 @@ import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContai
     <SideBar />
     <div class="punishments">
       <GroupLogos />
-<<<<<<< HEAD
-      <PunishmentContainer />
-=======
-      <PunishmentContainer/>
->>>>>>> 1793c66 (removes excess cols)
+      <PunishmentGrid2 />
     </div>
   </div>
   <Footer />
@@ -57,6 +51,7 @@ import PunishmentContainer from "./Components/PunishmentDisplay/PunishmentContai
     text-transform: uppercase;
   }
   .punishments {
+    @apply w-7/12;
     margin-left: auto;
     margin-right: auto;
   }

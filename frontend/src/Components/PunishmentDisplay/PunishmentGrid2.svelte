@@ -1,75 +1,83 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import GroupStore from "../../stores/groups";
+  import { getGroup, getUser, deletePunishment } from "../../api";
+  import type { Group, User } from "src/types";
+
+  let wine = "assets/wineglass.svg";
+  let cancelIcon = "assets/x-icon.svg";
+
+  let group_id: number = 1;
 </script>
 
-<div class="punishmentGrid">
-  <!-- This example requires Tailwind CSS v2.0+ -->
-  <div class="flex flex-col">
-    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-        <div
-          class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
-        >
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Navn
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Antall straffer
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Sist straffet
-                </th>
-              </tr>
-            </thead>
-            {#each $GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].users as user (user.id)}
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                      <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900">
-                          {user.name}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">WINE WINE WINE</td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">29.07.20</div>
-                  </td>
-                </tr>
-
-                <!-- More items... -->
-              </tbody>
+{#await getGroup(group_id) then group}
+  {#each group.members as user}
+    <div
+      tabindex="0"
+      class="collapse w-full border rounded-box border-base-300"
+    >
+      {#await getUser(user.user_id) then userInfo}
+        <div class="accordion_text collapse-title text-xl font-medium">
+          <div>{user.first_name} {user.last_name}</div>
+          {#if userInfo.punishments.length == 0}
+            <div>Ingen straffer</div>
+          {:else}
+            {#each userInfo.punishments as punishment}
+              <img class="icon" alt="wine" src="{wine}" />
             {/each}
-          </table>
+            <div>
+              <!-- {userInfo.punishments[userInfo.punishments.length - 1]}.givenTime -->
+              date
+            </div>
+          {/if}
         </div>
-      </div>
+        <div class="collapse-content">
+          {#if userInfo.punishments.length == 0}
+            <p>Ingen straffer å vise</p>
+          {:else}
+            {#each userInfo.punishments as punishment}
+              <div class="punishment">
+                <button
+                  type="button"
+                  on:click="{() => deletePunishment(punishment.id)}"
+                >
+                  <img
+                    class="cancel"
+                    src="{cancelIcon}"
+                    alt="remove punishment"
+                  />
+                </button>
+                <div>{punishment.reason}</div>
+                <div>number of punishments</div>
+                <div>{punishment.created_time}</div>
+              </div>
+            {/each}
+            <div>Total sum:</div>
+          {/if}
+        </div>
+      {/await}
     </div>
-  </div>
-</div>
+  {/each}
+{/await}
 
+<!-- {console.log(members)} -->
 <style lang="less">
   @import "../../variables.less";
-  .punishmentGrid {
-    display: grid;
-    box-sizing: border-box;
-    width: 600px;
-    grid-template-columns: 3fr 3fr 3fr;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+
+  .accordion_text {
+    @apply flex flex-row justify-between;
+  }
+
+  .icon {
+    @apply max-h-8;
+  }
+
+  .punishment {
+    @apply flex flex-row justify-between mx-2;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .punishment > {
+    @apply p-4;
   }
 </style>
