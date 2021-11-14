@@ -8,7 +8,7 @@
   {#each $GroupStore.groups as { name, logoUrl }}
     <GroupButton name="{name}" logoUrl="{logoUrl}" />
   {/each}
-  <AddCustomGroup name="addCustomGroup" />
+  <AddCustomGroup />
 </div>
 
 <style lang="less">

@@ -1,16 +1,32 @@
 <script lang="ts">
   import Modal, { getModal } from "./Modal.svelte";
+  import { postGroup } from "../../api";
 
   let modalTitle = "Create new group";
 
   let groupName: string;
   let groupUsers: string[] = [];
   let groupUser: string;
+  let groupRules: string;
 
   const validate = () => {
-    //sumn
+    // Creates group with name and rules, however right now name is the unique identifier lmao
+    postGroup(groupName, groupRules);
+    closeModal();
   };
 
+  const closeModal = () => {
+    clearFields();
+    getModal().close();
+  };
+
+  const clearFields = () => {
+    groupName = "";
+    groupUsers = [];
+    groupRules = "";
+  };
+
+  //Not being used in post rn
   const addUserToGroup = (userEmail: string) => {
     console.log(userEmail);
     if (userEmail != undefined) {
@@ -53,6 +69,13 @@
       type="text"
       bind:value="{groupName}"
       placeholder="Group name"
+    />
+
+    <h5>Group rules url:</h5>
+    <input
+      type="text"
+      bind:value="{groupRules}"
+      placeholder="Group rules url"
     />
 
     <h4>Add users:</h4>
@@ -98,7 +121,7 @@
   <button
     style="background-color: #cc0000; box-shadow: 2px 1px 2px #990f0f;"
     class="modalBtn"
-    on:click="{() => getModal().close()}"
+    on:click="{closeModal}"
   >
     Cancel
   </button>
@@ -109,6 +132,7 @@
 
   .nameInput {
     height: 3rem;
+    margin-bottom: 1rem;
   }
 
   button {
