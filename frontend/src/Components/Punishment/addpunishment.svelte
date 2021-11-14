@@ -1,13 +1,10 @@
 <script lang="ts">
   import Modal from "../Modal.svelte";
   import Button from "../Button.svelte";
-  export let punishmentTypes: string[] = [];
+  import { postPunishment } from "../../api";
+  import type { Punishment, PunishmentType } from "../../types";
+  export let punishmentTypes: PunishmentType[] = [];
   export let name: string;
-
-  interface Punishment {
-    name: string;
-    number: number;
-  }
 
   let punishments: Punishment[] = [];
   let reason: string = "";
@@ -34,11 +31,12 @@
 
   async function createPunishments() {
     const punishment = { punishments: punishments, reason: reason, name: name };
-    const json = postPunishment(punishments);
+    const json = await postPunishment(punishment);
 
     reason = "";
     showAdd = false;
     punishments = [];
+    return json;
   }
 </script>
 

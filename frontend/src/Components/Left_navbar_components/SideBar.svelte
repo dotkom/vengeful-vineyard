@@ -5,7 +5,6 @@
   //import AccordionContent from "./AccordionContent.svelte";
 
   //let sortOptions = ["Most Punished", "Recently Punished", "Punished By Me"];
-
 </script>
 
 <link
@@ -33,7 +32,8 @@
           </label>
         </div>
         <div>
-          <label for="recentlyPunished"><br />
+          <label for="recentlyPunished"
+            ><br />
             <input
               class="inputToggle"
               type="radio"
@@ -41,10 +41,12 @@
               name="punishments"
               value="recentlyPunished"
             />
-            Nylig straffet</label>
+            Nylig straffet</label
+          >
         </div>
         <div>
-          <label for="punishedByMe"><br />
+          <label for="punishedByMe"
+            ><br />
             <input
               class="inputToggle"
               type="radio"
@@ -72,7 +74,8 @@
           </label>
         </div>
         <div>
-          <label for="recentlyPunishedAllTime"><br />
+          <label for="recentlyPunishedAllTime"
+            ><br />
             <input
               class="inputToggle"
               type="radio"
@@ -80,10 +83,12 @@
               name="punishments"
               value="recentlyPunished"
             />
-            Nylig straffet</label>
+            Nylig straffet</label
+          >
         </div>
         <div>
-          <label for="punishedByMeAllTime"><br />
+          <label for="punishedByMeAllTime"
+            ><br />
             <input
               class="inputToggle"
               type="radio"
@@ -111,7 +116,7 @@
   </div>
 </div>
 
-<style lang="less">
+<style lang="postcss">
   @import "../../variables.less";
 
   .sideBarContainer {
@@ -141,7 +146,7 @@
     @apply bg-primary-1000;
     display: flex;
     height: 60px;
-    color: @white;
+    color: white;
     border-radius: 6px;
     filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.25));
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -153,5 +158,4 @@
     margin-bottom: auto;
     margin-left: 15px;
   }
-
 </style>

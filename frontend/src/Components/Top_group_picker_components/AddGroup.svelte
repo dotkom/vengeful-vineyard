@@ -18,25 +18,21 @@
 </script>
 
 <div class="addGroup-container">
-  <button
-    class="addGroup"
-    on:click="{toggleGroupAddModal}"
-    type="button"
-  >+</button>
+  <button class="addGroup" on:click="{toggleGroupAddModal}" type="button"
+    >+</button
+  >
 </div>
 <Modal bind:active="{showAdd}">
   <h1>Legg til gruppe</h1>
   <form on:submit|preventDefault="{toggleGroupAddModal}">
     <label for="groupname">
       Gruppenavn:
-      <input type="text" name="groupname" required /></label>
+      <input type="text" name="groupname" required /></label
+    >
     <br />
     Private or public group?
-    <label><input
-        type="radio"
-        name="grouptype"
-        checked="checked"
-      />Privat</label>
+    <label><input type="radio" name="grouptype" checked="{true}" />Privat</label
+    >
     <label><input type="radio" name="grouptype" />Offentlig</label>
     <br />
     <label> Legg til gruppemedlem <input type="text" name="addmember" /></label>

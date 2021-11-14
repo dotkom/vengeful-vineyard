@@ -48,3 +48,14 @@ repos:
         entry: bash -c "source backend/env/bin/activate && isort $@"
         types: [python]
         language: system
+#    -   id: prettier
+#        name: Format frontend-code
+#        entry: bash -c "cd frontend && npm ci && npx prettier -w src"
+#        always_run: true
+#        language: system
+#    -   id: svelte-validate
+#        name: Validate svelte
+#        entry: bash -c "cd frontend && npm ci && npm run validate"
+#        always_run: true
+#        pass_filenames: false
+#        language: system

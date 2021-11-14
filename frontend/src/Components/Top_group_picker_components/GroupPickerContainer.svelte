@@ -79,6 +79,7 @@
     appearance: auto;
     border: none;
     -webkit-writing-mode: horizontal-tb !important;
+    writing-mode: horizontal-tb !important;
     text-rendering: auto;
     color: -internal-light-dark(black, white);
     letter-spacing: normal;

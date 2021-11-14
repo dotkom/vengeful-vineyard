@@ -1,34 +1,34 @@
 {
-  "name": "Vengeful-vineyard",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "vite preview",
-    "watch": "vite build --watch",
-    "validate": "svelte-check"
-  },
-  "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.27",
-    "@tailwindcss/custom-forms": "^0.2.1",
-    "@tsconfig/svelte": "^1.0.0",
-    "autoprefixer": "^10.2.5",
-    "less": "^3.12.2",
-    "postcss": "^8.2.13",
-    "prettier": "^2.1.2",
-    "prettier-plugin-svelte": "^1.4.1",
-    "svelte": "^3.43.1",
-    "svelte-check": "^1.6.0",
-    "svelte-preprocess": "^4.9.8",
-    "tailwindcss": "^2.1.2",
-    "tslib": "^2.0.3",
-    "typescript": "^4.4.3",
-    "vite": "^2.2.3"
-  },
-  "dependencies": {
-    "@dopry/svelte-oidc": "^1.0.1",
-    "daisyui": "^1.14.2",
-    "oidc-client": "^1.11.5",
-    "pnpm": "^6.2.3"
-  }
+	"name": "Vengeful-vineyard",
+	"version": "1.0.0",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"start": "vite preview",
+		"watch": "vite build --watch",
+		"validate": "svelte-check"
+	},
+	"devDependencies": {
+		"@dopry/svelte-oidc": "^1.0.1",
+		"@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
+		"@tailwindcss/forms": "^0.3.4",
+		"@tsconfig/svelte": "^2.0.1",
+		"autoprefixer": "^10.3.7",
+		"cssnano": "^5.0.8",
+		"daisyui": "^1.14.2",
+		"less": "^3.13.1",
+		"oidc-client": "^1.11.5",
+		"pnpm": "^6.17.2",
+		"postcss": "^8.3.9",
+		"postcss-load-config": "^3.1.0",
+		"prettier": "^2.4.1",
+		"prettier-plugin-svelte": "^2.4.0",
+		"svelte": "^3.44.0",
+		"svelte-check": "^2.2.7",
+		"svelte-preprocess": "^4.9.8",
+		"tailwindcss": "^2.2.17",
+		"tslib": "^2.3.1",
+		"typescript": "^4.4.4",
+		"vite": "^2.6.9"
+	}
 }

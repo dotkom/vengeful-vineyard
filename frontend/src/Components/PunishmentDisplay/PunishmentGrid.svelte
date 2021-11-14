@@ -11,26 +11,12 @@
           class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
         >
           <table>
-            <thead >
+            <thead>
               <tr>
-                <th
-                  scope="col">
-                  Name
-                </th>
-                <th
-                  scope="col">
-                  Title
-                </th>
-                <th
-                  scope="col"
-                >
-                  Status
-                </th>
-                <th
-                  scope="col"
-                >
-                  Role
-                </th>
+                <th scope="col">Name</th>
+                <th scope="col">Title</th>
+                <th scope="col">Status</th>
+                <th scope="col">Role</th>
                 <th scope="col" class="editTh">
                   <span class="sr-only">Edit</span>
                 </th>
@@ -111,10 +97,9 @@
                 <td
                   class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                 >
-                  <a
-                    href="#"
-                    class="text-indigo-600 hover:text-indigo-900"
-                  >Edit</a>
+                  <a href="#edit" class="text-indigo-600 hover:text-indigo-900"
+                    >Edit</a
+                  >
                 </td>
               </tr>
 =======
@@ -141,8 +126,7 @@
   </div>
 </div>
 
-<style lang="less">
-  @import "../../variables.less";
+<style lang="postcss">
   .punishmentGrid {
     display: grid;
     box-sizing: border-box;
@@ -168,5 +152,4 @@
   .editTh {
     @apply relative px-6 py-3;
   }
-
 </style>
