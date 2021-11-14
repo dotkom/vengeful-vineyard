@@ -44,3 +44,11 @@ export interface Group {
   punishmentTypes: PunishmentType[];
   members: User[];
 }
+
+// export interface OWGroup {
+//   name_short: string;
+//   rulesUrl: string;
+//   logoUrl: string;
+//   punishmentTypes: PunishmentType[];
+//   members: User[];
+// }

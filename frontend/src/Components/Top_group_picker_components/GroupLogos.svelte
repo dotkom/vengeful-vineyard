@@ -1,12 +1,31 @@
 <script lang="ts">
-  import GroupStore from "../../stores/groups";
+  // import GroupStore from "../../stores/groups";
   import GroupButton from "./GroupButton.svelte";
+  // import { getUserGroups } from "../../api";
+  // import { onMount } from "svelte";
+  // import type { Group } from "src/types";
+
+  import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
+  import { getOnlineProfile, getMyOnlineGroups } from "../../api";
+
+  // let groups: Group[];
+  // let user_id = 1; //default ig
+
+  // onMount(async () => {
+  //   getUserGroups(user_id).then((res) => (groups = res.data));
+  // });
 </script>
 
 <div class="groupLogosContainer">
-  {#each $GroupStore.groups as { name, logoUrl }}
-    <GroupButton name="{name}" logoUrl="{logoUrl}" />
-  {/each}
+  {#if $isAuthenticated}
+    {#await getOnlineProfile($accessToken) then value}
+      {#await getMyOnlineGroups($accessToken, value.id) then groups}
+        {#each groups as group}
+          <GroupButton name="{group.name_short}" logoUrl="..." />
+        {/each}
+      {/await}
+    {/await}
+  {/if}
 </div>
 
 <style lang="less">
