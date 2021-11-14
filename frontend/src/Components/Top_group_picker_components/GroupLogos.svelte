@@ -21,7 +21,7 @@
   {#if $isAuthenticated}
     {#await getOnlineProfile($accessToken) then value}
       {#await getMyOnlineGroups($accessToken, value.id) then groups}
-        {#each groups as group}
+        {#each groups.filter((singGroup) => !singGroup.name_short.includes("permissions")) as group}
           <GroupButton name="{group.name_short}" logoUrl="{group.image}" />
         {/each}
       {/await}
