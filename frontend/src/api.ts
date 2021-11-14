@@ -61,8 +61,16 @@ export async function getOnlineProfile(token: string) {
 export async function getMyOnlineGroups(
   token: string,
   id: number
-): Promise<Group[]> {
+): Promise<OWGroup[]> {
   var endpoint = `https://online.ntnu.no/api/v1/group/online-groups/?members__user=${id}`;
   var groups = await authorizedOnlineFetch(endpoint, token);
   return groups["results"];
+}
+
+interface OWGroup {
+  group_type: string;
+  id: number;
+  image: string;
+  members: [];
+  name_short: string;
 }
