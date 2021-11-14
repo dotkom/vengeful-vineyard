@@ -7,8 +7,15 @@ export async function getGroups() {
   return json;
 }
 
-export async function getUserGroups(user_id: number) {
-  const res = await fetch(`http://localhost:8000/user/${user_id}/group`);
+export async function postGroup(name: string, rules: string) {
+  const res = await fetch("http://localhost:8000/group", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      rules,
+    }),
+  });
   const json = await res.json();
   return json;
 }

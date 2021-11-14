@@ -1,6 +1,7 @@
 <script lang="ts">
   // import GroupStore from "../../stores/groups";
   import GroupButton from "./GroupButton.svelte";
+  import AddCustomGroup from "./AddCustomGroup.svelte";
   // import { getUserGroups } from "../../api";
   // import { onMount } from "svelte";
   // import type { Group } from "src/types";
@@ -26,11 +27,16 @@
       {/await}
     {/await}
   {/if}
+
+  <AddCustomGroup />
 </div>
 
 <style lang="less">
   @import "../../variables.less";
   .groupLogosContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 0 auto;
   }
 </style>
