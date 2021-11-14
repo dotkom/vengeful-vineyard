@@ -7,7 +7,7 @@
 </script>
 
 <div class="punishmentContainer">
-  {#each $GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].members as user (user.id)}
+  <!-- {#each $GroupStore.groups.filter((g) => g.name === $GroupStore.currentGroup)[0].members as user (user.id)}
     <Accordion title="{user.name}" color="#223333">
       <div slot="title">
         <p>Utestående: {user.debt}</p>
@@ -27,7 +27,7 @@
         {/each}
       </div>
     </Accordion>
-  {/each}
+  {/each} -->
 </div>
 
 <style lang="less">

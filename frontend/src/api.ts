@@ -1,4 +1,4 @@
-import type { CreatePunishment } from "./types";
+import type { CreatePunishment, Group } from "./types";
 import { accessToken } from "@dopry/svelte-oidc";
 
 export async function getGroups() {
@@ -38,6 +38,7 @@ export async function deletePunishment(id: number) {
   );
   return res;
 }
+
 export async function postValidatePunishment(id: number) {
   const res = await fetch(
     "http://localhost:8080/validatePunishment/" + id.toString(),
@@ -64,12 +65,19 @@ export async function getOnlineProfile(token: string) {
   return response;
 }
 
-interface OWGroup {
-  name_short: string;
-}
-
-export async function getMyOnlineGroups(token: string, id: number): OWGroup[] {
+export async function getMyOnlineGroups(
+  token: string,
+  id: number
+): Promise<OWGroup[]> {
   var endpoint = `https://online.ntnu.no/api/v1/group/online-groups/?members__user=${id}`;
   var groups = await authorizedOnlineFetch(endpoint, token);
   return groups["results"];
+}
+
+interface OWGroup {
+  group_type: string;
+  id: number;
+  image: string;
+  members: [];
+  name_short: string;
 }
