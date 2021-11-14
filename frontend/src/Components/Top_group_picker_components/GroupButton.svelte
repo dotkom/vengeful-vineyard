@@ -8,31 +8,44 @@
   };
 </script>
 
-<input
+<button class="groupBtn" on:click="{changeActive}">
+  <img src="{logoUrl}" alt="{name}" />
+</button>
+
+<!-- <input
   type="image"
   class="groupBtn"
   class:active="{$GroupStore.currentGroup === name}"
   src="{logoUrl}"
   on:click="{changeActive}"
   alt="{name}"
-/>
-
+/> -->
 <style lang="less">
   @import "../../variables.less";
-  .groupBtn {
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 80px;
+    width: 80px;
     border-radius: 100%;
     background-color: @white;
-    margin: 5px;
-    box-shadow: 0 8px #c9c9c9;
-    transition: background-color 0.6s ease;
+    padding: 10px;
+    vertical-align: top;
+    box-shadow: 2px 1px 2px gray;
+    margin: 4px 10px 4px 10px;
+    border: none;
+    outline: none;
+  }
+
+  button:active {
+    box-shadow: 0 0 0 white;
+    margin: 6px 10px 2px 10px;
+    border: none;
+    outline: none;
   }
 
   .groupBtn:hover {
-    background-color: @secondary;
-  }
-
-  .active {
     background-color: @secondary;
   }
 </style>
