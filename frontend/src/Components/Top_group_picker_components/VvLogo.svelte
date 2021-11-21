@@ -1,5 +1,5 @@
 <div class="leftLogo">
-  <img src="assets/logo.svg" alt="vv logo" width="250" height="100" />
+  <img src="assets/VV-logo-white.svg" alt="vv logo" width="200" height="80" />
 </div>
 
 <style lang="less">
