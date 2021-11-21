@@ -3,7 +3,7 @@
   <a class="hover:underline" href="https://github.com/dotkom/vengeful-vineyard">
     Github</a
   >
-  og gi vinstraff til Anna!
+  og gi vinstraff til Joakim!
 </div>
 
 <style>

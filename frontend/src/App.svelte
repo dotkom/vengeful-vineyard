@@ -3,7 +3,7 @@
   import SideBar from "./Components/Left_navbar_components/SideBar.svelte";
   import GroupLogos from "./Components/Top_group_picker_components/GroupLogos.svelte";
   import Footer from "./Components/Footer/Footer.svelte";
-  import PunishmentGrid2 from "./Components/PunishmentDisplay/PunishmentGrid2.svelte";
+  import PunishmentGrid from "./Components/PunishmentDisplay/PunishmentGrid.svelte";
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -23,7 +23,7 @@
     <SideBar />
     <div class="punishments">
       <GroupLogos />
-      <PunishmentGrid2 />
+      <PunishmentGrid />
     </div>
   </div>
   <Footer />
@@ -35,7 +35,7 @@
   @tailwind utilities;
   @import "variables.less";
   .body_content {
-    display: flex;
+    @apply flex;
     margin: 0 5em;
   }
 
@@ -45,13 +45,12 @@
   }
 
   h1 {
-    text-align: center;
+    @apply uppercase text-center;
     font-family: "Montserrat", sans-serif;
     margin: 20px;
-    text-transform: uppercase;
   }
   .punishments {
-    @apply w-7/12;
+    @apply w-7/12 mt-4;
     margin-left: auto;
     margin-right: auto;
   }
