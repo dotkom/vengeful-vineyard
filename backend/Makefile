@@ -1,42 +1,37 @@
-BIN=env/bin
 .ONESHELL:
 .PHONY: prod dev test testv testvv mypy pylint clean help hooks
 
-env:
-	python3 -m venv env
-
 prod: .prod-reqs
-	VENGEFUL_DATABASE="vengeful_vineyard.db" $(BIN)/uvicorn app.main:app --host 0.0.0.0
+	VENGEFUL_DATABASE="vengeful_vineyard.db" poetry run uvicorn app.main:app --host 0.0.0.0
 
 dev: .dev-reqs
-	VENGEFUL_DATABASE="dev.db" $(BIN)/uvicorn --reload --reload-dir app app.main:app
+	VENGEFUL_DATABASE="dev.db" poetry run uvicorn --reload --reload-dir app app.main:app
 
 test: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" $(BIN)/pytest
+	VENGEFUL_DATABASE=":memory:" poetry run pytest
 
 testv: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" $(BIN)/pytest -v
+	VENGEFUL_DATABASE=":memory:" poetry run pytest -v
 
 testvv: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" $(BIN)/pytest -vv
+	VENGEFUL_DATABASE=":memory:" poetry run pytest -vv
 
-.prod-reqs: env
-	. env/bin/activate && pip install -r requirements.txt && touch .prod-reqs
+.prod-reqs:
+	poetry install --no-root --no-dev && touch .prod-reqs
 
-.dev-reqs: env .prod-reqs
-	. env/bin/activate && pip install -r requirements-dev.txt &&  pre-commit install && touch .dev-reqs
+.dev-reqs: .prod-reqs
+	poetry install --no-root && poetry run pre-commit install && touch .dev-reqs
 
 pylint: .dev-reqs
-	$(BIN)/pylint app
+	poetry run pylint app
 
 mypy: .dev-reqs
-	$(BIN)/mypy --strict app tests
+	poetry run mypy --strict app tests
 
 hooks: .dev-reqs
-	. env/bin/activate && pre-commit run -av
+	poetry run pre-commit run -av
 
 clean:
-	rm -rf env
 	rm -rf .mypy_cache
 	rm -rf __pycache__
 	rm -rf .pytest_cache
