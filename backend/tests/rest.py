@@ -4,10 +4,10 @@ from typing import Any, Dict
 from app.types import GroupId, UserId
 
 
-async def rest_create_user(client: Any, createUser: Dict[str, str]) -> Any:
+async def rest_create_user(client: Any, create_user: Dict[str, str]) -> Any:
     response = await client.post(
         "/user",
-        json=createUser,
+        json=create_user,
     )
     return response
 

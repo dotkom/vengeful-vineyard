@@ -2,7 +2,7 @@
 from typing import Any
 
 import pytest
-from tests.database import client
+from tests.fixtures import client, event_loop
 
 
 class TestGroup:
@@ -42,7 +42,7 @@ class TestPunishmentType:
     group_id = 1
 
     @pytest.mark.asyncio
-    async def test_create_punishmentType(self, client: Any) -> None:
+    async def test_create_punishment_type(self, client: Any) -> None:
         await TestGroup.test_create_group(self, client)
         response = await client.post(
             f"/group/{self.group_id}/punishmentType",
@@ -51,7 +51,7 @@ class TestPunishmentType:
         assert response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_create_punishmentType_duplicate(self, client: Any) -> None:
+    async def test_create_punishment_type_duplicate(self, client: Any) -> None:
         response = await client.post(
             f"/group/{self.group_id}/punishmentType",
             json={"name": "Vin", "value": 100, "logo_url": "http://example.com"},
@@ -59,7 +59,7 @@ class TestPunishmentType:
         assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_get_group_with_punishmentType(self, client: Any) -> None:
+    async def test_get_group_with_punishment_type(self, client: Any) -> None:
         response = await client.get("/group/1")
         assert response.status_code == 200
         assert response.json() == {
