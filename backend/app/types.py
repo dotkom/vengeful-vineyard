@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Some newtype definitions for extra type safety
 """

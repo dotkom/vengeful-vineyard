@@ -11,10 +11,8 @@ repos:
     -   id: debug-statements
     -   id: end-of-file-fixer
     -   id: fix-byte-order-marker
-    -   id: fix-encoding-pragma
     -   id: forbid-new-submodules
     -   id: mixed-line-ending
-    -   id: requirements-txt-fixer
     -   id: trailing-whitespace
 -   repo: local
     hooks:
@@ -46,6 +44,13 @@ repos:
         name: sort imports (python)
         entry: bash -c "poetry run isort $@"
         types: [python]
+        language: system
+    -   id: poetry-check
+        name: Check if poetry config is valid
+        entry: bash -c "poetry check"
+        always_run: true
+        types: [python]
+        pass_filenames: false
         language: system
 #    -   id: prettier
 #        name: Format frontend-code

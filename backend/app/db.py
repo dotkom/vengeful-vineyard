@@ -1,27 +1,30 @@
-# -*- coding: utf-8 -*-
 """
 Functions for interacting with the SQLite database.
 """
 import sqlite3
-from typing import Dict, List
+from sqlite3 import Connection
 
 from app.config import settings
-from app.models import (
-    CreateGroup,
-    CreatePunishment,
-    CreatePunishmentType,
-    CreateUser,
-    PunishmentDb,
-    PunishmentType,
-    User,
-)
+from app.models.group import GroupCreate
+from app.models.punishment import PunishmentCreate, PunishmentRead
+from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
+from app.models.user import User, UserCreate
 from app.types import GroupId, PunishmentId, UserId
 from fastapi import HTTPException
 
-CON = sqlite3.connect(settings.vengeful_database)
-CON.row_factory = sqlite3.Row
-CUR = CON.cursor()
-SCHEMAFILE = ""
+CONN = sqlite3.connect(settings.vengeful_database)
+CONN.row_factory = sqlite3.Row
+SCHEMAFILE = settings.schema_file
+
+DEFAULT_PUSHISHMENT_TYPES = [
+    PunishmentTypeCreate(name="Ølstraff", value=33, logo_url="https://example.com"),
+    PunishmentTypeCreate(name="Vinstraff", value=100, logo_url="https://example.com"),
+    PunishmentTypeCreate(name="Spritstraff", value=300, logo_url="https://example.com"),
+]
+
+
+def get_instance() -> Connection:
+    return CONN
 
 
 def load_schema(filepath: str) -> None:
@@ -33,16 +36,14 @@ def load_schema(filepath: str) -> None:
         schema = list(filter(lambda x: not x.startswith("--"), schema))
         # Merge to one long string
         schema_str = "".join([line.strip() for line in schema])
-    CUR.executescript(schema_str)
+    CONN.executescript(schema_str)
 
 
 def reconnect_db() -> None:
-    global CON
-    global CUR
+    global CONN
 
-    CON = sqlite3.connect(settings.vengeful_database)
-    CON.row_factory = sqlite3.Row
-    CUR = CON.cursor()
+    CONN = sqlite3.connect(settings.vengeful_database)
+    CONN.row_factory = sqlite3.Row
     try:
         load_schema(SCHEMAFILE)
     except FileNotFoundError:
@@ -53,7 +54,7 @@ reconnect_db()
 
 
 async def get_user(user_id: UserId, *, punishments: bool) -> User:
-    db_user = CUR.execute(
+    db_user = CONN.execute(
         """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
     ).fetchone()
     if not db_user:
@@ -61,7 +62,7 @@ async def get_user(user_id: UserId, *, punishments: bool) -> User:
     user = dict(db_user)
     user["punishments"] = []
     if punishments:
-        db_punishments = CUR.execute(
+        db_punishments = CONN.execute(
             """
             SELECT punishment_id, punishment_type, reason, amount, verified_by, verified_time, created_time
             FROM group_punishments
@@ -79,7 +80,7 @@ async def get_user(user_id: UserId, *, punishments: bool) -> User:
 async def get_group_user(
     group_id: GroupId, user_id: UserId, *, punishments: bool
 ) -> User:
-    db_user = CUR.execute(
+    db_user = CONN.execute(
         """SELECT * FROM users WHERE user_id = :user_id""", {"user_id": user_id}
     ).fetchone()
     if not db_user:
@@ -87,7 +88,7 @@ async def get_group_user(
     user = dict(db_user)
     user["punishments"] = []
     if punishments:
-        db_punishments = CUR.execute(
+        db_punishments = CONN.execute(
             """SELECT punishment_id, group_id, user_id, punishment_type, reason, amount, verified_by, verified_time, created_time
                FROM   group_punishments
                WHERE  group_id = :group_id
@@ -99,9 +100,9 @@ async def get_group_user(
     return User(**user)
 
 
-async def get_group_users(group_id: GroupId) -> List[User]:
+async def get_group_users(group_id: GroupId) -> list[User]:
     members = []
-    db_users = CUR.execute(
+    db_users = CONN.execute(
         """SELECT *
            FROM users
            INNER JOIN group_members
@@ -116,28 +117,30 @@ async def get_group_users(group_id: GroupId) -> List[User]:
     return members
 
 
-async def get_punishment_types(group_id: GroupId) -> List[PunishmentType]:
-    punishment_types = CUR.execute(
+async def get_punishment_types(group_id: GroupId) -> list[PunishmentTypeRead]:
+    punishment_types = CONN.execute(
         """SELECT * FROM punishment_types
            WHERE group_id = :group_id""",
         {"group_id": group_id},
     )
-    return list(map(lambda x: PunishmentType(**dict(x)), punishment_types.fetchall()))
+    return list(
+        map(lambda x: PunishmentTypeRead(**dict(x)), punishment_types.fetchall())
+    )
 
 
-async def get_punishment(punishment_id: PunishmentId) -> PunishmentDb:
-    punishments = CUR.execute(
+async def get_punishment(punishment_id: PunishmentId) -> PunishmentRead:
+    punishments = CONN.execute(
         """
         SELECT * FROM group_punishments
         WHERE punishment_id = :punishment_id
         """,
         {"punishment_id": punishment_id},
     )
-    return PunishmentDb(**dict(punishments.fetchone()))
+    return PunishmentRead(**dict(punishments.fetchone()))
 
 
-async def get_punishments(user_id: UserId, group_id: GroupId) -> List[PunishmentDb]:
-    punishments = CUR.execute(
+async def get_punishments(user_id: UserId, group_id: GroupId) -> list[PunishmentRead]:
+    punishments = CONN.execute(
         """
         SELECT * FROM group_punishments
         WHERE group_id = :group_id
@@ -145,47 +148,52 @@ async def get_punishments(user_id: UserId, group_id: GroupId) -> List[Punishment
         """,
         {"group_id": group_id, "user_id": user_id},
     )
-    return list(map(lambda x: PunishmentDb(**dict(x)), punishments.fetchall()))
+    return list(map(lambda x: PunishmentRead(**dict(x)), punishments.fetchall()))
 
 
-async def insert_user(user: CreateUser) -> Dict[str, int]:
+async def insert_user(user: UserCreate) -> dict[str, int]:
     statement = "INSERT INTO users(first_name, last_name, email) VALUES (?, ?, ?)"
     values = (user.first_name, user.last_name, user.email)
     try:
-        CUR.execute(statement, values)
+        cur = CONN.cursor()
+        cur.execute(statement, values)
     except sqlite3.IntegrityError as ex:
         raise HTTPException(status_code=400, detail=str(ex)) from ex
-    CON.commit()
-    return {"id": CUR.lastrowid}
+    CONN.commit()
+    return {"id": cur.lastrowid}
 
 
-async def insert_group(group: CreateGroup) -> Dict[str, int]:
+async def insert_group(group: GroupCreate) -> dict[str, int]:
     statement = "INSERT INTO groups(name, rules) VALUES (?, ?)"
     values = (group.name, group.rules)
     try:
-        CUR.execute(statement, values)
+        cur = CONN.cursor()
+        cur.execute(statement, values)
     except sqlite3.IntegrityError as ex:
         raise HTTPException(status_code=400, detail=str(ex)) from ex
-    CON.commit()
-    return {"id": CUR.lastrowid}
+    gid = cur.lastrowid
+    for punishment_type in DEFAULT_PUSHISHMENT_TYPES:
+        await insert_punishment_type(gid, punishment_type)
+    return {"id": gid}
 
 
-async def insert_user_in_group(group_id: GroupId, user_id: UserId) -> Dict[str, int]:
+async def insert_user_in_group(group_id: GroupId, user_id: UserId) -> dict[str, int]:
     statement = (
         "INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
     )
     values = (group_id, user_id)
     try:
-        CUR.execute(statement, values)
+        cur = CONN.cursor()
+        cur.execute(statement, values)
     except sqlite3.IntegrityError as ex:
         raise HTTPException(status_code=400, detail=str(ex)) from ex
-    CON.commit()
-    return {"id": CUR.lastrowid}
+    CONN.commit()
+    return {"id": cur.lastrowid}
 
 
 async def insert_punishment_type(
-    group_id: GroupId, punishment_type: CreatePunishmentType
-) -> Dict[str, int]:
+    group_id: GroupId, punishment_type: PunishmentTypeCreate
+) -> dict[str, int]:
     statement = "INSERT INTO punishment_types(group_id, name, value, logo_url) VALUES (?, ?, ?, ?)"
     values = (
         group_id,
@@ -194,16 +202,17 @@ async def insert_punishment_type(
         punishment_type.logo_url,
     )
     try:
-        CUR.execute(statement, values)
+        cur = CONN.cursor()
+        cur.execute(statement, values)
     except sqlite3.IntegrityError as ex:
         raise HTTPException(status_code=400, detail=str(ex)) from ex
-    CON.commit()
-    return {"id": CUR.lastrowid}
+    CONN.commit()
+    return {"id": cur.lastrowid}
 
 
 async def insert_punishments(
-    group_id: GroupId, user_id: UserId, punishments: List[CreatePunishment]
-) -> Dict[str, List[int]]:
+    group_id: GroupId, user_id: UserId, punishments: list[PunishmentCreate]
+) -> dict[str, list[int]]:
     ids = []
     for punishment in punishments:
         statement = "INSERT INTO group_punishments(group_id, user_id, punishment_type, reason, amount) VALUES (?, ?, ?, ?, ?)"
@@ -215,22 +224,23 @@ async def insert_punishments(
             punishment.amount,
         )
         try:
-            CUR.execute(statement, values)
-            ids.append(CUR.lastrowid)
+            cur = CONN.cursor()
+            cur.execute(statement, values)
+            ids.append(cur.lastrowid)
         except sqlite3.IntegrityError as ex:
             raise HTTPException(status_code=400, detail=str(ex)) from ex
-    CON.commit()
+    CONN.commit()
     return {"ids": ids}
 
 
 async def delete_punishment(punishment_id: PunishmentId) -> None:
     statement = "DELETE FROM group_punishments WHERE punishment_id=:punishment_id"
-    CUR.execute(statement, {"punishment_id": punishment_id})
-    CON.commit()
+    CONN.execute(statement, {"punishment_id": punishment_id})
+    CONN.commit()
 
 
-async def verify_punishment(punishment_id: PunishmentId) -> PunishmentDb:
+async def verify_punishment(punishment_id: PunishmentId) -> PunishmentRead:
     statement = "UPDATE group_punishments SET verified_time=datetime('now', 'localtime') WHERE punishment_id=:punishment_id"
-    CUR.execute(statement, {"punishment_id": punishment_id})
-    CON.commit()
+    CONN.execute(statement, {"punishment_id": punishment_id})
+    CONN.commit()
     return await get_punishment(punishment_id)

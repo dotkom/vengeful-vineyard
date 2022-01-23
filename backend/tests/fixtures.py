@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 import asyncio
 from asyncio import AbstractEventLoop
 from typing import AsyncGenerator, Generator
 
 import pytest
+from app.api.init_api import asgi_app
 from app.db import reconnect_db
-from app.main import app
 from httpx import AsyncClient
 
 
@@ -19,6 +18,6 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
 @pytest.fixture(scope="class")
 async def client() -> AsyncGenerator[AsyncClient, None]:
     reconnect_db()
-    async_client = AsyncClient(app=app, base_url="http://test")
+    async_client = AsyncClient(app=asgi_app, base_url="http://test")
     yield async_client
     await async_client.aclose()
