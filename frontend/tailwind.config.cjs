@@ -24,7 +24,14 @@ const config = {
   variants: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/forms")({strategy: 'class',})],
+  plugins: [
+    require("@tailwindcss/forms")
+    ({strategy: 'class',}),
+    require('daisyui'),
+  ],
+  daisyui: {
+    themes: false,
+  },
 };
 
 module.exports = config;

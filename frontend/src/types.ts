@@ -1,6 +1,15 @@
 export interface Punishment {
   name: string;
   number: number;
+  id: number;
+  price: number;
+  imageurl: string;
+  reason: string;
+  verifiedBy: string | null;
+  verifiedTime: string | null;
+  givenBy: string;
+  givenTime: string;
+  created_time: string;
 }
 
 export interface CreatePunishment {
@@ -28,12 +37,17 @@ export interface PunishmentType {
 }
 
 export interface User {
-  id: number;
-  name: string;
-  punishments: PunishmentInfo[];
-  debt: number;
-  totalPaid: number;
-  active: boolean;
+  user_id: number;
+  // name: string;
+  // punishments: PunishmentInfo[];
+  // debt: number;
+  // totalPaid: number;
+  // active: boolean;
+  // active: true
+  email: string;
+  first_name: string;
+  last_name: string;
+  punishments: Punishment[];
 }
 
 export interface Group {

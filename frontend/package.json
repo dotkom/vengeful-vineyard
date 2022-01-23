@@ -15,6 +15,7 @@
 		"@tsconfig/svelte": "^2.0.1",
 		"autoprefixer": "^10.3.7",
 		"cssnano": "^5.0.8",
+		"daisyui": "^1.14.2",
 		"less": "^3.13.1",
 		"oidc-client": "^1.11.5",
 		"pnpm": "^6.17.2",

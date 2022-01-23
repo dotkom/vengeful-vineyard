@@ -1,8 +1,20 @@
-import type { CreatePunishment, Group } from "./types";
+import type { CreatePunishment, Group, User } from "./types";
 import { accessToken } from "@dopry/svelte-oidc";
 
 export async function getGroups() {
   const res = await fetch("http://localhost:8080/group");
+  const json = await res.json();
+  return json;
+}
+
+export async function getGroup(group_id: number): Promise<Group> {
+  const res = await fetch(`http://localhost:8000/group/${group_id}`);
+  const json = await res.json();
+  return json;
+}
+
+export async function getUser(user_id: number): Promise<User> {
+  const res = await fetch(`http://localhost:8000/user/${user_id}`);
   const json = await res.json();
   return json;
 }
