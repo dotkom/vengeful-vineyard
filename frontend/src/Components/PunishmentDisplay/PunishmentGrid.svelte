@@ -16,12 +16,16 @@
       >
         {#await getUser(user.user_id) then userInfo}
           <div class="accordion_text collapse-title text-xl font-medium">
-            <div>{user.first_name} {user.last_name}</div>
-            {#each userInfo.punishments as punishment}
-              <img class="icon" alt="wine" src="{wine}" />
-            {:else}
-              <div>Ingen straffer</div>
-            {/each}
+            <div class="name">{user.first_name} {user.last_name}</div>
+            <div class="icons">
+              <!-- <img class="icon" alt="wine" src="{wine}" />
+              <img class="icon" alt="wine" src="{wine}" /> -->
+              {#each userInfo.punishments as punishment}
+                <img class="icon" alt="wine" src="{wine}" />
+              {:else}
+                Ingen straffer
+              {/each}
+            </div>
             <div>
               <!-- {userInfo.punishments[userInfo.punishments.length - 1]}.givenTime -->
               date
@@ -43,9 +47,16 @@
   .accordion_text {
     @apply flex flex-row justify-between text-gray-500;
   }
+  .name {
+    min-width: 7em;
+  }
 
   .icon {
-    @apply max-h-8;
+    @apply min-h-6;
+  }
+
+  .icons {
+    @apply flex justify-center;
   }
 
   .punishment_grid {
