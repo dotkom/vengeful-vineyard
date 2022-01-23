@@ -23,7 +23,7 @@ cd vengeful-vineyard
 ```
 
 ### Installation for Frontend and Backend
-You need npm, pip and Python3 installed on your computer.
+You need npm, poetry and Python3 installed on your computer.
 
 * [Frontend](frontend/README.md)
 * [Backend](backend/README.md)
