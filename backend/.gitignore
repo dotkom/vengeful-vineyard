@@ -89,3 +89,9 @@ local_settings.py
 # Makefile
 .dev-reqs
 .prod-reqs
+
+# Generated docs
+html
+
+# Generated codecoverage
+htmlcov

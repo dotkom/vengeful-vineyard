@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-from typing import Any, Dict
+from typing import Any
 
 from app.types import GroupId, UserId
 
 
-async def rest_create_user(client: Any, create_user: Dict[str, str]) -> Any:
+async def rest_create_user(client: Any, create_user: dict[str, str]) -> Any:
     response = await client.post(
         "/user",
         json=create_user,

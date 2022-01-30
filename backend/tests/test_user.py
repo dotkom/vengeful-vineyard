@@ -1,9 +1,33 @@
-# -*- coding: utf-8 -*-
-from typing import Any, Dict
+import logging
+from typing import Any
 
 import pytest
 from tests.fixtures import client, event_loop
+from tests.response_time import check_response_time
 from tests.rest import rest_create_group, rest_create_user
+
+logging.basicConfig(level=logging.DEBUG)
+
+DEFAULT_PUNISHMENT_TYPES = [
+    {
+        "name": "Spritstraff",
+        "value": 300,
+        "logo_url": "https://example.com",
+        "punishment_type_id": 3,
+    },
+    {
+        "name": "Vinstraff",
+        "value": 100,
+        "logo_url": "https://example.com",
+        "punishment_type_id": 2,
+    },
+    {
+        "name": "Ølstraff",
+        "value": 33,
+        "logo_url": "https://example.com",
+        "punishment_type_id": 1,
+    },
+]
 
 createdUserReturn = {
     "id": 1,
@@ -15,17 +39,10 @@ createUser = {
     "email": "email@example.com",
 }
 
-createdUser: Dict[str, Any] = createUser
+createdUser: dict[str, Any] = createUser
 createdUser["user_id"] = 1
 createdUser["active"] = True
 createdUser["punishments"] = []
-
-
-FAST_RESPONSE_MS = 50  # Milliseconds
-
-
-def check_response_time(response: Any, max_time: float = FAST_RESPONSE_MS) -> None:
-    assert float(response.headers["Process-Time-Ms"]) <= max_time
 
 
 class TestUser:
@@ -94,6 +111,13 @@ class TestUserInGroup:
         check_response_time(response)
 
     @pytest.mark.asyncio
+    async def test_get_user_groups(self, client: Any) -> None:
+        response = await client.get(f"user/{self.user_id}/group")
+        assert response.status_code == 200
+        assert response.json()["groups"][0]["group"] == "dotkom"
+        check_response_time(response)
+
+    @pytest.mark.asyncio
     async def test_check_user_in_group(self, client: Any) -> None:
         response = await client.get("/group/1")
         assert response.status_code == 200
@@ -104,24 +128,34 @@ class TestUserInGroup:
     async def test_create_punishment_type(self, client: Any) -> None:
         response = await client.post(
             "/group/1/punishmentType",
-            json={"name": "Vin", "value": 100, "logo_url": "http://example.com"},
+            json={"name": "Waffles", "value": 125, "logo_url": "http://example.com"},
         )
         assert response.status_code == 200
-        assert response.json() == {"id": 1}
+        assert response.json() == {"id": 4}
         check_response_time(response)
 
     @pytest.mark.asyncio
     async def test_get_group_with_punishment_type(self, client: Any) -> None:
         response = await client.get(f"/group/{self.group_id}")
         assert response.status_code == 200
-        assert response.json()["punishment_types"] == [
-            {
-                "name": "Vin",
-                "value": 100,
-                "logo_url": "http://example.com",
-                "punishment_type_id": 1,
-            }
-        ]
+        sort_key = lambda x: x["punishment_type_id"]
+        sorted_types = sorted(
+            response.json()["punishment_types"],
+            key=sort_key,
+            reverse=True,
+        )
+        assert (
+            sorted_types
+            == [
+                {
+                    "name": "Waffles",
+                    "value": 125,
+                    "logo_url": "http://example.com",
+                    "punishment_type_id": 4,
+                },
+            ]
+            + DEFAULT_PUNISHMENT_TYPES
+        )
         check_response_time(response)
 
     @pytest.mark.asyncio
