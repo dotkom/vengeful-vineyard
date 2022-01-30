@@ -1,7 +1,8 @@
 export interface Punishment {
   name: string;
-  number: number;
+  amount: number;
   id: number;
+  punishment_id: number; // to match backend
   price: number;
   imageurl: string;
   reason: string;

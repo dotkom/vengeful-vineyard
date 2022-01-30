@@ -1,10 +1,25 @@
 <script lang="ts">
   import { getGroup, getUser } from "../../api";
   import PunishmentInfo from "./PunishmentInfo.svelte";
+  import type { User } from "../../types";
 
   let wine = "assets/wineglass.svg";
 
+  //TODO add actual group id
   let group_id: number = 1;
+
+  const getLastPunishedDate = (user: User) => {
+    let date: String = "";
+    try {
+      date =
+        user.punishments[user.punishments.length - 1].created_time.split(
+          "T"
+        )[0];
+    } catch (TypeError) {
+      return "No date";
+    }
+    return date;
+  };
 </script>
 
 <div class="punishment_grid">
@@ -18,17 +33,16 @@
           <div class="accordion_text collapse-title text-xl font-medium">
             <div class="name">{user.first_name} {user.last_name}</div>
             <div class="icons">
-              <!-- <img class="icon" alt="wine" src="{wine}" />
-              <img class="icon" alt="wine" src="{wine}" /> -->
+              <!-- TODO add correct amount of punishments-->
               {#each userInfo.punishments as punishment}
                 <img class="icon" alt="wine" src="{wine}" />
               {:else}
-                Ingen straffer
+                Ingen straffer gitt
               {/each}
             </div>
             <div>
               <!-- {userInfo.punishments[userInfo.punishments.length - 1]}.givenTime -->
-              date
+              {getLastPunishedDate(userInfo)}
             </div>
           </div>
           <div class="collapse-content">
@@ -40,9 +54,12 @@
   {/await}
 </div>
 
-<!-- {console.log(members)} -->
 <style lang="less">
   @import "../../variables.less";
+
+  .collapse {
+    display: inline-block;
+  }
 
   .accordion_text {
     @apply flex flex-row justify-between text-gray-500;
@@ -52,7 +69,7 @@
   }
 
   .icon {
-    @apply min-h-6;
+    @apply h-6;
   }
 
   .icons {
