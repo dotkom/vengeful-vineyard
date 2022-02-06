@@ -40,17 +40,17 @@
   <slot name="punishments" />
   {#each punishments as punishment}
     <div class="punishment">
-      <div class="min-w-min">
-        <div
-          class="deleteBtn"
-          on:click="{() => {
-            removePunishment(punishment.punishment_id);
-          }}"
-        >
-          <img class="icon" src="{cancelIcon}" alt="Remove punishment" />
-        </div>
+      <div
+        class="deleteBtn"
+        on:click="{() => {
+          removePunishment(punishment.punishment_id);
+        }}"
+      >
+        <img class="icon" src="{cancelIcon}" alt="Remove punishment" />
       </div>
-      <div>{punishment.reason}</div>
+      <div>
+        <p class="reason">{punishment.reason}</p>
+      </div>
 
       <!-- Add a drink icon for each punishment-->
       <div class="punishment_icons">
@@ -72,9 +72,14 @@
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   }
 
-  .punishment > {
-    @apply p-4;
+  .punishment p {
+    @apply p-4 max-w-xs;
   }
+
+  .punishment > {
+    @apply items-center;
+  }
+
   .icon {
     @apply h-6 w-6;
   }
