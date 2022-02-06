@@ -32,14 +32,14 @@
   <div class="loginSection">
     <a href="https://vg.no"> <img alt="Login icon" src="{logIcon}" /></a>
     <OidcContext
-      issuer="https://online.ntnu.no/openid"
+      issuer="https://old.online.ntnu.no/openid"
       client_id="219919"
       redirect_uri="http://localhost:3000"
       post_logout_redirect_uri="http://localhost:3000"
       scope="openid profile onlineweb4"
       extraOptions="{{
         metadataUrl:
-          'https://online.ntnu.no/openid/.well-known/openid-configuration',
+          'https://old.online.ntnu.no/openid/.well-known/openid-configuration',
         filterProtocolClaims: true,
         loadUserInfo: true,
         silent_redirect_uri: 'http://localhost:3000',
