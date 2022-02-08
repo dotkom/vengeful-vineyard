@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS group_members (
 	group_id INTEGER NOT NULL references groups(group_id),
   user_id INTEGER NOT NULL references users(user_id),
   is_admin BOOLEAN DEFAULT False,
+  active BOOLEAN DEFAULT True,
   PRIMARY KEY (group_id, user_id)
 );
 
@@ -39,6 +40,7 @@ CREATE TABLE IF NOT EXISTS group_punishments (
   reason TEXT NOT NULL,
   amount INTEGER NOT NULL,
   verified_by INTEGER references users(user_id),
+  created_by INTEGER references users(user_id),
   verified_time DATE,
   created_time DATE DEFAULT (datetime('now','localtime'))
 );
