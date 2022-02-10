@@ -1,7 +1,9 @@
 """
 Functions for interacting with the SQLite database.
 """
+import logging
 import sqlite3
+from pathlib import Path
 from sqlite3 import Connection
 
 from app.config import settings
@@ -14,7 +16,6 @@ from fastapi import HTTPException
 
 CONN = sqlite3.connect(settings.vengeful_database)
 CONN.row_factory = sqlite3.Row
-SCHEMAFILE = settings.schema_file
 
 DEFAULT_PUSHISHMENT_TYPES = [
     PunishmentTypeCreate(name="Ølstraff", value=33, logo_url="https://example.com"),
@@ -27,16 +28,33 @@ def get_instance() -> Connection:
     return CONN
 
 
-def load_schema(filepath: str) -> None:
-    global SCHEMAFILE
-    SCHEMAFILE = filepath
+def read_sql_file(filepath: Path) -> str:
+    """Reads an SQL file and ignores comments"""
     with open(filepath, "r", encoding="utf-8") as file:
-        schema = file.readlines()
+        content = file.readlines()
         # Remove comments
-        schema = list(filter(lambda x: not x.startswith("--"), schema))
+        content = list(filter(lambda x: not x.startswith("--"), content))
         # Merge to one long string
-        schema_str = "".join([line.strip() for line in schema])
-    CONN.executescript(schema_str)
+        return "".join([line.strip() for line in content])
+
+
+def load_db_migrations() -> None:
+    """
+    Loads the database schema and applies new migrations.
+    """
+    schema_version = CONN.execute("pragma user_version").fetchone()["user_version"]
+    for file in settings.migrations_directory.iterdir():
+        if file.suffix != ".sql":
+            continue
+        file_version = int(file.name.split("_", 1)[0])
+
+        if file_version <= schema_version:
+            logging.debug("Skipping migration: %s", file.name)
+            continue
+
+        sql_commands = read_sql_file(file)
+        logging.info("Applying migration: %s", file.name)
+        CONN.executescript(sql_commands)
 
 
 def reconnect_db() -> None:
@@ -44,13 +62,7 @@ def reconnect_db() -> None:
 
     CONN = sqlite3.connect(settings.vengeful_database)
     CONN.row_factory = sqlite3.Row
-    try:
-        load_schema(SCHEMAFILE)
-    except FileNotFoundError:
-        pass
-
-
-reconnect_db()
+    load_db_migrations()
 
 
 async def get_user(user_id: UserId, *, punishments: bool) -> User:
