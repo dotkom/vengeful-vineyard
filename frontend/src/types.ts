@@ -8,8 +8,8 @@ export interface Punishment {
   imageurl: string;
   reason: string;
   created_time: string;
-  verifiedTime: string | null;
-  verifiedBy: string | null;
+  verified_time: string | null;
+  verified_by: string | null;
 
   // name: string;
   // number: number;

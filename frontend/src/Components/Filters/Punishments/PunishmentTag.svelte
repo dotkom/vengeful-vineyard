@@ -20,28 +20,20 @@
     currentUsers = value;
   });
 
-  const contains = (usersPunishments: Punishment[]) => {
-    console.log(usersPunishments);
-    console.log(filterPunishments);
-    usersPunishments.some((punishment) => {
-      return filterPunishments
-        .map((pun) => pun.id)
-        .includes(punishment.punishment_type);
-    });
-  };
-
-  // users.update((users) => users.filter((user) => user.punishments.some(punishment.id => {
-  //   return filterPunishments.includes(punishment.)
-  // })))
-
-  const removePunishment = (punishmentInput) => {
+  const removePunishment = (punishmentInput: PunishmentType) => {
     punishmentsToFilter.update((punishments) =>
       punishments.filter((punishment) => punishment.id != punishmentInput.id)
     );
 
-    users.update((users) => users.filter((user) => contains(user.punishments)));
-
-    // users.update((users) => users.filter((user) => user.punishments.filter((punishment) => punishment.punishment_type)))
+    users.update((users) =>
+      users.filter((user) =>
+        user.punishments
+          .map((pun) => pun.punishment_type)
+          .some((elem) => {
+            return filterPunishments.map((pun) => pun.id).includes(elem);
+          })
+      )
+    );
   };
 </script>
 
