@@ -3,15 +3,18 @@
   import type { Punishment, PunishmentType } from "../../types";
 
   export let punishments: Punishment[];
-  export let sum: number;
   export let p_types: PunishmentType[];
+  let cancelIcon = "assets/red-x.svg";
+  $: totalSum = calculateSum();
 
   const getUrl = (p_type: number) => {
     return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
   };
 
-  let cancelIcon = "assets/red-x.svg";
-
+  /**
+   * Creates a new object that stores punishment ids and punishment values.
+   * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
+   */
   const mapTypes = () => {
     let mappedTypes = {};
     p_types.map((p) => (mappedTypes[p.punishment_type_id] = p.value));
@@ -23,17 +26,13 @@
    * @returns the total sum as number
    */
   const calculateSum = () => {
-    //TODO calculate sum based on punishment type
     let dict = mapTypes();
     let sum: number = 0;
-    for (let i = 0; i < punishments.length; i++) {
-      let p_id = punishments[i].punishment_type;
-      sum += dict[p_id] * punishments[i].amount;
-    }
+    punishments.forEach((punishment) => {
+      sum += dict[punishment.punishment_type] * punishment.amount;
+    });
     return sum;
   };
-
-  $: totalSum = calculateSum();
 
   const returnDate = (given_time: String) => {
     return given_time.split("T")[0];
@@ -41,11 +40,13 @@
 
   /**
    * Deletes a punishment from database and removes the item from GUI.
+   * Updates total sum displayed
    * @param id punishment's id
    */
   const removePunishment = (id: number) => {
     deletePunishment(id);
     punishments = punishments.filter((p) => p.punishment_id !== id);
+    totalSum = calculateSum();
   };
 </script>
 
@@ -71,7 +72,7 @@
           <img
             class="icon"
             src="{getUrl(punishment.punishment_type)}"
-            alt="wineglass"
+            alt="punishment"
           />
         {/each}
       </div>

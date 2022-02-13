@@ -4,7 +4,7 @@
   import { isAuthenticated } from "@dopry/svelte-oidc";
   import PunishmentRow from "./PunishmentRow.svelte";
 
-  //TODO add actual group id
+  //TODO add actual group id, remember to edit this number when testing
   $: group_id = 6;
 
   /**
