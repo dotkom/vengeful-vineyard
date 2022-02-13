@@ -1,10 +1,8 @@
 <script lang="ts">
   import { getGroup, getGroupUser } from "../../api";
-  import type { User, PunishmentType } from "../../types";
-  import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
+  import type { User } from "../../types";
+  import { isAuthenticated } from "@dopry/svelte-oidc";
   import PunishmentRow from "./PunishmentRow.svelte";
-
-  // export let currentGroup;
 
   //TODO add actual group id
   $: group_id = 6;
@@ -17,8 +15,6 @@
     if ($isAuthenticated) {
     }
   };
-
-  const generateCorrectIcons = (user: User, types: PunishmentType[]) => {};
 </script>
 
 <div class="punishment_grid">
