@@ -14,7 +14,7 @@
   button {
     appearance: none;
     background: @primary;
-    border: 2px solid black;
+    border: 1px solid black;
     color: @white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     border-radius: 3px;

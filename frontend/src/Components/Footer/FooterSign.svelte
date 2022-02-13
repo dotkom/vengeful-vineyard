@@ -1,7 +1,7 @@
 <div class="footer_sign">
   Fra
   <a class="hover:underline" href="mailto:dotkom@online.ntnu.no">Dotkom</a>
-  med luv
+  med ♥️
 </div>
 
 <style lang="less">

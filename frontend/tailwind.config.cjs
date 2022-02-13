@@ -19,15 +19,18 @@ const config = {
         grey: "#E0E0E0",
         white: "white",
       },
+      fontFamily: {
+        sspro: ["Source Sans Pro", "sans-serif"],
+        montserrat: ["Montserrat", "sans-serif"],
+      },
     },
   },
   variants: {
     extend: {},
   },
   plugins: [
-    require("@tailwindcss/forms")
-    ({strategy: 'class',}),
-    require('daisyui'),
+    require("@tailwindcss/forms")({ strategy: "class" }),
+    require("daisyui"),
   ],
   daisyui: {
     themes: false,
