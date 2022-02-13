@@ -1,13 +1,22 @@
 <script lang="ts">
   import { deletePunishment } from "../../api";
-  import type { Punishment } from "../../types";
+  import type { Punishment, PunishmentType } from "../../types";
 
   export let punishments: Punishment[];
+  export let sum: number;
+  export let p_types: PunishmentType[];
 
-  // TODO get icons with internal object path
+  const getUrl = (p_type: number) => {
+    return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
+  };
+
   let cancelIcon = "assets/red-x.svg";
-  let wine = "assets/wineglass.svg";
-  let beer = "assets/beerglass.svg";
+
+  const mapTypes = () => {
+    let mappedTypes = {};
+    p_types.map((p) => (mappedTypes[p.punishment_type_id] = p.value));
+    return mappedTypes;
+  };
 
   /**
    * Calculates the total sum in NOK of punishments
@@ -15,12 +24,16 @@
    */
   const calculateSum = () => {
     //TODO calculate sum based on punishment type
+    let dict = mapTypes();
     let sum: number = 0;
     for (let i = 0; i < punishments.length; i++) {
-      sum += punishments[i].price;
+      let p_id = punishments[i].punishment_type;
+      sum += dict[p_id] * punishments[i].amount;
     }
     return sum;
   };
+
+  $: totalSum = calculateSum();
 
   const returnDate = (given_time: String) => {
     return given_time.split("T")[0];
@@ -40,22 +53,26 @@
   <slot name="punishments" />
   {#each punishments as punishment}
     <div class="punishment">
-      <div
-        class="deleteBtn"
-        on:click="{() => {
-          removePunishment(punishment.punishment_id);
-        }}"
-      >
-        <img class="icon" src="{cancelIcon}" alt="Remove punishment" />
-      </div>
-      <div>
+      <div class="reason_wrapper">
+        <div
+          class="deleteBtn"
+          on:click="{() => {
+            removePunishment(punishment.punishment_id);
+          }}"
+        >
+          <img class="icon" src="{cancelIcon}" alt="Remove punishment" />
+        </div>
         <p class="reason">{punishment.reason}</p>
       </div>
 
       <!-- Add a drink icon for each punishment-->
       <div class="punishment_icons">
         {#each Array(punishment.amount) as _, i}
-          <img class="icon" src="{wine}" alt="wineglass" />
+          <img
+            class="icon"
+            src="{getUrl(punishment.punishment_type)}"
+            alt="wineglass"
+          />
         {/each}
       </div>
       <div>{returnDate(punishment.created_time)}</div>
@@ -63,21 +80,24 @@
   {:else}
     <div></div>
   {/each}
-  <div class="sum">Total sum: {calculateSum()}</div>
+  <div class="sum">Total sum: {totalSum}</div>
 </div>
 
 <style lang="less">
+  .punishment_info {
+    @apply px-12;
+  }
   .punishment {
-    @apply flex flex-row justify-between mx-2 bg-white p-4;
+    @apply flex flex-row justify-between space-x-8 mx-2 bg-white p-4 px-12 mt-6;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   }
 
   .punishment p {
-    @apply p-4 max-w-xs;
+    @apply p-4 text-sm font-sspro !important;
   }
 
   .punishment > {
-    @apply items-center;
+    @apply items-center m-0;
   }
 
   .icon {
@@ -89,11 +109,21 @@
   }
 
   .deleteBtn {
-    @apply hover:cursor-pointer;
+    @apply float-left self-center hover:cursor-pointer;
+    min-width: 1.5rem;
   }
 
   .punishment_icons {
-    @apply flex;
+    @apply flex m-0;
     min-width: 7em;
+  }
+
+  .reason {
+    max-width: 7em;
+  }
+
+  .reason_wrapper {
+    @apply flex m-0 !important;
+    max-width: 10rem;
   }
 </style>

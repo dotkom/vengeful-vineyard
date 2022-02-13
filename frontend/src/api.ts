@@ -13,6 +13,17 @@ export async function getGroup(group_id: number): Promise<Group> {
   return json;
 }
 
+export async function getGroupUser(
+  group_id: number,
+  user_id: number
+): Promise<User> {
+  const res = await fetch(
+    `http://localhost:8000/group/${group_id}/user/${user_id}`
+  );
+  const json = await res.json();
+  return json;
+}
+
 export async function getUser(user_id: number): Promise<User> {
   const res = await fetch(`http://localhost:8000/user/${user_id}`);
   const json = await res.json();

@@ -3,6 +3,7 @@ export interface Punishment {
   amount: number;
   id: number;
   punishment_id: number; // to match backend
+  punishment_type: number;
   price: number;
   imageurl: string;
   reason: string;
@@ -31,10 +32,10 @@ export interface PunishmentInfo {
 }
 
 export interface PunishmentType {
-  id: number;
   name: string;
   value: number;
-  imageurl: string;
+  logo_url: string;
+  punishment_type_id: number;
 }
 
 export interface User {
@@ -56,6 +57,6 @@ export interface Group {
   name: string;
   rulesUrl: string;
   logoUrl: string;
-  punishmentTypes: PunishmentType[];
+  punishment_types: PunishmentType[];
   members: User[];
 }
