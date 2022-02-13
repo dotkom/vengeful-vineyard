@@ -1,12 +1,32 @@
 <script lang="ts">
-  // import GroupStore from "../../stores/groups";
+  import { users } from "../../stores/users";
+  import { members } from "../../stores/groups";
+
+  let val = "";
+
+  const filterSearch = (keyword) => {
+    keyword = keyword.toLocaleLowerCase();
+    users.update((users) =>
+      members.filter(
+        (user) =>
+          user.first_name.toLocaleLowerCase().includes(keyword) ||
+          user.last_name.toLocaleLowerCase().includes(keyword)
+      )
+    );
+  };
 </script>
 
 <div class="form-control">
   <label class="label">
     <span class="label-text">Finn bruker</span>
   </label>
-  <input type="text" placeholder="Navn" class="input input-bordered" />
+  <input
+    type="text"
+    placeholder="Navn"
+    class="input input-bordered"
+    bind:value="{val}"
+    on:input="{() => filterSearch(val)}"
+  />
 </div>
 
 <style lang="less">

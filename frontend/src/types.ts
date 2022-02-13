@@ -50,6 +50,7 @@ export interface User {
   first_name: string;
   last_name: string;
   punishments: Punishment[];
+  active: boolean;
 }
 
 export interface Group {

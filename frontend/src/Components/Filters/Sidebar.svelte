@@ -7,7 +7,6 @@
 <div class="wrapper">
   <SearchUser />
   <hr />
-  <SearchUser />
 </div>
 
 <style lang="less">

@@ -3,8 +3,15 @@
   import type { User } from "../../types";
   import { isAuthenticated } from "@dopry/svelte-oidc";
   import PunishmentRow from "./PunishmentRow.svelte";
+  // import type { User } from "src/types";
+
+  // import { getGroup, getUser } from "../../api";
+  import { users } from "../../stores/users";
+  import PunishmentInfo from "./PunishmentInfo.svelte";
 
   //TODO add actual group id, remember to edit this number when testing
+  let group_id: number = 1;
+
   $: group_id = 6;
 
   /**
@@ -15,6 +22,14 @@
     if ($isAuthenticated) {
     }
   };
+
+  // let group_id: number = 1;
+
+  let currentUsers: User[];
+
+  users.subscribe((value) => {
+    currentUsers = value;
+  });
 </script>
 
 <div class="punishment_grid">
