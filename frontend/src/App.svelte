@@ -4,6 +4,7 @@
   import GroupLogos from "./Components/Top_group_picker_components/GroupLogos.svelte";
   import Footer from "./Components/Footer/Footer.svelte";
   import PunishmentGrid from "./Components/PunishmentDisplay/PunishmentGrid.svelte";
+  import Sidebar from "./Components/Filters/Sidebar.svelte";
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -20,7 +21,8 @@
 <div class="content">
   <Navbar />
   <div class="body_content">
-    <SideBar />
+    <!-- <SideBar /> -->
+    <Sidebar />
     <div class="punishments">
       <GroupLogos />
       <PunishmentGrid />
