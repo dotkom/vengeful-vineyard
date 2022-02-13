@@ -2,13 +2,19 @@
   import type { Group, PunishmentType } from "src/types";
   import { group } from "../../../stores/groups";
   import PunishmentTag from "./PunishmentTag.svelte";
+  import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
 
-  let punishments: PunishmentType[] = group.punishmentTypes;
+  let filterPunishments: PunishmentType[];
+
+  punishmentsToFilter.subscribe((value) => {
+    filterPunishments = value;
+  });
+  // let punishments: PunishmentType[] = group.punishmentTypes;
 </script>
 
 <div class="wrapper">
   <div class="punishmentTags">
-    {#each punishments as punishment}
+    {#each filterPunishments as punishment}
       <PunishmentTag punishment="{punishment}" />
     {/each}
   </div>

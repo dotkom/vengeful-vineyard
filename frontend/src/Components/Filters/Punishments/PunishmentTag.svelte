@@ -1,9 +1,23 @@
 <script lang="ts">
   import type { PunishmentType } from "src/types";
 
+  import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
+
   let close = "assets/close.svg";
 
   export let punishment: PunishmentType;
+
+  let filterPunishments: PunishmentType[];
+
+  punishmentsToFilter.subscribe((value) => {
+    filterPunishments = value;
+  });
+
+  const removePunishment = (punishmentInput) => {
+    punishmentsToFilter.update((punishments) =>
+      punishments.filter((punishment) => punishment.id != punishmentInput.id)
+    );
+  };
 </script>
 
 <div class="wrapper">
@@ -15,7 +29,14 @@
     height="23"
   />
   <p>{punishment.name}</p>
-  <img class="close" alt="wine" src="{close}" width="23" height="23" />
+  <img
+    class="close"
+    alt="wine"
+    src="{close}"
+    width="23"
+    height="23"
+    on:click="{() => removePunishment(punishment)}"
+  />
 </div>
 
 <style lang="less">
