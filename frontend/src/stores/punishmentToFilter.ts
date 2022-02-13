@@ -7,4 +7,5 @@ const defaultPunishments: PunishmentType[] = [
   { imageurl: "assets/spiritOutlined.svg", value: 500, name: "Sprit", id: 2 },
   { imageurl: "assets/wineOutlined.svg", value: 15, name: "Vaffel", id: 3 },
 ];
+
 export const punishmentsToFilter = writable(defaultPunishments);

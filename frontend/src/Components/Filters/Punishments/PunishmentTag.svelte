@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Punishment, PunishmentType, User } from "src/types";
+  import type { PunishmentType, User } from "src/types";
 
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
   import { users } from "../../../stores/users";
@@ -7,12 +7,6 @@
   let close = "assets/close.svg";
 
   export let punishment: PunishmentType;
-
-  let filterPunishments: PunishmentType[];
-
-  punishmentsToFilter.subscribe((value) => {
-    filterPunishments = value;
-  });
 
   let currentUsers: User[];
 
@@ -30,7 +24,7 @@
         user.punishments
           .map((pun) => pun.punishment_type)
           .some((elem) => {
-            return filterPunishments.map((pun) => pun.id).includes(elem);
+            return $punishmentsToFilter.map((pun) => pun.id).includes(elem);
           })
       )
     );
