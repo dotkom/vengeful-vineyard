@@ -2,6 +2,7 @@
   import type { PunishmentType } from "src/types";
 
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
+  import { users } from "../../../stores/users";
 
   let close = "assets/close.svg";
 
@@ -17,6 +18,9 @@
     punishmentsToFilter.update((punishments) =>
       punishments.filter((punishment) => punishment.id != punishmentInput.id)
     );
+
+    // Filter through the users' punishments and check to see that at least one of their punishments are filtered on
+    // users.update((users) => users.filter((user) => user.punishments.filter((punishment) => punishment.punishment_type)))
   };
 </script>
 
