@@ -20,17 +20,17 @@ export const members: User[] = [
   },
 ];
 
-const group: Group = {
+export const group: Group = {
   id: 0,
   name: "placeholder",
   rulesUrl: "",
   logoUrl: "",
   members: members,
   punishmentTypes: [
-    { imageurl: "http://lol.com", value: 33, name: "Øl", id: 0 },
-    { imageurl: "http://lol.com", value: 33, name: "Vin", id: 1 },
-    { imageurl: "http://lol.com", value: 33, name: "Sprit", id: 2 },
-    { imageurl: "http://lol.com", value: 33, name: "Vaffel", id: 3 },
+    { imageurl: "assets/beerOutlined.svg", value: 33, name: "Øl", id: 0 },
+    { imageurl: "assets/wineOutlined.svg", value: 100, name: "Vin", id: 1 },
+    { imageurl: "assets/spiritOutlined.svg", value: 500, name: "Sprit", id: 2 },
+    { imageurl: "assets/wineOutlined.svg", value: 15, name: "Vaffel", id: 3 },
   ],
 };
 const initial = { currentGroup: "placeholder", groups: [group] };

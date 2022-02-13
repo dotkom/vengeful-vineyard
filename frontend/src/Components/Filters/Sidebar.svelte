@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PunishmentsFilters from "./Punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
 
   // import GroupStore from "../../stores/groups";
@@ -7,6 +8,7 @@
 <div class="wrapper">
   <SearchUser />
   <hr />
+  <PunishmentsFilters />
 </div>
 
 <style lang="less">
