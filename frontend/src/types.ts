@@ -7,11 +7,18 @@ export interface Punishment {
   price: number;
   imageurl: string;
   reason: string;
-  verifiedBy: string | null;
-  verifiedTime: string | null;
-  givenBy: string;
-  givenTime: string;
   created_time: string;
+  verifiedTime: string | null;
+  verifiedBy: string | null;
+
+  // name: string;
+  // number: number;
+  // id: number;
+  // price: number;
+  // imageurl: string;
+
+  // givenBy: string;
+  // givenTime: string;
 }
 
 export interface CreatePunishment {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PunishmentType } from "src/types";
+  import type { Punishment, PunishmentType, User } from "src/types";
 
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
   import { users } from "../../../stores/users";
@@ -14,12 +14,33 @@
     filterPunishments = value;
   });
 
+  let currentUsers: User[];
+
+  users.subscribe((value) => {
+    currentUsers = value;
+  });
+
+  const contains = (usersPunishments: Punishment[]) => {
+    console.log(usersPunishments);
+    console.log(filterPunishments);
+    usersPunishments.some((punishment) => {
+      return filterPunishments
+        .map((pun) => pun.id)
+        .includes(punishment.punishment_type);
+    });
+  };
+
+  // users.update((users) => users.filter((user) => user.punishments.some(punishment.id => {
+  //   return filterPunishments.includes(punishment.)
+  // })))
+
   const removePunishment = (punishmentInput) => {
     punishmentsToFilter.update((punishments) =>
       punishments.filter((punishment) => punishment.id != punishmentInput.id)
     );
 
-    // Filter through the users' punishments and check to see that at least one of their punishments are filtered on
+    users.update((users) => users.filter((user) => contains(user.punishments)));
+
     // users.update((users) => users.filter((user) => user.punishments.filter((punishment) => punishment.punishment_type)))
   };
 </script>
