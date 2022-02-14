@@ -15,5 +15,4 @@ Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
 
 ## To be done
 * Authentication: https://fastapi.tiangolo.com/tutorial/security
-* SQL migrations
 * Access control
