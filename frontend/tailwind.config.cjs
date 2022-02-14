@@ -11,7 +11,7 @@ const config = {
           750: "#00528B",
           1000: "#004372",
         },
-        secondary: "#FAA21B",
+        secondary: "#FBBF24",
         warning: "#FFC000",
         error: "#DF2020",
         success: "#09AA09",
@@ -33,7 +33,24 @@ const config = {
     require("daisyui"),
   ],
   daisyui: {
-    themes: false,
+    styled: true,
+    themes: [
+      {
+        mytheme: {
+          primary: "#093B51",
+          "primary-focus": "#8462f4",
+          "primary-content": "#ffffff",
+
+          secondary: "#FBBF24",
+          "secondary-focus": "#d4a11e",
+          "secondary-content": "#ffffff",
+        },
+      },
+    ],
+    base: true,
+    utils: true,
+    logs: true,
+    rtl: false,
   },
 };
 

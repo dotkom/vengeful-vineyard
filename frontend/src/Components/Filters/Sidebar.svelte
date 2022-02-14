@@ -1,4 +1,5 @@
 <script lang="ts">
+  import UserFilters from "./Checkboxes/UserFilters.svelte";
   import PunishmentsFilters from "./Punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
 
@@ -9,6 +10,8 @@
   <SearchUser />
   <hr />
   <PunishmentsFilters />
+  <hr />
+  <UserFilters />
 </div>
 
 <style lang="less">

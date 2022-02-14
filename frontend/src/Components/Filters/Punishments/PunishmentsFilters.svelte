@@ -33,7 +33,7 @@
       <input
         type="checkbox"
         bind:checked="{showAll}"
-        class="checkbox checkbox-accent"
+        class="checkbox checkbox-secondary"
         disabled="{showAll}"
         on:click="{() => resetPunishmentFilters()}"
       />
