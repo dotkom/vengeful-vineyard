@@ -15,17 +15,33 @@
   });
 
   const removePunishment = (punishmentInput: PunishmentType) => {
+    console.log(punishmentInput.punishment_type_id);
+    console.log($punishmentsToFilter[0].name);
     punishmentsToFilter.update((punishments) =>
-      punishments.filter((punishment) => punishment.id != punishmentInput.id)
+      punishments.filter(
+        (punishment) =>
+          punishment.punishment_type_id != punishmentInput.punishment_type_id
+      )
     );
 
     users.update((users) =>
-      users.filter((user) =>
-        user.punishments
-          .map((pun) => pun.punishment_type)
-          .some((elem) => {
-            return $punishmentsToFilter.map((pun) => pun.id).includes(elem);
-          })
+      users.filter(
+        (user) => {
+          if (user.punishments) {
+            return user.punishments
+              .map((pun) => pun.punishment_type)
+              .some((elem) => {
+                return $punishmentsToFilter
+                  .map((pun) => pun.punishment_type_id)
+                  .includes(elem);
+              });
+          }
+        }
+        // user.punishments
+        //   .map((pun) => pun.punishment_type)
+        //   .some((elem) => {
+        //     return $punishmentsToFilter.map((pun) => pun.id).includes(elem);
+        //   })
       )
     );
   };
@@ -35,7 +51,7 @@
   <img
     class="punishment"
     alt="wine"
-    src="{punishment.imageurl}"
+    src="{punishment.logo_url}"
     width="23"
     height="23"
   />

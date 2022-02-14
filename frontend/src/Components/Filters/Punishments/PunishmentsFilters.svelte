@@ -6,17 +6,19 @@
   import { users } from "../../../stores/users";
 
   const resetPunishmentFilters = () => {
-    punishmentsToFilter.set(group.punishmentTypes);
-    users.set(group.members);
+    punishmentsToFilter.set($group.punishment_types);
+    users.set($group.members);
   };
+
+  // $: showAll = true;
 
   $: showAll =
     $punishmentsToFilter
-      .map((pun) => pun.id)
+      .map((pun) => pun.punishment_type_id)
       .sort()
       .join(",") ===
-    group.punishmentTypes
-      .map((pun) => pun.id)
+    $group.punishment_types
+      .map((pun) => pun.punishment_type_id)
       .sort()
       .join(",");
 </script>

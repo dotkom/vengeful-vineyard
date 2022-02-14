@@ -58,19 +58,25 @@ export const members: User[] = [
   },
 ];
 
-export const group: Group = {
-  id: 0,
+const defaultGroup: Group = {
+  group_id: 0,
   name: "placeholder",
-  rulesUrl: "",
+  rules: "",
   logoUrl: "",
   members: members,
-  punishmentTypes: [
-    { imageurl: "assets/beerOutlined.svg", value: 33, name: "Øl", id: 0 },
-    { imageurl: "assets/wineOutlined.svg", value: 100, name: "Vin", id: 1 },
-    { imageurl: "assets/spiritOutlined.svg", value: 500, name: "Sprit", id: 2 },
-    { imageurl: "assets/wineOutlined.svg", value: 15, name: "Vaffel", id: 3 },
+  punishment_types: [
+    { imageurl: "assets/beerOutlined.svg", value: 33, name: "Øl", id: 4 },
+    { imageurl: "assets/wineOutlined.svg", value: 100, name: "Vin", id: 5 },
+    { imageurl: "assets/spiritOutlined.svg", value: 500, name: "Sprit", id: 6 },
+    { imageurl: "assets/wineOutlined.svg", value: 15, name: "Vaffel", id: 7 },
   ],
 };
+
+//export const group = writable(defaultGroup);
+
+export const group = writable<Group>(JSON.parse(localStorage.getItem("group")));
+
+group.subscribe((value) => (localStorage.group = JSON.stringify(value)));
 
 const initial = { currentGroup: "placeholder", groups: [group] };
 const GroupStore = writable(initial);

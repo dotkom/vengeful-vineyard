@@ -1,13 +1,13 @@
 <script lang="ts">
   import { users } from "../../stores/users";
-  import { members } from "../../stores/groups";
+  import { group } from "../../stores/groups";
 
   let val = "";
 
   const filterSearch = (keyword) => {
     keyword = keyword.toLocaleLowerCase();
     users.update((users) =>
-      members.filter(
+      $group.members.filter(
         (user) =>
           user.first_name.toLocaleLowerCase().includes(keyword) ||
           user.last_name.toLocaleLowerCase().includes(keyword)

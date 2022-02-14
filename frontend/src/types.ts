@@ -61,9 +61,9 @@ export interface User {
 }
 
 export interface Group {
-  id: number;
+  group_id: number;
   name: string;
-  rulesUrl: string;
+  rules: string;
   logoUrl: string;
   punishment_types: PunishmentType[];
   members: User[];
