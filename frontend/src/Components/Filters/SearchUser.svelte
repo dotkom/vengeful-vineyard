@@ -32,6 +32,11 @@
 <style lang="less">
   .label-text {
     color: #eeeeee;
-    font-size: 16px;
+    font-size: 20px;
+    float: left;
+  }
+
+  .input-bordered {
+    background-color: white;
   }
 </style>
