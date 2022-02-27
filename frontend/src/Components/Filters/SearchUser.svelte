@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { users } from "../../stores/users";
+  import { users, term } from "../../stores/users";
   import { group } from "../../stores/groups";
 
   let val = "";
+
+  $: term.set(val);
 
   const filterSearch = (keyword) => {
     keyword = keyword.toLocaleLowerCase();
@@ -25,7 +27,6 @@
     placeholder="Navn"
     class="input input-bordered"
     bind:value="{val}"
-    on:input="{() => filterSearch(val)}"
   />
 </div>
 

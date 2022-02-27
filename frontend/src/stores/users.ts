@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { writable, derived } from "svelte/store";
 import type { User } from "../types";
 
 // const defaultusers: User[] = [
@@ -58,8 +58,16 @@ import type { User } from "../types";
 //   },
 // ];
 
+export const term = writable<string>("");
 export const users = writable<User[]>(
   JSON.parse(localStorage.getItem("users"))
+);
+export const filteredUsers = derived([term, users], ([$term, $users]) =>
+  $users.filter(
+    (user) =>
+      user.first_name.toLocaleLowerCase().includes($term) ||
+      user.last_name.toLocaleLowerCase().includes($term)
+  )
 );
 
 users.subscribe((value) => (localStorage.users = JSON.stringify(value)));

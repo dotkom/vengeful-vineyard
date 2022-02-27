@@ -1,15 +1,11 @@
 export interface Punishment {
-  name: string;
-  amount: number;
-  id: number;
-  punishment_id: number; // to match backend
   punishment_type: number;
-  price: number;
-  imageurl: string;
   reason: string;
+  punishment_id: number;
   created_time: string;
   verified_time: string | null;
   verified_by: string | null;
+  amount: number;
 
   // name: string;
   // number: number;

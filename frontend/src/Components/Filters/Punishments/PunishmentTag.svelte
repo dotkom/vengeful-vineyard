@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { group } from "../../../stores/groups";
+
   import type { PunishmentType, User } from "src/types";
+  import { getGroupUser } from "../../../api";
 
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
   import { users } from "../../../stores/users";
@@ -8,43 +11,32 @@
 
   export let punishment: PunishmentType;
 
-  let currentUsers: User[];
+  function hasCommonElement(arr1, arr2): boolean {
+    return arr1.some((item) => arr2.includes(item));
+  }
 
-  users.subscribe((value) => {
-    currentUsers = value;
-  });
+  const containsPunType = async (user: User): Promise<boolean> => {
+    return await getGroupUser($group.group_id, user.user_id).then((res) => {
+      let xd = hasCommonElement(
+        res.punishments.map((pun) => pun.punishment_type),
+        $punishmentsToFilter.map((pun) => pun.punishment_type_id)
+      );
+      return xd;
+    });
+  };
 
-  const removePunishment = (punishmentInput: PunishmentType) => {
-    console.log(punishmentInput.punishment_type_id);
-    console.log($punishmentsToFilter[0].name);
+  const removePunishment = async (punishmentInput: PunishmentType) => {
     punishmentsToFilter.update((punishments) =>
       punishments.filter(
         (punishment) =>
           punishment.punishment_type_id != punishmentInput.punishment_type_id
       )
     );
-
-    users.update((users) =>
-      users.filter(
-        (user) => {
-          if (user.punishments) {
-            return user.punishments
-              .map((pun) => pun.punishment_type)
-              .some((elem) => {
-                return $punishmentsToFilter
-                  .map((pun) => pun.punishment_type_id)
-                  .includes(elem);
-              });
-          }
-        }
-        // user.punishments
-        //   .map((pun) => pun.punishment_type)
-        //   .some((elem) => {
-        //     return $punishmentsToFilter.map((pun) => pun.id).includes(elem);
-        //   })
-      )
-    );
+    let promises = $users.map((user) => containsPunType(user));
+    const toFilter = await Promise.all(promises);
+    users.update((users) => users.filter((users, i) => toFilter[i]));
   };
+  $: users;
 </script>
 
 <div class="wrapper">
