@@ -15,15 +15,15 @@
     return arr1.some((item) => arr2.includes(item));
   }
 
-  const containsPunType = async (user: User): Promise<boolean> => {
-    return await getGroupUser($group.group_id, user.user_id).then((res) => {
-      let xd = hasCommonElement(
-        res.punishments.map((pun) => pun.punishment_type),
-        $punishmentsToFilter.map((pun) => pun.punishment_type_id)
-      );
-      return xd;
-    });
-  };
+  // const containsPunType = async (user: User): Promise<boolean> => {
+  //   return await getGroupUser($group.group_id, user.user_id).then((res) => {
+  //     let xd = hasCommonElement(
+  //       res.punishments.map((pun) => pun.punishment_type),
+  //       $punishmentsToFilter.map((pun) => pun.punishment_type_id)
+  //     );
+  //     return xd;
+  //   });
+  // };
 
   const removePunishment = async (punishmentInput: PunishmentType) => {
     punishmentsToFilter.update((punishments) =>
@@ -32,9 +32,11 @@
           punishment.punishment_type_id != punishmentInput.punishment_type_id
       )
     );
-    let promises = $users.map((user) => containsPunType(user));
-    const toFilter = await Promise.all(promises);
-    users.update((users) => users.filter((users, i) => toFilter[i]));
+    console.log($users.map((user) => user.punishments));
+    // let promises = $users.map((user) => containsPunType(user));
+    // const toFilter = await Promise.all(promises);
+
+    console.log($users);
   };
 </script>
 

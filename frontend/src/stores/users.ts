@@ -1,5 +1,5 @@
 import { writable, derived } from "svelte/store";
-import type { User } from "../types";
+import type { User, PunishmentType } from "../types";
 
 // const defaultusers: User[] = [
 //   {
@@ -58,16 +58,21 @@ import type { User } from "../types";
 //   },
 // ];
 
+function hasCommonElement(arr1, arr2): boolean {
+  return arr1.some((item) => arr2.includes(item));
+}
+
 export const term = writable<string>("");
 export const users = writable<User[]>(
   JSON.parse(localStorage.getItem("users"))
 );
 export const showInactive = writable<boolean>();
 export const showPaid = writable<boolean>();
+export const filterOnPunishments = writable<PunishmentType[]>();
 
 export const filteredUsers = derived(
-  [term, users, showInactive],
-  ([$term, $users, $showInactive]) =>
+  [term, users, showInactive, filterOnPunishments],
+  ([$term, $users, $showInactive, $filterOnPunishments]) =>
     $users
       .filter((user) => ($showInactive ? user : user.active))
       .filter(

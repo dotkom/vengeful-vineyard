@@ -7,7 +7,7 @@
 
   const resetPunishmentFilters = () => {
     punishmentsToFilter.set($group.punishment_types);
-    users.set($group.members);
+    // users.set($group.members);
   };
 
   // $: showAll = true;
