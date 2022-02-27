@@ -9,6 +9,7 @@
     userInfo,
   } from "@dopry/svelte-oidc";
   import { getOnlineProfile, getMyOnlineGroups } from "../../api";
+  import Button from "../Button.svelte";
 
   let navElements = [
     { link: "index.html", name: "Hjem" },
@@ -30,16 +31,16 @@
     {/each}
   </ul>
   <div class="loginSection">
-    <a href="https://vg.no"> <img alt="Login icon" src="{logIcon}" /></a>
+    <img alt="Login icon" src="{logIcon}" />
     <OidcContext
-      issuer="https://online.ntnu.no/openid"
+      issuer="https://old.online.ntnu.no/openid"
       client_id="219919"
       redirect_uri="http://localhost:3000"
       post_logout_redirect_uri="http://localhost:3000"
       scope="openid profile onlineweb4"
       extraOptions="{{
         metadataUrl:
-          'https://online.ntnu.no/openid/.well-known/openid-configuration',
+          'https://old.online.ntnu.no/openid/.well-known/openid-configuration',
         filterProtocolClaims: true,
         loadUserInfo: true,
         silent_redirect_uri: 'http://localhost:3000',
@@ -48,17 +49,17 @@
     >
       {#if $isAuthenticated}
         <div class="text-white" style="color: white">{$userInfo.name}</div>
-        <LogoutButton>Logout</LogoutButton>
-        {#await getOnlineProfile($accessToken) then value}
-          <p>My ID: {value.id}</p>
-          {#await getMyOnlineGroups($accessToken, value.id) then groups}
-            {#each groups as group}
-              <p>{group.name_short}</p>
-            {/each}
-          {/await}
-        {/await}
+        <LogoutButton>
+          <div class="log_in_out">
+            <Button color="danger">Log out</Button>
+          </div>
+        </LogoutButton>
       {:else}
-        <LoginButton>Login</LoginButton>
+        <LoginButton>
+          <div class="log_in_out">
+            <Button color="success">Log in</Button>
+          </div>
+        </LoginButton>
       {/if}
     </OidcContext>
   </div>
@@ -82,5 +83,9 @@
 
   .loginSection {
     @apply flex flex-col justify-center items-center;
+  }
+
+  .log_in_out {
+    padding-top: 0.5rem;
   }
 </style>

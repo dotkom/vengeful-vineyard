@@ -2,13 +2,24 @@ import type { CreatePunishment, Group, User } from "./types";
 import { accessToken } from "@dopry/svelte-oidc";
 
 export async function getGroups() {
-  const res = await fetch("http://localhost:8080/group");
+  const res = await fetch("http://localhost:8000/group");
   const json = await res.json();
   return json;
 }
 
 export async function getGroup(group_id: number): Promise<Group> {
   const res = await fetch(`http://localhost:8000/group/${group_id}`);
+  const json = await res.json();
+  return json;
+}
+
+export async function getGroupUser(
+  group_id: number,
+  user_id: number
+): Promise<User> {
+  const res = await fetch(
+    `http://localhost:8000/group/${group_id}/user/${user_id}`
+  );
   const json = await res.json();
   return json;
 }
@@ -33,7 +44,7 @@ export async function postGroup(name: string, rules: string) {
 }
 
 export async function postPunishment(punishment: CreatePunishment) {
-  const res = await fetch("http://localhost:8080/punishment", {
+  const res = await fetch("http://localhost:8000/punishment", {
     method: "POST",
     body: JSON.stringify(punishment),
   });
@@ -42,18 +53,15 @@ export async function postPunishment(punishment: CreatePunishment) {
 }
 
 export async function deletePunishment(id: number) {
-  const res = await fetch(
-    "http://localhost:8080/validatePunishment/" + id.toString(),
-    {
-      method: "DELETE",
-    }
-  );
+  const res = await fetch("http://localhost:8000/punishment/" + id.toString(), {
+    method: "DELETE",
+  });
   return res;
 }
 
 export async function postValidatePunishment(id: number) {
   const res = await fetch(
-    "http://localhost:8080/validatePunishment/" + id.toString(),
+    "http://localhost:8000/validatePunishment/" + id.toString(),
     {
       method: "POST",
     }
@@ -72,7 +80,7 @@ async function authorizedOnlineFetch(url: string, token: string) {
 }
 
 export async function getOnlineProfile(token: string) {
-  var endpoint = "https://online.ntnu.no/api/v1/profile/";
+  var endpoint = "https://old.online.ntnu.no/api/v1/profile/";
   var response = await authorizedOnlineFetch(endpoint, token);
   return response;
 }
@@ -81,7 +89,7 @@ export async function getMyOnlineGroups(
   token: string,
   id: number
 ): Promise<OWGroup[]> {
-  var endpoint = `https://online.ntnu.no/api/v1/group/online-groups/?members__user=${id}`;
+  var endpoint = `https://old.online.ntnu.no/api/v1/group/online-groups/?members__user=${id}`;
   var groups = await authorizedOnlineFetch(endpoint, token);
   return groups["results"];
 }
