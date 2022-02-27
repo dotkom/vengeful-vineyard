@@ -1,37 +1,18 @@
 <script lang="ts">
-  import { deletePunishment } from "../../api";
-  import type { Punishment, PunishmentType } from "../../types";
+  import { deletePunishment, getGroupUser } from "../../api";
+  import type { Punishment, PunishmentType, User } from "../../types";
+  import { users } from "../../stores/users";
 
+  export let user: User;
   export let punishments: Punishment[];
   export let p_types: PunishmentType[];
+  export let totalSum: number;
+
   let cancelIcon = "assets/red-x.svg";
-  $: totalSum = calculateSum();
+  // $: totalSum = calculateSum();
 
   const getUrl = (p_type: number) => {
     return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
-  };
-
-  /**
-   * Creates a new object that stores punishment ids and punishment values.
-   * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
-   */
-  const mapTypes = () => {
-    let mappedTypes = {};
-    p_types.map((p) => (mappedTypes[p.punishment_type_id] = p.value));
-    return mappedTypes;
-  };
-
-  /**
-   * Calculates the total sum in NOK of punishments
-   * @returns the total sum as number
-   */
-  const calculateSum = () => {
-    let dict = mapTypes();
-    let sum: number = 0;
-    punishments.forEach((punishment) => {
-      sum += dict[punishment.punishment_type] * punishment.amount;
-    });
-    return sum;
   };
 
   const returnDate = (given_time: String) => {
@@ -43,10 +24,11 @@
    * Updates total sum displayed
    * @param id punishment's id
    */
-  const removePunishment = (id: number) => {
-    deletePunishment(id);
-    punishments = punishments.filter((p) => p.punishment_id !== id);
-    totalSum = calculateSum();
+  const removePunishment = async (id: number) => {
+    await deletePunishment(id);
+    punishments = user.punishments.filter((p) => p.punishment_id !== id);
+
+    // totalSum = calculateSum();
   };
 </script>
 
@@ -63,6 +45,7 @@
         >
           <img class="icon" src="{cancelIcon}" alt="Remove punishment" />
         </div>
+
         <p class="reason">{punishment.reason}</p>
       </div>
 

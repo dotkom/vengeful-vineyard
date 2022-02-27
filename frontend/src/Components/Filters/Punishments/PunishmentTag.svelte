@@ -11,20 +11,6 @@
 
   export let punishment: PunishmentType;
 
-  function hasCommonElement(arr1, arr2): boolean {
-    return arr1.some((item) => arr2.includes(item));
-  }
-
-  // const containsPunType = async (user: User): Promise<boolean> => {
-  //   return await getGroupUser($group.group_id, user.user_id).then((res) => {
-  //     let xd = hasCommonElement(
-  //       res.punishments.map((pun) => pun.punishment_type),
-  //       $punishmentsToFilter.map((pun) => pun.punishment_type_id)
-  //     );
-  //     return xd;
-  //   });
-  // };
-
   const removePunishment = async (punishmentInput: PunishmentType) => {
     punishmentsToFilter.update((punishments) =>
       punishments.filter(
@@ -32,11 +18,6 @@
           punishment.punishment_type_id != punishmentInput.punishment_type_id
       )
     );
-    console.log($users.map((user) => user.punishments));
-    // let promises = $users.map((user) => containsPunType(user));
-    // const toFilter = await Promise.all(promises);
-
-    console.log($users);
   };
 </script>
 

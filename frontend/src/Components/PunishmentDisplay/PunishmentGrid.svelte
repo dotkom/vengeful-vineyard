@@ -73,6 +73,7 @@
     punishments.forEach((punishment) => {
       sum += dict[punishment.punishment_type] * punishment.amount;
     });
+    console.log(sum);
     return sum;
   };
 
@@ -121,6 +122,16 @@
     expandRowKey="id"
     ><svelte:fragment slot="expanded" let:row>
       <PunishmentInfo
+        totalSum="{calculateSum(
+          row.user.punishments
+            .filter((pun) =>
+              $punishmentsToFilter
+                .map((pun) => pun.punishment_type_id)
+                .includes(pun.punishment_type)
+            )
+            .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+        )}"
+        user="{row.user}"
         p_types="{$group.punishment_types}"
         punishments="{row.user.punishments
           .filter((pun) =>

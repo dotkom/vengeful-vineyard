@@ -71,8 +71,8 @@ export const showPaid = writable<boolean>();
 export const filterOnPunishments = writable<PunishmentType[]>();
 
 export const filteredUsers = derived(
-  [term, users, showInactive, filterOnPunishments],
-  ([$term, $users, $showInactive, $filterOnPunishments]) =>
+  [term, users, showInactive],
+  ([$term, $users, $showInactive]) =>
     $users
       .filter((user) => ($showInactive ? user : user.active))
       .filter(
