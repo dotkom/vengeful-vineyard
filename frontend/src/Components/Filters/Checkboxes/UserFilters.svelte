@@ -1,6 +1,11 @@
 <script lang="ts">
-  let showPaid = false;
-  let showInactive = false;
+  import { showPaid, showInactive } from "../../../stores/users";
+
+  let showPaidCB = false;
+  let showInactiveCB = false;
+
+  $: showPaid.set(showPaidCB);
+  $: showInactive.set(showInactiveCB);
 </script>
 
 <div>
@@ -8,7 +13,7 @@
     <label class="cursor-pointer label">
       <input
         type="checkbox"
-        bind:checked="{showPaid}"
+        bind:checked="{showPaidCB}"
         class="checkbox checkbox-secondary"
       />
       <span class="label-text">Vis betalte straffer</span>
@@ -18,7 +23,7 @@
     <label class="cursor-pointer label">
       <input
         type="checkbox"
-        bind:checked="{showInactive}"
+        bind:checked="{showInactiveCB}"
         class="checkbox checkbox-secondary"
       />
       <span class="label-text">Vis inaktive medlemmer</span>

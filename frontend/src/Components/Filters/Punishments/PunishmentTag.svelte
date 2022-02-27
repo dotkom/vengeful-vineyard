@@ -36,7 +36,6 @@
     const toFilter = await Promise.all(promises);
     users.update((users) => users.filter((users, i) => toFilter[i]));
   };
-  $: users;
 </script>
 
 <div class="wrapper">
