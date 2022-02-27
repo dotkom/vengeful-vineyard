@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let logoUrl = "";
+  export let logoUrl;
   export let name = "";
   import GroupStore from "../../stores/groups";
 
@@ -9,7 +9,7 @@
 </script>
 
 <button class="groupBtn" on:click="{changeActive}">
-  <img src="{logoUrl}" alt="{name}" />
+  <img src="{logoUrl.sm}" alt="{name}" />
 </button>
 
 <!-- <input
