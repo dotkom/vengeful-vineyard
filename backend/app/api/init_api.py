@@ -4,13 +4,18 @@ Sets up the API (FastAPI)
     * Middlewares + CORS
 """
 
+import logging
 from timeit import default_timer as timer
 from typing import Any
 
 from app.api.endpoints import group, punishment, user
+from app.config import settings
+from app.db import load_db_migrations
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+
+logging.basicConfig(level=logging.DEBUG if settings.debug else logging.INFO)
 
 
 def init_middlewares(app: FastAPI) -> None:
@@ -49,6 +54,7 @@ def init_routes(app: FastAPI) -> None:
 
 
 def init_api() -> FastAPI:
+    load_db_migrations()
     app = FastAPI()
     init_middlewares(app)
     init_routes(app)

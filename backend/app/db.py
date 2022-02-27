@@ -23,6 +23,8 @@ DEFAULT_PUSHISHMENT_TYPES = [
     PunishmentTypeCreate(name="Spritstraff", value=300, logo_url="https://example.com"),
 ]
 
+logger = logging.getLogger(__name__)
+
 
 def get_instance() -> Connection:
     return CONN
@@ -43,18 +45,20 @@ def load_db_migrations() -> None:
     Loads the database schema and applies new migrations.
     """
     schema_version = CONN.execute("pragma user_version").fetchone()["user_version"]
+    logger.debug("Schema version: %d", schema_version)
     for file in settings.migrations_directory.iterdir():
         if file.suffix != ".sql":
             continue
         file_version = int(file.name.split("_", 1)[0])
 
         if file_version <= schema_version:
-            logging.debug("Skipping migration: %s", file.name)
+            logger.debug("Skipping migration: %s", file.name)
             continue
 
         sql_commands = read_sql_file(file)
-        logging.info("Applying migration: %s", file.name)
+        logger.info("Applying migration: %s", file.name)
         CONN.executescript(sql_commands)
+        CONN.execute(f"pragma user_version={file_version}")
 
 
 def reconnect_db() -> None:
