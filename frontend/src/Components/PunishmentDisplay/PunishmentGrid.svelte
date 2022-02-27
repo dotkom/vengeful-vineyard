@@ -16,6 +16,9 @@
       JSON.stringify(res.punishment_types)
     );
     console.log(window.localStorage.getItem("users"));
+
+    console.log(window.localStorage.getItem("users"));
+
     console.log(window.localStorage.getItem("punishmentFilters"));
   });
 </script>
