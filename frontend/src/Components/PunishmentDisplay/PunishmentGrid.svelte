@@ -104,7 +104,7 @@
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         ),
       sortable: true,
-      class: "text-center",
+      class: "flex justify-center border-none",
       renderComponent: {
         component: PunishmentsListed,
         props: {
@@ -164,12 +164,12 @@
         sist_straffet: getLastPunishedDate(user),
       };
     })}"
-    showExpandIcon="{true}"
+    showExpandIcon="{false}"
     iconAsc="{'↑'}"
     iconDesc="{'↓'}"
-    classNameTable="table bg-white border-solid border-2 border-slate-400 rounded-md text-center shadow-md text-[##333333] h-20"
-    classNameThead="table-primary border-double border-b-4 border-slate-400"
-    classNameRow="cursor-pointer h-20 border-solid border-b-2 border-slate-400"
+    classNameTable="table bg-white border-solid border border-slate-400 rounded-md text-center shadow-md text-[##333333]"
+    classNameThead="table-primary h-20 border-double border-b border-slate-400"
+    classNameRow="cursor-pointer border-solid border-b-2 border-slate-400"
     classNameRowExpanded="row-expanded"
     classNameExpandedContent="expanded-content bg-[#F2F2F2] shadow-inner border-solid border-b-2 border-slate-400"
     bind:expanded="{expandedArr}"

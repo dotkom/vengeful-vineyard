@@ -40,6 +40,7 @@
 		"svelte-select": "^4.4.7",
 		"svelte-table": "^0.3.4",
 		"svelte-tablesort": "^1.1.0",
-		"svelte-tailwind-table": "^0.10.0"
+		"svelte-tailwind-table": "^0.10.0",
+		"svelte-tooltip": "^1.2.0"
 	}
 }

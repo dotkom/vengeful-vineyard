@@ -1,15 +1,18 @@
 <script lang="ts">
   import { deletePunishment, getGroupUser } from "../../api";
   import type { Punishment, PunishmentType, User } from "../../types";
+  import Button from "../Button.svelte";
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
+  import SvelteTooltip from "svelte-tooltip";
 
   export let user: User;
   export let punishments: Punishment[];
   export let p_types: PunishmentType[];
   export let totalSum: number;
 
-  let cancelIcon = "assets/red-x.svg";
+  let cancelIcon = "assets/cancelIcon.svg";
+  let verifyIcon = "assets/checkGreen.svg";
 
   const getUrl = (p_type: number) => {
     return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
@@ -44,14 +47,26 @@
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
-        <div
-          class="deleteBtn"
+        <button
           on:click="{() => {
             removePunishment(punishment.punishment_id);
           }}"
+          type="button"
+          style="width: fit-content;"
+          class="text-white bg-[rgb(255,25,25)] hover:bg-[#FF9119]/80 focus:ring-4 focus:ring-[#FF9119]/50 font-medium rounded-lg text-sm px-1.5 py-1 text-center inline-flex items-center mr-2 mb-2"
         >
-          <img class="h-7 w-7" src="{cancelIcon}" alt="Remove punishment" />
-        </div>
+          <img class="w-3 h-3" src="{cancelIcon}" alt="punishment" />
+          Annuler
+        </button>
+        <SvelteTooltip
+          tip="Marker som betalt"
+          bottom
+          color="rgba(117, 191, 148, 0.6)"
+        >
+          <div class="verifyBtn">
+            <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
+          </div></SvelteTooltip
+        >
       </div>
 
       <div
@@ -63,7 +78,14 @@
           style="max-width: 100%;
         white-space: break-spaces;"
         >
-          {punishment.reason}
+          "{punishment.reason}"
+        </p>
+        <p
+          class="break-words"
+          style="max-width: 100%;
+      white-space: break-spaces; padding: 0!important;"
+        >
+          - Gitt av <i>user</i>
         </p>
       </div>
 
@@ -77,7 +99,9 @@
           />
         {/each}
       </div>
-      <div class="col-span-3">{returnDate(punishment.created_time)}</div>
+      <div class="col-span-2">
+        {returnDate(punishment.created_time)}
+      </div>
     </div>
   {:else}
     <div></div>
@@ -115,14 +139,19 @@
   }
 
   .deleteBtn {
+    padding: 0;
+  }
+
+  .verifyBtn {
     @apply float-left self-center hover:cursor-pointer;
     min-width: 1.5rem;
   }
 
   .punishment_icons {
-    @apply flex justify-center col-span-3;
+    @apply flex justify-center items-center col-span-4;
     min-width: 7em;
     border-right: 1px solid #d9d9d9;
+    height: 100%;
   }
 
   // .reason {
@@ -132,7 +161,9 @@
 
   .reason_wrapper {
     @apply flex m-0 col-start-1 col-end-2;
-    max-width: 10rem;
     justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 </style>
