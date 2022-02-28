@@ -3,7 +3,7 @@
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { filteredUsers, showPaid, users } from "../../stores/users";
   import { group } from "../../stores/groups";
-  import { onlyShowAfterDate } from "../../stores/users";
+  import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
 
   export let p_types: PunishmentType[];
 
@@ -21,7 +21,7 @@
           .map((pun) => pun.punishment_type_id)
           .includes(pun.punishment_type))
       .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
-      .filter((pun) => new Date(pun.created_time).getTime() >= $onlyShowAfterDate.getTime() || (new Date(pun.created_time).getDate() == $onlyShowAfterDate.getDate() && new Date(pun.created_time).getMonth() == $onlyShowAfterDate.getMonth() && new Date(pun.created_time).getFullYear() == $onlyShowAfterDate.getFullYear())) as punishment}
+      .filter((pun) => (new Date(pun.created_time).getTime() >= $onlyShowAfterDate.getTime() && new Date(pun.created_time).getTime() <= $onlyShowBeforeDate.getTime()) || (new Date(pun.created_time).getDate() == $onlyShowAfterDate.getDate() && new Date(pun.created_time).getMonth() == $onlyShowAfterDate.getMonth() && new Date(pun.created_time).getFullYear() == $onlyShowAfterDate.getFullYear()) || (new Date(pun.created_time).getDate() == $onlyShowBeforeDate.getDate() && new Date(pun.created_time).getMonth() == $onlyShowBeforeDate.getMonth() && new Date(pun.created_time).getFullYear() == $onlyShowBeforeDate.getFullYear())) as punishment}
       <img
         class="icon"
         alt="punishment"

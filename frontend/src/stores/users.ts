@@ -69,10 +69,11 @@ export const users = writable<User[]>(
 export const showInactive = writable<boolean>();
 export const showPaid = writable<boolean>();
 export const onlyShowAfterDate = writable<Date>();
+export const onlyShowBeforeDate = writable<Date>();
 
 export const filteredUsers = derived(
-  [term, users, showInactive, onlyShowAfterDate],
-  ([$term, $users, $showInactive, $onlyShowAfterDate]) =>
+  [term, users, showInactive],
+  ([$term, $users, $showInactive]) =>
     $users
       .filter((user) => ($showInactive ? user : user.active))
       .filter(

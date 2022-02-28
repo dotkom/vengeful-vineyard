@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { Group, Punishment, User } from "src/types";
   import { getGroup, getUser, getGroupUser } from "../../api";
-  import { users, filteredUsers, onlyShowAfterDate } from "../../stores/users";
+  import {
+    users,
+    filteredUsers,
+    onlyShowAfterDate,
+    onlyShowBeforeDate,
+  } from "../../stores/users";
   import { group } from "../../stores/groups";
   import PunishmentInfo from "./PunishmentInfo.svelte";
   import PunishmentRow from "./PunishmentRow.svelte";
@@ -140,14 +145,22 @@
             )
             .filter(
               (pun) =>
-                new Date(pun.created_time).getTime() >=
-                  $onlyShowAfterDate.getTime() ||
+                (new Date(pun.created_time).getTime() >=
+                  $onlyShowAfterDate.getTime() &&
+                  new Date(pun.created_time).getTime() <=
+                    $onlyShowBeforeDate.getTime()) ||
                 (new Date(pun.created_time).getDate() ==
                   $onlyShowAfterDate.getDate() &&
                   new Date(pun.created_time).getMonth() ==
                     $onlyShowAfterDate.getMonth() &&
                   new Date(pun.created_time).getFullYear() ==
-                    $onlyShowAfterDate.getFullYear())
+                    $onlyShowAfterDate.getFullYear()) ||
+                (new Date(pun.created_time).getDate() ==
+                  $onlyShowBeforeDate.getDate() &&
+                  new Date(pun.created_time).getMonth() ==
+                    $onlyShowBeforeDate.getMonth() &&
+                  new Date(pun.created_time).getFullYear() ==
+                    $onlyShowBeforeDate.getFullYear())
             )
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         )}"
@@ -161,14 +174,22 @@
           )
           .filter(
             (pun) =>
-              new Date(pun.created_time).getTime() >=
-                $onlyShowAfterDate.getTime() ||
+              (new Date(pun.created_time).getTime() >=
+                $onlyShowAfterDate.getTime() &&
+                new Date(pun.created_time).getTime() <=
+                  $onlyShowBeforeDate.getTime()) ||
               (new Date(pun.created_time).getDate() ==
                 $onlyShowAfterDate.getDate() &&
                 new Date(pun.created_time).getMonth() ==
                   $onlyShowAfterDate.getMonth() &&
                 new Date(pun.created_time).getFullYear() ==
-                  $onlyShowAfterDate.getFullYear())
+                  $onlyShowAfterDate.getFullYear()) ||
+              (new Date(pun.created_time).getDate() ==
+                $onlyShowBeforeDate.getDate() &&
+                new Date(pun.created_time).getMonth() ==
+                  $onlyShowBeforeDate.getMonth() &&
+                new Date(pun.created_time).getFullYear() ==
+                  $onlyShowBeforeDate.getFullYear())
           )
           .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) ||
           null}"

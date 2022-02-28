@@ -1,6 +1,7 @@
 const config = {
   mode: "jit",
   purge: ["./src/**/*.{html,js,svelte,ts}"],
+  content: ["./node_modules/flowbite/**/*.js"],
   theme: {
     extend: {
       colors: {
