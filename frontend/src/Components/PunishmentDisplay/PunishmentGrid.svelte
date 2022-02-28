@@ -88,7 +88,16 @@
     {
       key: "straffer",
       title: "Straffer",
-      value: (v) => calculateSum(v.straffer),
+      value: (v) =>
+        calculateSum(
+          v.straffer
+            .filter((pun) =>
+              $punishmentsToFilter
+                .map((pun) => pun.punishment_type_id)
+                .includes(pun.punishment_type)
+            )
+            .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+        ),
       sortable: true,
       renderComponent: {
         component: PunishmentsListed,
