@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Group, Punishment, User } from "src/types";
   import { getGroup, getUser, getGroupUser } from "../../api";
-  import { users, filteredUsers } from "../../stores/users";
+  import { users, filteredUsers, onlyShowAfterDate } from "../../stores/users";
   import { group } from "../../stores/groups";
   import PunishmentInfo from "./PunishmentInfo.svelte";
   import PunishmentRow from "./PunishmentRow.svelte";
@@ -138,6 +138,17 @@
                 .map((pun) => pun.punishment_type_id)
                 .includes(pun.punishment_type)
             )
+            .filter(
+              (pun) =>
+                new Date(pun.created_time).getTime() >=
+                  $onlyShowAfterDate.getTime() ||
+                (new Date(pun.created_time).getDate() ==
+                  $onlyShowAfterDate.getDate() &&
+                  new Date(pun.created_time).getMonth() ==
+                    $onlyShowAfterDate.getMonth() &&
+                  new Date(pun.created_time).getFullYear() ==
+                    $onlyShowAfterDate.getFullYear())
+            )
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         )}"
         user="{row.user}"
@@ -147,6 +158,17 @@
             $punishmentsToFilter
               .map((pun) => pun.punishment_type_id)
               .includes(pun.punishment_type)
+          )
+          .filter(
+            (pun) =>
+              new Date(pun.created_time).getTime() >=
+                $onlyShowAfterDate.getTime() ||
+              (new Date(pun.created_time).getDate() ==
+                $onlyShowAfterDate.getDate() &&
+                new Date(pun.created_time).getMonth() ==
+                  $onlyShowAfterDate.getMonth() &&
+                new Date(pun.created_time).getFullYear() ==
+                  $onlyShowAfterDate.getFullYear())
           )
           .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) ||
           null}"
