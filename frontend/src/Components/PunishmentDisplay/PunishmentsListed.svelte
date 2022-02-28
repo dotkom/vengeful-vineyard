@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Punishment, PunishmentType, User } from "src/types";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
-  import { showPaid, users } from "../../stores/users";
+  import { filteredUsers, showPaid, users } from "../../stores/users";
   import { group } from "../../stores/groups";
+  import { onlyShowAfterDate } from "../../stores/users";
 
   export let p_types: PunishmentType[];
 
@@ -19,7 +20,8 @@
       .filter((pun) => $punishmentsToFilter
           .map((pun) => pun.punishment_type_id)
           .includes(pun.punishment_type))
-      .filter( (pun) => ($showPaid ? pun : pun.verified_time === null) ) as punishment}
+      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+      .filter((pun) => new Date(pun.created_time).getTime() >= $onlyShowAfterDate.getTime() || (new Date(pun.created_time).getDate() == $onlyShowAfterDate.getDate() && new Date(pun.created_time).getMonth() == $onlyShowAfterDate.getMonth() && new Date(pun.created_time).getFullYear() == $onlyShowAfterDate.getFullYear())) as punishment}
       <img
         class="icon"
         alt="punishment"

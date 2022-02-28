@@ -2,6 +2,7 @@
   import UserFilters from "./Checkboxes/UserFilters.svelte";
   import PunishmentsFilters from "./Punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
+  import DateTimeFilters from "./Time/DateTimeFilters.svelte";
 
   // import GroupStore from "../../stores/groups";
 </script>
@@ -10,6 +11,8 @@
   <SearchUser />
   <hr />
   <PunishmentsFilters />
+  <hr />
+  <DateTimeFilters />
   <hr />
   <UserFilters />
 </div>

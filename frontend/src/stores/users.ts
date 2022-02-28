@@ -68,11 +68,11 @@ export const users = writable<User[]>(
 );
 export const showInactive = writable<boolean>();
 export const showPaid = writable<boolean>();
-export const deletePunId = writable<number>();
+export const onlyShowAfterDate = writable<Date>();
 
 export const filteredUsers = derived(
-  [term, users, showInactive, deletePunId],
-  ([$term, $users, $showInactive, $deletePunId]) =>
+  [term, users, showInactive, onlyShowAfterDate],
+  ([$term, $users, $showInactive, $onlyShowAfterDate]) =>
     $users
       .filter((user) => ($showInactive ? user : user.active))
       .filter(
@@ -80,6 +80,11 @@ export const filteredUsers = derived(
           user.first_name.toLocaleLowerCase().includes($term) ||
           user.last_name.toLocaleLowerCase().includes($term)
       )
+  // .map((user) =>
+  //   user.punishments.filter(
+  //     (pun) => new Date(pun.created_time) > $onlyShowAfterDate
+  //   )
+  // )
   // .filter((user) =>
   //   user.punishments.filter((pun) => pun.punishment_id !== $deletePunId)
   // )
