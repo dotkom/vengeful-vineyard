@@ -42,7 +42,7 @@
   }
 
   .content {
-    background-color: #f2f2f2;
+    background-color: #f7f7f7;
     font-family: "Source Sans Pro", sans-serif;
   }
 

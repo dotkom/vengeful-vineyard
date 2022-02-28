@@ -40,7 +40,7 @@
 </script>
 
 <div class="punishment_info">
-  <slot name="punishments" />
+  <!-- <slot name="punishments" /> -->
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
@@ -50,10 +50,21 @@
             removePunishment(punishment.punishment_id);
           }}"
         >
-          <img class="icon" src="{cancelIcon}" alt="Remove punishment" />
+          <img class="h-7 w-7" src="{cancelIcon}" alt="Remove punishment" />
         </div>
+      </div>
 
-        <p class="reason">{punishment.reason}</p>
+      <div
+        class="col-span-2 "
+        style="border-right: 1px solid #d9d9d9; border-left: 1px solid #d9d9d9;"
+      >
+        <p
+          class="break-words"
+          style="max-width: 100%;
+        white-space: break-spaces;"
+        >
+          {punishment.reason}
+        </p>
       </div>
 
       <!-- Add a drink icon for each punishment-->
@@ -66,7 +77,7 @@
           />
         {/each}
       </div>
-      <div>{returnDate(punishment.created_time)}</div>
+      <div class="col-span-3">{returnDate(punishment.created_time)}</div>
     </div>
   {:else}
     <div></div>
@@ -76,11 +87,15 @@
 
 <style lang="less">
   .punishment_info {
-    @apply px-12;
+    // @apply px-12;
   }
   .punishment {
-    @apply flex flex-row justify-between space-x-8 mx-2 bg-white p-4 px-12 mt-6;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    @apply grid grid-cols-9 gap-1 bg-white shadow-md h-20;
+    border: 0.3px solid #d9d9d9;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    height: auto;
   }
 
   .punishment p {
@@ -88,11 +103,11 @@
   }
 
   .punishment > {
-    @apply items-center m-0;
+    @apply items-center m-1 p-1;
   }
 
   .icon {
-    @apply h-6 w-6;
+    @apply h-8 w-8;
   }
 
   .sum {
@@ -105,16 +120,19 @@
   }
 
   .punishment_icons {
-    @apply flex m-0;
+    @apply flex justify-center col-span-3;
     min-width: 7em;
+    border-right: 1px solid #d9d9d9;
   }
 
-  .reason {
-    max-width: 7em;
-  }
+  // .reason {
+  //   max-width: 7em;
+  //   border-left: 1px solid #d9d9d9;
+  // }
 
   .reason_wrapper {
-    @apply flex m-0 !important;
+    @apply flex m-0 col-start-1 col-end-2;
     max-width: 10rem;
+    justify-content: center;
   }
 </style>

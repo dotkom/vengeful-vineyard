@@ -83,13 +83,9 @@
     type="text/css"
     href="https://npmcdn.com/flatpickr/dist/themes/confetti.css"
   />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
-  />
 </svelte:head>
 
-<div class="flex flex-row justify-center">
+<div class="flex flex-row justify-center ">
   <label class="label">
     <span class="label-text">Vis straffer fra</span>
   </label>

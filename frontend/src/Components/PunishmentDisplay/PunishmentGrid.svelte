@@ -20,7 +20,7 @@
 
   // import * as $j from "jquery";
 
-  let wine = "assets/wineglass.svg";
+  let chevron_up = "assets/icons/chevron-up-solid.svg";
   let group_id: number = 2;
   // let fetchedGroup: Group;
 
@@ -104,6 +104,7 @@
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         ),
       sortable: true,
+      class: "text-center",
       renderComponent: {
         component: PunishmentsListed,
         props: {
@@ -116,8 +117,39 @@
       title: "Sist straffet",
       value: (v) => v.sist_straffet,
       sortable: true,
+      class: "text-center",
     },
   ];
+
+  let expanded1 = "";
+  let expandedCache = "";
+  let expandedArr = [];
+  $: {
+    // 2-way binding setup between input and table expanded items
+    if (expandedCache === expanded1) {
+      // update string
+      expanded1 = expandedArr.join(",");
+    } else {
+      // update array
+      expandedArr = expanded1.split(",").map((n) => parseInt(n));
+    }
+    expandedCache = expanded1;
+  }
+
+  function handleRowClick(event) {
+    // manually toggle expanded items
+    const row = event.detail.row;
+    if (!row.$expanded) {
+      expandedArr = [...expandedArr, row.id];
+    } else {
+      expandedArr = expandedArr.filter((id) => id !== row.id);
+    }
+  }
+  function handleExpand(event) {
+    const row = event.detail.row;
+    const operation = row.$expanded ? "open" : "close";
+    console.log(`${operation} ${row.first_name} ${row.last_name}`);
+  }
 </script>
 
 <div class="punishment_grid">
@@ -133,7 +165,16 @@
       };
     })}"
     showExpandIcon="{true}"
+    iconAsc="{'↑'}"
+    iconDesc="{'↓'}"
+    classNameTable="table bg-white border-solid border-2 border-slate-400 rounded-md text-center shadow-md text-[##333333] h-20"
+    classNameThead="table-primary border-double border-b-4 border-slate-400"
+    classNameRow="cursor-pointer h-20 border-solid border-b-2 border-slate-400"
+    classNameRowExpanded="row-expanded"
+    classNameExpandedContent="expanded-content bg-[#F2F2F2] shadow-inner border-solid border-b-2 border-slate-400"
+    bind:expanded="{expandedArr}"
     expandRowKey="id"
+    on:clickRow="{handleRowClick}"
     ><svelte:fragment slot="expanded" let:row>
       <PunishmentInfo
         totalSum="{calculateSum(
@@ -228,5 +269,10 @@
   }
   .punishment_grid {
     @apply mt-4;
+  }
+
+  .table-primary {
+    text-align: center;
+    background-color: white;
   }
 </style>
