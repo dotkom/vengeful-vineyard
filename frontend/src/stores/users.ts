@@ -68,11 +68,11 @@ export const users = writable<User[]>(
 );
 export const showInactive = writable<boolean>();
 export const showPaid = writable<boolean>();
-export const filterOnPunishments = writable<PunishmentType[]>();
+export const deletePunId = writable<number>();
 
 export const filteredUsers = derived(
-  [term, users, showInactive],
-  ([$term, $users, $showInactive]) =>
+  [term, users, showInactive, deletePunId],
+  ([$term, $users, $showInactive, $deletePunId]) =>
     $users
       .filter((user) => ($showInactive ? user : user.active))
       .filter(
@@ -80,6 +80,9 @@ export const filteredUsers = derived(
           user.first_name.toLocaleLowerCase().includes($term) ||
           user.last_name.toLocaleLowerCase().includes($term)
       )
+  // .filter((user) =>
+  //   user.punishments.filter((pun) => pun.punishment_id !== $deletePunId)
+  // )
 );
 
 users.subscribe((value) => (localStorage.users = JSON.stringify(value)));

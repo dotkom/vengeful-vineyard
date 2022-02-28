@@ -2,6 +2,7 @@
   import { deletePunishment, getGroupUser } from "../../api";
   import type { Punishment, PunishmentType, User } from "../../types";
   import { users } from "../../stores/users";
+  import { group } from "../../stores/groups";
 
   export let user: User;
   export let punishments: Punishment[];
@@ -9,7 +10,6 @@
   export let totalSum: number;
 
   let cancelIcon = "assets/red-x.svg";
-  // $: totalSum = calculateSum();
 
   const getUrl = (p_type: number) => {
     return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
@@ -25,10 +25,17 @@
    * @param id punishment's id
    */
   const removePunishment = async (id: number) => {
-    await deletePunishment(id);
-    punishments = user.punishments.filter((p) => p.punishment_id !== id);
+    await deletePunishment(id).then(async () => {
+      users.set(
+        await Promise.all(
+          $group.members.map(async (member) =>
+            getGroupUser($group.group_id, member.user_id)
+          )
+        )
+      );
+    });
 
-    // totalSum = calculateSum();
+    punishments = user.punishments.filter((p) => p.punishment_id !== id);
   };
 </script>
 
