@@ -3,13 +3,19 @@
   export let name = "";
   import GroupStore from "../../stores/groups";
 
+  import tempImg from "/assets/image.svg";
+
   const changeActive = () => {
     $GroupStore.currentGroup = name;
   };
 </script>
 
 <button class="groupBtn" on:click="{changeActive}">
-  <img src="{logoUrl.sm}" alt="{name}" />
+  {#if logoUrl}
+    <img src="{logoUrl.sm}" alt="{name}" />
+  {:else}
+    <img src="{tempImg}" alt="{name}" />
+  {/if}
 </button>
 
 <!-- <input
