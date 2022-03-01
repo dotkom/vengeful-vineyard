@@ -1,28 +1,20 @@
 <script lang="ts">
-  import type { Group, Punishment, User } from "src/types";
-  import { getGroup, getUser, getGroupUser } from "../../api";
+  import type { Punishment, User } from "src/types";
+  import { getGroup, getGroupUser } from "../../api";
   import {
-    users,
     filteredUsers,
     onlyShowAfterDate,
     onlyShowBeforeDate,
   } from "../../stores/users";
   import { group } from "../../stores/groups";
   import PunishmentInfo from "./PunishmentInfo.svelte";
-  import PunishmentRow from "./PunishmentRow.svelte";
-  import Table from "svelte-tailwind-table";
-  import { TableSort } from "svelte-tablesort";
-  import Button from "../Button.svelte";
+
   import SvelteTable from "svelte-table";
   import PunishmentsListed from "./PunishmentsListed.svelte";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
 
-  // import * as $j from "jquery";
-
-  let chevron_up = "assets/icons/chevron-up-solid.svg";
   let group_id: number = 2;
-  // let fetchedGroup: Group;
 
   getGroup(group_id).then(async (res) => {
     //group.set(res);
@@ -237,22 +229,8 @@
       /></svelte:fragment
     >
   </SvelteTable>
-  <!-- {#each $filteredUsers as user}
-    <div
-      tabindex="0"
-      class="collapse w-full border rounded-box border-base-300 collapse-arrow"
-    >
-      {#await getGroupUser(group_id, user.user_id) then userInfo}
-        <PunishmentRow user="{userInfo}" p_types="{$group.punishment_types}" />
-      {/await}
-    </div>
-  {/each} -->
-
-  <!-- {/each}
-  {/await} -->
 </div>
 
-<!-- {console.log(members)} -->
 <style lang="less">
   @import "../../variables.less";
   .accordion_text {

@@ -3,8 +3,6 @@
   import PunishmentsFilters from "./Punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
   import DateTimeFilters from "./Time/DateTimeFilters.svelte";
-
-  // import GroupStore from "../../stores/groups";
 </script>
 
 <div class="wrapper">
@@ -19,6 +17,7 @@
 
 <style lang="less">
   @import "../../variables.less";
+
   .wrapper {
     width: 25rem;
     padding: 20px;

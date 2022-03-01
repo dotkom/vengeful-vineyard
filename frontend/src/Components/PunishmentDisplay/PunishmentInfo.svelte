@@ -1,7 +1,6 @@
 <script lang="ts">
   import { deletePunishment, getGroupUser } from "../../api";
   import type { Punishment, PunishmentType, User } from "../../types";
-  import Button from "../Button.svelte";
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
   import SvelteTooltip from "svelte-tooltip";
@@ -47,17 +46,24 @@
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
-        <button
-          on:click="{() => {
-            removePunishment(punishment.punishment_id);
-          }}"
-          type="button"
-          style="width: fit-content;"
-          class="text-white bg-[rgb(255,25,25)] hover:bg-[#FF9119]/80 focus:ring-4 focus:ring-[#FF9119]/50 font-medium rounded-lg text-sm px-1.5 py-1 text-center inline-flex items-center mr-2 mb-2"
+        <SvelteTooltip
+          tip="Annuler straff"
+          bottom
+          color="rgba(237, 63, 63, 0.74)"
+          class="z-10"
         >
-          <img class="w-3 h-3" src="{cancelIcon}" alt="punishment" />
-          Annuler
-        </button>
+          <button
+            on:click="{() => {
+              removePunishment(punishment.punishment_id);
+            }}"
+            type="button"
+            style="width: fit-content;"
+            class="text-white bg-[rgb(255,25,25)] hover:bg-[##ff4747]/80 focus:ring-4 focus:ring-[##ff4747]/50 font-medium rounded-lg text-sm px-1.5 py-1 text-center inline-flex items-center mr-2 mb-2"
+          >
+            <img class="w-3 h-3" src="{cancelIcon}" alt="punishment" />
+            Annuler
+          </button>
+        </SvelteTooltip>
         <SvelteTooltip
           tip="Marker som betalt"
           bottom

@@ -1,8 +1,7 @@
 <script lang="ts">
-  import type { Punishment, PunishmentType, User } from "src/types";
+  import type { PunishmentType } from "src/types";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
-  import { filteredUsers, showPaid, users } from "../../stores/users";
-  import { group } from "../../stores/groups";
+  import { showPaid } from "../../stores/users";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
 
   export let p_types: PunishmentType[];

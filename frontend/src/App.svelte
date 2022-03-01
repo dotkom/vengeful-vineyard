@@ -21,7 +21,6 @@
 <div class="content">
   <Navbar />
   <div class="body_content">
-    <!-- <SideBar /> -->
     <Sidebar />
     <div class="punishments">
       <GroupLogos />
