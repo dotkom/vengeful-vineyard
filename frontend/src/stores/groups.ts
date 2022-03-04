@@ -87,8 +87,6 @@ const defaultGroup: Group = {
   ],
 };
 
-//export const group = writable(defaultGroup);
-
 export const group = writable<Group>(JSON.parse(localStorage.getItem("group")));
 
 group.subscribe((value) => (localStorage.group = JSON.stringify(value)));

@@ -15,8 +15,6 @@
   let startDate;
   let endDate;
 
-  console.log(startDate);
-
   $: onlyShowAfterDate.set(dateToFilterBy);
   $: onlyShowBeforeDate.set(noLaterThan);
 
@@ -68,7 +66,7 @@
       value = null;
     },
     onOpen: function () {
-      console.log("opened");
+      // console.log("opened");
     },
   };
 </script>
@@ -156,20 +154,10 @@
 
   .themed {
     --borderRadius: var(--rounded-btn, 0.5rem);
-    // --background: var(--itemIsActiveBG, white);
     background: var(--borderFocusColor, none);
     border-color: var(--borderFocusColor, none);
     border: var(--border, none);
-
-    // --borderFocusColor: white;
-    // --borderHoverColor: white;
-    // --border: none;
     --itemIsActiveColor: black;
-    // background: var(--itemIsActiveBG, white);
     --itemIsActiveBG: #f5f9ff;
   }
-
-  //   .themed:active {
-  //       background
-  //   }
 </style>

@@ -160,11 +160,6 @@
     height: 100%;
   }
 
-  // .reason {
-  //   max-width: 7em;
-  //   border-left: 1px solid #d9d9d9;
-  // }
-
   .reason_wrapper {
     @apply flex m-0 col-start-1 col-end-2;
     justify-content: center;

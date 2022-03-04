@@ -17,7 +17,6 @@
   let group_id: number = 2;
 
   getGroup(group_id).then(async (res) => {
-    //group.set(res);
     window.localStorage.setItem("group", JSON.stringify(res));
     window.localStorage.setItem(
       "users",
@@ -70,7 +69,7 @@
     punishments.forEach((punishment) => {
       sum += dict[punishment.punishment_type] * punishment.amount;
     });
-    console.log(sum);
+
     return sum;
   };
 
@@ -140,7 +139,6 @@
   function handleExpand(event) {
     const row = event.detail.row;
     const operation = row.$expanded ? "open" : "close";
-    console.log(`${operation} ${row.first_name} ${row.last_name}`);
   }
 </script>
 

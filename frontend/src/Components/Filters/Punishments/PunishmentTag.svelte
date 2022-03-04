@@ -1,11 +1,7 @@
 <script lang="ts">
-  import { group } from "../../../stores/groups";
-
-  import type { PunishmentType, User } from "src/types";
-  import { getGroupUser } from "../../../api";
+  import type { PunishmentType } from "src/types";
 
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
-  import { users } from "../../../stores/users";
 
   let close = "assets/close.svg";
 
