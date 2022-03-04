@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { punishmentsToFilter } from "../../stores/punishmentToFilter";
+  import { showPaid } from "../../stores/users";
+
   import type { User, PunishmentType } from "src/types";
   import PunishmentInfo from "./PunishmentInfo.svelte";
   export let user: User;
@@ -10,9 +13,18 @@
   const mapPunishments = () => {
     //TODO remove an icon here when a punishment is removed
     let allPunishments = {};
-    user.punishments.map((punishment) => {
-      allPunishments[punishment.punishment_type] = punishment.amount;
-    });
+    user.punishments
+      .filter((pun) =>
+        $punishmentsToFilter
+          .map((pun) => pun.punishment_type_id)
+          .includes(pun.punishment_type)
+      )
+      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+      .map((punishment) => {
+        allPunishments[punishment.punishment_type] =
+          (allPunishments[punishment.punishment_type] || 0) + punishment.amount;
+      });
+
     return allPunishments;
   };
 
@@ -53,7 +65,16 @@
   </div>
 </div>
 <div class="collapse-content">
-  <PunishmentInfo p_types="{p_types}" punishments="{user.punishments}" />
+  <PunishmentInfo
+    p_types="{p_types}"
+    punishments="{user.punishments
+      .filter((pun) =>
+        $punishmentsToFilter
+          .map((pun) => pun.punishment_type_id)
+          .includes(pun.punishment_type)
+      )
+      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))}"
+  />
 </div>
 
 <style>

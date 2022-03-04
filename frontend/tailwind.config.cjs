@@ -1,6 +1,7 @@
 const config = {
   mode: "jit",
   purge: ["./src/**/*.{html,js,svelte,ts}"],
+  content: ["./node_modules/flowbite/**/*.js"],
   theme: {
     extend: {
       colors: {
@@ -11,7 +12,7 @@ const config = {
           750: "#00528B",
           1000: "#004372",
         },
-        secondary: "#FAA21B",
+        secondary: "#FBBF24",
         warning: "#FFC000",
         error: "#DF2020",
         success: "#09AA09",
@@ -31,9 +32,27 @@ const config = {
   plugins: [
     require("@tailwindcss/forms")({ strategy: "class" }),
     require("daisyui"),
+    require("flowbite/plugin"),
   ],
   daisyui: {
-    themes: false,
+    styled: true,
+    themes: [
+      {
+        mytheme: {
+          primary: "#093B51",
+          "primary-focus": "#8462f4",
+          "primary-content": "#ffffff",
+
+          secondary: "#FBBF24",
+          "secondary-focus": "#d4a11e",
+          "secondary-content": "#ffffff",
+        },
+      },
+    ],
+    base: true,
+    utils: true,
+    logs: true,
+    rtl: false,
   },
 };
 

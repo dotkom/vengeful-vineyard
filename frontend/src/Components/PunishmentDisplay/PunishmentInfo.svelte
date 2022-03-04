@@ -1,37 +1,20 @@
 <script lang="ts">
-  import { deletePunishment } from "../../api";
-  import type { Punishment, PunishmentType } from "../../types";
+  import { deletePunishment, getGroupUser } from "../../api";
+  import type { Punishment, PunishmentType, User } from "../../types";
+  import { users } from "../../stores/users";
+  import { group } from "../../stores/groups";
+  import SvelteTooltip from "svelte-tooltip";
 
+  export let user: User;
   export let punishments: Punishment[];
   export let p_types: PunishmentType[];
-  let cancelIcon = "assets/red-x.svg";
-  $: totalSum = calculateSum();
+  export let totalSum: number;
+
+  let cancelIcon = "assets/cancelIcon.svg";
+  let verifyIcon = "assets/checkGreen.svg";
 
   const getUrl = (p_type: number) => {
     return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
-  };
-
-  /**
-   * Creates a new object that stores punishment ids and punishment values.
-   * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
-   */
-  const mapTypes = () => {
-    let mappedTypes = {};
-    p_types.map((p) => (mappedTypes[p.punishment_type_id] = p.value));
-    return mappedTypes;
-  };
-
-  /**
-   * Calculates the total sum in NOK of punishments
-   * @returns the total sum as number
-   */
-  const calculateSum = () => {
-    let dict = mapTypes();
-    let sum: number = 0;
-    punishments.forEach((punishment) => {
-      sum += dict[punishment.punishment_type] * punishment.amount;
-    });
-    return sum;
   };
 
   const returnDate = (given_time: String) => {
@@ -43,27 +26,73 @@
    * Updates total sum displayed
    * @param id punishment's id
    */
-  const removePunishment = (id: number) => {
-    deletePunishment(id);
-    punishments = punishments.filter((p) => p.punishment_id !== id);
-    totalSum = calculateSum();
+  const removePunishment = async (id: number) => {
+    await deletePunishment(id).then(async () => {
+      users.set(
+        await Promise.all(
+          $group.members.map(async (member) =>
+            getGroupUser($group.group_id, member.user_id)
+          )
+        )
+      );
+    });
+
+    punishments = user.punishments.filter((p) => p.punishment_id !== id);
   };
 </script>
 
 <div class="punishment_info">
-  <slot name="punishments" />
+  <!-- <slot name="punishments" /> -->
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
-        <div
-          class="deleteBtn"
-          on:click="{() => {
-            removePunishment(punishment.punishment_id);
-          }}"
+        <SvelteTooltip
+          tip="Annuler straff"
+          bottom
+          color="rgba(237, 63, 63, 0.74)"
+          class="z-10"
         >
-          <img class="icon" src="{cancelIcon}" alt="Remove punishment" />
-        </div>
-        <p class="reason">{punishment.reason}</p>
+          <button
+            on:click="{() => {
+              removePunishment(punishment.punishment_id);
+            }}"
+            type="button"
+            style="width: fit-content;"
+            class="text-white bg-[rgb(255,25,25)] hover:bg-[##ff4747]/80 focus:ring-4 focus:ring-[##ff4747]/50 font-medium rounded-lg text-sm px-1.5 py-1 text-center inline-flex items-center mr-2 mb-2"
+          >
+            <img class="w-3 h-3" src="{cancelIcon}" alt="punishment" />
+            Annuler
+          </button>
+        </SvelteTooltip>
+        <SvelteTooltip
+          tip="Marker som betalt"
+          bottom
+          color="rgba(117, 191, 148, 0.6)"
+        >
+          <div class="verifyBtn">
+            <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
+          </div></SvelteTooltip
+        >
+      </div>
+
+      <div
+        class="col-span-2 "
+        style="border-right: 1px solid #d9d9d9; border-left: 1px solid #d9d9d9;"
+      >
+        <p
+          class="break-words"
+          style="max-width: 100%;
+        white-space: break-spaces;"
+        >
+          "{punishment.reason}"
+        </p>
+        <p
+          class="break-words"
+          style="max-width: 100%;
+      white-space: break-spaces; padding: 0!important;"
+        >
+          - Gitt av <i>user</i>
+        </p>
       </div>
 
       <!-- Add a drink icon for each punishment-->
@@ -76,7 +105,9 @@
           />
         {/each}
       </div>
-      <div>{returnDate(punishment.created_time)}</div>
+      <div class="col-span-2">
+        {returnDate(punishment.created_time)}
+      </div>
     </div>
   {:else}
     <div></div>
@@ -86,11 +117,15 @@
 
 <style lang="less">
   .punishment_info {
-    @apply px-12;
+    // @apply px-12;
   }
   .punishment {
-    @apply flex flex-row justify-between space-x-8 mx-2 bg-white p-4 px-12 mt-6;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    @apply grid grid-cols-9 gap-1 bg-white shadow-md h-20;
+    border: 0.3px solid #d9d9d9;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    height: auto;
   }
 
   .punishment p {
@@ -98,11 +133,11 @@
   }
 
   .punishment > {
-    @apply items-center m-0;
+    @apply items-center m-1 p-1;
   }
 
   .icon {
-    @apply h-6 w-6;
+    @apply h-8 w-8;
   }
 
   .sum {
@@ -110,21 +145,26 @@
   }
 
   .deleteBtn {
+    padding: 0;
+  }
+
+  .verifyBtn {
     @apply float-left self-center hover:cursor-pointer;
     min-width: 1.5rem;
   }
 
   .punishment_icons {
-    @apply flex m-0;
+    @apply flex justify-center items-center col-span-4;
     min-width: 7em;
-  }
-
-  .reason {
-    max-width: 7em;
+    border-right: 1px solid #d9d9d9;
+    height: 100%;
   }
 
   .reason_wrapper {
-    @apply flex m-0 !important;
-    max-width: 10rem;
+    @apply flex m-0 col-start-1 col-end-2;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 </style>

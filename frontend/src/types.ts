@@ -1,17 +1,20 @@
 export interface Punishment {
-  name: string;
-  amount: number;
-  id: number;
-  punishment_id: number; // to match backend
   punishment_type: number;
-  price: number;
-  imageurl: string;
   reason: string;
-  verifiedBy: string | null;
-  verifiedTime: string | null;
-  givenBy: string;
-  givenTime: string;
+  punishment_id: number;
   created_time: string;
+  verified_time: string | null;
+  verified_by: string | null;
+  amount: number;
+
+  // name: string;
+  // number: number;
+  // id: number;
+  // price: number;
+  // imageurl: string;
+
+  // givenBy: string;
+  // givenTime: string;
 }
 
 export interface CreatePunishment {
@@ -50,12 +53,13 @@ export interface User {
   first_name: string;
   last_name: string;
   punishments: Punishment[];
+  active: boolean;
 }
 
 export interface Group {
-  id: number;
+  group_id: number;
   name: string;
-  rulesUrl: string;
+  rules: string;
   logoUrl: string;
   punishment_types: PunishmentType[];
   members: User[];
