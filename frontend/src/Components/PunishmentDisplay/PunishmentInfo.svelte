@@ -4,6 +4,7 @@
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
   import SvelteTooltip from "svelte-tooltip";
+  import AddNewPunishment from "./AddNewPunishment.svelte";
 
   export let user: User;
   export let punishments: Punishment[];
@@ -42,11 +43,12 @@
 </script>
 
 <div class="punishment_info">
+  <AddNewPunishment user="{user}" />
   <!-- <slot name="punishments" /> -->
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
-        <SvelteTooltip
+        <!-- <SvelteTooltip
           tip="Annuler straff"
           bottom
           color="rgba(237, 63, 63, 0.74)"
@@ -63,7 +65,7 @@
             <img class="w-3 h-3" src="{cancelIcon}" alt="punishment" />
             Annuler
           </button>
-        </SvelteTooltip>
+        </SvelteTooltip> -->
         <SvelteTooltip
           tip="Marker som betalt"
           bottom
