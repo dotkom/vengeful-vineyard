@@ -3,7 +3,7 @@
 
   import Select from "svelte-select";
   import type { User, CreatePunishment, PunishmentType } from "src/types";
-  import { getGroupUser, postPunishment } from "../../api";
+  import { getGroupUser, addPunishmentToUser } from "../../api";
   import { users } from "../../stores/users";
 
   export let user: User;
@@ -15,33 +15,38 @@
   let disable: boolean =
     punType == undefined || amount == undefined ? true : false;
 
-  console.log(punType == undefined);
-
   function handleSelect(event) {
     punType = event.detail.value;
-    console.log(punType == undefined);
-    console.log(amount == undefined);
-
-    console.log(disable);
-    console.log();
   }
 
-  const clickNewPunishment = async (id: number) => {
-    // let new_punishment: CreatePunishment = {
-    //   punishment_type: punType.punishment_type_id,
-    //   reason: reason,
-    //   amount: amount,
-    // };
-    // await postPunishment(new_punishment).then(async () => {
-    //   users.set(
-    //     await Promise.all(
-    //       $group.members.map(async (member) =>
-    //         getGroupUser($group.group_id, member.user_id)
-    //       )
-    //     )
-    //   );
-    // });
-    //punishments = user.punishments.filter((p) => p.punishment_id !== id);
+  const getPunType = (punName: string): PunishmentType => {
+    return $group.punishment_types.find((pun) => pun.name === punName);
+  };
+
+  const clickNewPunishment = async () => {
+    let new_punishment: CreatePunishment = {
+      punishment_type: getPunType(punType).punishment_type_id,
+      reason: reason,
+      amount: amount,
+    };
+
+    await addPunishmentToUser(
+      new_punishment,
+      $group.group_id,
+      user.user_id
+    ).then(async () => {
+      users.set(
+        await Promise.all(
+          $group.members.map(async (member) =>
+            getGroupUser($group.group_id, member.user_id)
+          )
+        )
+      );
+    });
+
+    reason = "";
+    punType = undefined;
+    amount = undefined;
   };
 </script>
 
@@ -81,7 +86,7 @@
     disabled="{punType == undefined || amount == undefined || reason == ''
       ? true
       : false}"
-    on:click="{() => clickNewPunishment}"
+    on:click="{clickNewPunishment}"
   >
     <svg
       width="15"
