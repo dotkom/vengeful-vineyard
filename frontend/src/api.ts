@@ -68,12 +68,9 @@ export async function deletePunishment(id: number) {
 }
 
 export async function postValidatePunishment(id: number) {
-  const res = await fetch(
-    "http://localhost:8000/validatePunishment/" + id.toString(),
-    {
-      method: "POST",
-    }
-  );
+  const res = await fetch(`http://localhost:8000/punishment/${id}/verify`, {
+    method: "POST",
+  });
   return res;
 }
 

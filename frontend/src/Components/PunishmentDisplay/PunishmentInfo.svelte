@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { deletePunishment, getGroupUser } from "../../api";
+  import {
+    deletePunishment,
+    getGroupUser,
+    postValidatePunishment,
+  } from "../../api";
   import type { Punishment, PunishmentType, User } from "../../types";
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
@@ -40,6 +44,20 @@
 
     punishments = user.punishments.filter((p) => p.punishment_id !== id);
   };
+
+  const verifyPunishment = async (id: number) => {
+    await postValidatePunishment(id).then(async () => {
+      users.set(
+        await Promise.all(
+          $group.members.map(async (member) =>
+            getGroupUser($group.group_id, member.user_id)
+          )
+        )
+      );
+    });
+
+    //punishments = user.punishments.filter((p) => p.punishment_id !== id);
+  };
 </script>
 
 <div class="punishment_info">
@@ -71,7 +89,10 @@
           bottom
           color="rgba(117, 191, 148, 0.6)"
         >
-          <div class="verifyBtn">
+          <div
+            class="verifyBtn"
+            on:click="{() => verifyPunishment(punishment.punishment_id)}"
+          >
             <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
           </div></SvelteTooltip
         >
