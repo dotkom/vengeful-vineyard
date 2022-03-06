@@ -29,20 +29,11 @@ DEFAULT_PUNISHMENT_TYPES = [
     },
 ]
 
-createdUserReturn = {
-    "id": 1,
-}
-
 createUser = {
     "first_name": "Joakim",
     "last_name": "Fremstad",
     "email": "email@example.com",
 }
-
-createdUser: dict[str, Any] = createUser
-createdUser["user_id"] = 1
-createdUser["active"] = True
-createdUser["punishments"] = []
 
 
 class TestUser:
@@ -57,7 +48,7 @@ class TestUser:
     async def test_create_user(self, client: Any) -> None:
         response = await rest_create_user(client, createUser)
         assert response.status_code == 200
-        assert response.json() == createdUserReturn
+        assert response.json() == {"id": 1}
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -73,7 +64,7 @@ class TestUser:
     async def test_get_user(self, client: Any) -> None:
         response = await client.get("/user/1")
         assert response.status_code == 200
-        assert response.json() == createdUser
+        assert response.json()["first_name"] == "Joakim"
         check_response_time(response)
 
     @pytest.mark.asyncio

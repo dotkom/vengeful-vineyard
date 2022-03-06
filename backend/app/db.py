@@ -168,8 +168,10 @@ async def get_punishments(user_id: UserId, group_id: GroupId) -> list[Punishment
 
 
 async def insert_user(user: UserCreate) -> dict[str, int]:
-    statement = "INSERT INTO users(first_name, last_name, email) VALUES (?, ?, ?)"
-    values = (user.first_name, user.last_name, user.email)
+    statement = (
+        "INSERT INTO users(first_name, last_name, email, ow_id) VALUES (?, ?, ?, ?)"
+    )
+    values = (user.first_name, user.last_name, user.email, user.ow_id)
     try:
         cur = CONN.cursor()
         cur.execute(statement, values)

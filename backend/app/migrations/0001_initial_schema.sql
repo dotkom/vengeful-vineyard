@@ -3,10 +3,12 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (
 	user_id INTEGER PRIMARY KEY,
+	ow_id INTEGER UNIQUE,
 	first_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
 	email TEXT NOT NULL UNIQUE,
-  active BOOLEAN DEFAULT TRUE
+  active BOOLEAN DEFAULT TRUE,
+  last_logged_in DATE
 );
 
 CREATE TABLE IF NOT EXISTS groups (
