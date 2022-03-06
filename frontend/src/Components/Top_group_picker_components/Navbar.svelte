@@ -8,20 +8,12 @@
     isAuthenticated,
     userInfo,
   } from "@dopry/svelte-oidc";
-  import { getOnlineProfile, getMyOnlineGroups } from "../../api";
-  import Button from "../Button.svelte";
-
-  let navElements = [
-    { link: "index.html", name: "Hjem" },
-    { link: "index2.html", name: "Wall of Shame" },
-  ];
 
   let logIcon = "assets/LogIn.svg";
 </script>
 
 <nav>
   <VvLogo />
-
   <div class="loginSection">
     <img alt="Login icon" src="{logIcon}" />
     <OidcContext
@@ -79,9 +71,5 @@
 
   .loginSection {
     @apply flex flex-col justify-center items-center;
-  }
-
-  .log_in_out {
-    /* padding-top: 0.5rem; */
   }
 </style>

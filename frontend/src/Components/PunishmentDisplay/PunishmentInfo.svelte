@@ -152,7 +152,15 @@
             >
           </ul>
         </div>
-        <div>{returnDate(punishment.created_time)}</div>
+        <div>
+          <p
+            class="break-words"
+            style="max-width: 100%;
+      white-space: break-spaces;"
+          >
+            {returnDate(punishment.created_time)}
+          </p>
+        </div>
       </div>
     </div>
   {:else}

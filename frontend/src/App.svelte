@@ -1,6 +1,5 @@
 <script lang="ts">
   import Navbar from "./Components/Top_group_picker_components/Navbar.svelte";
-  import SideBar from "./Components/Left_navbar_components/SideBar.svelte";
   import GroupLogos from "./Components/Top_group_picker_components/GroupLogos.svelte";
   import Footer from "./Components/Footer/Footer.svelte";
   import PunishmentGrid from "./Components/PunishmentDisplay/PunishmentGrid.svelte";
@@ -17,32 +16,42 @@
   href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap"
   rel="stylesheet"
 />
-
-<div class="content">
-  <Navbar />
-  <div class="body_content">
-    <Sidebar />
+<Navbar />
+<div class="h-screen drawer drawer-mobile w-full">
+  <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content w-full">
+    <!-- Page content here -->
+    <!-- <label for="my-drawer-2" class="btn btn-primary drawer-button md:hidden"
+      >Open drawer</label
+    > -->
     <div class="punishments">
       <GroupLogos />
       <PunishmentGrid />
     </div>
+    <label
+      for="my-drawer-2"
+      class="show-filters btn btn-primary drawer-button hidden bg-primary text-center"
+      >Vis/Skjul filter</label
+    >
   </div>
-  <Footer />
+  <div class="drawer-side">
+    <label for="my-drawer-2" class="drawer-overlay"></label>
+    <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
+      <!-- Sidebar content here -->
+      <li><Sidebar /></li>
+    </ul>
+  </div>
 </div>
+<Footer />
 
 <style lang="less" global>
   @tailwind base;
   @tailwind components;
   @tailwind utilities;
   @import "variables.less";
-  .body_content {
-    @apply flex;
-    margin: 0 5em;
-  }
 
-  .content {
-    background-color: #f7f7f7;
-    font-family: "Source Sans Pro", sans-serif;
+  .body_content {
+    @apply flex w-full;
   }
 
   h1 {
@@ -51,8 +60,30 @@
     margin: 20px;
   }
   .punishments {
-    @apply w-7/12 mt-4;
+    @apply mt-4;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .show-filters {
+      /* STICKY POSITIONING */
+      display: block;
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      margin-right: 5px;
+      margin-bottom: 5px;
+
+      /* STYLE */
+      padding-top: 10px;
+      border-radius: 30px;
+      width: 7rem;
+    }
+
+    .body_content {
+      width: 100%;
+    }
   }
 </style>

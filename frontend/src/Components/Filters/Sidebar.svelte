@@ -19,7 +19,6 @@
   @import "../../variables.less";
 
   .wrapper {
-    width: 25rem;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -28,8 +27,8 @@
     box-sizing: border-box;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 6px;
-    height: fit-content;
     padding-bottom: 5rem;
+    height: 100%;
   }
 
   hr {

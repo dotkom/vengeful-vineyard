@@ -7,5 +7,6 @@
   .leftLogo {
     left: 2%;
     top: 2%;
+    height: 100%;
   }
 </style>
