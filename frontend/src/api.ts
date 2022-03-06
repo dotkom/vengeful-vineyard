@@ -43,11 +43,19 @@ export async function postGroup(name: string, rules: string) {
   return json;
 }
 
-export async function postPunishment(punishment: CreatePunishment) {
-  const res = await fetch("http://localhost:8000/punishment", {
-    method: "POST",
-    body: JSON.stringify(punishment),
-  });
+export async function addPunishmentToUser(
+  punishment: CreatePunishment,
+  group_id: number,
+  user_id: number
+) {
+  const res = await fetch(
+    `http://localhost:8000/group/${group_id}/user/${user_id}/punishment`,
+    {
+      headers: new Headers({ "content-type": "application/json" }),
+      method: "POST",
+      body: JSON.stringify([punishment]),
+    }
+  );
   const json = await res.json();
   return json;
 }

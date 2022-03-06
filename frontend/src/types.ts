@@ -18,9 +18,9 @@ export interface Punishment {
 }
 
 export interface CreatePunishment {
-  name: string;
+  punishment_type: number;
   reason: string;
-  punishments: Punishment[];
+  amount: number;
 }
 
 export interface PunishmentInfo {
