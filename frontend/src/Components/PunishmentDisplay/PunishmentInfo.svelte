@@ -66,36 +66,28 @@
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
-        <!-- <SvelteTooltip
-          tip="Annuler straff"
-          bottom
-          color="rgba(237, 63, 63, 0.74)"
-          class="z-10"
-        >
-          <button
-            on:click="{() => {
-              removePunishment(punishment.punishment_id);
-            }}"
-            type="button"
-            style="width: fit-content;"
-            class="text-white bg-[rgb(255,25,25)] hover:bg-[##ff4747]/80 focus:ring-4 focus:ring-[##ff4747]/50 font-medium rounded-lg text-sm px-1.5 py-1 text-center inline-flex items-center mr-2 mb-2"
+        {#if punishment.verified_time}
+          <p
+            class="text-green-600 break-words"
+            style="max-width: 100%;
+        white-space: break-spaces;"
           >
-            <img class="w-3 h-3" src="{cancelIcon}" alt="punishment" />
-            Annuler
-          </button>
-        </SvelteTooltip> -->
-        <SvelteTooltip
-          tip="Marker som betalt"
-          bottom
-          color="rgba(117, 191, 148, 0.6)"
-        >
-          <div
-            class="verifyBtn"
-            on:click="{() => verifyPunishment(punishment.punishment_id)}"
+            Verifisert av {punishment.verified_by}
+          </p>
+        {:else}
+          <SvelteTooltip
+            tip="Marker som betalt"
+            bottom
+            color="rgba(117, 191, 148, 0.6)"
           >
-            <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
-          </div></SvelteTooltip
-        >
+            <div
+              class="verifyBtn"
+              on:click="{() => verifyPunishment(punishment.punishment_id)}"
+            >
+              <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
+            </div></SvelteTooltip
+          >
+        {/if}
       </div>
 
       <div
@@ -112,7 +104,7 @@
         <p
           class="break-words"
           style="max-width: 100%;
-      white-space: break-spaces; padding: 0!important;"
+      white-space: break-spaces;"
         >
           - Gitt av <i>user</i>
         </p>
