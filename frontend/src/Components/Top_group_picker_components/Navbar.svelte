@@ -21,15 +21,7 @@
 
 <nav>
   <VvLogo />
-  <ul class="navContentWrapper">
-    {#each navElements as element}
-      <li>
-        <a href="{element.link}" class="navElement" style="color: white"
-          >{element.name}</a
-        >
-      </li>
-    {/each}
-  </ul>
+
   <div class="loginSection">
     <img alt="Login icon" src="{logIcon}" />
     <OidcContext
@@ -49,16 +41,18 @@
     >
       {#if $isAuthenticated}
         <div class="text-white" style="color: white">{$userInfo.name}</div>
-        <LogoutButton>
-          <div class="log_in_out">
-            <Button color="danger">Log out</Button>
-          </div>
-        </LogoutButton>
+        <!-- <LogoutButton> -->
+        <!-- <div class="log_in_out"> -->
+        <!-- <Button color="danger">Log out</Button> -->
+        <LogoutButton class="btn btn-error bg-red-400">Logg ut</LogoutButton>
+        <!-- </div> -->
+        <!-- </LogoutButton> -->
       {:else}
         <LoginButton>
-          <div class="log_in_out">
+          <!-- <div class="log_in_out">
             <Button color="success">Log in</Button>
-          </div>
+          </div> -->
+          Logg inn
         </LoginButton>
       {/if}
     </OidcContext>
@@ -67,7 +61,9 @@
 
 <style lang="postcss">
   nav {
-    @apply flex justify-between bg-primary-1000 mb-4 px-24 w-full;
+    @apply flex justify-between mb-4 px-24 w-full;
+    background: #093b51;
+    border: 1px solid #072e3f;
   }
 
   .navContentWrapper {
@@ -86,6 +82,6 @@
   }
 
   .log_in_out {
-    padding-top: 0.5rem;
+    /* padding-top: 0.5rem; */
   }
 </style>
