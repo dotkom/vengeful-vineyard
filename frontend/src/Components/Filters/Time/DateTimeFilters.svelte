@@ -61,9 +61,11 @@
     dateFormat: "Y-m-d",
 
     onClose: function (selectedDates, dateStr, instance) {
-      dateToFilterBy = new Date(selectedDates[0]);
-      noLaterThan = new Date(selectedDates[1]);
-      value = null;
+      if (selectedDates[0] != undefined && selectedDates[1] != undefined) {
+        dateToFilterBy = new Date(selectedDates[0]);
+        noLaterThan = new Date(selectedDates[1]);
+        value = null;
+      }
     },
     onOpen: function () {
       // console.log("opened");
