@@ -153,7 +153,11 @@
             tabindex="0"
             class="menu menu-compact dropdown-content shadow bg-white rounded-box w-40"
           >
-            <button>Annuler straff</button>
+            <button
+              on:click="{() => {
+                removePunishment(punishment.punishment_id);
+              }}">Annuler straff</button
+            >
           </ul>
         </div>
         <div>{returnDate(punishment.created_time)}</div>
