@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { deletePunishment, getGroupUser } from "../../api";
+  import {
+    deletePunishment,
+    getGroupUser,
+    postValidatePunishment,
+  } from "../../api";
   import type { Punishment, PunishmentType, User } from "../../types";
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
@@ -40,6 +44,20 @@
 
     punishments = user.punishments.filter((p) => p.punishment_id !== id);
   };
+
+  const verifyPunishment = async (id: number) => {
+    await postValidatePunishment(id).then(async () => {
+      users.set(
+        await Promise.all(
+          $group.members.map(async (member) =>
+            getGroupUser($group.group_id, member.user_id)
+          )
+        )
+      );
+    });
+
+    //punishments = user.punishments.filter((p) => p.punishment_id !== id);
+  };
 </script>
 
 <div class="punishment_info">
@@ -48,33 +66,28 @@
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
-        <!-- <SvelteTooltip
-          tip="Annuler straff"
-          bottom
-          color="rgba(237, 63, 63, 0.74)"
-          class="z-10"
-        >
-          <button
-            on:click="{() => {
-              removePunishment(punishment.punishment_id);
-            }}"
-            type="button"
-            style="width: fit-content;"
-            class="text-white bg-[rgb(255,25,25)] hover:bg-[##ff4747]/80 focus:ring-4 focus:ring-[##ff4747]/50 font-medium rounded-lg text-sm px-1.5 py-1 text-center inline-flex items-center mr-2 mb-2"
+        {#if punishment.verified_time}
+          <p
+            class="text-green-600 break-words"
+            style="max-width: 100%;
+        white-space: break-spaces;"
           >
-            <img class="w-3 h-3" src="{cancelIcon}" alt="punishment" />
-            Annuler
-          </button>
-        </SvelteTooltip> -->
-        <SvelteTooltip
-          tip="Marker som betalt"
-          bottom
-          color="rgba(117, 191, 148, 0.6)"
-        >
-          <div class="verifyBtn">
-            <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
-          </div></SvelteTooltip
-        >
+            Verifisert av {punishment.verified_by}
+          </p>
+        {:else}
+          <SvelteTooltip
+            tip="Marker som betalt"
+            bottom
+            color="rgba(117, 191, 148, 0.6)"
+          >
+            <div
+              class="verifyBtn"
+              on:click="{() => verifyPunishment(punishment.punishment_id)}"
+            >
+              <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
+            </div></SvelteTooltip
+          >
+        {/if}
       </div>
 
       <div
@@ -91,7 +104,7 @@
         <p
           class="break-words"
           style="max-width: 100%;
-      white-space: break-spaces; padding: 0!important;"
+      white-space: break-spaces;"
         >
           - Gitt av <i>user</i>
         </p>
@@ -107,14 +120,47 @@
           />
         {/each}
       </div>
-      <div class="col-span-2">
-        {returnDate(punishment.created_time)}
+      <div
+        class="col-span-2 relative h-full flex justify-center align-middle items-center"
+      >
+        <div class="dropdown dropdown-end absolute z-10 top-0 right-0">
+          <label
+            tabindex="0"
+            class="badge hover:cursor-pointer border-gray-300 bg-gray-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              class="inline-block w-5 h-5 stroke-current"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+              ></path></svg
+            >
+          </label>
+          <ul
+            tabindex="0"
+            class="menu menu-compact dropdown-content shadow bg-white rounded-box w-40"
+          >
+            <button
+              on:click="{() => {
+                removePunishment(punishment.punishment_id);
+              }}">Annuler straff</button
+            >
+          </ul>
+        </div>
+        <div>{returnDate(punishment.created_time)}</div>
       </div>
     </div>
   {:else}
     <div></div>
   {/each}
-  <div class="sum">Total sum: {totalSum}</div>
+  <div class="sum">
+    Total sum: {totalSum}
+  </div>
 </div>
 
 <style lang="less">
