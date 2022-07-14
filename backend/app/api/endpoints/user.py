@@ -24,7 +24,7 @@ async def get_users() -> dict[str, list[Any]]:
 
 
 @router.post("")
-async def post_user(user: UserCreate) -> dict[str, int]:
+async def post_user(user: UserCreate) -> dict[str, int | None]:
     """
     Endpoint to create a user.
     """
