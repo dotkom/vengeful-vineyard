@@ -41,7 +41,7 @@ async def get_group(group_id: GroupId) -> Group:
 
 
 @router.post("")
-async def post_group(group: GroupCreate) -> dict[str, int]:
+async def post_group(group: GroupCreate) -> dict[str, int | None]:
     """
     Endpoint to create a new group.
     """
@@ -51,7 +51,7 @@ async def post_group(group: GroupCreate) -> dict[str, int]:
 @router.post("/{group_id}/punishmentType")
 async def add_punishment_type_to_group(
     group_id: GroupId, punishment_type: PunishmentTypeCreate
-) -> dict[str, int]:
+) -> dict[str, int | None]:
     """
     Endpoint to create a custom punishment type for a group.
     """
@@ -59,7 +59,9 @@ async def add_punishment_type_to_group(
 
 
 @router.post("/{group_id}/user/{user_id}")
-async def add_user_to_group(group_id: GroupId, user_id: UserId) -> dict[str, int]:
+async def add_user_to_group(
+    group_id: GroupId, user_id: UserId
+) -> dict[str, int | None]:
     """
     Endpoint to add a user to a group.
     """
@@ -69,7 +71,7 @@ async def add_user_to_group(group_id: GroupId, user_id: UserId) -> dict[str, int
 @router.post("/{group_id}/user/{user_id}/punishment")
 async def add_punishment(
     group_id: GroupId, user_id: UserId, punishments: list[PunishmentCreate]
-) -> dict[str, list[int]]:
+) -> dict[str, list[int | None]]:
     """
     Endpoint to add a punishment to a user in the context of a specific group.
     """

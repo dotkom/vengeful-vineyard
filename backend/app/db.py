@@ -5,6 +5,7 @@ import logging
 import sqlite3
 from pathlib import Path
 from sqlite3 import Connection
+from typing import cast
 
 from app.config import settings
 from app.models.group import GroupCreate
@@ -167,7 +168,7 @@ async def get_punishments(user_id: UserId, group_id: GroupId) -> list[Punishment
     return list(map(lambda x: PunishmentRead(**dict(x)), punishments.fetchall()))
 
 
-async def insert_user(user: UserCreate) -> dict[str, int]:
+async def insert_user(user: UserCreate) -> dict[str, int | None]:
     statement = "INSERT INTO users(first_name, last_name, email) VALUES (?, ?, ?)"
     values = (user.first_name, user.last_name, user.email)
     try:
@@ -179,7 +180,7 @@ async def insert_user(user: UserCreate) -> dict[str, int]:
     return {"id": cur.lastrowid}
 
 
-async def insert_group(group: GroupCreate) -> dict[str, int]:
+async def insert_group(group: GroupCreate) -> dict[str, int | None]:
     statement = "INSERT INTO groups(name, rules) VALUES (?, ?)"
     values = (group.name, group.rules)
     try:
@@ -187,13 +188,15 @@ async def insert_group(group: GroupCreate) -> dict[str, int]:
         cur.execute(statement, values)
     except sqlite3.IntegrityError as ex:
         raise HTTPException(status_code=400, detail=str(ex)) from ex
-    gid = cur.lastrowid
+    gid = cast(GroupId, cur.lastrowid)
     for punishment_type in DEFAULT_PUSHISHMENT_TYPES:
         await insert_punishment_type(gid, punishment_type)
     return {"id": gid}
 
 
-async def insert_user_in_group(group_id: GroupId, user_id: UserId) -> dict[str, int]:
+async def insert_user_in_group(
+    group_id: GroupId, user_id: UserId
+) -> dict[str, int | None]:
     statement = (
         "INSERT INTO group_members(group_id, user_id, is_admin) VALUES (?, ?, False)"
     )
@@ -209,7 +212,7 @@ async def insert_user_in_group(group_id: GroupId, user_id: UserId) -> dict[str, 
 
 async def insert_punishment_type(
     group_id: GroupId, punishment_type: PunishmentTypeCreate
-) -> dict[str, int]:
+) -> dict[str, int | None]:
     statement = "INSERT INTO punishment_types(group_id, name, value, logo_url) VALUES (?, ?, ?, ?)"
     values = (
         group_id,
@@ -228,7 +231,7 @@ async def insert_punishment_type(
 
 async def insert_punishments(
     group_id: GroupId, user_id: UserId, punishments: list[PunishmentCreate]
-) -> dict[str, list[int]]:
+) -> dict[str, list[int | None]]:
     ids = []
     for punishment in punishments:
         statement = "INSERT INTO group_punishments(group_id, user_id, punishment_type, reason, amount) VALUES (?, ?, ?, ?, ?)"

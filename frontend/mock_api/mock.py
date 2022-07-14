@@ -5,10 +5,9 @@ import random
 import string
 from datetime import datetime
 
-from aiohttp import web, BasicAuth, ClientSession
+from aiohttp import BasicAuth, ClientSession, web
 
-
-APIURL="http://localhost:8888"
+APIURL = "http://localhost:8888"
 
 GROUPIMAGES = {
     "Dotkom": "https://i.ibb.co/tJrB8kn/dotkom.png",
@@ -367,6 +366,7 @@ async def getGroups(request):
         async with session.get(f"{APIURL}/group") as resp:
             r = await resp.json()
             return web.json_response(r)
+
 
 async def acceptAndReflect(request):
     data = await request.text()
