@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal, { getModal } from "./Modal.svelte";
+  import Modal, { getModal } from "./GroupModal.svelte";
   import { postGroup } from "../../api";
 
   let modalTitle = "Create new group";

@@ -1,10 +1,9 @@
 <script lang="ts">
-  import Navbar from "./Components/Top_group_picker_components/Navbar.svelte";
-  import SideBar from "./Components/Left_navbar_components/SideBar.svelte";
-  import GroupLogos from "./Components/Top_group_picker_components/GroupLogos.svelte";
-  import Footer from "./Components/Footer/Footer.svelte";
-  import PunishmentGrid from "./Components/PunishmentDisplay/PunishmentGrid.svelte";
-  import Sidebar from "./Components/Filters/Sidebar.svelte";
+  import Navbar from "./components/navbar/Navbar.svelte";
+  import GroupLogos from "./components/groups/GroupLogos.svelte";
+  import Footer from "./components/footer/Footer.svelte"
+  import PunishmentGrid from "./components/punishments/PunishmentGrid.svelte";
+  import Sidebar from "./components/filters/Sidebar.svelte";
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
