@@ -4,17 +4,9 @@
     OidcContext,
     LoginButton,
     LogoutButton,
-    accessToken,
     isAuthenticated,
     userInfo,
   } from "@dopry/svelte-oidc";
-  import { getOnlineProfile, getMyOnlineGroups } from "../../api";
-  import Button from "../Button.svelte";
-
-  let navElements = [
-    { link: "index.html", name: "Hjem" },
-    { link: "index2.html", name: "Wall of Shame" },
-  ];
 
   let logIcon = "assets/LogIn.svg";
 </script>
@@ -66,22 +58,8 @@
     border: 1px solid #072e3f;
   }
 
-  .navContentWrapper {
-    @apply flex flex-row space-x-4 items-center m-0 p-0 align-baseline uppercase;
-  }
-  .navElement {
-    @apply h-full w-full text-2xl mx-12;
-  }
-
-  .navElement:hover {
-    @apply bg-primary-750;
-  }
-
   .loginSection {
     @apply flex flex-col justify-center items-center;
   }
 
-  .log_in_out {
-    /* padding-top: 0.5rem; */
-  }
 </style>
