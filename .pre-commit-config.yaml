@@ -1,65 +1,61 @@
 files: backend
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
-    -   id: check-case-conflict
-    -   id: check-docstring-first
-    -   id: check-json
-    -   id: check-merge-conflict
-    -   id: check-yaml
-    -   id: debug-statements
-    -   id: end-of-file-fixer
-    -   id: fix-byte-order-marker
-    -   id: forbid-new-submodules
-    -   id: mixed-line-ending
-    -   id: trailing-whitespace
--   repo: local
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+  - repo: local
     hooks:
-    -   id: run-tests
+      - id: run-tests
         name: run tests
         entry: 'bash -c "cd backend && make test"'
         types: [python]
         language: system
-        always_run: true
         pass_filenames: false
-    -   id: pylint
+      - id: pylint
         name: pylint
         entry: bash -c "cd backend && make pylint"
         pass_filenames: false
         types: [python]
         language: system
-    -   id: mypy
+      - id: mypy
         name: mypy type checking
         entry: bash -c "cd backend && make mypy"
         pass_filenames: false
         types: [python]
         language: system
-    -   id: black
+      - id: black
         name: autoformat (python)
         entry: bash -c "poetry run black ."
         types: [python]
         language: system
-    -   id: isort
+      - id: isort
         name: sort imports (python)
         entry: bash -c "poetry run isort ."
         types: [python]
         language: system
-    -   id: poetry-check
+      - id: poetry-check
         name: Check if poetry config is valid
         entry: bash -c "poetry check"
-        always_run: true
         types: [python]
         pass_filenames: false
         language: system
-#    -   id: prettier
-#        name: Format frontend-code
-#        entry: bash -c "cd frontend && npm ci && npx prettier -w src"
-#        always_run: true
-#        language: system
-#    -   id: svelte-validate
-#        name: Validate svelte
-#        entry: bash -c "cd frontend && npm ci && npm run validate"
-#        always_run: true
-#        pass_filenames: false
-#        language: system
+      - id: prettier
+        name: Format frontend-code
+        entry: bash -c "cd frontend && npm ci && npx prettier -w src"
+        language: system
+      - id: svelte-validate
+        name: Validate svelte
+        entry: bash -c "cd frontend && npm ci && npm run validate"
+        pass_filenames: false
+        language: system
