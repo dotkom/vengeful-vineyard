@@ -12,6 +12,8 @@ python = "^3.10"
 fastapi = "^0.71.0"
 pydantic = "^1.9.0"
 uvicorn = "^0.16.0"
+aiosqlite = "^0.17.0"
+asgi-lifespan = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
