@@ -42,7 +42,7 @@ repos:
         language: system
     -   id: isort
         name: sort imports (python)
-        entry: bash -c "poetry run isort $@"
+        entry: bash -c "poetry run isort ."
         types: [python]
         language: system
     -   id: poetry-check

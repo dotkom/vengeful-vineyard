@@ -1,13 +1,13 @@
 """API related functions and classes."""
 
 from typing import Any, Callable, Coroutine
-from fastapi import Response
-from fastapi import Request as OriginalRequest
-from fastapi import FastAPI as OriginalFastAPI
-from fastapi.routing import APIRoute
-from app.db import Database
-from starlette.requests import Request as StarletteRequest
 
+from app.db import Database
+from fastapi import FastAPI as OriginalFastAPI
+from fastapi import Request as OriginalRequest
+from fastapi import Response
+from fastapi.routing import APIRoute
+from starlette.requests import Request as StarletteRequest
 
 __all__ = (
     "FastAPI",
