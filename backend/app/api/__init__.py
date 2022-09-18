@@ -10,9 +10,9 @@ from starlette.requests import Request as StarletteRequest
 
 
 __all__ = (
-    'FastAPI',
-    'Request',
-    'ModifiedRoute',
+    "FastAPI",
+    "Request",
+    "ModifiedRoute",
 )
 
 
@@ -28,7 +28,9 @@ class Request(OriginalRequest):
 
 
 class ModifiedRoute(APIRoute):
-    def get_route_handler(self) -> Callable[[StarletteRequest], Coroutine[Any, Any, Response]]:
+    def get_route_handler(
+        self,
+    ) -> Callable[[StarletteRequest], Coroutine[Any, Any, Response]]:
         original_route_handler = super().get_route_handler()
 
         async def custom_route_handler(request: OriginalRequest) -> Response:

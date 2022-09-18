@@ -37,7 +37,7 @@ repos:
         language: system
     -   id: black
         name: autoformat (python)
-        entry: bash -c "poetry run black $@"
+        entry: bash -c "poetry run black ."
         types: [python]
         language: system
     -   id: isort
