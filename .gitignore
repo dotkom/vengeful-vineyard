@@ -20,3 +20,5 @@ yarn.lock
 */__pycache__/*
 
 *.db
+
+postgres-data

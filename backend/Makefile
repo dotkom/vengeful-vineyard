@@ -1,20 +1,51 @@
+export SHELL:=/bin/bash
+export SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)pipefail:errexit
+
 .ONESHELL:
-.PHONY: prod dev test testv testvv mypy pylint clean help hooks docs
+.PHONY: prod dev dev-memory test testv testvv mypy pylint clean help hooks docs
 
 prod: .prod-reqs
 	VENGEFUL_DATABASE="vengeful_vineyard.db" poetry run uvicorn app.api.init_api:asgi_app --host 0.0.0.0
 
 dev: .dev-reqs
-	VENGEFUL_DATABASE="dev.db" poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
+	function tearDown {
+		docker stop dev-db
+	}
+	trap tearDown EXIT
+	docker run -d --rm --name dev-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=dev -v ${PWD}/postgres-data:/var/lib/postgresql/data postgres:11.3-alpine
+	POSTGRES_DB=dev poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
+
+dev-memory: .dev-reqs
+	function tearDown {
+		docker stop test-db
+	}
+	trap tearDown EXIT
+	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
+	POSTGRES_DB=test poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
 
 test: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" poetry run pytest --asyncio-mode=strict
+	function tearDown {
+		docker stop test-db
+	}
+	trap tearDown EXIT
+	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
+	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict
 
 testv: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" poetry run pytest --asyncio-mode=strict -v --cov=app --cov-report term:skip-covered --cov-report html
+	function tearDown {
+		docker stop test-db
+	}
+	trap tearDown EXIT
+	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
+	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict -v --cov=app --cov-report term:skip-covered --cov-report html
 
 testvv: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" poetry run pytest --asyncio-mode=strict -vv --cov=app --cov-report term:skip-covered --cov-report html
+	function tearDown {
+		docker stop test-db
+	}
+	trap tearDown EXIT
+	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
+	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict -vv --cov=app --cov-report term:skip-covered --cov-report html
 
 .prod-reqs:
 	poetry install --no-root --no-dev && touch .prod-reqs

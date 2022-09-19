@@ -33,3 +33,4 @@ class TestManyGroups:
             response = await rest_join_group(
                 client, GroupId(group_id), UserId(random.randint(0, self.users))
             )
+            assert response.status_code == 200

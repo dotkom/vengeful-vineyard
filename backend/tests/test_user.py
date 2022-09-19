@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 import pytest
-from tests.fixtures import client, event_loop
+from tests.fixtures import client
 from tests.response_time import check_response_time
 from tests.rest import rest_create_group, rest_create_user
 
@@ -199,7 +199,7 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_delete_punishment_duplicate(self, client: Any) -> None:
         response = await client.delete(f"/punishment/{self.punishment_id}")
-        assert response.status_code == 200
+        assert response.status_code == 404
         check_response_time(response)
 
     @pytest.mark.asyncio
