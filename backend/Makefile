@@ -8,13 +8,13 @@ dev: .dev-reqs
 	VENGEFUL_DATABASE="dev.db" poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
 
 test: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" poetry run pytest
+	VENGEFUL_DATABASE=":memory:" poetry run pytest --asyncio-mode=strict
 
 testv: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" poetry run pytest -v --cov=app --cov-report term:skip-covered --cov-report html
+	VENGEFUL_DATABASE=":memory:" poetry run pytest --asyncio-mode=strict -v --cov=app --cov-report term:skip-covered --cov-report html
 
 testvv: .dev-reqs
-	VENGEFUL_DATABASE=":memory:" poetry run pytest -vv --cov=app --cov-report term:skip-covered --cov-report html
+	VENGEFUL_DATABASE=":memory:" poetry run pytest --asyncio-mode=strict -vv --cov=app --cov-report term:skip-covered --cov-report html
 
 .prod-reqs:
 	poetry install --no-root --no-dev && touch .prod-reqs

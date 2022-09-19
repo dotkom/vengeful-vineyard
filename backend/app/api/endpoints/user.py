@@ -4,7 +4,8 @@ User endpoints
 
 from typing import Any
 
-from app import db
+from app.api import Request
+from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.user import User, UserCreate
 from app.types import UserId
 from fastapi import APIRouter, HTTPException
@@ -13,46 +14,47 @@ router = APIRouter(prefix="/user", tags=["User"])
 
 
 @router.get("")
-async def get_users() -> dict[str, list[Any]]:
+async def get_users(request: Request) -> dict[str, list[Any]]:
     """
     Endpoint to get all users on the system.
     """
-    conn = db.get_instance()
-    db_users = conn.execute("""SELECT * FROM users""")
-    users = list(map(dict, db_users))
-    return {"users": users}
+    app = request.app
+    return await app.db.get_raw_users()
 
 
 @router.post("")
-async def post_user(user: UserCreate) -> dict[str, int | None]:
+async def post_user(request: Request, user: UserCreate) -> dict[str, int | None]:
     """
     Endpoint to create a user.
     """
-    return await db.insert_user(user)
+    app = request.app
+    try:
+        return await app.db.insert_user(user)
+    except DatabaseIntegrityException as exc:
+        raise HTTPException(status_code=400, detail=exc.detail) from exc
 
 
 @router.get("/{user_id}")
-async def get_user(user_id: UserId) -> User:
+async def get_user(request: Request, user_id: UserId) -> User:
     """
     Endpoint to get a specific user.
     """
-    return await db.get_user(user_id, punishments=True)
+    app = request.app
+    try:
+        return await app.db.get_user(user_id, punishments=True)
+    except NotFound as exc:
+        raise HTTPException(status_code=404, detail="User not found") from exc
 
 
 @router.get("/{user_id}/group", tags=["User"])
-async def get_user_groups(user_id: UserId) -> dict[str, Any]:
+async def get_user_groups(request: Request, user_id: UserId) -> dict[str, Any]:
     """
     Endpoint to get all groups a user is a member of.
     """
-    conn = db.get_instance()
-    groups = conn.execute(
-        """SELECT group_members.group_id, name from group_members
-           INNER JOIN users on users.user_id = group_members.user_id
-           INNER JOIN groups on groups.group_id = group_members.group_id
-           WHERE group_members.user_id = :user_id""",
-        {"user_id": user_id},
-    ).fetchall()
-    if groups is None:
-        raise HTTPException(status_code=500, detail="User groups could not be found")
-
-    return {"groups": list(map(lambda x: {"id": x[0], "group": x[1]}, groups))}
+    app = request.app
+    try:
+        return await app.db.get_raw_user_groups(user_id)
+    except NotFound as exc:
+        raise HTTPException(
+            status_code=500, detail="User groups could not be found"
+        ) from exc  # TODO??: 500?
