@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from tests.fixtures import client, event_loop
+from tests.fixtures import client
 from tests.response_time import check_response_time
 from tests.test_user import DEFAULT_PUNISHMENT_TYPES
 

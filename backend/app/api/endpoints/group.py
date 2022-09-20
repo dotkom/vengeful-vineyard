@@ -106,7 +106,7 @@ async def add_user_to_group(
         raise HTTPException(
             status_code=404,
             detail="Could not find the specified group",
-        )
+        ) from exc
 
 
 @router.post("/{group_id}/user/{user_id}/punishment")

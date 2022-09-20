@@ -21,8 +21,7 @@ async def delete_punishment(request: Request, punishment_id: PunishmentId) -> No
         await app.db.delete_punishment(punishment_id)
     except NotFound as exc:
         raise HTTPException(
-            status_code=404,
-            detail="The punishment could not be found."
+            status_code=404, detail="The punishment could not be found."
         ) from exc
 
 
@@ -38,6 +37,5 @@ async def verify_punishment(
         return await app.db.verify_punishment(punishment_id)
     except NotFound as exc:
         raise HTTPException(
-            status_code=404,
-            detail="The punishment could not be found."
+            status_code=404, detail="The punishment could not be found."
         ) from exc

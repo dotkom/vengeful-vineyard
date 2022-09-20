@@ -1,5 +1,5 @@
 # Backend
-Created with [FastAPI](https://fastapi.tiangolo.com) and SQLite.
+Created with [FastAPI](https://fastapi.tiangolo.com) and PostgreSQL.
 
 ## Development
 * Start server with: `make dev`

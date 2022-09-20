@@ -5,14 +5,14 @@ CREATE TABLE IF NOT EXISTS users (
 	email TEXT NOT NULL UNIQUE,
     active BOOLEAN DEFAULT TRUE
 );
-ALTER SEQUENCE users_user_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1
+-- ALTER SEQUENCE users_user_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1
 
 CREATE TABLE IF NOT EXISTS groups (
 	group_id SERIAL PRIMARY KEY,
 	name TEXT NOT NULL UNIQUE,
 	rules TEXT NOT NULL
 );
-ALTER SEQUENCE groups_group_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1
+-- ALTER SEQUENCE groups_group_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1
 
 CREATE TABLE IF NOT EXISTS group_members (
 	group_id INTEGER NOT NULL references groups(group_id),
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS punishment_types (
 	logo_url TEXT NOT NULL,
 	UNIQUE (group_id, name)
 );
-ALTER SEQUENCE punishment_types_punishment_type_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1
+-- ALTER SEQUENCE punishment_types_punishment_type_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1
 
 CREATE TABLE IF NOT EXISTS group_punishments (
 	punishment_id SERIAL PRIMARY KEY,
@@ -44,4 +44,4 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	verified_time TIMESTAMP WITHOUT TIME ZONE,
 	created_time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc')
 );
-ALTER SEQUENCE group_punishments_punishment_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1
+-- ALTER SEQUENCE group_punishments_punishment_id_seq MINVALUE 0 RESTART WITH 0; -- Start sequence at 0 instead of 1

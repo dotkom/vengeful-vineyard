@@ -36,8 +36,6 @@ DEFAULT_PUSHISHMENT_TYPES = [
 
 logger = logging.getLogger(__name__)
 
-MaybeConn = Pool | None
-
 
 def read_sql_file(filepath: Path) -> str:
     """Reads an SQL file and ignores comments"""
@@ -59,6 +57,7 @@ def read_sql_file(filepath: Path) -> str:
 class Database:
     def __init__(self) -> None:
         self._pool: Pool | None = None
+        self._db_name = ""
 
     @property
     def pool(self) -> Pool:
@@ -70,19 +69,23 @@ class Database:
     def pool(self, value: Pool) -> None:
         self._pool = value
 
-    async def async_init(self) -> None:
+    async def async_init(self, **db_settings: str) -> None:
         for _ in range(10):  # Try for 10*0.5 seconds
             try:
                 logger.info("Connecting to postgres database.")
+
+                self._db_name = db_settings.get("database", settings.postgres_db)
                 self._pool = await create_pool(
-                    host=settings.postgres_host,
-                    port=settings.postgres_port,
-                    user=settings.postgres_user,
-                    password=settings.postgres_password,
-                    database=settings.postgres_db,
+                    host=db_settings.get("host", settings.postgres_host),
+                    port=db_settings.get("port", settings.postgres_port),
+                    user=db_settings.get("user", settings.postgres_user),
+                    password=db_settings.get("password", settings.postgres_password),
+                    database=self._db_name,
                 )
             except (ConnectionError, CannotConnectNowError):
-                logger.info("Connection to postgres database could not be established. Retrying in 0.5s")
+                logger.info(
+                    "Connection to postgres database could not be established. Retrying in 0.5s"
+                )
                 await asyncio.sleep(0.5)
             else:
                 break
@@ -95,12 +98,14 @@ class Database:
     async def close(self) -> None:
         await self.pool.close()
 
-    async def _set_database_version(self, version: int, conn: Pool | None = None) -> None:
+    async def _set_database_version(
+        self, version: int, conn: Pool | None = None
+    ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = f"set mg.version to {version}; alter database {settings.postgres_db} set mg.version from current;"
+            query = f"set mg.version to {version}; alter database {self._db_name} set mg.version from current;"
             await conn.execute(query)
 
-    async def load_db_migrations(self, conn: MaybeConn = None) -> None:
+    async def load_db_migrations(self, conn: Pool | None = None) -> None:
         """
         Loads the database schema and applies new migrations.
         """
@@ -135,14 +140,16 @@ class Database:
             await conn.execute(sql_commands)
             await self._set_database_version(file_version)
 
-    async def get_raw_users(self, conn: MaybeConn = None) -> dict[str, list[Any]]:
+    async def get_raw_users(self, conn: Pool | None = None) -> dict[str, list[Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             db_users = await conn.fetch("SELECT * FROM users")
 
         users = [dict(row) for row in db_users]
         return {"users": users}
 
-    async def get_user(self, user_id: UserId, *, punishments: bool, conn: MaybeConn = None) -> User:
+    async def get_user(
+        self, user_id: UserId, *, punishments: bool, conn: Pool | None = None
+    ) -> User:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM users WHERE user_id = $1"
             db_user = await conn.fetchrow(query, user_id)
@@ -166,7 +173,9 @@ class Database:
 
             return User(**user)
 
-    async def get_raw_user_groups(self, user_id: UserId, conn: MaybeConn = None) -> dict[str, Any]:
+    async def get_raw_user_groups(
+        self, user_id: UserId, conn: Pool | None = None
+    ) -> dict[str, Any]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT group_members.group_id, name from group_members
                     INNER JOIN users on users.user_id = group_members.user_id
@@ -180,7 +189,7 @@ class Database:
 
         return {"groups": list(map(lambda x: {"id": x[0], "group": x[1]}, groups))}
 
-    async def get_group(self, group_id: GroupId, conn: MaybeConn = None) -> Group:
+    async def get_group(self, group_id: GroupId, conn: Pool | None = None) -> Group:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM groups WHERE groups.group_id = $1"
             db_group = await conn.fetchrow(query, group_id)
@@ -194,7 +203,12 @@ class Database:
         return Group(**dict(group))
 
     async def get_group_user(
-        self, group_id: GroupId, user_id: UserId, *, punishments: bool, conn: MaybeConn = None
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        *,
+        punishments: bool,
+        conn: Pool | None = None,
     ) -> User:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM users WHERE user_id = $1"
@@ -224,7 +238,9 @@ class Database:
 
             return User(**user)
 
-    async def get_group_users(self, group_id: GroupId, conn: MaybeConn = None) -> list[User]:
+    async def get_group_users(
+        self, group_id: GroupId, conn: Pool | None = None
+    ) -> list[User]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT *
                     FROM users
@@ -242,33 +258,39 @@ class Database:
 
         return members
 
-    async def get_punishment_types(self, group_id: GroupId, conn: MaybeConn = None) -> list[PunishmentTypeRead]:
+    async def get_punishment_types(
+        self, group_id: GroupId, conn: Pool | None = None
+    ) -> list[PunishmentTypeRead]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM punishment_types WHERE group_id = $1"
             punishment_types = await conn.fetch(query, group_id)
 
-        return list(map(lambda x: PunishmentTypeRead(**dict(x)), punishment_types))
+        return [PunishmentTypeRead(**dict(x)) for x in punishment_types]
 
-    async def get_punishment(self, punishment_id: PunishmentId, conn: MaybeConn = None) -> PunishmentRead:
+    async def get_punishment(
+        self, punishment_id: PunishmentId, conn: Pool | None = None
+    ) -> PunishmentRead:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM group_punishments WHERE punishment_id = $1"
             punishments = await conn.fetchrow(query, punishment_id)
-            import json
-            print(json.dumps(punishments, indent=2, default=lambda o: str(o)))
             assert punishments is not None
 
         return PunishmentRead(**dict(punishments))
 
     async def get_punishments(
-        self, user_id: UserId, group_id: GroupId, conn: MaybeConn = None
+        self, user_id: UserId, group_id: GroupId, conn: Pool | None = None
     ) -> list[PunishmentRead]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = "SELECT * FROM group_punishments WHERE group_id = $1 AND user_id = $2"
+            query = (
+                "SELECT * FROM group_punishments WHERE group_id = $1 AND user_id = $2"
+            )
             punishments = await conn.fetch(query, group_id, user_id)
 
-        return list(map(lambda x: PunishmentRead(**dict(x)), punishments))
+        return [PunishmentRead(**dict(x)) for x in punishments]
 
-    async def insert_user(self, user: UserCreate, conn: MaybeConn = None) -> dict[str, int | None]:
+    async def insert_user(
+        self, user: UserCreate, conn: Pool | None = None
+    ) -> dict[str, int | None]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "INSERT INTO users(first_name, last_name, email) VALUES ($1, $2, $3) RETURNING user_id"
             try:
@@ -283,7 +305,9 @@ class Database:
 
         return {"id": user_id}
 
-    async def insert_group(self, group: GroupCreate, conn: MaybeConn = None) -> dict[str, int | None]:
+    async def insert_group(
+        self, group: GroupCreate, conn: Pool | None = None
+    ) -> dict[str, int | None]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "INSERT INTO groups(name, rules) VALUES ($1, $2) RETURNING group_id"
             try:
@@ -297,12 +321,12 @@ class Database:
 
             gid = cast(GroupId, group_id)
             for punishment_type in DEFAULT_PUSHISHMENT_TYPES:
-                await self.insert_punishment_type(gid, punishment_type, conn=conn)  # TODO: Maybe not a single call per??
+                await self.insert_punishment_type(gid, punishment_type, conn=conn)
 
         return {"id": gid}
 
     async def insert_user_in_group(
-        self, group_id: GroupId, user_id: UserId, conn: MaybeConn = None
+        self, group_id: GroupId, user_id: UserId, conn: Pool | None = None
     ) -> dict[str, int | None]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO group_members(group_id, user_id, is_admin)
@@ -310,21 +334,22 @@ class Database:
                     RETURNING group_id, user_id
                     """
             try:
-                res = await conn.fetchrow(
-                    query,
-                    group_id,
-                    user_id,
-                    False
-                )
+                res = await conn.fetchrow(query, group_id, user_id, False)
             except UniqueViolationError as exc:
                 raise DatabaseIntegrityException(detail=str(exc)) from exc
             except ForeignKeyViolationError as exc:
-                raise NotFound
+                raise NotFound from exc
 
-        return {"group_id": group_id, "user_id": res["user_id"]}  # TODO: Test this with frontend AND because returning multiple values
+        return {
+            "group_id": group_id,
+            "user_id": res["user_id"],
+        }
 
     async def insert_punishment_type(
-        self, group_id: GroupId, punishment_type: PunishmentTypeCreate, conn: MaybeConn = None
+        self,
+        group_id: GroupId,
+        punishment_type: PunishmentTypeCreate,
+        conn: Pool | None = None,
     ) -> dict[str, int | None]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO punishment_types(group_id, name, value, logo_url)
@@ -347,7 +372,10 @@ class Database:
         return {"id": punishment_type_id}
 
     async def delete_punishment_type(
-        self, group_id: GroupId, punishment_type_id: PunishmentTypeId, conn: MaybeConn = None
+        self,
+        group_id: GroupId,
+        punishment_type_id: PunishmentTypeId,
+        conn: Pool | None = None,
     ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "DELETE FROM punishment_types WHERE group_id = $1 AND punishment_type_id = $2 RETURNING *"
@@ -361,7 +389,11 @@ class Database:
                 raise PunishmentTypeNotExists
 
     async def insert_punishments(
-        self, group_id: GroupId, user_id: UserId, punishments: list[PunishmentCreate], conn: MaybeConn = None
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        punishments: list[PunishmentCreate],
+        conn: Pool | None = None,
     ) -> dict[str, list[int]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             # Run a check to make sure that the punishments exists in the groups context
@@ -400,7 +432,9 @@ class Database:
 
         return {"ids": ids}
 
-    async def delete_punishment(self, punishment_id: PunishmentId, conn: MaybeConn = None) -> None:
+    async def delete_punishment(
+        self, punishment_id: PunishmentId, conn: Pool | None = None
+    ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "DELETE FROM group_punishments WHERE punishment_id = $1 RETURNING *"
             res = await conn.fetchval(query, punishment_id)
@@ -408,7 +442,9 @@ class Database:
             if res is None:
                 raise NotFound
 
-    async def verify_punishment(self, punishment_id: PunishmentId, conn: MaybeConn = None) -> PunishmentRead:
+    async def verify_punishment(
+        self, punishment_id: PunishmentId, conn: Pool | None = None
+    ) -> PunishmentRead:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "UPDATE group_punishments SET verified_time = $1 WHERE punishment_id = $2 RETURNING punishment_id"
             res = await conn.fetchval(
