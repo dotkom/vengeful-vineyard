@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 import pytest
-from tests.fixtures import client, event_loop
+from tests.fixtures import client
 from tests.response_time import check_response_time
 from tests.rest import rest_create_group, rest_create_user
 
@@ -10,10 +10,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 DEFAULT_PUNISHMENT_TYPES = [
     {
-        "name": "Spritstraff",
-        "value": 300,
+        "name": "Ølstraff",
+        "value": 33,
         "logo_url": "https://example.com",
-        "punishment_type_id": 3,
+        "punishment_type_id": 1,
     },
     {
         "name": "Vinstraff",
@@ -22,10 +22,10 @@ DEFAULT_PUNISHMENT_TYPES = [
         "punishment_type_id": 2,
     },
     {
-        "name": "Ølstraff",
-        "value": 33,
+        "name": "Spritstraff",
+        "value": 300,
         "logo_url": "https://example.com",
-        "punishment_type_id": 1,
+        "punishment_type_id": 3,
     },
 ]
 
@@ -138,24 +138,14 @@ class TestUserInGroup:
     async def test_get_group_with_punishment_type(self, client: Any) -> None:
         response = await client.get(f"/group/{self.group_id}")
         assert response.status_code == 200
-        sort_key = lambda x: x["punishment_type_id"]
-        sorted_types = sorted(
-            response.json()["punishment_types"],
-            key=sort_key,
-            reverse=True,
-        )
-        assert (
-            sorted_types
-            == [
-                {
-                    "name": "Waffles",
-                    "value": 125,
-                    "logo_url": "http://example.com",
-                    "punishment_type_id": 4,
-                },
-            ]
-            + DEFAULT_PUNISHMENT_TYPES
-        )
+        assert response.json()["punishment_types"] == DEFAULT_PUNISHMENT_TYPES + [
+            {
+                "name": "Waffles",
+                "value": 125,
+                "logo_url": "http://example.com",
+                "punishment_type_id": 4,
+            },
+        ]
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -199,7 +189,7 @@ class TestUserInGroup:
     @pytest.mark.asyncio
     async def test_delete_punishment_duplicate(self, client: Any) -> None:
         response = await client.delete(f"/punishment/{self.punishment_id}")
-        assert response.status_code == 200
+        assert response.status_code == 404
         check_response_time(response)
 
     @pytest.mark.asyncio

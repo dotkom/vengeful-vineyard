@@ -57,13 +57,13 @@ def init_routes(app: FastAPI) -> None:
     app.include_router(punishment.router)
 
 
-def init_events(app: FastAPI) -> None:
+def init_events(app: FastAPI, **db_settings: str) -> None:
     @app.on_event("startup")
     async def start_handler() -> None:
         database = Database()
         app.set_db(database)
 
-        await database.async_init()
+        await database.async_init(**db_settings)
 
     @app.on_event("shutdown")
     async def shutdown_handler() -> None:
@@ -72,12 +72,12 @@ def init_events(app: FastAPI) -> None:
             await database.close()
 
 
-def init_api() -> FastAPI:
+def init_api(**db_settings: str) -> FastAPI:
     app = FastAPI()
     app.router.route_class = ModifiedRoute
     init_middlewares(app)
     init_routes(app)
-    init_events(app)
+    init_events(app, **db_settings)
     return app
 
 
