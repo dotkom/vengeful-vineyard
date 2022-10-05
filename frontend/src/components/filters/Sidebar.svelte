@@ -1,5 +1,5 @@
 <script lang="ts">
-  import UserFilters from "./Checkboxes/UserFilters.svelte";
+  import UserFilters from "./checkboxes/UserFilters.svelte";
   import PunishmentsFilters from "./Punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
   import DateTimeFilters from "./Time/DateTimeFilters.svelte";
