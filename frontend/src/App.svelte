@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { OidcContext, isAuthenticated } from "@dopry/svelte-oidc";
   import Navbar from "./components/navbar/Navbar.svelte";
   import GroupLogos from "./components/groups/GroupLogos.svelte";
-  import Footer from "./components/footer/Footer.svelte"
+  import Footer from "./components/footer/Footer.svelte";
   import PunishmentGrid from "./components/punishments/PunishmentGrid.svelte";
   import Sidebar from "./components/filters/Sidebar.svelte";
 </script>
@@ -19,13 +20,32 @@
 
 <div class="content">
   <Navbar />
-  <div class="body_content">
-    <Sidebar />
-    <div class="punishments">
-      <GroupLogos />
-      <PunishmentGrid />
-    </div>
-  </div>
+  <OidcContext
+    issuer="https://old.online.ntnu.no/openid"
+    client_id="219919"
+    redirect_uri="http://localhost:3000"
+    post_logout_redirect_uri="http://localhost:3000"
+    scope="openid profile onlineweb4"
+    extraOptions="{{
+      metadataUrl:
+        'https://old.online.ntnu.no/openid/.well-known/openid-configuration',
+      filterProtocolClaims: true,
+      loadUserInfo: true,
+      silent_redirect_uri: 'http://localhost:3000',
+      revokeAccessTokenOnSignout: true,
+    }}"
+  >
+    {#if $isAuthenticated}
+      <div class="body_content">
+        <Sidebar />
+        <div class="punishments">
+          <GroupLogos />
+          <PunishmentGrid />
+        </div>
+      </div>
+    {/if}
+  </OidcContext>
+
   <Footer />
 </div>
 

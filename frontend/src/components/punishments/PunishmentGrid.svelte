@@ -14,7 +14,9 @@
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
 
-  let group_id: number = 2;
+  let group_id: number = 1;
+
+  console.log($filteredUsers)
 
   getGroup(group_id).then(async (res) => {
     window.localStorage.setItem("group", JSON.stringify(res));

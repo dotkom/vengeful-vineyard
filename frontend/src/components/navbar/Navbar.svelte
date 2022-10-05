@@ -15,7 +15,6 @@
   <VvLogo />
 
   <div class="loginSection">
-    <img alt="Login icon" src="{logIcon}" />
     <OidcContext
       issuer="https://old.online.ntnu.no/openid"
       client_id="219919"
@@ -32,26 +31,25 @@
       }}"
     >
       {#if $isAuthenticated}
+        <img alt="Login icon" src="{logIcon}" />
         <div class="text-white" style="color: white">{$userInfo.name}</div>
-        <!-- <LogoutButton> -->
-        <!-- <div class="log_in_out"> -->
-        <!-- <Button color="danger">Log out</Button> -->
-        <LogoutButton class="btn btn-error bg-red-400">Logg ut</LogoutButton>
-        <!-- </div> -->
-        <!-- </LogoutButton> -->
+        <div class="bg-red-500 rounded-lg">
+          <LogoutButton>Logg ut</LogoutButton>
+        </div>
       {:else}
-        <LoginButton>
-          <!-- <div class="log_in_out">
-            <Button color="success">Log in</Button>
-          </div> -->
-          Logg inn
-        </LoginButton>
+        <div class="bg-yellow-400 rounded-lg">
+          <LoginButton>Logg inn</LoginButton>
+        </div>
       {/if}
     </OidcContext>
   </div>
 </nav>
 
 <style lang="postcss">
+  .btn {
+    background: red;
+  }
+
   nav {
     @apply flex justify-between mb-4 px-24 w-full;
     background: #093b51;
@@ -61,5 +59,4 @@
   .loginSection {
     @apply flex flex-col justify-center items-center;
   }
-
 </style>
