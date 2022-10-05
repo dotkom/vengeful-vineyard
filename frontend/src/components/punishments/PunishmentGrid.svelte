@@ -14,6 +14,8 @@
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
 
+  // TODO
+  // Remove group_id once members from OW group from backend is implemented.
   let group_id: number = 1;
 
   getGroup(group_id).then(async (res) => {
