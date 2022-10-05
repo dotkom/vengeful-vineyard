@@ -5,6 +5,7 @@ export const term = writable<string>("");
 export const users = writable<User[]>(
   JSON.parse(localStorage.getItem("users"))
 );
+
 export const showInactive = writable<boolean>();
 export const showPaid = writable<boolean>();
 export const onlyShowAfterDate = writable<Date>();
