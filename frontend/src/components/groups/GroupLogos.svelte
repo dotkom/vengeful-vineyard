@@ -22,13 +22,17 @@
     {#await getOnlineProfile($accessToken) then value}
       {#await getMyOnlineGroups($accessToken, value.id) then groups}
         {#each groups.filter((singGroup) => !singGroup.name_short.includes("permissions")) as group}
-          <GroupButton name="{group.name_short}" logoUrl="{group.image}" />
+          <div class="flex flex-col justify-center items-center">
+            <GroupButton name="{group.name_short}" logoUrl="{group.image}" />
+            <p>{group.name_short}</p>
+          </div>
         {/each}
       {/await}
     {/await}
   {/if}
 
-  <AddCustomGroup />
+  <!-- TODO -->
+  <!-- <AddCustomGroup /> -->
 </div>
 
 <style lang="less">
