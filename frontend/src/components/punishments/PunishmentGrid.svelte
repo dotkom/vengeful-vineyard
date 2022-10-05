@@ -16,8 +16,6 @@
 
   let group_id: number = 1;
 
-  console.log($filteredUsers)
-
   getGroup(group_id).then(async (res) => {
     window.localStorage.setItem("group", JSON.stringify(res));
     window.localStorage.setItem(
