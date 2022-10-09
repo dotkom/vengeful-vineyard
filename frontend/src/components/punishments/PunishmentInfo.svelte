@@ -3,20 +3,20 @@
     deletePunishment,
     getGroupUser,
     postValidatePunishment,
-  } from "../../api";
-  import type { Punishment, PunishmentType, User } from "../../types";
+  } from "../../lib/api";
+  import type { Punishment, PunishmentType, User } from "../../lib/types";
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
   import SvelteTooltip from "svelte-tooltip";
   import AddNewPunishment from "./AddNewPunishment.svelte";
 
-  export let user: User;
+  export let user: User | undefined;
   export let punishments: Punishment[];
   export let p_types: PunishmentType[];
-  export let totalSum: number;
+  export let totalSum: number | undefined;
 
-  let cancelIcon = "assets/cancelIcon.svg";
-  let verifyIcon = "assets/checkGreen.svg";
+  // let cancelIcon = "assets/cancelIcon.svg";
+  let verifyIconPath = "../../assets/checkGreen.svg";
 
   const getUrl = (p_type: number) => {
     return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
@@ -42,7 +42,7 @@
       );
     });
 
-    punishments = user.punishments.filter((p) => p.punishment_id !== id);
+    punishments = user.punishments.filter((p: Punishment) => p.punishment_id !== id);
   };
 
   const verifyPunishment = async (id: number) => {
@@ -58,6 +58,7 @@
 
     //punishments = user.punishments.filter((p) => p.punishment_id !== id);
   };
+  
 </script>
 
 <div class="punishment_info">
@@ -84,7 +85,7 @@
               class="verifyBtn"
               on:click="{() => verifyPunishment(punishment.punishment_id)}"
             >
-              <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
+              <img class="h-7 w-7" src="{verifyIconPath}" alt="Remove punishment" />
             </div></SvelteTooltip
           >
         {/if}
@@ -99,7 +100,7 @@
           style="max-width: 100%;
         white-space: break-spaces;"
         >
-          "{punishment.reason}"
+          {punishment.reason}
         </p>
         <p
           class="break-words"
@@ -124,6 +125,7 @@
         class="col-span-2 relative h-full flex justify-center align-middle items-center"
       >
         <div class="dropdown dropdown-end absolute z-10 top-0 right-0">
+          <!-- svelte-ignore a11y-label-has-associated-control -->
           <label
             tabindex="0"
             class="badge hover:cursor-pointer border-gray-300 bg-gray-100"
@@ -163,10 +165,7 @@
   </div>
 </div>
 
-<style lang="less">
-  .punishment_info {
-    // @apply px-12;
-  }
+<style lang="postcss">
   .punishment {
     @apply grid grid-cols-9 gap-1 bg-white shadow-md h-20;
     border: 0.3px solid #d9d9d9;
@@ -177,7 +176,7 @@
   }
 
   .punishment p {
-    @apply p-4 text-sm font-sspro !important;
+    @apply p-4 text-sm font-sspro;
   }
 
   .punishment > {
@@ -192,13 +191,14 @@
     @apply m-4 text-right;
   }
 
-  .deleteBtn {
-    padding: 0;
-  }
 
   .verifyBtn {
-    @apply float-left self-center hover:cursor-pointer;
+    @apply float-left self-center;
     min-width: 1.5rem;
+    
+  }
+  .verifyBtn:hover{
+    cursor: pointer
   }
 
   .punishment_icons {

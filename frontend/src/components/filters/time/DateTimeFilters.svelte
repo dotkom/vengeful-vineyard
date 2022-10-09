@@ -98,6 +98,7 @@
 </svelte:head>
 
 <div class="flex flex-row justify-center ">
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
     <span class="label-text">Vis straffer fra</span>
   </label>
@@ -131,7 +132,8 @@
             placeholder="Velg datoer"
             data-input
             class="w-full pl-4 pr-10 py-3 leading-none rounded-lg shadow-sm
-          focus:outline-none focus:shadow-outline text-black font-medium bg-white"
+            focus:outline-none focus:shadow-outline text-black font-medium
+            bg-white"
           />
 
           <div class="absolute top-0 right-0 px-3 py-2">
@@ -150,8 +152,9 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0
-              00-2 2v12a2 2 0 002 2z"></path>
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2
+                0 00-2 2v12a2 2 0 002 2z"
+              ></path>
             </svg>
           </div>
         </div>
@@ -160,7 +163,9 @@
   </div>
   {#if displayCancel}
     <div
-      class=" text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-200 font-thin rounded-lg text-2xs text-center inline-flex items-center p-1 cursor-pointer"
+      class=" text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4
+      focus:ring-yellow-200 font-thin rounded-lg text-2xs text-center
+      inline-flex items-center p-1 cursor-pointer"
       on:click="{onCancel}"
       style="width: fit-content; margin-left: 1.5rem; margin-top: -1rem;"
     >

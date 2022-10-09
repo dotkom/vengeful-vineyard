@@ -2,9 +2,9 @@
   import { group } from "../../stores/groups";
 
   import Select from "svelte-select";
-  import type { User, CreatePunishment, PunishmentType } from "src/types";
-  import { getGroupUser, addPunishmentToUser } from "../../api";
   import { users } from "../../stores/users";
+  import type { User, CreatePunishment, PunishmentType } from "../../lib/types"
+  import { getGroupUser, addPunishmentToUser } from "../../lib/api";
 
   export let user: User;
 
@@ -118,7 +118,7 @@
   </button>
 </div>
 
-<style lang="less">
+<style lang="postcss">
   .input-bordered {
     background-color: white;
   }

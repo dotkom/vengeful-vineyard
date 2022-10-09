@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PunishmentType } from "src/types";
+  import type { PunishmentType } from "src/lib/types";
 
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
 

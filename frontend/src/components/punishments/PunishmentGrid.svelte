@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { Punishment, User } from "src/types";
-  import { getGroup, getGroupUser } from "../../api";
+  import type { Punishment, PunishmentType, User } from "src/lib/types";
+  import { getGroup, getGroupUser } from "../../lib/api";
   import {
     filteredUsers,
     onlyShowAfterDate,
@@ -17,9 +17,11 @@
 
   // TODO
   // Remove group_id once members from OW group from backend is implemented.
-  let group_id: number = 1;
+  let group_id: number = 2;
 
   getGroup(group_id).then(async (res) => {
+
+    
     window.localStorage.setItem("group", JSON.stringify(res));
     window.localStorage.setItem(
       "users",
@@ -54,10 +56,10 @@
    * Creates a new object that stores punishment ids and punishment values.
    * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
    */
-  const mapTypes = () => {
+  const mapTypes = ():object => {
     let mappedTypes = {};
     $group.punishment_types.map(
-      (p) => (mappedTypes[p.punishment_type_id] = p.value)
+      (p: PunishmentType) => (mappedTypes[p.punishment_type_id] = p.value)
     );
     return mappedTypes;
   };
@@ -81,7 +83,7 @@
     {
       key: "name",
       title: "Navn",
-      value: (v) => v.name,
+      value: (v: { name: string; }) => v.name,
       sortable: true,
     },
     {
@@ -90,12 +92,12 @@
       value: (v) =>
         calculateSum(
           v.straffer
-            .filter((pun) =>
+            .filter((pun: Punishment) =>
               $punishmentsToFilter
                 .map((pun) => pun.punishment_type_id)
                 .includes(pun.punishment_type)
             )
-            .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+            .filter((pun: Punishment) => ($showPaid ? pun : pun.verified_time === null))
         ),
       sortable: true,
       class: "flex justify-center border-none",
@@ -109,7 +111,7 @@
     {
       key: "sist_straffet",
       title: "Sist straffet",
-      value: (v) => v.sist_straffet,
+      value: (v: { sist_straffet: string; }) => v.sist_straffet,
       sortable: true,
       class: "text-center",
     },
@@ -139,10 +141,10 @@
       expandedArr = expandedArr.filter((id) => id !== row.id);
     }
   }
-  function handleExpand(event) {
-    const row = event.detail.row;
-    const operation = row.$expanded ? "open" : "close";
-  }
+  // function handleExpand(event) {
+  //   const row = event.detail.row;
+  //   const operation = row.$expanded ? "open" : "close";
+  // }
 </script>
 
 <div class="punishment_grid">
@@ -208,26 +210,8 @@
   </SvelteTable>
 </div>
 
-<style lang="less">
-  @import "../../variables.less";
-  .accordion_text {
-    @apply flex flex-row justify-between text-gray-500;
-  }
-  .name {
-    min-width: 7em;
-  }
-  .icon {
-    @apply min-h-6;
-  }
-  .icons {
-    @apply flex justify-center;
-  }
+<style lang="postcss">
   .punishment_grid {
     @apply mt-4;
-  }
-
-  .table-primary {
-    text-align: center;
-    background-color: white;
   }
 </style>

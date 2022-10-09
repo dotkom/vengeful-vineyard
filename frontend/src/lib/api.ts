@@ -1,5 +1,4 @@
 import type { CreatePunishment, Group, User } from "./types";
-import { accessToken } from "@dopry/svelte-oidc";
 
 export async function getGroups() {
   const res = await fetch("http://localhost:8000/group");

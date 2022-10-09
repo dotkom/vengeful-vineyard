@@ -5,7 +5,6 @@
 </div>
 
 <style lang="less">
-  @import "../../variables.less";
   .footer_logo {
     margin: 20px;
   }

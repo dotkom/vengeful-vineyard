@@ -1,6 +1,6 @@
 <script lang="ts">
   import Modal, { getModal } from "./GroupModal.svelte";
-  import { postGroup } from "../../api";
+  import { postGroup } from "../../lib/api";
 
   let modalTitle = "Create new group";
 
@@ -9,7 +9,7 @@
   let groupUser: string;
   let groupRules: string;
 
-  const validate = () => {
+  const validate = ():void => {
     // Creates group with name and rules, however right now name is the unique identifier lmao
     postGroup(groupName, groupRules);
     closeModal();
@@ -128,7 +128,7 @@
 </Modal>
 
 <style lang="less">
-  @import "../../variables.less";
+  @import "../../styles/variables.less";
 
   .nameInput {
     height: 3rem;

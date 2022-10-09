@@ -2,7 +2,7 @@
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
 
-  import type { User, PunishmentType } from "src/types";
+  import type { User, PunishmentType } from "src/lib/types";
   import PunishmentInfo from "./PunishmentInfo.svelte";
   export let user: User;
   export let p_types: PunishmentType[];
@@ -66,14 +66,14 @@
 </div>
 <div class="collapse-content">
   <PunishmentInfo
-    p_types="{p_types}"
-    punishments="{user.punishments
+    p_types={p_types}
+    punishments={user.punishments
       .filter((pun) =>
         $punishmentsToFilter
           .map((pun) => pun.punishment_type_id)
           .includes(pun.punishment_type)
       )
-      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))}"
+      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))}
   />
 </div>
 
