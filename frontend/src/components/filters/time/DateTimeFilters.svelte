@@ -12,9 +12,6 @@
   let dateToFilterBy: Date = new Date(1560807962);
   let noLaterThan: Date = new Date();
 
-  let startDate;
-  let endDate;
-
   $: onlyShowAfterDate.set(dateToFilterBy);
   $: onlyShowBeforeDate.set(noLaterThan);
 
@@ -86,6 +83,7 @@
 </svelte:head>
 
 <div class="flex flex-row justify-center ">
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
     <span class="label-text">Vis straffer fra</span>
   </label>

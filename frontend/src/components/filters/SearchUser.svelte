@@ -7,6 +7,7 @@
 </script>
 
 <div class="form-control">
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
     <span class="label-text">Finn bruker</span>
   </label>
