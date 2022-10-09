@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { User, Group } from "../types";
+import type { User, Group } from "../lib/types";
 
 export const members: User[] = [
   {
@@ -57,35 +57,6 @@ export const members: User[] = [
     ],
   },
 ];
-
-const defaultGroup: Group = {
-  group_id: 0,
-  name: "placeholder",
-  rules: "",
-  logoUrl: "",
-  members: members,
-  punishment_types: [
-    {
-      logo_url: "assets/beerOutlined.svg",
-      value: 33,
-      name: "Øl",
-      punishment_type_id: 4,
-    },
-    {
-      logo_url: "assets/wineOutlined.svg",
-      value: 100,
-      name: "Vin",
-      punishment_type_id: 5,
-    },
-    { logo_url: "assets/spiritOutlined.svg", value: 500, name: "Sprit", id: 6 },
-    {
-      logo_url: "assets/wineOutlined.svg",
-      value: 15,
-      name: "Vaffel",
-      punishment_type_id: 7,
-    },
-  ],
-};
 
 export const group = writable<Group>(JSON.parse(localStorage.getItem("group")));
 

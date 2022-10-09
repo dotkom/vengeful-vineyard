@@ -3,7 +3,7 @@
   import PunishmentTag from "./PunishmentTag.svelte";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
 
-  const resetPunishmentFilters = () => {
+  const resetPunishmentFilters = (): void => {
     punishmentsToFilter.set($group.punishment_types);
   };
 

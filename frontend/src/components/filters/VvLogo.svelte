@@ -3,7 +3,6 @@
 </div>
 
 <style lang="less">
-  @import "../../variables.less";
   .leftLogo {
     margin: 0 auto;
     display: flex;

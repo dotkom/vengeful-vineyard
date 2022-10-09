@@ -44,10 +44,6 @@
 </nav>
 
 <style lang="postcss">
-  .btn {
-    background: red;
-  }
-
   nav {
     @apply flex justify-between mb-4 px-24 w-full;
     background: #093b51;

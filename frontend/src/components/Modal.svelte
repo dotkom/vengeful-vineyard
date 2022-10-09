@@ -1,7 +1,7 @@
 <script lang="ts">
   export let active: boolean = true;
 
-  const toggleModal = () => {
+  const toggleModal = (): void => {
     active = !active;
   };
 </script>

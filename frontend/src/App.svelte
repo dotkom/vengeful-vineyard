@@ -10,7 +10,7 @@
   import Footer from "./components/footer/Footer.svelte";
   import PunishmentGrid from "./components/punishments/PunishmentGrid.svelte";
   import Sidebar from "./components/filters/Sidebar.svelte";
-  import { getOnlineProfile, getMyOnlineGroups } from "./api";
+  import { getOnlineProfile, getMyOnlineGroups } from "./lib/api";
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -76,11 +76,7 @@
   </OidcContext>
 </div>
 
-<style lang="less" global>
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-  @import "variables.less";
+<style lang="postcss" global>
   .body_content {
     @apply flex;
     margin: 0;

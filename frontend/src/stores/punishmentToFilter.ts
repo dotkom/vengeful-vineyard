@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { PunishmentType } from "../types";
+import type { PunishmentType } from "../lib/types";
 
 function getRawPunishmentFilters(): string {
   const rawPunishmentFilters = window.localStorage.getItem("punishmentFilters");

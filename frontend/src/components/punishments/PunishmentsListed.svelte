@@ -1,15 +1,19 @@
 <script lang="ts">
-  import type { PunishmentType } from "src/types";
+  import type {PunishmentType, User } from "src/lib/types";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
 
   export let p_types: PunishmentType[];
 
-  export let row;
+  export let row: Row;
+
+  interface Row {
+    user: User;
+  }
 
   const getUrl = (p_type: number) => {
-    return p_types.filter((p) => p.punishment_type_id === p_type)[0].logo_url;
+    return p_types.filter((p: PunishmentType) => p.punishment_type_id === p_type)[0].logo_url;
   };
 </script>
 

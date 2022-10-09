@@ -30,8 +30,6 @@
 </div>
 
 <style lang="less">
-  @import "../../variables.less";
-
   .wrapper {
     width: 25rem;
     display: flex;

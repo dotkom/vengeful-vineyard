@@ -6,15 +6,6 @@ export interface Punishment {
   verified_time: string | null;
   verified_by: string | null;
   amount: number;
-
-  // name: string;
-  // number: number;
-  // id: number;
-  // price: number;
-  // imageurl: string;
-
-  // givenBy: string;
-  // givenTime: string;
 }
 
 export interface CreatePunishment {
@@ -43,12 +34,6 @@ export interface PunishmentType {
 
 export interface User {
   user_id: number;
-  // name: string;
-  // punishments: PunishmentInfo[];
-  // debt: number;
-  // totalPaid: number;
-  // active: boolean;
-  // active: true
   email: string;
   first_name: string;
   last_name: string;
@@ -63,4 +48,21 @@ export interface Group {
   logoUrl: string;
   punishment_types: PunishmentType[];
   members: User[];
+}
+
+export interface LogoObject {
+  description: string;
+  id: number;
+  lg: string;
+  md: string;
+  name: string;
+  original: string;
+  photographer: string;
+  preset: string;
+  sm: string;
+  tags: string[];
+  thumb: string;
+  timestamp: string;
+  wide: string;
+  xs: string;
 }
