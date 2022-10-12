@@ -16,19 +16,19 @@ DEFAULT_PUNISHMENT_TYPES = [
     {
         "name": "Ølstraff",
         "value": 33,
-        "logo_url": "https://example.com",
+        "logo_url": "./assets/beerOutlined.svg",
         "punishment_type_id": 1,
     },
     {
         "name": "Vinstraff",
         "value": 100,
-        "logo_url": "https://example.com",
+        "logo_url": "./assets/wineOutlined.svg",
         "punishment_type_id": 2,
     },
     {
         "name": "Spritstraff",
         "value": 300,
-        "logo_url": "https://example.com",
+        "logo_url": "./assets/spiritOutlined.svg",
         "punishment_type_id": 3,
     },
 ]
