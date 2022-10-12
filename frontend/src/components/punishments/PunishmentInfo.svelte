@@ -12,14 +12,14 @@
 
   export let user: User | undefined;
   export let punishments: Punishment[];
-  export let p_types: PunishmentType[];
+  export let punishmentTypes: PunishmentType[];
   export let totalSum: number | undefined;
 
   // let cancelIcon = "assets/cancelIcon.svg";
   let verifyIconPath = "../../assets/checkGreen.svg";
 
   const getUrl = (p_type: number) => {
-    return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
+    return punishmentTypes.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
   };
 
   const returnDate = (given_time: String) => {

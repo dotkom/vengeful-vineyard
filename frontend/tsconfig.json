@@ -40,5 +40,9 @@
     "src/**/*.svelte",
     "src/lib/custom.d.ts"
   ],
-  "extends": "@tsconfig/svelte/tsconfig.json"
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "exclude": [
+    "src/components/filters/time/DateTimeFilters.svelte",
+    "node_modules"
+  ]
 }

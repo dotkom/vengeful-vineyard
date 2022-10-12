@@ -20,8 +20,6 @@
   let group_id: number = 2;
 
   getGroup(group_id).then(async (res) => {
-
-    
     window.localStorage.setItem("group", JSON.stringify(res));
     window.localStorage.setItem(
       "users",
@@ -145,6 +143,7 @@
   //   const row = event.detail.row;
   //   const operation = row.$expanded ? "open" : "close";
   // }
+  
 </script>
 
 <div class="punishment_grid">
@@ -189,7 +188,7 @@
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         )}"
         user="{row.user}"
-        p_types="{$group.punishment_types}"
+        punishmentTypes="{$group.punishment_types}"
         punishments="{row.user.punishments
           .filter((pun) =>
             $punishmentsToFilter

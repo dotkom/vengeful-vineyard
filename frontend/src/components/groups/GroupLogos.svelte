@@ -1,10 +1,8 @@
 <script lang="ts">
-  // import GroupStore from "../../stores/groups";
+  import GroupStore from "../../stores/groups";
   import GroupButton from "./GroupButton.svelte";
-  //import AddCustomGroup from "./AddCustomGroup.svelte";
-  // import { getUserGroups } from "../../api";
-  // import { onMount } from "svelte";
-  import type { Group } from "src/lib/types";
+  import AddCustomGroup from "./AddCustomGroup.svelte";
+  import { onMount } from "svelte";
 
   import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
   import { getOnlineProfile, getMyOnlineGroups } from "../../lib/api";
@@ -21,8 +19,8 @@
   {#if $isAuthenticated}
     {#await getOnlineProfile($accessToken) then value}
       {#await getMyOnlineGroups($accessToken, value.id) then groups}
-        {#each groups.filter((singGroup) => !singGroup.name_short.includes("permissions")) as group}
-          <div class="flex flex-col justify-center items-center">
+        {#each groups.filter((owGroup) => !owGroup.name_short.includes("permissions")) as group}
+          <div class="flex flex-col justify-center items-center"> 
             <GroupButton name="{group.name_short}" logoUrl="{group.image.sm}" />
             <p>{group.name_short}</p>
           </div>
@@ -35,7 +33,7 @@
   <!-- <AddCustomGroup /> -->
 </div>
 
-<style lang="less">
+<style lang="postcss">
   .groupLogosContainer {
     display: flex;
     justify-content: center;

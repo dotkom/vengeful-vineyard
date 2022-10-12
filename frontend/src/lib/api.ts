@@ -1,4 +1,4 @@
-import type { CreatePunishment, Group, User } from "./types";
+import type { CreatePunishment, Group, User, OWGroup } from "./types";
 
 export async function getGroups() {
   const res = await fetch("http://localhost:8000/group");
@@ -96,12 +96,4 @@ export async function getMyOnlineGroups(
   var endpoint = `https://old.online.ntnu.no/api/v1/group/online-groups/?members__user=${id}`;
   var groups = await authorizedOnlineFetch(endpoint, token);
   return groups["results"];
-}
-
-interface OWGroup {
-  group_type: string;
-  id: number;
-  image: string;
-  members: [];
-  name_short: string;
 }

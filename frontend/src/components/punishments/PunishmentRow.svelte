@@ -66,7 +66,9 @@
 </div>
 <div class="collapse-content">
   <PunishmentInfo
-    p_types={p_types}
+  totalSum={undefined}
+    punishmentTypes={p_types}
+    user={user}
     punishments={user.punishments
       .filter((pun) =>
         $punishmentsToFilter
@@ -77,7 +79,7 @@
   />
 </div>
 
-<style>
+<style lang="postcss">
   .accordion_text {
     @apply flex flex-row justify-between text-gray-500;
   }
