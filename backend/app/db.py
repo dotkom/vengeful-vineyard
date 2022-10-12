@@ -31,9 +31,15 @@ from asyncpg.exceptions import (
 )
 
 DEFAULT_PUSHISHMENT_TYPES = [
-    PunishmentTypeCreate(name="Ølstraff", value=33, logo_url="./assets/beerOutlined.svg"),
-    PunishmentTypeCreate(name="Vinstraff", value=100, logo_url="./assets/wineOutlined.svg"),
-    PunishmentTypeCreate(name="Spritstraff", value=300, logo_url="./assets/spiritOutlined.svg"),
+    PunishmentTypeCreate(
+        name="Ølstraff", value=33, logo_url="./assets/beerOutlined.svg"
+    ),
+    PunishmentTypeCreate(
+        name="Vinstraff", value=100, logo_url="./assets/wineOutlined.svg"
+    ),
+    PunishmentTypeCreate(
+        name="Spritstraff", value=300, logo_url="./assets/spiritOutlined.svg"
+    ),
 ]
 
 logger = logging.getLogger(__name__)
