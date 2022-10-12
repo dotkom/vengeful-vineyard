@@ -9,42 +9,27 @@ prod: .prod-reqs
 	# PROD NOT FOR USE
 
 dev: .dev-reqs
-	function tearDown {
-		docker stop dev-db
-	}
-	trap tearDown EXIT
+	trap 'docker stop dev-db' EXIT
 	docker run -d --rm --name dev-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=dev -v ${PWD}/postgres-data:/var/lib/postgresql/data postgres:11.3-alpine
 	POSTGRES_DB=dev poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
 
 dev-memory: .dev-reqs
-	function tearDown {
-		docker stop test-db
-	}
-	trap tearDown EXIT
+	trap 'docker stop test-db' EXIT
 	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
 	POSTGRES_DB=test poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
 
 test: .dev-reqs
-	function tearDown {
-		docker stop test-db
-	}
-	trap tearDown EXIT
+	trap 'docker stop test-db' EXIT
 	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DEFAULT_DATABASE_NAME=db -v ${PWD}/create-databases.sh:/docker-entrypoint-initdb.d/temp.sh -v ${PWD}/tests:/tests postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
 	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict
 
 testv: .dev-reqs
-	function tearDown {
-		docker stop test-db
-	}
-	trap tearDown EXIT
+	trap 'docker stop test-db' EXIT
 	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DEFAULT_DATABASE_NAME=db -v ${PWD}/create-databases.sh:/docker-entrypoint-initdb.d/temp.sh -v ${PWD}/tests:/tests postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
 	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict -v --cov=app --cov-report term:skip-covered --cov-report html
 
 testvv: .dev-reqs
-	function tearDown {
-		docker stop test-db
-	}
-	trap tearDown EXIT
+	trap 'docker stop test-db' EXIT
 	docker run -d --rm --name test-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DEFAULT_DATABASE_NAME=db -v ${PWD}/create-databases.sh:/docker-entrypoint-initdb.d/temp.sh -v ${PWD}/tests:/tests postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
 	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict -vv --cov=app --cov-report term:skip-covered --cov-report html
 
