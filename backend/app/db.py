@@ -231,7 +231,7 @@ class Database:
                         WHERE  group_id = $1
                         AND    user_id = $2
                         """
-                db_punishments = await conn.fetch(query, user_id, group_id)
+                db_punishments = await conn.fetch(query, group_id, user_id)
 
                 for db_punishment in db_punishments:
                     user["punishments"].append(dict(db_punishment))
