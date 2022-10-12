@@ -66,3 +66,11 @@ export interface LogoObject {
   wide: string;
   xs: string;
 }
+
+export interface OWGroup {
+  group_type: string;
+  id: number;
+  image: LogoObject;
+  members: [];
+  name_short: string;
+}

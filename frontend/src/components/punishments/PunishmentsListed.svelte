@@ -4,7 +4,7 @@
   import { showPaid } from "../../stores/users";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
 
-  export let p_types: PunishmentType[];
+  export let punishmentTypes: PunishmentType[];
 
   export let row: Row;
 
@@ -13,7 +13,7 @@
   }
 
   const getUrl = (p_type: number) => {
-    return p_types.filter((p: PunishmentType) => p.punishment_type_id === p_type)[0].logo_url;
+    return punishmentTypes.filter((p: PunishmentType) => p.punishment_type_id === p_type)[0].logo_url;
   };
 </script>
 

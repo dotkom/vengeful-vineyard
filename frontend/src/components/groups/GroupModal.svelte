@@ -18,13 +18,13 @@
 
   export let id = "";
 
-  function keyPress(ev) {
+  function keyPress(ev: { key: string; }) {
     //only respond if the current modal is the top one
     if (ev.key == "Escape" && onTop == topDiv) close(); //ESC
   }
 
   /**  API **/
-  function open(callback) {
+  function open(callback: any) {
     closeCallback = callback;
     if (visible) return;
     prevOnTop = onTop;
@@ -39,7 +39,7 @@
     document.body.appendChild(topDiv);
   }
 
-  function close(retVal) {
+  function close(retVal?: undefined) {
     if (!visible) return;
     window.removeEventListener("keydown", keyPress);
     onTop = prevOnTop;
