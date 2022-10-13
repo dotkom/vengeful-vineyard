@@ -1,17 +1,17 @@
 <script lang="ts">
-  import GroupStore from "../../stores/groups";
+  // import GroupStore from "../../stores/groups";
   import GroupButton from "./GroupButton.svelte";
-  import AddCustomGroup from "./AddCustomGroup.svelte";
-  import { onMount } from "svelte";
+  // import AddCustomGroup from "./AddCustomGroup.svelte";
+  // import { onMount } from "svelte";
 
   import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
   import { getOnlineProfile, getMyOnlineGroups } from "../../lib/api";
 
   // let groups: Group[];
-  // let user_id = 1; //default ig
+  // let userId = 1; //default ig
 
   // onMount(async () => {
-  //   getUserGroups(user_id).then((res) => (groups = res.data));
+  //   getUserGroups(userId).then((res) => (groups = res.data));
   // });
 </script>
 

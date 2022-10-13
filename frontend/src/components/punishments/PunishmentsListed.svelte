@@ -5,7 +5,6 @@
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
 
   export let punishmentTypes: PunishmentType[];
-
   export let row: Row;
 
   interface Row {

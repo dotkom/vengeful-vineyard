@@ -5,7 +5,7 @@
   import type { User, PunishmentType } from "src/lib/types";
   import PunishmentInfo from "./PunishmentInfo.svelte";
   export let user: User;
-  export let p_types: PunishmentType[];
+  export let punishmentTypes: PunishmentType[];
 
   /**
    * Map all punishments with type id to amount
@@ -31,17 +31,17 @@
   $: p_dictionary = mapPunishments();
 
   const getUrl = (p_type: string) => {
-    return p_types.filter((p) => p.punishment_type_id.toString() === p_type)[0]
-      .logo_url;
+    return punishmentTypes.filter(
+      (p) => p.punishment_type_id.toString() === p_type
+    )[0].logo_url;
   };
 
   const getLastPunishedDate = (user: User) => {
     let date: String = "";
     try {
-      date =
-        user.punishments[user.punishments.length - 1].created_time.split(
-          "T"
-        )[0];
+      date = user.punishments[user.punishments.length - 1].created_time.split(
+        "T"
+      )[0];
     } catch (TypeError) {
       return "No date";
     }
@@ -56,26 +56,22 @@
       {#each Array(amount) as _}
         <img class="icon" alt="punishment" src="{getUrl(type)}" />
       {/each}
-    {:else}
-      Ingen straffer
-    {/each}
+    {:else}Ingen straffer{/each}
   </div>
-  <div>
-    {getLastPunishedDate(user)}
-  </div>
+  <div>{getLastPunishedDate(user)}</div>
 </div>
 <div class="collapse-content">
   <PunishmentInfo
-  totalSum={undefined}
-    punishmentTypes={p_types}
-    user={user}
-    punishments={user.punishments
+    totalSum="{undefined}"
+    punishmentTypes="{punishmentTypes}"
+    user="{user}"
+    punishments="{user.punishments
       .filter((pun) =>
         $punishmentsToFilter
           .map((pun) => pun.punishment_type_id)
           .includes(pun.punishment_type)
       )
-      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))}
+      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))}"
   />
 </div>
 
