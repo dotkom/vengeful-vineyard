@@ -24,7 +24,7 @@
 />
 
 <div class="content">
-  <Navbar />
+  <!-- <Navbar /> -->
   <OidcContext
     issuer="https://old.online.ntnu.no/openid"
     client_id="219919"
@@ -81,7 +81,7 @@
   @import "variables.less";
   .body_content {
     @apply flex;
-    margin: 0 5em;
+    margin: 0;
   }
 
   .content {

@@ -44,6 +44,7 @@
 
 <style lang="less">
   .wrapper {
+    padding: 0rem 1.5rem;
   }
 
   .punishmentTags {

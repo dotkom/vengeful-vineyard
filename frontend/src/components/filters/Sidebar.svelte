@@ -1,17 +1,19 @@
 <script lang="ts">
-  import UserFilters from "./Checkboxes/UserFilters.svelte";
+  import VvLogo from "./VvLogo.svelte";
+  import UserFilters from "./checkboxes/UserFilters.svelte";
   import PunishmentsFilters from "./Punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
   import DateTimeFilters from "./Time/DateTimeFilters.svelte";
 </script>
 
 <div class="wrapper">
+  <VvLogo />
   <SearchUser />
-  <hr />
+  <div class="splitter"></div>
   <PunishmentsFilters />
-  <hr />
+  <div class="splitter"></div>
   <DateTimeFilters />
-  <hr />
+  <div class="splitter"></div>
   <UserFilters />
 </div>
 
@@ -20,16 +22,17 @@
 
   .wrapper {
     width: 25rem;
-    padding: 20px;
     display: flex;
     flex-direction: column;
-    background: #093b51;
-    border: 1px solid #072e3f;
+    background: #153e75;
     box-sizing: border-box;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 6px;
     height: fit-content;
     padding-bottom: 5rem;
+  }
+
+  .splitter {
+    margin: 30px 0;
   }
 
   hr {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import VvLogo from "./VvLogo.svelte";
+  import VvLogo from "../filters/VvLogo.svelte";
   import {
     OidcContext,
     LoginButton,
@@ -12,8 +12,6 @@
 </script>
 
 <nav>
-  <VvLogo />
-
   <div class="loginSection">
     <OidcContext
       issuer="https://old.online.ntnu.no/openid"
