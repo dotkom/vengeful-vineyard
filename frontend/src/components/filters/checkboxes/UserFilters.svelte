@@ -8,7 +8,7 @@
   $: showInactive.set(showInactiveCB);
 </script>
 
-<div>
+<div class="wrapper">
   <div class="form-control">
     <label class="cursor-pointer label">
       <input
@@ -32,6 +32,10 @@
 </div>
 
 <style lang="less">
+  .wrapper {
+    padding: 0rem 1.5rem;
+  }
+
   .label-text {
     color: #eeeeee;
     font-size: 20px;

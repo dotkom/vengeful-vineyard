@@ -5,7 +5,12 @@
 <style lang="less">
   @import "../../variables.less";
   .leftLogo {
-    left: 2%;
-    top: 2%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    width: 100%;
+    border-bottom: 1px solid #133767;
   }
 </style>

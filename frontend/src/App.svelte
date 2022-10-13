@@ -3,6 +3,7 @@
     OidcContext,
     isAuthenticated,
     accessToken,
+    LoginButton,
   } from "@dopry/svelte-oidc";
   import Navbar from "./components/navbar/Navbar.svelte";
   import GroupLogos from "./components/groups/GroupLogos.svelte";
@@ -24,7 +25,7 @@
 />
 
 <div class="content">
-  <Navbar />
+  <!-- <Navbar /> -->
   <OidcContext
     issuer="https://old.online.ntnu.no/openid"
     client_id="219919"
@@ -47,7 +48,7 @@
           {#await getOnlineProfile($accessToken) then value}
             {#await getMyOnlineGroups($accessToken, value.id) then groups}
               {#if groups}
-                <GroupLogos />
+                <!-- <GroupLogos /> -->
                 <PunishmentGrid />
               {:else}
                 <div
@@ -66,12 +67,13 @@
               {/if}
             {/await}
           {/await}
+          <Footer />
         </div>
       </div>
+    {:else}
+      <LoginButton>Logg inn</LoginButton>
     {/if}
   </OidcContext>
-
-  <Footer />
 </div>
 
 <style lang="less" global>
@@ -81,7 +83,7 @@
   @import "variables.less";
   .body_content {
     @apply flex;
-    margin: 0 5em;
+    margin: 0;
   }
 
   .content {

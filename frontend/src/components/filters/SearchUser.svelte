@@ -19,6 +19,10 @@
 </div>
 
 <style lang="less">
+  .form-control {
+    padding: 0rem 1.5rem;
+  }
+
   .label-text {
     color: #eeeeee;
     font-size: 20px;

@@ -22,41 +22,41 @@
     class="punishment"
     alt="wine"
     src="{punishment.logo_url}"
-    width="23"
-    height="23"
+    width="15"
+    height="15"
   />
   <p>{punishment.name}</p>
   <img
     class="close"
     alt="wine"
     src="{close}"
-    width="23"
-    height="23"
+    width="20"
+    height="20"
     on:click="{() => removePunishment(punishment)}"
   />
 </div>
 
 <style lang="less">
   .wrapper {
+    height: 1.25rem;
     margin: 3px;
-    padding: 3px;
     width: fit-content;
     display: flex;
     align-items: center;
     align-content: center;
     flex-direction: row;
-    background: #b1d5ea;
-    border: 1px solid #6c8da0;
+    background: #f1f7ff;
+    border: 0.5px solid #c1dff3;
     box-sizing: border-box;
-    border-radius: 3px;
     text-align: center;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
-      rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding-right: 3px;
   }
 
   p {
-    font-size: 20px;
-    color: #000000;
+    font-size: 16px;
+    color: #1b618b;
     font-weight: 400;
   }
 
