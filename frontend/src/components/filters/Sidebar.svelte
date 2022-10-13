@@ -1,23 +1,32 @@
 <script lang="ts">
+  import BackToOw from "./BackToOW.svelte";
   import UserFilters from "./checkboxes/UserFilters.svelte";
   import GroupPicker from "./GroupPicker.svelte";
+  import Logout from "./Logout.svelte";
   import PunishmentsFilters from "./punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
   import DateTimeFilters from "./time/DateTimeFilters.svelte";
   import VvLogo from "./VvLogo.svelte";
 </script>
 
-<div class="wrapper">
-  <VvLogo />
-  <GroupPicker />
-  <div class="splitter"></div>
-  <SearchUser />
-  <div class="splitter"></div>
-  <PunishmentsFilters />
-  <div class="splitter"></div>
-  <DateTimeFilters />
-  <div class="splitter"></div>
-  <UserFilters />
+<div class="sticky top-0 h-screen">
+  <div class="wrapper">
+    <VvLogo />
+    <GroupPicker />
+    <div class="splitter"></div>
+    <SearchUser />
+    <div class="splitter"></div>
+    <PunishmentsFilters />
+    <div class="splitter"></div>
+    <DateTimeFilters />
+    <div class="splitter"></div>
+    <UserFilters />
+    <div class="splitter"></div>
+    <div class="splitter"></div>
+    <BackToOw />
+    <div class="splitter"></div>
+    <Logout />
+  </div>
 </div>
 
 <style lang="less">
@@ -35,7 +44,7 @@
   }
 
   .splitter {
-    margin: 1rem 0;
+    margin: 0.5rem 0;
   }
 
   hr {

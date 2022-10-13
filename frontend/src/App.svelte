@@ -3,6 +3,7 @@
     OidcContext,
     isAuthenticated,
     accessToken,
+    LoginButton,
   } from "@dopry/svelte-oidc";
   import Navbar from "./components/navbar/Navbar.svelte";
   import GroupLogos from "./components/groups/GroupLogos.svelte";
@@ -66,12 +67,13 @@
               {/if}
             {/await}
           {/await}
+          <Footer />
         </div>
       </div>
+    {:else}
+      <LoginButton>Logg inn</LoginButton>
     {/if}
   </OidcContext>
-
-  <Footer />
 </div>
 
 <style lang="less" global>
