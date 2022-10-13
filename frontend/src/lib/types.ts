@@ -1,30 +1,25 @@
-export interface Punishment {
-  punishment_type: number;
-  reason: string;
-  punishment_id: number;
-  created_time: string;
-  verified_time: string | null;
-  verified_by: string | null;
-  amount: number;
-}
-
+/**
+ * Interface for punishments that are created in the Frontend
+ */
 export interface CreatePunishment {
   punishment_type: number;
   reason: string;
   amount: number;
 }
 
-export interface PunishmentInfo {
-  id: number;
-  price: number;
-  imageurl: string;
-  reason: string;
-  verifiedBy: string | null;
-  verifiedTime: string | null;
-  givenBy: string;
-  givenTime: string;
+/**
+ * Interface for punishments.
+ */
+export interface Punishment extends CreatePunishment {
+  punishment_id: number;
+  created_time: string;
+  verified_time: string | null;
+  verified_by: string | null;
 }
 
+/**
+ * Interface for custom Punishment types.
+ */
 export interface PunishmentType {
   name: string;
   value: number;
@@ -32,6 +27,9 @@ export interface PunishmentType {
   punishment_type_id: number;
 }
 
+/**
+ * Interface for users in the app.
+ */
 export interface User {
   user_id: number;
   email: string;
@@ -41,15 +39,21 @@ export interface User {
   active: boolean;
 }
 
+/**
+ * Interface for groups in the app.
+ */
 export interface Group {
   group_id: number;
   name: string;
   rules: string;
-  logoUrl: string;
+  logo_url: string;
   punishment_types: PunishmentType[];
   members: User[];
 }
 
+/**
+ * Interface for the logos fetched through OW.
+ */
 export interface LogoObject {
   description: string;
   id: number;
@@ -67,6 +71,9 @@ export interface LogoObject {
   xs: string;
 }
 
+/**
+ * Interface for groups fetched from OW.
+ */
 export interface OWGroup {
   group_type: string;
   id: number;

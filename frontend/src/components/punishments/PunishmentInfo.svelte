@@ -5,6 +5,7 @@
     postValidatePunishment,
   } from "../../lib/api";
   import type { Punishment, PunishmentType, User } from "../../lib/types";
+  import { getLogoUrl, formatGivenTime } from "../../lib/functions";
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
   import SvelteTooltip from "svelte-tooltip";
@@ -15,16 +16,7 @@
   export let punishmentTypes: PunishmentType[];
   export let totalSum: number | undefined;
 
-  // let cancelIcon = "assets/cancelIcon.svg";
   let verifyIconPath = "../../assets/checkGreen.svg";
-
-  const getUrl = (p_type: number) => {
-    return punishmentTypes.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
-  };
-
-  const returnDate = (given_time: String) => {
-    return given_time.split("T")[0];
-  };
 
   /**
    * Deletes a punishment from database and removes the item from GUI.
@@ -42,7 +34,9 @@
       );
     });
 
-    punishments = user.punishments.filter((p: Punishment) => p.punishment_id !== id);
+    punishments = user.punishments.filter(
+      (p: Punishment) => p.punishment_id !== id
+    );
   };
 
   const verifyPunishment = async (id: number) => {
@@ -56,9 +50,8 @@
       );
     });
 
-    //punishments = user.punishments.filter((p) => p.punishment_id !== id);
+    punishments = user.punishments.filter((p) => p.punishment_id !== id);
   };
-  
 </script>
 
 <div class="punishment_info">
@@ -70,8 +63,7 @@
         {#if punishment.verified_time}
           <p
             class="text-green-600 break-words"
-            style="max-width: 100%;
-        white-space: break-spaces;"
+            style="max-width: 100%; white-space: break-spaces;"
           >
             Verifisert av {punishment.verified_by}
           </p>
@@ -85,9 +77,13 @@
               class="verifyBtn"
               on:click="{() => verifyPunishment(punishment.punishment_id)}"
             >
-              <img class="h-7 w-7" src="{verifyIconPath}" alt="Remove punishment" />
-            </div></SvelteTooltip
-          >
+              <img
+                class="h-7 w-7"
+                src="{verifyIconPath}"
+                alt="Remove punishment"
+              />
+            </div>
+          </SvelteTooltip>
         {/if}
       </div>
 
@@ -97,17 +93,16 @@
       >
         <p
           class="break-words"
-          style="max-width: 100%;
-        white-space: break-spaces;"
+          style="max-width: 100%; white-space: break-spaces;"
         >
           {punishment.reason}
         </p>
         <p
           class="break-words"
-          style="max-width: 100%;
-      white-space: break-spaces;"
+          style="max-width: 100%; white-space: break-spaces;"
         >
-          - Gitt av <i>user</i>
+          - Gitt av
+          <i>user</i>
         </p>
       </div>
 
@@ -116,13 +111,14 @@
         {#each Array(punishment.amount) as _, i}
           <img
             class="icon"
-            src="{getUrl(punishment.punishment_type)}"
+            src="{getLogoUrl(punishment.punishment_type, punishmentTypes)}"
             alt="punishment"
           />
         {/each}
       </div>
       <div
-        class="col-span-2 relative h-full flex justify-center align-middle items-center"
+        class="col-span-2 relative h-full flex justify-center align-middle
+        items-center"
       >
         <div class="dropdown dropdown-end absolute z-10 top-0 right-0">
           <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -135,34 +131,37 @@
               fill="none"
               viewBox="0 0 24 24"
               class="inline-block w-5 h-5 stroke-current"
-              ><path
+            >
+              <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-              ></path></svg
-            >
+                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012
+                0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+              ></path>
+            </svg>
           </label>
           <ul
             tabindex="0"
-            class="menu menu-compact dropdown-content shadow bg-white rounded-box w-40"
+            class="menu menu-compact dropdown-content shadow bg-white
+            rounded-box w-40"
           >
             <button
               on:click="{() => {
                 removePunishment(punishment.punishment_id);
-              }}">Annuler straff</button
+              }}"
             >
+              Annuler straff
+            </button>
           </ul>
         </div>
-        <div>{returnDate(punishment.created_time)}</div>
+        <div>{formatGivenTime(punishment.created_time)}</div>
       </div>
     </div>
   {:else}
     <div></div>
   {/each}
-  <div class="sum">
-    Total sum: {totalSum}
-  </div>
+  <div class="sum">Total sum: {totalSum}</div>
 </div>
 
 <style lang="postcss">
@@ -191,14 +190,12 @@
     @apply m-4 text-right;
   }
 
-
   .verifyBtn {
     @apply float-left self-center;
     min-width: 1.5rem;
-    
   }
-  .verifyBtn:hover{
-    cursor: pointer
+  .verifyBtn:hover {
+    cursor: pointer;
   }
 
   .punishment_icons {

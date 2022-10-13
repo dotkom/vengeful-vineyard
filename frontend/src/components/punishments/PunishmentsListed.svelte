@@ -7,7 +7,6 @@
   import { Circle } from "svelte-loading-spinners";
 
   export let punishmentTypes: PunishmentType[];
-
   export let row: Row;
 
   interface Row {

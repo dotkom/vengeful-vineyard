@@ -1,32 +1,25 @@
-import type { Writable } from "svelte/store";
-import type { Group, Punishment, PunishmentType } from "./types";
+import type { PunishmentType } from "./types";
 
 /**
- * Creates a new object that stores punishment ids and punishment values.
- * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
+ * Gives the logo url for a punishment type in an array.
+ * @param punishmentTypeId Id as number for the punishment type
+ * @param punishmentTypes PunishmentType array with punishment types
+ * @returns the logo URL as string
  */
-export const mapTypes = (group: Group): object => {
-  let mappedTypes = {};
-  group.punishment_types.map(
-    (p: PunishmentType) => (mappedTypes[p.punishment_type_id] = p.value)
-  );
-  return mappedTypes;
+export const getLogoUrl = (
+  punishmentTypeId: number,
+  punishmentTypes: PunishmentType[]
+): string => {
+  return punishmentTypes.filter(
+    (p) => p.punishment_type_id == punishmentTypeId
+  )[0].logo_url;
 };
 
 /**
- * Calculates the total sum in NOK of punishments
- * @returns the total sum as number
+ * Formats the given time in YYYY-MM-DD format.
+ * @param givenTime in ISO format
+ * @returns Given time as string.
  */
-export const calculateSum = (
-  punishments: Punishment[],
-  group: Group | Writable<Group>
-): number => {
-  const g = group as Group;
-  const dict = mapTypes(g);
-  let sum: number = 0;
-  punishments.forEach((punishment) => {
-    sum += dict[punishment.punishment_type] * punishment.amount;
-  });
-
-  return sum;
+export const formatGivenTime = (givenTime: String) => {
+  return givenTime.split("T")[0];
 };

@@ -16,10 +16,10 @@
   import { shouldDisplay } from "../../timeFilterFunc";
 
   // TODO
-  // Remove group_id once members from OW group from backend is implemented.
-  let group_id: number = 2;
+  // Remove groupId once members from OW group from backend is implemented.
+  let groupId: number = 1;
 
-  getGroup(group_id).then(async (res) => {
+  getGroup(groupId).then(async (res) => {
     window.localStorage.setItem("group", JSON.stringify(res));
     window.localStorage.setItem(
       "users",
@@ -102,7 +102,7 @@
       renderComponent: {
         component: PunishmentsListed,
         props: {
-          p_types: $group.punishment_types,
+          punishmentTypes: $group.punishment_types,
         },
       },
     },
@@ -139,10 +139,10 @@
       expandedArr = expandedArr.filter((id) => id !== row.id);
     }
   }
-  // function handleExpand(event) {
-  //   const row = event.detail.row;
-  //   const operation = row.$expanded ? "open" : "close";
-  // }
+  function handleExpand(event: { detail: { row: any; }; }) {
+    const row = event.detail.row;
+    const operation = row.$expanded ? "open" : "close";
+  }
   
 </script>
 
@@ -150,6 +150,7 @@
   <SvelteTable
     columns="{columns}"
     rows="{$filteredUsers.map((user) => {
+      
       return {
         id: user.user_id,
         user: user,
