@@ -1,5 +1,6 @@
 <script lang="ts">
   import UserFilters from "./checkboxes/UserFilters.svelte";
+  import GroupPicker from "./GroupPicker.svelte";
   import PunishmentsFilters from "./punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
   import DateTimeFilters from "./time/DateTimeFilters.svelte";
@@ -8,6 +9,8 @@
 
 <div class="wrapper">
   <VvLogo />
+  <GroupPicker />
+  <div class="splitter"></div>
   <SearchUser />
   <div class="splitter"></div>
   <PunishmentsFilters />
@@ -32,7 +35,7 @@
   }
 
   .splitter {
-    margin: 30px 0;
+    margin: 1rem 0;
   }
 
   hr {

@@ -108,7 +108,7 @@
     element="#my-picker"
     bind:flatpickr
   >
-    <div class="mb-5 w-80 ">
+    <div class="mb-5 w-full px-6">
       <label for="datepicker" class="mb-1 text-[#eeeeee] block text-[20px]">
         Vis straffer i tidsrom
       </label>

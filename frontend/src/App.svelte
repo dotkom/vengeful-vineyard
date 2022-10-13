@@ -47,7 +47,7 @@
           {#await getOnlineProfile($accessToken) then value}
             {#await getMyOnlineGroups($accessToken, value.id) then groups}
               {#if groups}
-                <GroupLogos />
+                <!-- <GroupLogos /> -->
                 <PunishmentGrid />
               {:else}
                 <div
