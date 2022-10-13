@@ -1,9 +1,9 @@
 <script lang="ts">
-  import VvLogo from "./VvLogo.svelte";
   import UserFilters from "./checkboxes/UserFilters.svelte";
-  import PunishmentsFilters from "./Punishments/PunishmentsFilters.svelte";
+  import PunishmentsFilters from "./punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
-  import DateTimeFilters from "./Time/DateTimeFilters.svelte";
+  import DateTimeFilters from "./time/DateTimeFilters.svelte";
+  import VvLogo from "./VvLogo.svelte";
 </script>
 
 <div class="wrapper">
