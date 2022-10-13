@@ -1,9 +1,14 @@
 import { writable, derived } from "svelte/store";
 import type { User } from "../types";
 
+function getRawUsers(): string {
+  const rawUsers = localStorage.getItem("users");
+  return rawUsers !== 'null' ? rawUsers : '[]';
+}
+
 export const term = writable<string>("");
 export const users = writable<User[]>(
-  JSON.parse(localStorage.getItem("users"))
+  JSON.parse(getRawUsers())
 );
 export const showInactive = writable<boolean>();
 export const showPaid = writable<boolean>();

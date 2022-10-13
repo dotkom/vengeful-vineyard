@@ -1,8 +1,13 @@
 import { writable } from "svelte/store";
 import type { PunishmentType } from "../types";
 
+function getRawPunishmentFilters(): string {
+  const rawPunishmentFilters = window.localStorage.getItem("punishmentFilters");
+  return rawPunishmentFilters !== 'null' ? rawPunishmentFilters : '[]';
+}
+
 export const punishmentsToFilter = writable<PunishmentType[]>(
-  JSON.parse(window.localStorage.getItem("punishmentFilters"))
+  JSON.parse(getRawPunishmentFilters())
 );
 
 punishmentsToFilter.subscribe(
