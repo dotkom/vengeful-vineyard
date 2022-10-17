@@ -7,11 +7,12 @@
 </script>
 
 <div class="form-control">
-  <label class="label">
+  <label for="user" class="label">
     <span class="label-text">Finn bruker</span>
   </label>
   <input
     type="text"
+    id="user"
     placeholder="Navn"
     class="input input-bordered"
     bind:value="{val}"

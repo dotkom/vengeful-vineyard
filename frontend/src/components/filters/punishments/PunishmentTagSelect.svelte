@@ -1,44 +1,60 @@
 <script lang="ts">
   import type { PunishmentType } from "src/types";
   import { group } from "../../../stores/groups";
-  import Svelecte, { addFormatter } from "svelecte";
+  import Svelecte, { addFormatter, config } from "svelecte";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
 
-  let options = $group.punishment_types
-    .filter((groupPun) =>
-      $punishmentsToFilter.map(
-        (filterPun) =>
-          groupPun.punishment_type_id !== filterPun.punishment_type_id
-      )
-    )
-    .map((pun) => pun.name);
+  const myI18n = {
+    empty: `Alle straffer vises`,
+    nomatch: "Ingen matchende straffer",
+  };
 
   let value: string;
 
-  //   function colorRenderer(item, isSelected) {
-  //     if (isSelected) {
-  //       return `<div class="color-item" style="background-color: ${item.hex}">
-  //         Selected color
-  //       </div>`;
-  //     }
-  //     return `<span class="color-item" style="background-color: ${item.hex};">
-  //       </span>${item.text}`;
-  //   }
-  //   // add custom renderer
-  //   addFormatter("color-blocks", colorRenderer);
-  //   // alternatively you can use object syntax
-  //   addFormatter({
-  //     "color-blocks": colorRenderer,
-  //   });
+  const addPunishment = async (punishmentInput: PunishmentType) => {
+    $punishmentsToFilter = [
+      ...$punishmentsToFilter,
+      {
+        name: punishmentInput.name,
+        logo_url: punishmentInput.logo_url,
+        value: punishmentInput.value,
+        punishment_type_id: punishmentInput.punishment_type_id,
+      },
+    ];
+  };
+
+  function colorRenderer(punishment: PunishmentType, isSelected: boolean) {
+    if (isSelected) {
+      addPunishment(punishment);
+      value = null;
+    }
+    return `<span class="pun-item"><img class="manImg" src=${punishment.logo_url}></img>
+      </span>${punishment.name}`;
+  }
+
+  addFormatter({
+    "pun-blocks": colorRenderer,
+  });
 </script>
 
-<label for="punishment">Select a country</label>
-<Svelecte
-  options="{options}"
-  inputId="punishment"
-  bind:value
-  placeholder="Navn på straff"
-/>
+<div class="flex flex-col w-full mt-2">
+  <label for="punishment"
+    ><span class="label-text mb-2">Vis strafftyper</span></label
+  >
+  <Svelecte
+    options="{$group.punishment_types.filter(
+      (filterPun) =>
+        !$punishmentsToFilter
+          .map((groupPun) => groupPun.punishment_type_id)
+          .includes(filterPun.punishment_type_id)
+    )}"
+    i18n="{myI18n}"
+    renderer="pun-blocks"
+    inputId="punishment"
+    bind:value
+    placeholder="Navn på straff"
+  />
+</div>
 
 <style lang="less">
   .wrapper {
@@ -58,6 +74,12 @@
     padding-right: 3px;
   }
 
+  .label-text {
+    color: #eeeeee;
+    font-size: 20px;
+    float: left;
+  }
+
   p {
     font-size: 16px;
     color: #1b618b;
@@ -74,5 +96,11 @@
 
   .punishment {
     padding-right: 2px;
+  }
+
+  .pun-item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
   }
 </style>
