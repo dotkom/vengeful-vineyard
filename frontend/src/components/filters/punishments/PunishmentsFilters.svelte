@@ -2,6 +2,7 @@
   import { group } from "../../../stores/groups";
   import PunishmentTag from "./PunishmentTag.svelte";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
+  import PunishmentTagSelect from "./PunishmentTagSelect.svelte";
 
   const resetPunishmentFilters = () => {
     punishmentsToFilter.set($group.punishment_types);
@@ -26,6 +27,7 @@
         <PunishmentTag punishment="{punishment}" />
       {/each}
     </div>
+    <PunishmentTagSelect />
 
     <div class="form-control">
       <label class="cursor-pointer label">
