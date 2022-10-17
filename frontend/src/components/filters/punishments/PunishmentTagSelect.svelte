@@ -28,8 +28,8 @@
       addPunishment(punishment);
       value = null;
     }
-    return `<span class="pun-item"><img class="manImg" src=${punishment.logo_url}></img>
-      </span>${punishment.name}`;
+    return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
+     `;
   }
 
   addFormatter({

@@ -22,7 +22,6 @@
     <div class="splitter"></div>
     <UserFilters />
     <div class="splitter"></div>
-    <div class="splitter"></div>
     <BackToOw />
     <div class="splitter"></div>
     <Logout />
