@@ -9,11 +9,10 @@
 
   let value: string = "alle tider";
 
-  let dateToFilterBy: Date = new Date(1560807962);
-  let noLaterThan: Date = new Date();
+  let displayCancel: boolean;
 
-  let startDate;
-  let endDate;
+  let dateToFilterBy: Date = new Date();
+  let noLaterThan: Date = new Date();
 
   $: onlyShowAfterDate.set(dateToFilterBy);
   $: onlyShowBeforeDate.set(noLaterThan);
@@ -25,6 +24,7 @@
     value = event.detail.value;
     date = null;
     noLaterThan = new Date();
+    displayCancel = false;
     if (event.detail.value == "alle tider") {
       var today = new Date();
       dateToFilterBy = new Date(
@@ -65,11 +65,23 @@
         dateToFilterBy = new Date(selectedDates[0]);
         noLaterThan = new Date(selectedDates[1]);
         value = null;
+        displayCancel = true;
       }
     },
-    onOpen: function () {
-      // console.log("opened");
-    },
+  };
+
+  const onCancel = () => {
+    date = null;
+    noLaterThan = new Date();
+    displayCancel = false;
+    var today = new Date();
+    dateToFilterBy = new Date(
+      today.getFullYear() - 5,
+      today.getMonth(),
+      today.getDate()
+    );
+
+    value = "alle tider";
   };
 </script>
 
@@ -101,49 +113,60 @@
   </div>
 </div>
 
-<div class="flex flex-row justify-center mt-6">
-  <Flatpickr
-    options="{flatpickrOptions}"
-    bind:value="{date}"
-    element="#my-picker"
-    bind:flatpickr
-  >
-    <div class="mb-5 w-full px-6">
-      <label for="datepicker" class="mb-1 text-[#eeeeee] block text-[20px]">
-        Vis straffer i tidsrom
-      </label>
-      <div class="flatpickr relative" id="my-picker">
-        <input
-          type="text"
-          placeholder="Velg datoer"
-          data-input
-          class="w-full pl-4 pr-10 py-3 leading-none rounded-lg shadow-sm
+<div class="flex flex-col">
+  <div class="flex flex-row justify-center mt-6">
+    <Flatpickr
+      options="{flatpickrOptions}"
+      bind:value="{date}"
+      element="#my-picker"
+      bind:flatpickr
+    >
+      <div class="mb-5 w-full px-6">
+        <label for="datepicker" class="mb-1 text-[#eeeeee] block text-[20px]">
+          Vis straffer i tidsrom
+        </label>
+        <div class="flatpickr relative" id="my-picker">
+          <input
+            type="text"
+            placeholder="Velg datoer"
+            data-input
+            class="w-full pl-4 pr-10 py-3 leading-none rounded-lg shadow-sm
           focus:outline-none focus:shadow-outline text-black font-medium bg-white"
-        />
+          />
 
-        <div class="absolute top-0 right-0 px-3 py-2">
-          <svg
-            on:click="{() => {
-              if (flatpickr) {
-                flatpickr.open();
-              }
-            }}"
-            class="h-6 w-6 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0
+          <div class="absolute top-0 right-0 px-3 py-2">
+            <svg
+              on:click="{() => {
+                if (flatpickr) {
+                  flatpickr.open();
+                }
+              }}"
+              class="h-6 w-6 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0
               00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
+            </svg>
+          </div>
         </div>
       </div>
+    </Flatpickr>
+  </div>
+  {#if displayCancel}
+    <div
+      class=" text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-200 font-thin rounded-lg text-2xs text-center inline-flex items-center p-1 cursor-pointer"
+      on:click="{onCancel}"
+      style="width: fit-content; margin-left: 1.5rem; margin-top: -1rem;"
+    >
+      Avbryt
     </div>
-  </Flatpickr>
+  {/if}
 </div>
 
 <style lang="less">

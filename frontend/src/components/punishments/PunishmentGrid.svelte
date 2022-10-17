@@ -16,7 +16,7 @@
 
   // TODO
   // Remove group_id once members from OW group from backend is implemented.
-  let group_id: number = 1;
+  let group_id: number = 3;
 
   getGroup(group_id).then(async (res) => {
     window.localStorage.setItem("group", JSON.stringify(res));
