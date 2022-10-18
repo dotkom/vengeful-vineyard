@@ -56,7 +56,7 @@
   />
 </div>
 
-<style lang="less">
+<style lang="postcss">
   .wrapper {
     height: 1.25rem;
     margin: 3px;
