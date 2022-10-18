@@ -6,7 +6,7 @@
   } from "@dopry/svelte-oidc";
 </script>
 
-<div class="flex m-auto">
+<div class="flex m-auto pt-5">
   {#if $isAuthenticated}
     <div class="w-full m-auto hover:bg-red-600 rounded-lg">
       <div class="btn bg-red-500 rounded-lg ">

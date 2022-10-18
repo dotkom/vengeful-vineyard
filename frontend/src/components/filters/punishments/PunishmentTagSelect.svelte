@@ -76,7 +76,7 @@
 
   .label-text {
     color: #eeeeee;
-    font-size: 20px;
+    font-size: 18px;
     float: left;
   }
 

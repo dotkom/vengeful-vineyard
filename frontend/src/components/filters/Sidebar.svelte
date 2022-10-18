@@ -9,22 +9,23 @@
   import VvLogo from "./VvLogo.svelte";
 </script>
 
-<div class="sticky top-0 h-screen">
-  <div class="wrapper h-full">
+<div class="wrapper sticky h-screen top-0">
+  <div class="flex flex-col h-3/4">
     <VvLogo />
     <GroupPicker />
-    <div class="splitter"></div>
+
     <SearchUser />
-    <div class="splitter"></div>
+
     <PunishmentsFilters />
-    <div class="splitter"></div>
+
     <DateTimeFilters />
-    <div class="splitter"></div>
+
     <UserFilters />
-    <div class="splitter"></div>
-    <BackToOw />
-    <div class="splitter"></div>
-    <Logout />
+
+    <div class="mt-8 flex flex-col">
+      <BackToOw />
+      <Logout />
+    </div>
   </div>
 </div>
 
@@ -41,16 +42,7 @@
     padding-bottom: 1rem;
   }
 
-  .splitter {
-    margin: 0.5rem 0;
-  }
-
-  hr {
-    margin: 40px 0 30px 0;
-    border-top: 1px solid #06212d;
-    backdrop-filter: blur(4px);
-    /* Note: backdrop-filter has minimal browser support */
-
-    border-radius: 10px;
-  }
+  // .splitter {
+  //   margin: 0.3rem 0;
+  // }
 </style>

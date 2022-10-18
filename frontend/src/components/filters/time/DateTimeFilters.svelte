@@ -172,7 +172,7 @@
 <style lang="less">
   .label-text {
     color: #eeeeee;
-    font-size: 20px;
+    font-size: 18px;
     float: left;
     padding-right: 1rem;
   }

@@ -6,7 +6,7 @@
   $: term.set(val);
 </script>
 
-<div class="form-control">
+<div class="form-control mb-3">
   <label for="user" class="label">
     <span class="label-text">Finn bruker</span>
   </label>
@@ -26,7 +26,7 @@
 
   .label-text {
     color: #eeeeee;
-    font-size: 20px;
+    font-size: 18px;
     float: left;
   }
 

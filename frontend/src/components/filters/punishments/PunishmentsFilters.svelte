@@ -57,7 +57,7 @@
 
   .label-text {
     color: #eeeeee;
-    font-size: 20px;
+    font-size: 16px;
     float: left;
     padding-left: 5px;
   }
@@ -66,5 +66,11 @@
     display: flex;
     justify-content: left;
     width: fit-content;
+  }
+
+  .checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 6px;
   }
 </style>
