@@ -9,7 +9,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
+    padding: 0.5rem;
     width: 100%;
     border-bottom: 1px solid #133767;
   }

@@ -22,8 +22,8 @@
     class="punishment"
     alt="wine"
     src="{punishment.logo_url}"
-    width="15"
-    height="15"
+    width="20"
+    height="20"
   />
   <p>{punishment.name}</p>
   <img
@@ -52,6 +52,7 @@
     box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     padding-right: 3px;
+    padding: 6px;
   }
 
   p {
