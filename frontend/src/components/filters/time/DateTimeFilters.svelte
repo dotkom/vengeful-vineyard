@@ -85,7 +85,7 @@
   <label class="label">
     <span class="label-text">Vis straffer fra</span>
   </label>
-  <div class="themed" style="width: 55%;">
+  <div class="themed w-[55%]">
     <Select
       items="{items}"
       value="{value}"

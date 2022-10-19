@@ -53,12 +53,11 @@
     <input
       type="text"
       placeholder="Begrunnelse"
-      class="input input-bordered w-full "
+      class="input input-bordered w-full border-[#d1d1d1]"
       bind:value="{reason}"
-      style="border-color: #d1d1d1"
     />
   </div>
-  <div class="themed pr-1" style="width: 15%;">
+  <div class="themed pr-1 w-[15%]">
     <Select
       items="{$group.punishment_types.map((pun) => pun.name)}"
       value="{punType}"
@@ -74,9 +73,8 @@
       type="number"
       min="1"
       placeholder="Antall"
-      class="input input-bordered w-full"
+      class="input input-bordered w-full border-[#d1d1d1]"
       bind:value="{amount}"
-      style="border-color: #d1d1d1"
     />
   </div>
   <button
