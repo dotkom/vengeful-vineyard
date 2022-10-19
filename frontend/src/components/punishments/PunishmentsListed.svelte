@@ -4,6 +4,7 @@
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
+  import { Circle } from "svelte-loading-spinners";
 
   export let p_types: PunishmentType[];
 
@@ -15,7 +16,9 @@
 </script>
 
 <div class="flex justify-center flex-wrap max-w-[13rem]">
-  {#await row.straffer then}
+  {#await row.straffer}
+    <Circle size="60" color="#153E75" unit="px" duration="1s" />
+  {:then}
     {#if row.straffer}
       {#each row.straffer
         .filter((pun) => $punishmentsToFilter
