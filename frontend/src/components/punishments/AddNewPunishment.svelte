@@ -5,25 +5,36 @@
   import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
   import { getGroupUser, addPunishmentToUser } from "../../lib/api";
 
-  export let user: User;
+  export let user: User | undefined;
 
-  let reason: string = "";
-  let punType: string;
-  let amount: number;
+  let reason = "";
+  let punType: string | undefined;
+  let amount: number | undefined;
 
   function handleSelect(event: CustomEvent<{ value: string }>) {
     punType = event.detail.value;
   }
 
-  const getPunType = (punName: string): PunishmentType => {
+  const getPunType = (
+    punName: string | undefined
+  ): PunishmentType | undefined => {
     return $group.punishment_types.find(
       (pun: PunishmentType) => pun.name === punName
     );
   };
 
   const clickNewPunishment = async () => {
+    if (!user) {
+      console.error("User is undefined");
+      return;
+    }
+    let punishmentType = getPunType(punType);
+    if (!punishmentType || !amount) {
+      console.error("Invalid punishment type or amount");
+      return;
+    }
     let new_punishment: CreatePunishment = {
-      punishment_type: getPunType(punType).punishment_type_id,
+      punishment_type: punishmentType.punishment_type_id,
       reason: reason,
       amount: amount,
     };

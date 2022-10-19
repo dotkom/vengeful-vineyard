@@ -6,7 +6,7 @@
 
   let groupName: string;
   let groupUsers: string[] = [];
-  let groupUser: string;
+  let groupUser: string | undefined;
   let groupRules: string;
 
   const validate = (): void => {
@@ -27,7 +27,7 @@
   };
 
   //Not being used in post rn
-  const addUserToGroup = (userEmail: string) => {
+  const addUserToGroup = (userEmail?: string) => {
     if (userEmail != undefined) {
       groupUsers = [...groupUsers, userEmail];
     }
@@ -35,7 +35,7 @@
     groupUser = undefined;
   };
 
-  const removeUser = (userEmail: string) => {
+  const removeUser = (userEmail?: string) => {
     groupUsers = groupUsers.filter(function (user) {
       return user !== userEmail;
     });

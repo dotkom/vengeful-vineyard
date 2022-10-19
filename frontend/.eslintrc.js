@@ -1,23 +1,32 @@
 module.exports = {
-  parser: "@typescript-eslint/parser", // add the TypeScript parser
-  plugins: [
-    "svelte3",
-    "@typescript-eslint", // add the TypeScript plugin
-  ],
+  parser: '@typescript-eslint/parser',
+  extends: ['eslint:recommended'],
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module',
+    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.json'],
+    extraFileExtensions: ['.svelte']
+  },
+  env: {
+    es6: true,
+    browser: true
+  },
   overrides: [
-    // this stays the same
     {
-      files: ["*.svelte"],
-      processor: "svelte3/svelte3",
-    },
+      files: ['*.svelte'],
+      processor: 'svelte3/svelte3'
+    }
   ],
-  rules: {
-    // ...
-  },
   settings: {
-    "svelte3/typescript": () => require("typescript"), // pass the TypeScript package to the Svelte plugin
-    // OR
-    "svelte3/typescript": true, // load TypeScript as peer dependency
-    // ...
+    'svelte3/typescript': require('typescript'),
+    // Ignore style tags in Svelte because of Tailwind CSS
+    // See https://github.com/sveltejs/eslint-plugin-svelte3/issues/70
+    'svelte3/ignore-styles': () => true
   },
-};
+  plugins: ['svelte3', '@typescript-eslint'],
+  rules: {
+    '@typescript-eslint/ban-ts-comment': 'off'
+  },
+  ignorePatterns: ['node_modules']
+}
