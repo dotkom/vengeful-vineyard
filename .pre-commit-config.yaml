@@ -55,9 +55,12 @@ repos:
         entry: bash -c "cd frontend && CI=false npm ci && npx prettier -w src"
         language: system
       - id: lint
-        name: "Lint code"
-        entry: bash -c "cd frontend && CI=false npm run lint"
+        name: Lints files
+        entry: bash -c "cd frontend && npm ci && npm run lint"
+        pass_filenames: false
+        types: ["svelte", "ts"]
         language: system
+    # If we get svelte-validate to work, this check would be nice
     #   - id: svelte-validate
     #     name: Validate svelte
     #     entry: bash -c "cd frontend && npm ci && npm run validate"
