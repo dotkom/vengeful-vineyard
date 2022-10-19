@@ -52,11 +52,11 @@ repos:
         language: system
       - id: prettier
         name: Format frontend-code
-        entry: bash -c "cd frontend && npm ci && npx prettier -w src"
+        entry: bash -c "cd frontend && CI=false npm ci && npx prettier -w src"
         language: system
       - id: lint
         name: "Lint code"
-        entry: bash -c "cd frontend && npm run lint"
+        entry: bash -c "cd frontend && CI=false npm run lint"
         language: system
     #   - id: svelte-validate
     #     name: Validate svelte
