@@ -9,8 +9,7 @@
     "validate": "svelte-check",
     "format": "prettier --write ./src/**/*.{svelte,ts}",
     "lint": "eslint './src/**/*.{ts,svelte}'",
-    "lint:fix": "eslint --fix './src/**/*.{ts,svelte}'",
-    "prelint": "npm run format"
+    "lint:fix": "eslint --fix './src/**/*.{ts,svelte}'"
   },
   "devDependencies": {
     "@dopry/svelte-oidc": "^1.0.1",
