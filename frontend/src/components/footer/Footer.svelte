@@ -11,7 +11,6 @@
 </footer>
 
 <style lang="less">
-  @import "../../variables.less";
   footer {
     background: rgb(242, 242, 242);
     height: 220px;

@@ -1,11 +1,11 @@
 <script lang="ts">
   import BackToOw from "./BackToOW.svelte";
-  import UserFilters from "./checkboxes/UserFilters.svelte";
+  import UserFilters from "../filters/checkboxes/UserFilters.svelte";
   import GroupPicker from "./GroupPicker.svelte";
   import Logout from "./Logout.svelte";
-  import PunishmentsFilters from "./punishments/PunishmentsFilters.svelte";
+  import PunishmentsFilters from "../filters/punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
-  import DateTimeFilters from "./time/DateTimeFilters.svelte";
+  import DateTimeFilters from "../filters/time/DateTimeFilters.svelte";
   import VvLogo from "./VvLogo.svelte";
 </script>
 
@@ -30,8 +30,6 @@
 </div>
 
 <style lang="less">
-  @import "../../variables.less";
-
   .wrapper {
     width: 25rem;
     display: flex;
@@ -41,8 +39,4 @@
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     padding-bottom: 1rem;
   }
-
-  // .splitter {
-  //   margin: 0.3rem 0;
-  // }
 </style>

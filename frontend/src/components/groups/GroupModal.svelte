@@ -1,9 +1,10 @@
 <script context="module" lang="ts">
-  let onTop; //keeping track of which open modal is on top
+  let onTop: HTMLDivElement | null; //keeping track of which open modal is on top
   const modals = {}; //all modals get registered here for easy future access
 
   // 	returns an object for the modal specified by `id`, which contains the API functions (`open` and `close` )
   export function getModal(id = "") {
+    // @ts-ignore
     return modals[id];
   }
 </script>
@@ -11,27 +12,29 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
 
-  let topDiv;
+  let topDiv: HTMLDivElement;
   let visible = false;
-  let prevOnTop;
-  let closeCallback;
+  let prevOnTop: any;
+
+  /* eslint-disable-next-line no-unused-vars*/
+  let closeCallback: (arg0: undefined) => void;
 
   export let id = "";
 
-  function keyPress(ev) {
+  function keyPress(ev: { key: string }) {
     //only respond if the current modal is the top one
     if (ev.key == "Escape" && onTop == topDiv) close(); //ESC
   }
 
   /**  API **/
-  function open(callback) {
+  function open(callback: any) {
     closeCallback = callback;
     if (visible) return;
     prevOnTop = onTop;
     onTop = topDiv;
     window.addEventListener("keydown", keyPress);
 
-    //this prevents scrolling of the main window on larger screens
+    // This prevents scrolling of the main window on larger screens
     document.body.style.overflow = "hidden";
 
     visible = true;
@@ -39,7 +42,7 @@
     document.body.appendChild(topDiv);
   }
 
-  function close(retVal) {
+  function close(retVal?: undefined) {
     if (!visible) return;
     window.removeEventListener("keydown", keyPress);
     onTop = prevOnTop;
@@ -48,10 +51,12 @@
     if (closeCallback) closeCallback(retVal);
   }
 
-  //expose the API
+  // Expose the API
+  // @ts-ignore
   modals[id] = { open, close };
 
   onDestroy(() => {
+    // @ts-ignore
     delete modals[id];
     window.removeEventListener("keydown", keyPress);
   });
@@ -63,7 +68,7 @@
   bind:this="{topDiv}"
   on:click="{() => close()}"
 >
-  <div id="modal" on:click|stopPropagation="{() => {}}">
+  <div id="modal" on:click|stopPropagation>
     <svg id="close" on:click="{() => close()}" viewBox="0 0 12 12">
       <circle cx="6" cy="6" r="6"></circle>
       <line x1="3" y1="3" x2="9" y2="9"></line>
@@ -75,7 +80,7 @@
   </div>
 </div>
 
-<style>
+<style lang="postcss">
   #topModal {
     visibility: hidden;
     z-index: 9999;

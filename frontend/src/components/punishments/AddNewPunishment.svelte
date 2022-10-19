@@ -1,31 +1,40 @@
 <script lang="ts">
   import { group } from "../../stores/groups";
-
   import Select from "svelte-select";
-  import type { User, CreatePunishment, PunishmentType } from "src/types";
-  import { getGroupUser, addPunishmentToUser } from "../../api";
   import { users } from "../../stores/users";
+  import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
+  import { getGroupUser, addPunishmentToUser } from "../../lib/api";
 
-  export let user: User;
+  export let user: User | undefined;
 
-  let reason: string = "";
-  let punType: string;
-  let amount: number;
+  let reason = "";
+  let punType: string | undefined;
+  let amount: number | undefined;
 
-  let disable: boolean =
-    punType == undefined || amount == undefined ? true : false;
-
-  function handleSelect(event) {
+  function handleSelect(event: CustomEvent<{ value: string }>) {
     punType = event.detail.value;
   }
 
-  const getPunType = (punName: string): PunishmentType => {
-    return $group.punishment_types.find((pun) => pun.name === punName);
+  const getPunType = (
+    punName: string | undefined
+  ): PunishmentType | undefined => {
+    return $group.punishment_types.find(
+      (pun: PunishmentType) => pun.name === punName
+    );
   };
 
   const clickNewPunishment = async () => {
+    if (!user) {
+      console.error("User is undefined");
+      return;
+    }
+    let punishmentType = getPunType(punType);
+    if (!punishmentType || !amount) {
+      console.error("Invalid punishment type or amount");
+      return;
+    }
     let new_punishment: CreatePunishment = {
-      punishment_type: getPunType(punType).punishment_type_id,
+      punishment_type: punishmentType.punishment_type_id,
       reason: reason,
       amount: amount,
     };
@@ -37,7 +46,7 @@
     ).then(async () => {
       users.set(
         await Promise.all(
-          $group.members.map(async (member) =>
+          $group.members.map(async (member: User) =>
             getGroupUser($group.group_id, member.user_id)
           )
         )
@@ -55,12 +64,11 @@
     <input
       type="text"
       placeholder="Begrunnelse"
-      class="input input-bordered w-full "
+      class="input input-bordered w-full border-[#d1d1d1]"
       bind:value="{reason}"
-      style="border-color: #d1d1d1"
     />
   </div>
-  <div class="themed pr-1" style="width: 15%;">
+  <div class="themed pr-1 w-[15%]">
     <Select
       items="{$group.punishment_types.map((pun) => pun.name)}"
       value="{punType}"
@@ -76,16 +84,15 @@
       type="number"
       min="1"
       placeholder="Antall"
-      class="input input-bordered w-full"
+      class="input input-bordered w-full border-[#d1d1d1]"
       bind:value="{amount}"
-      style="border-color: #d1d1d1"
     />
   </div>
   <button
-    class=" btn text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2"
-    disabled="{punType == undefined || amount == undefined || reason == ''
-      ? true
-      : false}"
+    class=" btn text-white bg-green-500 hover:bg-green-600 focus:ring-4
+    focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
+    inline-flex items-center mr-2"
+    disabled="{punType == undefined || amount == undefined || reason == '' ? true : false}"
     on:click="{clickNewPunishment}"
   >
     <svg
@@ -118,7 +125,7 @@
   </button>
 </div>
 
-<style lang="less">
+<style lang="postcss">
   .input-bordered {
     background-color: white;
   }

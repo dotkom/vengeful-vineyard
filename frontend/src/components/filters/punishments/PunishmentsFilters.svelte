@@ -4,7 +4,7 @@
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
   import PunishmentTagSelect from "./PunishmentTagSelect.svelte";
 
-  const resetPunishmentFilters = () => {
+  const resetPunishmentFilters = (): void => {
     punishmentsToFilter.set($group.punishment_types);
   };
 

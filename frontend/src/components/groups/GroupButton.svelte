@@ -1,18 +1,19 @@
 <script lang="ts">
-  export let logoUrl;
-  export let name = "";
   import GroupStore from "../../stores/groups";
+  import tempImg from "../../assets/placeholderGroup.svg"
 
-  import tempImg from "/assets/image.svg";
+  export let logoUrl: string;
+  export let name = "";
 
-  const changeActive = () => {
+  const changeActive = (): void => {
     $GroupStore.currentGroup = name;
   };
+  
 </script>
 
 <button class="groupBtn" on:click="{changeActive}">
   {#if logoUrl}
-    <img src="{logoUrl.sm}" alt="{name}" />
+    <img src="{logoUrl}" alt="{name}" />
   {:else}
     <img src="{tempImg}" alt="{name}" />
   {/if}
@@ -27,7 +28,7 @@
   alt="{name}"
 /> -->
 <style lang="less">
-  @import "../../variables.less";
+  @import "../../styles/variables.less";
   button {
     display: flex;
     justify-content: center;

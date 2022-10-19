@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { Punishment, User } from "src/types";
-  import { getGroup, getGroupUser } from "../../api";
+  import type { Punishment, PunishmentType } from "../../lib/types"
+  import { getGroup, getGroupUser } from "../../lib/api";
+  import { getLastPunishedDate} from "../../lib/functions";
   import {
     filteredUsers,
     onlyShowAfterDate,
@@ -16,10 +17,10 @@
   import { shouldDisplay } from "../../timeFilterFunc";
 
   // TODO
-  // Remove group_id once members from OW group from backend is implemented.
-  let group_id: number = 1;
+  // Remove groupId once members from OW group from backend is implemented.
+  let groupId: number = 1;
 
-  getGroup(group_id).then(async (res) => {
+  getGroup(groupId).then(async (res) => {
     window.localStorage.setItem("group", JSON.stringify(res));
     window.localStorage.setItem(
       "users",
@@ -37,27 +38,16 @@
     );
   });
 
-  const getLastPunishedDate = (user: User) => {
-    let date: String = "";
-    try {
-      date =
-        user.punishments[user.punishments.length - 1].created_time.split(
-          "T"
-        )[0];
-    } catch (TypeError) {
-      return "No date";
-    }
-    return date;
-  };
+ 
 
   /**
    * Creates a new object that stores punishment ids and punishment values.
    * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
    */
-  const mapTypes = () => {
-    let mappedTypes = {};
+  const mapTypes = (): {[key: string]: number} => {
+    let mappedTypes: {[key: string]: number} = {};
     $group.punishment_types.map(
-      (p) => (mappedTypes[p.punishment_type_id] = p.value)
+      (p: PunishmentType) => (mappedTypes[p.punishment_type_id] = p.value)
     );
     return mappedTypes;
   };
@@ -68,7 +58,7 @@
    */
   const calculateSum = (punishments: Punishment[]): number => {
     let dict = mapTypes();
-    let sum: number = 0;
+    let sum = 0;
     punishments.forEach((punishment) => {
       sum += dict[punishment.punishment_type] * punishment.amount;
     });
@@ -81,35 +71,35 @@
     {
       key: "name",
       title: "Navn",
-      value: (v) => v.name,
+      value: (v: { name: string; }) => v.name,
       sortable: true,
     },
     {
       key: "straffer",
       title: "Straffer",
-      value: (v) =>
+      value: (v: { straffer: Punishment[]; }) =>
         calculateSum(
           v.straffer
-            .filter((pun) =>
+            .filter((pun: Punishment) =>
               $punishmentsToFilter
                 .map((pun) => pun.punishment_type_id)
                 .includes(pun.punishment_type)
             )
-            .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+            .filter((pun: Punishment) => ($showPaid ? pun : pun.verified_time === null))
         ),
       sortable: true,
       class: "flex justify-center border-none",
       renderComponent: {
         component: PunishmentsListed,
         props: {
-          p_types: $group.punishment_types,
+          punishmentTypes: $group.punishment_types,
         },
       },
     },
     {
       key: "sist_straffet",
       title: "Sist straffet",
-      value: (v) => v.sist_straffet,
+      value: (v: any) => v.sist_straffet,
       sortable: true,
       class: "text-center",
     },
@@ -117,7 +107,7 @@
 
   let expanded1 = "";
   let expandedCache = "";
-  let expandedArr = [];
+  let expandedArr: any[] = [];
   $: {
     // 2-way binding setup between input and table expanded items
     if (expandedCache === expanded1) {
@@ -130,7 +120,7 @@
     expandedCache = expanded1;
   }
 
-  function handleRowClick(event) {
+  function handleRowClick(event: CustomEvent<{ row: any }>) {
     // manually toggle expanded items
     const row = event.detail.row;
     if (!row.$expanded) {
@@ -139,16 +129,14 @@
       expandedArr = expandedArr.filter((id) => id !== row.id);
     }
   }
-  function handleExpand(event) {
-    const row = event.detail.row;
-    const operation = row.$expanded ? "open" : "close";
-  }
+  /* eslint-disable */
 </script>
 
 <div class="punishment_grid">
   <SvelteTable
     columns="{columns}"
     rows="{$filteredUsers.map((user) => {
+      
       return {
         id: user.user_id,
         user: user,
@@ -172,11 +160,13 @@
       <PunishmentInfo
         totalSum="{calculateSum(
           row.user.punishments
+          /* @ts-ignore */
             .filter((pun) =>
               $punishmentsToFilter
                 .map((pun) => pun.punishment_type_id)
                 .includes(pun.punishment_type)
             )
+            /* @ts-ignore */
             .filter((pun) =>
               shouldDisplay(
                 new Date(pun.created_time),
@@ -184,16 +174,19 @@
                 $onlyShowBeforeDate
               )
             )
+            /* @ts-ignore */
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         )}"
         user="{row.user}"
-        p_types="{$group.punishment_types}"
+        punishmentTypes="{$group.punishment_types}"
         punishments="{row.user.punishments
+        /* @ts-ignore */
           .filter((pun) =>
             $punishmentsToFilter
               .map((pun) => pun.punishment_type_id)
               .includes(pun.punishment_type)
           )
+          /* @ts-ignore */
           .filter((pun) =>
             shouldDisplay(
               new Date(pun.created_time),
@@ -201,6 +194,7 @@
               $onlyShowBeforeDate
             )
           )
+          /* @ts-ignore */
           .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) ||
           null}"
       /></svelte:fragment
@@ -208,26 +202,8 @@
   </SvelteTable>
 </div>
 
-<style lang="less">
-  @import "../../variables.less";
-  .accordion_text {
-    @apply flex flex-row justify-between text-gray-500;
-  }
-  .name {
-    min-width: 7em;
-  }
-  .icon {
-    @apply min-h-6;
-  }
-  .icons {
-    @apply flex justify-center;
-  }
+<style lang="postcss">
   .punishment_grid {
     @apply mt-4;
-  }
-
-  .table-primary {
-    text-align: center;
-    background-color: white;
   }
 </style>

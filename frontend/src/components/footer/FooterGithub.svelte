@@ -7,7 +7,6 @@
 </div>
 
 <style>
-  @import "../../variables.less";
   .footer_github {
     margin: 1em;
   }

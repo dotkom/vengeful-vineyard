@@ -3,28 +3,20 @@
     deletePunishment,
     getGroupUser,
     postValidatePunishment,
-  } from "../../api";
-  import type { Punishment, PunishmentType, User } from "../../types";
+  } from "../../lib/api";
+  import type { Punishment, PunishmentType, User } from "../../lib/types";
+  import { getLogoUrl, formatGivenTime } from "../../lib/functions";
   import { users } from "../../stores/users";
   import { group } from "../../stores/groups";
   import SvelteTooltip from "svelte-tooltip";
   import AddNewPunishment from "./AddNewPunishment.svelte";
 
-  export let user: User;
+  export let user: User | undefined;
   export let punishments: Punishment[];
-  export let p_types: PunishmentType[];
-  export let totalSum: number;
+  export let punishmentTypes: PunishmentType[];
+  export let totalSum: number | undefined;
 
-  let cancelIcon = "assets/cancelIcon.svg";
-  let verifyIcon = "assets/checkGreen.svg";
-
-  const getUrl = (p_type: number) => {
-    return p_types.filter((p) => p.punishment_type_id == p_type)[0].logo_url;
-  };
-
-  const returnDate = (given_time: String) => {
-    return given_time.split("T")[0];
-  };
+  let verifyIconPath = "../../assets/checkGreen.svg";
 
   /**
    * Deletes a punishment from database and removes the item from GUI.
@@ -32,7 +24,32 @@
    * @param id punishment's id
    */
   const removePunishment = async (id: number) => {
+    if (!user) {
+      console.error("User is undefined");
+      return;
+    }
     await deletePunishment(id).then(async () => {
+      users.set(
+        await Promise.all(
+          $group.members.map(async (member) =>
+            getGroupUser($group.group_id, member.user_id)
+          )
+        )
+      );
+    });
+
+    punishments = user.punishments.filter(
+      (p: Punishment) => p.punishment_id !== id
+    );
+  };
+
+  const verifyPunishment = async (id: number) => {
+    if (!user) {
+      // TODO add error msg to user here
+      console.error("Error when verifying punishment");
+      return;
+    }
+    await postValidatePunishment(id).then(async () => {
       users.set(
         await Promise.all(
           $group.members.map(async (member) =>
@@ -44,20 +61,6 @@
 
     punishments = user.punishments.filter((p) => p.punishment_id !== id);
   };
-
-  const verifyPunishment = async (id: number) => {
-    await postValidatePunishment(id).then(async () => {
-      users.set(
-        await Promise.all(
-          $group.members.map(async (member) =>
-            getGroupUser($group.group_id, member.user_id)
-          )
-        )
-      );
-    });
-
-    //punishments = user.punishments.filter((p) => p.punishment_id !== id);
-  };
 </script>
 
 <div class="punishment_info">
@@ -67,11 +70,7 @@
     <div class="punishment">
       <div class="reason_wrapper">
         {#if punishment.verified_time}
-          <p
-            class="text-green-600 break-words"
-            style="max-width: 100%;
-        white-space: break-spaces;"
-          >
+          <p class="text-green-600 break-words break-spaces">
             Verifisert av {punishment.verified_by}
           </p>
         {:else}
@@ -84,29 +83,21 @@
               class="verifyBtn"
               on:click="{() => verifyPunishment(punishment.punishment_id)}"
             >
-              <img class="h-7 w-7" src="{verifyIcon}" alt="Remove punishment" />
-            </div></SvelteTooltip
-          >
+              <img
+                class="h-7 w-7"
+                src="{verifyIconPath}"
+                alt="Remove punishment"
+              />
+            </div>
+          </SvelteTooltip>
         {/if}
       </div>
 
-      <div
-        class="col-span-2 "
-        style="border-right: 1px solid #d9d9d9; border-left: 1px solid #d9d9d9;"
-      >
-        <p
-          class="break-words"
-          style="max-width: 100%;
-        white-space: break-spaces;"
-        >
-          "{punishment.reason}"
-        </p>
-        <p
-          class="break-words"
-          style="max-width: 100%;
-      white-space: break-spaces;"
-        >
-          - Gitt av <i>user</i>
+      <div class="col-span-2 border-box">
+        <p class="break-words break-spaces">{punishment.reason}</p>
+        <p class="break-words break-spaces">
+          - Gitt av
+          <i>user</i>
         </p>
       </div>
 
@@ -115,15 +106,17 @@
         {#each Array(punishment.amount) as _, i}
           <img
             class="icon"
-            src="{getUrl(punishment.punishment_type)}"
+            src="{getLogoUrl(punishment.punishment_type, punishmentTypes)}"
             alt="punishment"
           />
         {/each}
       </div>
       <div
-        class="col-span-2 relative h-full flex justify-center align-middle items-center"
+        class="col-span-2 relative h-full flex justify-center align-middle
+        items-center"
       >
         <div class="dropdown dropdown-end absolute z-10 top-0 right-0">
+          <!-- svelte-ignore a11y-label-has-associated-control -->
           <label
             tabindex="0"
             class="badge hover:cursor-pointer border-gray-300 bg-gray-100"
@@ -133,40 +126,40 @@
               fill="none"
               viewBox="0 0 24 24"
               class="inline-block w-5 h-5 stroke-current"
-              ><path
+            >
+              <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-              ></path></svg
-            >
+                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012
+                0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+              ></path>
+            </svg>
           </label>
           <ul
             tabindex="0"
-            class="menu menu-compact dropdown-content shadow bg-white rounded-box w-40"
+            class="menu menu-compact dropdown-content shadow bg-white
+            rounded-box w-40"
           >
             <button
               on:click="{() => {
                 removePunishment(punishment.punishment_id);
-              }}">Annuler straff</button
+              }}"
             >
+              Annuler straff
+            </button>
           </ul>
         </div>
-        <div>{returnDate(punishment.created_time)}</div>
+        <div>{formatGivenTime(punishment.created_time)}</div>
       </div>
     </div>
   {:else}
     <div></div>
   {/each}
-  <div class="sum">
-    Total sum: {totalSum}
-  </div>
+  <div class="sum">Total sum: {totalSum}</div>
 </div>
 
-<style lang="less">
-  .punishment_info {
-    // @apply px-12;
-  }
+<style lang="postcss">
   .punishment {
     @apply grid grid-cols-9 gap-1 bg-white shadow-md h-20;
     border: 0.3px solid #d9d9d9;
@@ -177,7 +170,7 @@
   }
 
   .punishment p {
-    @apply p-4 text-sm font-sspro !important;
+    @apply p-4 text-sm font-sspro;
   }
 
   .punishment > {
@@ -192,13 +185,12 @@
     @apply m-4 text-right;
   }
 
-  .deleteBtn {
-    padding: 0;
-  }
-
   .verifyBtn {
-    @apply float-left self-center hover:cursor-pointer;
+    @apply float-left self-center;
     min-width: 1.5rem;
+  }
+  .verifyBtn:hover {
+    cursor: pointer;
   }
 
   .punishment_icons {
@@ -209,10 +201,17 @@
   }
 
   .reason_wrapper {
-    @apply flex m-0 col-start-1 col-end-2;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-    flex-direction: column;
+    @apply flex flex-col m-0 col-start-1 col-end-2 justify-center content-center items-center;
+  }
+
+  .break-spaces {
+    @apply text-center;
+    white-space: break-spaces;
+    max-width: 100%;
+  }
+
+  .border-box {
+    border-right: 1px solid #d9d9d9;
+    border-left: 1px solid #d9d9d9;
   }
 </style>

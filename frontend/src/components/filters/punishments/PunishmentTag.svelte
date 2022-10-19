@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { PunishmentType } from "src/types";
-
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
+  import type { PunishmentType } from "../../../lib/types"
 
   let close = "assets/close.svg";
 

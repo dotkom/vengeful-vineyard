@@ -1,15 +1,15 @@
 <script lang="ts">
   import Modal, { getModal } from "./GroupModal.svelte";
-  import { postGroup } from "../../api";
+  import { postGroup } from "../../lib/api";
 
   let modalTitle = "Create new group";
 
   let groupName: string;
   let groupUsers: string[] = [];
-  let groupUser: string;
+  let groupUser: string | undefined;
   let groupRules: string;
 
-  const validate = () => {
+  const validate = (): void => {
     // Creates group with name and rules, however right now name is the unique identifier lmao
     postGroup(groupName, groupRules);
     closeModal();
@@ -27,17 +27,15 @@
   };
 
   //Not being used in post rn
-  const addUserToGroup = (userEmail: string) => {
-    console.log(userEmail);
+  const addUserToGroup = (userEmail?: string) => {
     if (userEmail != undefined) {
       groupUsers = [...groupUsers, userEmail];
-      console.log(groupUsers);
     }
 
     groupUser = undefined;
   };
 
-  const removeUser = (userEmail: string) => {
+  const removeUser = (userEmail?: string) => {
     groupUsers = groupUsers.filter(function (user) {
       return user !== userEmail;
     });
@@ -53,10 +51,20 @@
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M18.2189 11.9844H26.841C28.1101 11.9844 29.1269 12.9825 29.1269 14.1986C29.1269 15.4146 28.1101 16.4127 26.841 16.4127H18.2189C17.8076 16.4127 17.4618 16.7386 17.4618 17.1556V25.5338C17.4618 26.7498 16.445 27.748 15.1759 27.748C13.9067 27.748 12.89 26.7498 12.89 25.5338V17.1556C12.89 16.7386 12.5441 16.4127 12.1328 16.4127H3.51075C2.24157 16.4127 1.22485 15.4146 1.22485 14.1986C1.22485 12.9825 2.24157 11.9844 3.51075 11.9844H12.1328C12.5441 11.9844 12.89 11.6585 12.89 11.2416V2.86335C12.89 1.6473 13.9067 0.64917 15.1759 0.64917C16.445 0.64917 17.4618 1.6473 17.4618 2.86335V11.2416C17.4618 11.6585 17.8076 11.9844 18.2189 11.9844Z"
+      d="M18.2189 11.9844H26.841C28.1101 11.9844 29.1269 12.9825 29.1269
+      14.1986C29.1269 15.4146 28.1101 16.4127 26.841 16.4127H18.2189C17.8076
+      16.4127 17.4618 16.7386 17.4618 17.1556V25.5338C17.4618 26.7498 16.445
+      27.748 15.1759 27.748C13.9067 27.748 12.89 26.7498 12.89
+      25.5338V17.1556C12.89 16.7386 12.5441 16.4127 12.1328
+      16.4127H3.51075C2.24157 16.4127 1.22485 15.4146 1.22485 14.1986C1.22485
+      12.9825 2.24157 11.9844 3.51075 11.9844H12.1328C12.5441 11.9844 12.89
+      11.6585 12.89 11.2416V2.86335C12.89 1.6473 13.9067 0.64917 15.1759
+      0.64917C16.445 0.64917 17.4618 1.6473 17.4618 2.86335V11.2416C17.4618
+      11.6585 17.8076 11.9844 18.2189 11.9844Z"
       fill="#FBBF24"
       stroke="#EA9819"
-      stroke-width="0.5"></path>
+      stroke-width="0.5"
+    ></path>
   </svg>
 </button>
 
@@ -95,7 +103,7 @@
     <div class="invitedUsers">
       {#each groupUsers as user}
         <div class="addedUser">
-          <h5 style="padding-right: 0.5rem">{user}</h5>
+          <h5 class="pr-2">{user}</h5>
 
           <img
             width="24px"
@@ -103,24 +111,19 @@
             alt="Red X"
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Red_X.svg/64px-Red_X.svg.png"
             on:click="{() => removeUser(user)}"
-            style="cursor: pointer;"
+            class="cursor-pointer"
           />
         </div>
       {/each}
     </div>
 
-    <button
-      style="background-color: #4BB543; box-shadow: 2px 1px 2px #3a8d34;"
-      class="modalBtn"
-      type="submit"
-    >
+    <button class="modalBtn bg-[#4BB543] shadow-[#3a8d34]" type="submit">
       Create group
     </button>
   </form>
 
   <button
-    style="background-color: #cc0000; box-shadow: 2px 1px 2px #990f0f;"
-    class="modalBtn"
+    class="modalBtn bg-[#cc0000] shadow-[#990f0f]"
     on:click="{closeModal}"
   >
     Cancel
@@ -128,7 +131,7 @@
 </Modal>
 
 <style lang="less">
-  @import "../../variables.less";
+  @import "../../styles/variables.less";
 
   .nameInput {
     height: 3rem;
@@ -207,15 +210,9 @@
     flex-direction: column;
   }
 
-  input,
-  textarea {
+  input {
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
-  }
-
-  textarea {
-    height: 6rem;
-    margin-bottom: 4rem;
   }
 </style>

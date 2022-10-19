@@ -5,7 +5,6 @@
 </div>
 
 <style lang="less">
-  @import "../../variables.less";
   .footer_sign {
     font-size: 16px;
     justify-content: center;

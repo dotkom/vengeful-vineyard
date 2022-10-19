@@ -10,23 +10,23 @@
   let dateToFilterBy: Date = new Date(1560807962);
   let noLaterThan: Date = new Date();
 
-  let value: string = "alle tider";
+  let value: string | null = "alle tider";
 
   let displayCancel: boolean;
 
   $: onlyShowAfterDate.set(dateToFilterBy);
   $: onlyShowBeforeDate.set(noLaterThan);
 
-  let flatpickr;
-  let date = null;
+  let flatpickr: { open: () => void };
+  let date: null;
+  const today = new Date();
 
-  function handleSelect(event) {
+  function handleSelect(event: CustomEvent<{ value: string }>) {
     value = event.detail.value;
     date = null;
     noLaterThan = new Date();
     displayCancel = false;
     if (event.detail.value == "alle tider") {
-      var today = new Date();
       dateToFilterBy = new Date(
         today.getFullYear() - 5,
         today.getMonth(),
@@ -35,14 +35,12 @@
     } else if (event.detail.value == "i dag") {
       dateToFilterBy = new Date();
     } else if (event.detail.value == "siste uke") {
-      var today = new Date();
       dateToFilterBy = new Date(
         today.getFullYear(),
         today.getMonth(),
         today.getDate() - 7
       );
     } else {
-      var today = new Date();
       dateToFilterBy = new Date(
         today.getFullYear(),
         today.getMonth() - 1,
@@ -60,7 +58,7 @@
     altFormat: "F j, Y",
     dateFormat: "Y-m-d",
 
-    onClose: function (selectedDates, dateStr, instance) {
+    onClose: function (selectedDates: (string | number | Date)[]) {
       if (selectedDates[0] != undefined && selectedDates[1] != undefined) {
         dateToFilterBy = new Date(selectedDates[0]);
         noLaterThan = new Date(selectedDates[1]);
@@ -70,7 +68,7 @@
     },
   };
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     date = null;
     noLaterThan = new Date();
     displayCancel = false;
@@ -80,7 +78,6 @@
       today.getMonth(),
       today.getDate()
     );
-
     value = "alle tider";
   };
 </script>
@@ -98,10 +95,11 @@
 </svelte:head>
 
 <div class="flex flex-row justify-center ">
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
     <span class="label-text">Vis straffer fra</span>
   </label>
-  <div class="themed" style="width: 55%;">
+  <div class="themed w-[55%]">
     <Select
       items="{items}"
       value="{value}"
@@ -131,7 +129,8 @@
             placeholder="Velg datoer"
             data-input
             class="w-full pl-4 pr-10 py-3 leading-none rounded-lg shadow-sm
-          focus:outline-none focus:shadow-outline text-black font-medium bg-white"
+            focus:outline-none focus:shadow-outline text-black font-medium
+            bg-white"
           />
 
           <div class="absolute top-0 right-0 px-3 py-2">
@@ -150,8 +149,9 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0
-              00-2 2v12a2 2 0 002 2z"></path>
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2
+                0 00-2 2v12a2 2 0 002 2z"
+              ></path>
             </svg>
           </div>
         </div>
@@ -160,7 +160,9 @@
   </div>
   {#if displayCancel}
     <div
-      class=" text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-200 font-thin rounded-lg text-2xs text-center inline-flex items-center p-1 cursor-pointer"
+      class=" text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4
+      focus:ring-yellow-200 font-thin rounded-lg text-2xs text-center
+      inline-flex items-center p-1 cursor-pointer"
       on:click="{onCancel}"
       style="width: fit-content; margin-left: 1.5rem; margin-top: -1rem;"
     >

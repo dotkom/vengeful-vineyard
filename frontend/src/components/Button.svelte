@@ -9,7 +9,7 @@
 </button>
 
 <style lang="less">
-  @import "../variables.less";
+  @import "../styles/variables.less";
 
   button {
     appearance: none;
