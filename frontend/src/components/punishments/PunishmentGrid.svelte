@@ -87,7 +87,7 @@
     {
       key: "straffer",
       title: "Straffer",
-      value: (v) =>
+      value: (v: { straffer: any[]; }) =>
         calculateSum(
           v.straffer
             .filter((pun: Punishment) =>
@@ -130,7 +130,7 @@
     expandedCache = expanded1;
   }
 
-  function handleRowClick(event) {
+  function handleRowClick(event: CustomEvent<{ row: any }>) {
     // manually toggle expanded items
     const row = event.detail.row;
     if (!row.$expanded) {
@@ -138,10 +138,6 @@
     } else {
       expandedArr = expandedArr.filter((id) => id !== row.id);
     }
-  }
-  function handleExpand(event: { detail: { row: any; }; }) {
-    const row = event.detail.row;
-    const operation = row.$expanded ? "open" : "close";
   }
   
 </script>

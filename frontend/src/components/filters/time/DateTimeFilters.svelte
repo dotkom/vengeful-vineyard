@@ -20,7 +20,7 @@
   let flatpickr;
   let date = null;
 
-  function handleSelect(event) {
+  function handleSelect(event: CustomEvent<{ value: string }>) {
     value = event.detail.value;
     date = null;
     noLaterThan = new Date();
@@ -60,7 +60,7 @@
     altFormat: "F j, Y",
     dateFormat: "Y-m-d",
 
-    onClose: function (selectedDates, dateStr, instance) {
+    onClose: function (selectedDates: (string | number | Date)[]) {
       if (selectedDates[0] != undefined && selectedDates[1] != undefined) {
         dateToFilterBy = new Date(selectedDates[0]);
         noLaterThan = new Date(selectedDates[1]);
@@ -70,7 +70,7 @@
     },
   };
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     date = null;
     noLaterThan = new Date();
     displayCancel = false;
@@ -80,7 +80,6 @@
       today.getMonth(),
       today.getDate()
     );
-
     value = "alle tider";
   };
 </script>
