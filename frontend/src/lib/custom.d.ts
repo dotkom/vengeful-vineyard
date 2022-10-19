@@ -25,4 +25,10 @@ declare module 'svelte-table' {
   export default content
 }
 
+declare module 'svelecte' {
+  const content: any
+  export const addFormatter: any
+  export default content
+}
+
 /* eslint-enable @typescript-eslint/no-explicit-any */

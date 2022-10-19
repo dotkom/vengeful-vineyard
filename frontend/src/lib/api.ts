@@ -1,4 +1,5 @@
 import type { CreatePunishment, Group, User, OWGroup } from './types'
+import * as http from 'http'
 
 export async function getGroups() {
   const res = await fetch('http://localhost:8000/group')
@@ -69,8 +70,8 @@ export async function postValidatePunishment(id: number) {
 }
 
 async function authorizedOnlineFetch(url: string, token: string) {
-  const headers = {}
-  const request_options = {}
+  const headers: { [header: string]: string | string[] | undefined } = {}
+  const request_options: { [key: string]: {} } = {}
   headers['Authorization'] = `Bearer ${token}`
   request_options['headers'] = headers
   const res = await fetch(url, request_options)

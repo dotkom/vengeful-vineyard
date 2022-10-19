@@ -45,6 +45,7 @@
     "@themesberg/tailwind-datepicker": "^1.1.0",
     "flatpickr": "^4.4.0",
     "flowbite": "^1.3.4",
+    "svelecte": "^3.12.0",
     "svelte-flatpickr": "^3.2.6",
     "svelte-loading-spinners": "^0.3.4",
     "svelte-select": "^4.4.7",
