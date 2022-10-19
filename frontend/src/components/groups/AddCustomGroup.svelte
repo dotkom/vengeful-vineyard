@@ -103,7 +103,7 @@
     <div class="invitedUsers">
       {#each groupUsers as user}
         <div class="addedUser">
-          <h5 style="padding-right: 0.5rem">{user}</h5>
+          <h5 class="pr-2">{user}</h5>
 
           <img
             width="24px"
@@ -111,24 +111,19 @@
             alt="Red X"
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Red_X.svg/64px-Red_X.svg.png"
             on:click="{() => removeUser(user)}"
-            style="cursor: pointer;"
+            class="cursor-pointer"
           />
         </div>
       {/each}
     </div>
 
-    <button
-      style="background-color: #4BB543; box-shadow: 2px 1px 2px #3a8d34;"
-      class="modalBtn"
-      type="submit"
-    >
+    <button class="modalBtn bg-[#4BB543] shadow-[#3a8d34]" type="submit">
       Create group
     </button>
   </form>
 
   <button
-    style="background-color: #cc0000; box-shadow: 2px 1px 2px #990f0f;"
-    class="modalBtn"
+    class="modalBtn bg-[#cc0000] shadow-[#990f0f]"
     on:click="{closeModal}"
   >
     Cancel
@@ -215,15 +210,9 @@
     flex-direction: column;
   }
 
-  input,
-  textarea {
+  input {
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
-  }
-
-  textarea {
-    height: 6rem;
-    margin-bottom: 4rem;
   }
 </style>

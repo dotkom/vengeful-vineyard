@@ -61,10 +61,7 @@
     <div class="punishment">
       <div class="reason_wrapper">
         {#if punishment.verified_time}
-          <p
-            class="text-green-600 break-words"
-            style="max-width: 100%; white-space: break-spaces;"
-          >
+          <p class="text-green-600 break-words break-spaces">
             Verifisert av {punishment.verified_by}
           </p>
         {:else}
@@ -87,20 +84,9 @@
         {/if}
       </div>
 
-      <div
-        class="col-span-2 "
-        style="border-right: 1px solid #d9d9d9; border-left: 1px solid #d9d9d9;"
-      >
-        <p
-          class="break-words"
-          style="max-width: 100%; white-space: break-spaces;"
-        >
-          {punishment.reason}
-        </p>
-        <p
-          class="break-words"
-          style="max-width: 100%; white-space: break-spaces;"
-        >
+      <div class="col-span-2 border-box">
+        <p class="break-words break-spaces">{punishment.reason}</p>
+        <p class="break-words break-spaces">
           - Gitt av
           <i>user</i>
         </p>
@@ -206,10 +192,17 @@
   }
 
   .reason_wrapper {
-    @apply flex m-0 col-start-1 col-end-2;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-    flex-direction: column;
+    @apply flex flex-col m-0 col-start-1 col-end-2 justify-center content-center items-center;
+  }
+
+  .break-spaces {
+    @apply text-center;
+    white-space: break-spaces;
+    max-width: 100%;
+  }
+
+  .border-box {
+    border-right: 1px solid #d9d9d9;
+    border-left: 1px solid #d9d9d9;
   }
 </style>
