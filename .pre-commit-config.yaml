@@ -50,15 +50,9 @@ repos:
         types: [python]
         pass_filenames: false
         language: system
-      - id: prettier
-        name: Format frontend code
-        entry: bash -c "cd frontend && npm ci && npm run format"
-        types: ["svelte", "ts", "css"]
-        language: system
       - id: eslint
         name: Lint frontend code
-        entry: bash -c "cd frontend && npm run lint"
-        types: ["svelte", "ts"]
+        entry: bash -c "cd frontend && npm ci &&  npm run lint"
         language: system
     #   - id: svelte-validate
     #     name: Validate svelte
