@@ -1,11 +1,11 @@
 <script lang="ts">
   import BackToOw from "./BackToOW.svelte";
-  import UserFilters from "./checkboxes/UserFilters.svelte";
+  import UserFilters from "../filters/checkboxes/UserFilters.svelte";
   import GroupPicker from "./GroupPicker.svelte";
   import Logout from "./Logout.svelte";
-  import PunishmentsFilters from "./punishments/PunishmentsFilters.svelte";
+  import PunishmentsFilters from "../filters/punishments/PunishmentsFilters.svelte";
   import SearchUser from "./SearchUser.svelte";
-  import DateTimeFilters from "./time/DateTimeFilters.svelte";
+  import DateTimeFilters from "../filters/time/DateTimeFilters.svelte";
   import VvLogo from "./VvLogo.svelte";
 </script>
 

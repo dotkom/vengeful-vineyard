@@ -2,7 +2,7 @@
   <img src="assets/VV-logo-white.svg" alt="vv logo" width="200" height="80" />
 </div>
 
-<style lang="less">
+<style lang="postcss">
   .leftLogo {
     margin: 0 auto;
     display: flex;
