@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { Punishment, PunishmentType, User } from "src/lib/types";
+  import type { Punishment, PunishmentType } from "../../lib/types"
   import { getGroup, getGroupUser } from "../../lib/api";
+  import { getLastPunishedDate} from "../../lib/functions";
   import {
     filteredUsers,
     onlyShowAfterDate,
@@ -37,25 +38,14 @@
     );
   });
 
-  const getLastPunishedDate = (user: User) => {
-    let date: String = "";
-    try {
-      date =
-        user.punishments[user.punishments.length - 1].created_time.split(
-          "T"
-        )[0];
-    } catch (TypeError) {
-      return "No date";
-    }
-    return date;
-  };
+ 
 
   /**
    * Creates a new object that stores punishment ids and punishment values.
    * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
    */
-  const mapTypes = ():object => {
-    let mappedTypes = {};
+  const mapTypes = (): {[key: string]: number} => {
+    let mappedTypes: {[key: string]: number} = {};
     $group.punishment_types.map(
       (p: PunishmentType) => (mappedTypes[p.punishment_type_id] = p.value)
     );
@@ -68,7 +58,7 @@
    */
   const calculateSum = (punishments: Punishment[]): number => {
     let dict = mapTypes();
-    let sum: number = 0;
+    let sum = 0;
     punishments.forEach((punishment) => {
       sum += dict[punishment.punishment_type] * punishment.amount;
     });
@@ -87,7 +77,7 @@
     {
       key: "straffer",
       title: "Straffer",
-      value: (v: { straffer: any[]; }) =>
+      value: (v: { straffer: Punishment[]; }) =>
         calculateSum(
           v.straffer
             .filter((pun: Punishment) =>
@@ -109,7 +99,7 @@
     {
       key: "sist_straffet",
       title: "Sist straffet",
-      value: (v: { sist_straffet: string; }) => v.sist_straffet,
+      value: (v: any) => v.sist_straffet,
       sortable: true,
       class: "text-center",
     },
@@ -117,7 +107,7 @@
 
   let expanded1 = "";
   let expandedCache = "";
-  let expandedArr = [];
+  let expandedArr: any[] = [];
   $: {
     // 2-way binding setup between input and table expanded items
     if (expandedCache === expanded1) {
@@ -139,7 +129,7 @@
       expandedArr = expandedArr.filter((id) => id !== row.id);
     }
   }
-  
+  /* eslint-disable */
 </script>
 
 <div class="punishment_grid">
@@ -170,11 +160,13 @@
       <PunishmentInfo
         totalSum="{calculateSum(
           row.user.punishments
+          /* @ts-ignore */
             .filter((pun) =>
               $punishmentsToFilter
                 .map((pun) => pun.punishment_type_id)
                 .includes(pun.punishment_type)
             )
+            /* @ts-ignore */
             .filter((pun) =>
               shouldDisplay(
                 new Date(pun.created_time),
@@ -182,16 +174,19 @@
                 $onlyShowBeforeDate
               )
             )
+            /* @ts-ignore */
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         )}"
         user="{row.user}"
         punishmentTypes="{$group.punishment_types}"
         punishments="{row.user.punishments
+        /* @ts-ignore */
           .filter((pun) =>
             $punishmentsToFilter
               .map((pun) => pun.punishment_type_id)
               .includes(pun.punishment_type)
           )
+          /* @ts-ignore */
           .filter((pun) =>
             shouldDisplay(
               new Date(pun.created_time),
@@ -199,6 +194,7 @@
               $onlyShowBeforeDate
             )
           )
+          /* @ts-ignore */
           .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) ||
           null}"
       /></svelte:fragment

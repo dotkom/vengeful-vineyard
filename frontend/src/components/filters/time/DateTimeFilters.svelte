@@ -10,15 +10,16 @@
   let dateToFilterBy: Date = new Date(1560807962);
   let noLaterThan: Date = new Date();
 
-  let value: string = "alle tider";
+  let value: string | null = "alle tider";
 
   let displayCancel: boolean;
 
   $: onlyShowAfterDate.set(dateToFilterBy);
   $: onlyShowBeforeDate.set(noLaterThan);
 
-  let flatpickr;
-  let date = null;
+  let flatpickr: { open: () => void };
+  let date: null;
+  const today = new Date();
 
   function handleSelect(event: CustomEvent<{ value: string }>) {
     value = event.detail.value;
@@ -26,7 +27,6 @@
     noLaterThan = new Date();
     displayCancel = false;
     if (event.detail.value == "alle tider") {
-      var today = new Date();
       dateToFilterBy = new Date(
         today.getFullYear() - 5,
         today.getMonth(),
@@ -35,14 +35,12 @@
     } else if (event.detail.value == "i dag") {
       dateToFilterBy = new Date();
     } else if (event.detail.value == "siste uke") {
-      var today = new Date();
       dateToFilterBy = new Date(
         today.getFullYear(),
         today.getMonth(),
         today.getDate() - 7
       );
     } else {
-      var today = new Date();
       dateToFilterBy = new Date(
         today.getFullYear(),
         today.getMonth() - 1,

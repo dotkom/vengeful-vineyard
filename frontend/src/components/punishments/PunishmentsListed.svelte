@@ -1,6 +1,7 @@
 <script lang="ts">
   import { shouldDisplay } from "../../timeFilterFunc";
-  import type { PunishmentType, User } from "src/lib/types";
+  import type { PunishmentType, User } from "../../lib/types";
+  import { getLogoUrl } from "../../lib/functions";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
@@ -11,13 +12,8 @@
 
   interface Row {
     user: User;
+    straffer: any;
   }
-
-  const getUrl = (p_type: number) => {
-    return punishmentTypes.filter(
-      (p: PunishmentType) => p.punishment_type_id === p_type
-    )[0].logo_url;
-  };
 </script>
 
 <div class="flex justify-center flex-wrap max-w-[13rem]">
@@ -43,7 +39,7 @@
           <img
             class="h-8 w-8 m-[2px]"
             alt="punishment"
-            src="{getUrl(punishment.punishment_type)}"
+            src="{getLogoUrl(punishment.punishment_type, punishmentTypes)}"
           />
         {/each}
       {/each}

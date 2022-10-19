@@ -24,6 +24,10 @@
    * @param id punishment's id
    */
   const removePunishment = async (id: number) => {
+    if (!user) {
+      console.error("User is undefined");
+      return;
+    }
     await deletePunishment(id).then(async () => {
       users.set(
         await Promise.all(
@@ -40,6 +44,11 @@
   };
 
   const verifyPunishment = async (id: number) => {
+    if (!user) {
+      // TODO add error msg to user here
+      console.error("Error when verifying punishment");
+      return;
+    }
     await postValidatePunishment(id).then(async () => {
       users.set(
         await Promise.all(

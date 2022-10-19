@@ -1,7 +1,12 @@
 {
-  "svelteSortOrder": "scripts-markup-styles",
+  "svelteSortOrder": "options-styles-scripts-markup",
   "svelteStrictMode": true,
-  "svelteBracketNewLine": true,
   "svelteAllowShorthand": false,
-  "svelteIndentScriptAndStyle": true
+  "svelteIndentScriptAndStyle": true,
+  "arrowParens": "avoid",
+  "singleQuote": true,
+  "printWidth": 90,
+  "plugins": ["prettier-plugin-svelte"],
+  "semi": false,
+  "trailingComma": "none"
 }
