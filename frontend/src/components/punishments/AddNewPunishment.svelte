@@ -1,6 +1,5 @@
 <script lang="ts">
   import { group } from "../../stores/groups";
-
   import Select from "svelte-select";
   import { users } from "../../stores/users";
   import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
@@ -12,15 +11,14 @@
   let punType: string;
   let amount: number;
 
-  let disable: boolean =
-    punType == undefined || amount == undefined ? true : false;
-
-  function handleSelect(event) {
+  function handleSelect(event: CustomEvent<{ value: string }>) {
     punType = event.detail.value;
   }
 
   const getPunType = (punName: string): PunishmentType => {
-    return $group.punishment_types.find((pun) => pun.name === punName);
+    return $group.punishment_types.find(
+      (pun: PunishmentType) => pun.name === punName
+    );
   };
 
   const clickNewPunishment = async () => {
@@ -37,7 +35,7 @@
     ).then(async () => {
       users.set(
         await Promise.all(
-          $group.members.map(async (member) =>
+          $group.members.map(async (member: User) =>
             getGroupUser($group.group_id, member.user_id)
           )
         )

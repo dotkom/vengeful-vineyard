@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    OidcContext,
-    LogoutButton,
-    isAuthenticated,
-  } from "@dopry/svelte-oidc";
+  import { LogoutButton, isAuthenticated } from "@dopry/svelte-oidc";
 </script>
 
 <div class="flex m-auto">
@@ -14,10 +10,9 @@
       </div>
     </div>
   {/if}
-  <!-- </OidcContext> -->
 </div>
 
-<style lang="less">
+<style lang="postcss">
   .btn {
     width: fit-content;
     padding: 0;

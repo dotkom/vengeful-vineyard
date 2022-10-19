@@ -44,13 +44,4 @@
   .splitter {
     margin: 0.5rem 0;
   }
-
-  hr {
-    margin: 40px 0 30px 0;
-    border-top: 1px solid #06212d;
-    backdrop-filter: blur(4px);
-    /* Note: backdrop-filter has minimal browser support */
-
-    border-radius: 10px;
-  }
 </style>

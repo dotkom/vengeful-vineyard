@@ -18,7 +18,7 @@
   let flatpickr;
   let date = null;
 
-  function handleSelect(event) {
+  function handleSelect(event: CustomEvent<{ value: string }>) {
     value = event.detail.value;
     date = null;
     noLaterThan = new Date();
@@ -57,16 +57,14 @@
     altFormat: "F j, Y",
     dateFormat: "Y-m-d",
 
-    onClose: function (selectedDates, dateStr, instance) {
+    onClose: function (selectedDates: (string | number | Date)[]) {
       if (selectedDates[0] != undefined && selectedDates[1] != undefined) {
         dateToFilterBy = new Date(selectedDates[0]);
         noLaterThan = new Date(selectedDates[1]);
         value = null;
       }
     },
-    onOpen: function () {
-      // console.log("opened");
-    },
+    onOpen: function () {},
   };
 </script>
 
@@ -116,7 +114,8 @@
           placeholder="Velg datoer"
           data-input
           class="w-full pl-4 pr-10 py-3 leading-none rounded-lg shadow-sm
-          focus:outline-none focus:shadow-outline text-black font-medium bg-white"
+          focus:outline-none focus:shadow-outline text-black font-medium
+          bg-white"
         />
 
         <div class="absolute top-0 right-0 px-3 py-2">
@@ -136,7 +135,8 @@
               stroke-linejoin="round"
               stroke-width="2"
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0
-              00-2 2v12a2 2 0 002 2z"></path>
+              00-2 2v12a2 2 0 002 2z"
+            ></path>
           </svg>
         </div>
       </div>

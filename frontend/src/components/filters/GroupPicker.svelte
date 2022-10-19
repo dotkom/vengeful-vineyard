@@ -1,14 +1,15 @@
 <script lang="ts">
   import Select from "svelte-select";
   import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
-  import { getOnlineProfile, getMyOnlineGroups } from "../../api";
+  import { getOnlineProfile, getMyOnlineGroups } from "../../lib/api";
 
-  function handleSelect(event) {
+  function handleSelect(event: CustomEvent<{ value: string }>) {
     console.log(event.detail.value);
   }
 </script>
 
 <div class="flex flex-col justify-center m-auto pt-3">
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
     <span class="label-text">Viser straffer fra gruppe</span>
   </label>
@@ -38,7 +39,7 @@
   {/if}
 </div>
 
-<style lang="less">
+<style lang="postcss">
   .label-text {
     color: #eeeeee;
     font-size: 20px;
