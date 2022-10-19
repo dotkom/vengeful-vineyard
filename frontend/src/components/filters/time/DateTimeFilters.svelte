@@ -1,7 +1,6 @@
 <script lang="ts">
   import Select from "svelte-select";
   import "flowbite";
-  import "@themesberg/flowbite";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../../stores/users";
   import Flatpickr from "svelte-flatpickr";
 
