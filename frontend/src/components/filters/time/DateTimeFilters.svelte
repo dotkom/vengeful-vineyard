@@ -7,12 +7,12 @@
 
   const items = ["alle tider", "i dag", "siste uke", "siste måned"];
 
+  let dateToFilterBy: Date = new Date(1560807962);
+  let noLaterThan: Date = new Date();
+
   let value: string = "alle tider";
 
   let displayCancel: boolean;
-
-  let dateToFilterBy: Date = new Date();
-  let noLaterThan: Date = new Date();
 
   $: onlyShowAfterDate.set(dateToFilterBy);
   $: onlyShowBeforeDate.set(noLaterThan);

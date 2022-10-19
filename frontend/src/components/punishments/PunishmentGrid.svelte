@@ -13,6 +13,7 @@
   import PunishmentsListed from "./PunishmentsListed.svelte";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
+  import { shouldDisplay } from "../../timeFilterFunc";
 
   // TODO
   // Remove group_id once members from OW group from backend is implemented.
@@ -176,24 +177,12 @@
                 .map((pun) => pun.punishment_type_id)
                 .includes(pun.punishment_type)
             )
-            .filter(
-              (pun) =>
-                (new Date(pun.created_time).getTime() >=
-                  $onlyShowAfterDate.getTime() &&
-                  new Date(pun.created_time).getTime() <=
-                    $onlyShowBeforeDate.getTime()) ||
-                (new Date(pun.created_time).getDate() ==
-                  $onlyShowAfterDate.getDate() &&
-                  new Date(pun.created_time).getMonth() ==
-                    $onlyShowAfterDate.getMonth() &&
-                  new Date(pun.created_time).getFullYear() ==
-                    $onlyShowAfterDate.getFullYear()) ||
-                (new Date(pun.created_time).getDate() ==
-                  $onlyShowBeforeDate.getDate() &&
-                  new Date(pun.created_time).getMonth() ==
-                    $onlyShowBeforeDate.getMonth() &&
-                  new Date(pun.created_time).getFullYear() ==
-                    $onlyShowBeforeDate.getFullYear())
+            .filter((pun) =>
+              shouldDisplay(
+                new Date(pun.created_time),
+                $onlyShowAfterDate,
+                $onlyShowBeforeDate
+              )
             )
             .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
         )}"
@@ -205,24 +194,12 @@
               .map((pun) => pun.punishment_type_id)
               .includes(pun.punishment_type)
           )
-          .filter(
-            (pun) =>
-              (new Date(pun.created_time).getTime() >=
-                $onlyShowAfterDate.getTime() &&
-                new Date(pun.created_time).getTime() <=
-                  $onlyShowBeforeDate.getTime()) ||
-              (new Date(pun.created_time).getDate() ==
-                $onlyShowAfterDate.getDate() &&
-                new Date(pun.created_time).getMonth() ==
-                  $onlyShowAfterDate.getMonth() &&
-                new Date(pun.created_time).getFullYear() ==
-                  $onlyShowAfterDate.getFullYear()) ||
-              (new Date(pun.created_time).getDate() ==
-                $onlyShowBeforeDate.getDate() &&
-                new Date(pun.created_time).getMonth() ==
-                  $onlyShowBeforeDate.getMonth() &&
-                new Date(pun.created_time).getFullYear() ==
-                  $onlyShowBeforeDate.getFullYear())
+          .filter((pun) =>
+            shouldDisplay(
+              new Date(pun.created_time),
+              $onlyShowAfterDate,
+              $onlyShowBeforeDate
+            )
           )
           .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) ||
           null}"

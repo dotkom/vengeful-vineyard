@@ -37,24 +37,26 @@
   });
 </script>
 
-<div class="flex flex-col w-full mt-2">
-  <label for="punishment"
-    ><span class="label-text mb-2">Vis strafftyper</span></label
-  >
-  <Svelecte
-    options="{$group.punishment_types.filter(
-      (filterPun) =>
-        !$punishmentsToFilter
-          .map((groupPun) => groupPun.punishment_type_id)
-          .includes(filterPun.punishment_type_id)
-    )}"
-    i18n="{myI18n}"
-    renderer="pun-blocks"
-    inputId="punishment"
-    bind:value
-    placeholder="Navn på straff"
-  />
-</div>
+{#if $group !== null && $punishmentsToFilter !== null}
+  <div class="flex flex-col w-full mt-2">
+    <label for="punishment"
+      ><span class="label-text mb-2">Vis strafftyper</span></label
+    >
+    <Svelecte
+      options="{$group.punishment_types.filter(
+        (filterPun) =>
+          !$punishmentsToFilter
+            .map((groupPun) => groupPun.punishment_type_id)
+            .includes(filterPun.punishment_type_id)
+      )}"
+      i18n="{myI18n}"
+      renderer="pun-blocks"
+      inputId="punishment"
+      bind:value
+      placeholder="Navn på straff"
+    />
+  </div>
+{/if}
 
 <style lang="postcss">
   .wrapper {
