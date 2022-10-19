@@ -54,8 +54,12 @@ repos:
         name: Format frontend-code
         entry: bash -c "cd frontend && npm ci && npx prettier -w src"
         language: system
-      - id: svelte-validate
-        name: Validate svelte
-        entry: bash -c "cd frontend && npm ci && npm run validate"
-        pass_filenames: false
+      - id: lint
+        name: "Lint code"
+        entry: bash -c "cd frontend && npm run lint"
         language: system
+    #   - id: svelte-validate
+    #     name: Validate svelte
+    #     entry: bash -c "cd frontend && npm ci && npm run validate"
+    #     pass_filenames: false
+    #     language: system
