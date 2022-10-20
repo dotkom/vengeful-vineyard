@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { shouldDisplay } from "../../timeFilterFunc";
   import type { PunishmentType, User } from "../../lib/types";
-  import { getLogoUrl } from "../../lib/functions";
+  import { getLogoUrl, shouldDisplay } from "../../lib/functions";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
@@ -22,12 +21,15 @@
   {:then}
     {#if row.straffer}
       {#each row.straffer
+       /* @ts-ignore */
         .filter((pun) =>
           $punishmentsToFilter
             .map((pun) => pun.punishment_type_id)
             .includes(pun.punishment_type)
         )
+         /* @ts-ignore */
         .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+         /* @ts-ignore */
         .filter((pun) =>
           shouldDisplay(
             new Date(pun.created_time),

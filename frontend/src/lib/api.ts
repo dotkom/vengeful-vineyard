@@ -1,5 +1,4 @@
 import type { CreatePunishment, Group, User, OWGroup } from './types'
-import * as http from 'http'
 
 export async function getGroups() {
   const res = await fetch('http://localhost:8000/group')

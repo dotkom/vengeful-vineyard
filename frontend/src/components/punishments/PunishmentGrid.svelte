@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Punishment, PunishmentType } from "../../lib/types"
   import { getGroup, getGroupUser } from "../../lib/api";
-  import { getLastPunishedDate} from "../../lib/functions";
+  import { getLastPunishedDate, shouldDisplay} from "../../lib/functions";
   import {
     filteredUsers,
     onlyShowAfterDate,
@@ -14,7 +14,6 @@
   import PunishmentsListed from "./PunishmentsListed.svelte";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
-  import { shouldDisplay } from "../../timeFilterFunc";
 
   // TODO
   // Remove groupId once members from OW group from backend is implemented.
