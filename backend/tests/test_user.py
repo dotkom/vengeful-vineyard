@@ -199,6 +199,17 @@ class TestUserInGroup:
         check_response_time(response)
 
     @pytest.mark.asyncio
+    async def test_get_group_users_with_punishment(self, client: Any) -> None:
+        response = await client.get(f"/group/{self.group_id}/users")
+        assert response.status_code == 200
+
+        punishments = response.json()[0].get("punishments")
+        assert punishments is not None
+        assert len(punishments) == 1
+        assert punishments[0]["verified_time"] is not None
+        check_response_time(response)
+
+    @pytest.mark.asyncio
     async def test_delete_punishment(self, client: Any) -> None:
         response = await client.delete(f"/punishment/{self.punishment_id}")
         assert response.status_code == 200

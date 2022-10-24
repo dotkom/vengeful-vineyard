@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
     deletePunishment,
-    getGroupUser,
+    getGroupUsers,
     postValidatePunishment,
   } from "../../lib/api";
   import type { Punishment, PunishmentType, User } from "../../lib/types";
@@ -30,11 +30,7 @@
     }
     await deletePunishment(id).then(async () => {
       users.set(
-        await Promise.all(
-          $group.members.map(async (member) =>
-            getGroupUser($group.group_id, member.user_id)
-          )
-        )
+        await getGroupUsers($group.group_id)
       );
     });
 
@@ -51,11 +47,7 @@
     }
     await postValidatePunishment(id).then(async () => {
       users.set(
-        await Promise.all(
-          $group.members.map(async (member) =>
-            getGroupUser($group.group_id, member.user_id)
-          )
-        )
+        await getGroupUsers($group.group_id)
       );
     });
 

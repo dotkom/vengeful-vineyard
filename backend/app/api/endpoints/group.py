@@ -73,6 +73,16 @@ async def get_group_user(
         ) from exc
 
 
+@router.get("/{group_id}/users")
+async def get_group_users(request: Request, group_id: GroupId) -> list[User]:
+    """
+    Endpoint to get all users in a group.
+    """
+    app = request.app
+
+    return await app.db.get_group_users(group_id)
+
+
 @router.get("/{group_id}")
 async def get_group(request: Request, group_id: GroupId) -> Group:
     """
