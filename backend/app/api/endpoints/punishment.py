@@ -2,13 +2,17 @@
 Punishment endpoints
 """
 
-from app.api import Request
+from app.api import APIRoute, Request
 from app.exceptions import NotFound
 from app.models.punishment import PunishmentOut
 from app.types import PunishmentId
 from fastapi import APIRouter, HTTPException
 
-router = APIRouter(prefix="/punishment", tags=["Punishment"])
+router = APIRouter(
+    prefix="/punishment",
+    tags=["Punishment"],
+    route_class=APIRoute,
+)
 
 
 @router.delete("/{punishment_id}", tags=["Punishment"])

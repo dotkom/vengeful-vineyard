@@ -1,0 +1,52 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 4,
+            "image": {
+                "id": 705,
+                "name": "Dotkom Komit\u00e9symbol",
+                "timestamp": "2020-04-01T08:57:18.339954+02:00",
+                "description": "Komit\u00e9symbol for dotkom",
+                "thumb": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/thumbnails/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "original": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "wide": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/wide/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "lg": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/lg/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "md": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/md/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "sm": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "xs": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/xs/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "tags": [
+                    "dotkom",
+                    "terminal",
+                    "kode",
+                    "server",
+                    "cloud"
+                ],
+                "photographer": "Prokom",
+                "preset": "group",
+                "preset_display": "Gruppe"
+            },
+            "name_short": "Dotkom",
+            "name_long": "Drifts- og Utviklingskomiteen",
+            "description_long": "Drifts- og Utviklingskomiteen er komiteen som er ansvarlig for utvikling og vedlikehold av Online sine nettsider, samt drift av maskinparken.\r\n\r\nDotkom har ogs\u00e5 ansvaret for \u00e5 sikre at Online p\u00e5 best mulig m\u00e5te benytter IT i sine arbeidsprosesser, der Online er tjent med det. dotKom er som f\u00f8lge av det, ogs\u00e5 forpliktet til \u00e5 utvikle og vedlikeholde IT-systemer som Online er tjent med - med hensyn til Online som linjeforening og Online sine studenter.",
+            "description_short": "Drifts- og Utviklingskomiteen er komiteen som er ansvarlig for utvikling og vedlikehold av Online sine nettsider, samt drift av maskinparken.",
+            "application_description": "Drifts- og utviklingskomiteen har ansvaret for alle linjeforeningens datasystemer.\r\nVi leverer tjenester som nettside, wiki, e-postsystemer, filomr\u00e5der og mye annet spennende.\r\nI en stor linjeforening er informasjonsflyt og kvalitet viktig.\r\nDrifts- og utviklingskomiteen pr\u00f8ver hele tiden \u00e5 lage smarte l\u00f8sninger som holder en h\u00f8y standard, slik som i en bedrift.\r\nEr du interessert i programmering, drifting eller teknologi generelt?\r\nVi kan tilby et unikt verv i en meget sosial gjeng som driver med IT p\u00e5 h\u00f8yt niv\u00e5.\r\nIngen forkunnskaper er p\u00e5krevd annet enn stor l\u00e6revilje!",
+            "email": "dotkom@online.ntnu.no",
+            "created": "2019-07-27T10:03:33+02:00",
+            "group_type": "committee",
+            "verbose_type": "Komit\u00e9",
+            "group": 4,
+            "members": [
+                656,
+                658,
+                1552,
+                2227,
+                1052,
+                2224,
+                1551
+            ]
+        }
+    ]
+}

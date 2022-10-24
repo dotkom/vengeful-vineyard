@@ -1,0 +1,100 @@
+[
+    {
+        "id": 656,
+        "user": {
+            "id": 1381,
+            "first_name": "Amund",
+            "last_name": "",
+            "email": "email2@email.com",
+            "username": "r33an1"
+        },
+        "added": "2019-07-27T10:03:33.649888+02:00",
+        "roles": [],
+        "is_on_leave": false,
+        "is_retired": false
+    },
+    {
+        "id": 658,
+        "user": {
+            "id": 1383,
+            "first_name": "Anh-Kha Nguyen",
+            "last_name": "",
+            "email": "email3@email.com",
+            "username": "kharann"
+        },
+        "added": "2019-07-27T10:03:33.652692+02:00",
+        "roles": [],
+        "is_on_leave": false,
+        "is_retired": false
+    },
+    {
+        "id": 1552,
+        "user": {
+            "id": 2027,
+            "first_name": "Anna Irene",
+            "last_name": "",
+            "email": "email4@email.com",
+            "username": "annaandresen"
+        },
+        "added": "2020-08-31T19:51:15.077907+02:00",
+        "roles": [],
+        "is_on_leave": false,
+        "is_retired": false
+    },
+    {
+        "id": 2227,
+        "user": {
+            "id": 2219,
+            "first_name": "Billy Steen",
+            "last_name": "",
+            "email": "email5@email.com",
+            "username": "billysb"
+        },
+        "added": "2022-09-07T20:03:53.514264+02:00",
+        "roles": [],
+        "is_on_leave": false,
+        "is_retired": false
+    },
+    {
+        "id": 1052,
+        "user": {
+            "id": 1705,
+            "first_name": "B\u00f8rge",
+            "last_name": "",
+            "email": "email6@email.com",
+            "username": "kaffikaffi"
+        },
+        "added": "2019-09-04T22:43:28+02:00",
+        "roles": [],
+        "is_on_leave": true,
+        "is_retired": false
+    },
+    {
+        "id": 2224,
+        "user": {
+            "id": 2581,
+            "first_name": "Brage",
+            "last_name": "",
+            "email": "email1@email.com",
+            "username": "bragebau"
+        },
+        "added": "2022-09-07T20:03:24.432403+02:00",
+        "roles": [],
+        "is_on_leave": false,
+        "is_retired": false
+    },
+    {
+        "id": 1551,
+        "user": {
+            "id": 1395,
+            "first_name": "Carl",
+            "last_name": "",
+            "email": "email7@email.com",
+            "username": "carlofholy"
+        },
+        "added": "2020-08-31T19:51:04.777707+02:00",
+        "roles": [],
+        "is_on_leave": false,
+        "is_retired": false
+    }
+]

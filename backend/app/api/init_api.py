@@ -12,10 +12,13 @@ from typing import Any
 from app.api.endpoints import group, punishment, user
 from app.config import settings
 from app.db import Database
+from app.http import HTTPClient
+from app.state import State
+from app.sync import OWSync
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from . import FastAPI, ModifiedRoute, Request
+from . import APIRoute, FastAPI, Request
 
 logging.basicConfig(level=logging.DEBUG if settings.debug else logging.INFO)
 
@@ -63,7 +66,14 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
         database = Database()
         app.set_db(database)
 
+        http = HTTPClient()
+        app.set_http(http)
+
+        app.set_app_state(State())
+        app.set_ow_sync(OWSync(app))
+
         await database.async_init(**db_settings)
+        await http.async_init()
 
     @app.on_event("shutdown")
     async def shutdown_handler() -> None:
@@ -71,10 +81,13 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
         if database is not None:
             await database.close()
 
+        if app.http is not None:
+            await app.http.close()
+
 
 def init_api(**db_settings: str) -> FastAPI:
     app = FastAPI()
-    app.router.route_class = ModifiedRoute
+    app.router.route_class = APIRoute
     init_middlewares(app)
     init_routes(app)
     init_events(app, **db_settings)

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Punishment, PunishmentType } from "../../lib/types"
-  import { getGroup, getGroupUser } from "../../lib/api";
+  import { getGroup } from "../../lib/api";
   import { getLastPunishedDate, shouldDisplay} from "../../lib/functions";
   import {
     filteredUsers,
@@ -24,11 +24,7 @@
     window.localStorage.setItem(
       "users",
       JSON.stringify(
-        await Promise.all(
-          $group.members.map(async (member) =>
-            getGroupUser($group.group_id, member.user_id)
-          )
-        )
+        res.members || []
       )
     );
     window.localStorage.setItem(

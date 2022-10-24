@@ -1,7 +1,7 @@
 <script lang="ts">
   import Select from "svelte-select";
   import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
-  import { getOnlineProfile, getMyOnlineGroups } from "../../lib/api";
+  import { getMyOnlineGroups } from "../../lib/api";
 
   function handleSelect(event: CustomEvent<{ value: string }>) {
     console.log(event.detail.value);
@@ -14,27 +14,25 @@
     <span class="label-text">Viser straffer fra gruppe</span>
   </label>
   {#if $isAuthenticated}
-    {#await getOnlineProfile($accessToken) then value}
-      {#await getMyOnlineGroups($accessToken, value.id) then groups}
-        <div class="themed">
-          <Select
-            items="{groups
-              .filter(
-                (singGroup) => !singGroup.name_short.includes('permissions')
-              )
-              .map((group) => group.name_short)}"
-            value="{groups
-              .filter(
-                (singGroup) => !singGroup.name_short.includes('permissions')
-              )
-              .map((group) => group.name_short)[0]}"
-            on:select="{handleSelect}"
-            isClearable="{false}"
-            showIndicator="{true}"
-            placeholder="Velg periode"
-          />
-        </div>
-      {/await}
+    {#await getMyOnlineGroups($accessToken) then groups}
+      <div class="themed">
+        <Select
+          items="{groups
+            .filter(
+              (singGroup) => !singGroup.name_short.includes('permissions')
+            )
+            .map((group) => group.name_short)}"
+          value="{groups
+            .filter(
+              (singGroup) => !singGroup.name_short.includes('permissions')
+            )
+            .map((group) => group.name_short)[0]}"
+          on:select="{handleSelect}"
+          isClearable="{false}"
+          showIndicator="{true}"
+          placeholder="Velg periode"
+        />
+      </div>
     {/await}
   {/if}
 </div>
