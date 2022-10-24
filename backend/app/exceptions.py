@@ -17,7 +17,9 @@ class NotAuthorizedException(OWException):
 
 class DatabaseIntegrityException(VineyardException):
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[str] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[str] = None,
     ) -> None:
         super().__init__(message)
         self.detail = detail

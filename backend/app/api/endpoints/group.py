@@ -28,7 +28,8 @@ router = APIRouter(
 
 @router.get("/me")
 async def get_my_groups(
-    request: Request, wait_for_updates: bool = True
+    request: Request,
+    wait_for_updates: bool = True,
 ) -> list[dict[str, Any]]:
     app = request.app
     request.raise_if_missing_authorization()
@@ -53,7 +54,11 @@ async def get_my_groups(
 
 
 @router.get("/{group_id}/user/{user_id}")
-async def get_group_user(request: Request, group_id: GroupId, user_id: UserId) -> User:
+async def get_group_user(
+    request: Request,
+    group_id: GroupId,
+    user_id: UserId,
+) -> User:
     """
     Endpoint to get a user in the context of a group.
     """
@@ -81,7 +86,10 @@ async def get_group(request: Request, group_id: GroupId) -> Group:
 
 
 @router.post("")
-async def post_group(request: Request, group: GroupCreate) -> dict[str, int | None]:
+async def post_group(
+    request: Request,
+    group: GroupCreate,
+) -> dict[str, int | None]:
     """
     Endpoint to create a new group.
     """
@@ -95,7 +103,9 @@ async def post_group(request: Request, group: GroupCreate) -> dict[str, int | No
 
 @router.post("/{group_id}/punishmentType")
 async def add_punishment_type_to_group(
-    request: Request, group_id: GroupId, punishment_type: PunishmentTypeCreate
+    request: Request,
+    group_id: GroupId,
+    punishment_type: PunishmentTypeCreate,
 ) -> dict[str, int]:
     """
     Endpoint to create a custom punishment type for a group.
@@ -109,7 +119,9 @@ async def add_punishment_type_to_group(
 
 @router.delete("/{group_id}/punishmentType/{punishment_type_id}")
 async def delete_punishment_type_to_group(
-    request: Request, group_id: GroupId, punishment_type_id: PunishmentTypeId
+    request: Request,
+    group_id: GroupId,
+    punishment_type_id: PunishmentTypeId,
 ) -> None:
     """
     Endpoint to remove a custom punishment type for a group.

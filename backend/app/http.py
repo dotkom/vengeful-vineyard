@@ -93,7 +93,10 @@ class HTTPClient:
             return data
 
     async def get_ow_profile_by_user_id(
-        self, user_id: int, *, access_token: str | None = None
+        self,
+        user_id: int,
+        *,
+        access_token: str | None = None,
     ) -> Any | None:
         headers = {}
         if access_token is not None:
@@ -111,7 +114,10 @@ class HTTPClient:
             return await response.json()
 
     async def search_ow_profiles(
-        self, query: str, *, access_token: str | None = None
+        self,
+        query: str,
+        *,
+        access_token: str | None = None,
     ) -> Any | None:
         headers = {}
         if access_token is not None:

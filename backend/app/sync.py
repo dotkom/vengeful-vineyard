@@ -51,7 +51,10 @@ class OWSync:
         return user.user_id, ow_user_id
 
     async def sync_for_user(
-        self, ow_user_id: OWUserId, user_id: UserId, wait_for_updates: bool = True
+        self,
+        ow_user_id: OWUserId,
+        user_id: UserId,
+        wait_for_updates: bool = True,
     ) -> None:
         groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
         filtered_groups_data = [
@@ -81,7 +84,11 @@ class OWSync:
                 await asyncio.gather(*tasks)
 
     async def create_user_if_not_exists(
-        self, ow_user_id: OWUserId, first_name: str, last_name: str, email: str
+        self,
+        ow_user_id: OWUserId,
+        first_name: str,
+        last_name: str,
+        email: str,
     ) -> UserId:
         user_create = UserCreate(
             ow_user_id=ow_user_id,
@@ -93,7 +100,10 @@ class OWSync:
         return res["id"]
 
     async def add_user_to_group(
-        self, group_id: GroupId, user_data: dict[str, Any], conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        user_data: dict[str, Any],
+        conn: Pool | None = None,
     ) -> None:
         user_create = UserCreate(
             ow_user_id=user_data["user"]["id"],
@@ -181,7 +191,10 @@ class OWSync:
                 )
 
     async def sync_group_for_user(
-        self, ow_user_id: OWUserId, user_id: UserId, group_data: dict[str, Any]
+        self,
+        ow_user_id: OWUserId,
+        user_id: UserId,
+        group_data: dict[str, Any],
     ) -> None:
         group_users = await self.app.http.get_ow_group_users(group_data["id"])
 
@@ -252,7 +265,10 @@ class OWSync:
                 )
 
     async def update_user(
-        self, user_id: UserId, user_data: dict[str, Any], conn: Pool | None = None
+        self,
+        user_id: UserId,
+        user_data: dict[str, Any],
+        conn: Pool | None = None,
     ) -> None:
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             user_update = UserUpdate(

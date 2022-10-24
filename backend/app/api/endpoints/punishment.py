@@ -16,7 +16,10 @@ router = APIRouter(
 
 
 @router.delete("/{punishment_id}", tags=["Punishment"])
-async def delete_punishment(request: Request, punishment_id: PunishmentId) -> None:
+async def delete_punishment(
+    request: Request,
+    punishment_id: PunishmentId,
+) -> None:
     """
     Endpoint to delete a punishment.
     """
@@ -31,7 +34,8 @@ async def delete_punishment(request: Request, punishment_id: PunishmentId) -> No
 
 @router.post("/{punishment_id}/verify", tags=["Punishment"])
 async def verify_punishment(
-    request: Request, punishment_id: PunishmentId
+    request: Request,
+    punishment_id: PunishmentId,
 ) -> PunishmentOut:
     """
     Endpoint to mark a punishment as verified (paid/done).

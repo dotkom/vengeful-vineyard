@@ -84,7 +84,11 @@ def patched_add(self: Any, *args: Any, **kwargs: Any) -> None:
 
 
 async def patched_match(
-    self: Any, method: str, url: URL, allow_redirects: bool = True, **kwargs: Any
+    self: Any,
+    method: str,
+    url: URL,
+    allow_redirects: bool = True,
+    **kwargs: Any,
 ) -> Any:
     history = []
     while True:

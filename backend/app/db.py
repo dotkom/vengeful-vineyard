@@ -111,7 +111,9 @@ class Database:
         await self.pool.close()
 
     async def _set_database_version(
-        self, version: int, conn: Pool | None = None
+        self,
+        version: int,
+        conn: Pool | None = None,
     ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = f"set mg.version to {version}; alter database {self._db_name} set mg.version from current;"
@@ -195,7 +197,11 @@ class Database:
             return User(**user)
 
     async def get_user_groups(
-        self, user_id: UserId, *, is_ow_user_id: bool = False, conn: Pool | None = None
+        self,
+        user_id: UserId,
+        *,
+        is_ow_user_id: bool = False,
+        conn: Pool | None = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             if not is_ow_user_id:
@@ -211,7 +217,11 @@ class Database:
             result = await conn.fetch(query, user_id)
             return [dict(row) for row in result]
 
-    async def get_group(self, group_id: GroupId, conn: Pool | None = None) -> Group:
+    async def get_group(
+        self,
+        group_id: GroupId,
+        conn: Pool | None = None,
+    ) -> Group:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM groups WHERE groups.group_id = $1"
             db_group = await conn.fetchrow(query, group_id)
@@ -232,7 +242,10 @@ class Database:
             return Group(**group)
 
     async def get_raw_punishments_for_user(
-        self, group_id: GroupId, user_id: UserId, conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        conn: Pool | None = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT * FROM group_punishments
@@ -248,7 +261,10 @@ class Database:
             return punishments
 
     async def get_raw_punishments_for_users(
-        self, group_id: GroupId, user_ids: list[UserId], conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        user_ids: list[UserId],
+        conn: Pool | None = None,
     ) -> dict[UserId, list[dict[UserId, Any]]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT * FROM group_punishments
@@ -298,7 +314,9 @@ class Database:
             return User(**user)
 
     async def get_raw_group_users(
-        self, group_id: GroupId, conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        conn: Pool | None = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT *
@@ -312,7 +330,10 @@ class Database:
         return [dict(row) for row in db_users]
 
     async def get_group_users(
-        self, group_id: GroupId, punishments: bool = True, conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        punishments: bool = True,
+        conn: Pool | None = None,
     ) -> list[User]:
         async with MaybeAcquire(conn, self.pool) as conn:
             db_users = await self.get_raw_group_users(group_id, conn=conn)
@@ -336,7 +357,9 @@ class Database:
             return users
 
     async def get_group_members_raw(
-        self, group_id: GroupId, conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        conn: Pool | None = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM group_members WHERE group_id = $1"
@@ -345,7 +368,10 @@ class Database:
         return [dict(row) for row in res]
 
     async def delete_user_from_group(
-        self, group_id: GroupId, user_id: UserId, conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        conn: Pool | None = None,
     ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "DELETE FROM group_members WHERE group_id = $1 AND user_id = $2 RETURNING *"
@@ -355,7 +381,10 @@ class Database:
                 raise NotFound
 
     async def delete_users_from_group(
-        self, group_id: GroupId, users: list[UserId], conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        users: list[UserId],
+        conn: Pool | None = None,
     ) -> list[UserId]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """DELETE FROM group_members
@@ -370,7 +399,9 @@ class Database:
             return [r["user_id"] for r in res]
 
     async def get_punishment_types(
-        self, group_id: GroupId, conn: Pool | None = None
+        self,
+        group_id: GroupId,
+        conn: Pool | None = None,
     ) -> list[PunishmentTypeRead]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM punishment_types WHERE group_id = $1"
@@ -379,7 +410,9 @@ class Database:
         return [PunishmentTypeRead(**dict(x)) for x in punishment_types]
 
     async def get_punishment(
-        self, punishment_id: PunishmentId, conn: Pool | None = None
+        self,
+        punishment_id: PunishmentId,
+        conn: Pool | None = None,
     ) -> PunishmentRead:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM group_punishments WHERE punishment_id = $1"
@@ -389,7 +422,10 @@ class Database:
         return PunishmentRead(**dict(punishments))
 
     async def get_punishments(
-        self, user_id: UserId, group_id: GroupId, conn: Pool | None = None
+        self,
+        user_id: UserId,
+        group_id: GroupId,
+        conn: Pool | None = None,
     ) -> list[PunishmentRead]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = (
@@ -400,7 +436,9 @@ class Database:
         return [PunishmentRead(**dict(x)) for x in punishments]
 
     async def insert_user(
-        self, user: UserCreate, conn: Pool | None = None
+        self,
+        user: UserCreate,
+        conn: Pool | None = None,
     ) -> InsertOrUpdateUser:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO users(ow_user_id, first_name, last_name, email)
@@ -420,7 +458,10 @@ class Database:
         return {"id": user_id, "action": "CREATE"}
 
     async def update_user(
-        self, user_id: UserId, user: UserUpdate, conn: Pool | None = None
+        self,
+        user_id: UserId,
+        user: UserUpdate,
+        conn: Pool | None = None,
     ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """UPDATE users
@@ -435,7 +476,9 @@ class Database:
             )
 
     async def update_users(
-        self, users: list[UserUpdate], conn: Pool | None = None
+        self,
+        users: list[UserUpdate],
+        conn: Pool | None = None,
     ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """UPDATE users
@@ -455,7 +498,9 @@ class Database:
             )
 
     async def update_user_by_ow_user_id(
-        self, user: UserCreate, conn: Pool | None = None
+        self,
+        user: UserCreate,
+        conn: Pool | None = None,
     ) -> InsertOrUpdateUser:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """UPDATE users
@@ -472,7 +517,9 @@ class Database:
             return {"id": user_id, "action": "UPDATE"}
 
     async def insert_or_update_user(
-        self, user: UserCreate, conn: Pool | None = None
+        self,
+        user: UserCreate,
+        conn: Pool | None = None,
     ) -> InsertOrUpdateUser:
         async with MaybeAcquire(conn, self.pool) as conn:
             try:
@@ -481,7 +528,9 @@ class Database:
                 return await self.update_user_by_ow_user_id(user, conn=conn)
 
     async def insert_many_users(
-        self, users: list[UserCreate], conn: Pool | None = None
+        self,
+        users: list[UserCreate],
+        conn: Pool | None = None,
     ) -> dict[OWUserId, UserId]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO users(ow_user_id, first_name, last_name, email)
@@ -503,7 +552,9 @@ class Database:
             return {x["ow_user_id"]: x["user_id"] for x in res}
 
     async def update_many_users_by_ow_id(
-        self, users: list[UserCreate], conn: Pool | None = None
+        self,
+        users: list[UserCreate],
+        conn: Pool | None = None,
     ) -> dict[OWUserId, UserId]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """UPDATE users
@@ -522,7 +573,9 @@ class Database:
             return {x["ow_user_id"]: x["user_id"] for x in res}
 
     async def insert_or_update_users(
-        self, users: list[UserCreate], conn: Pool | None = None
+        self,
+        users: list[UserCreate],
+        conn: Pool | None = None,
     ) -> dict[OWUserId, UserId]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT ow_user_id FROM users WHERE ow_user_id = ANY($1)"
@@ -554,7 +607,9 @@ class Database:
             return created | updated
 
     async def insert_group(
-        self, group: GroupCreate, conn: Pool | None = None
+        self,
+        group: GroupCreate,
+        conn: Pool | None = None,
     ) -> InsertOrUpdateGroup:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO groups(ow_group_id, name, name_short, rules, image)
@@ -579,7 +634,9 @@ class Database:
         return {"id": gid, "action": "CREATE"}
 
     async def update_group(
-        self, group: GroupCreate, conn: Pool | None = None
+        self,
+        group: GroupCreate,
+        conn: Pool | None = None,
     ) -> InsertOrUpdateGroup:
         if group.ow_group_id is None:
             raise ValueError("ow_group_id must be set")
@@ -600,7 +657,9 @@ class Database:
             return {"id": group_id, "action": "UPDATE"}
 
     async def insert_or_update_group(
-        self, group: GroupCreate, conn: Pool | None = None
+        self,
+        group: GroupCreate,
+        conn: Pool | None = None,
     ) -> InsertOrUpdateGroup:
         async with MaybeAcquire(conn, self.pool) as conn:
             try:
@@ -609,7 +668,9 @@ class Database:
                 return await self.update_group(group, conn=conn)
 
     async def insert_user_in_group(
-        self, member: GroupMemberCreate, conn: Pool | None = None
+        self,
+        member: GroupMemberCreate,
+        conn: Pool | None = None,
     ) -> dict[str, GroupId | UserId]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id)
@@ -634,7 +695,9 @@ class Database:
         }
 
     async def insert_users_in_group(
-        self, members: list[GroupMemberCreate], conn: Pool | None = None
+        self,
+        members: list[GroupMemberCreate],
+        conn: Pool | None = None,
     ) -> list[dict[str, GroupId | UserId]]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id)
@@ -743,7 +806,9 @@ class Database:
         return {"ids": ids}
 
     async def delete_punishment(
-        self, punishment_id: PunishmentId, conn: Pool | None = None
+        self,
+        punishment_id: PunishmentId,
+        conn: Pool | None = None,
     ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "DELETE FROM group_punishments WHERE punishment_id = $1 RETURNING *"
@@ -753,7 +818,9 @@ class Database:
                 raise NotFound
 
     async def verify_punishment(
-        self, punishment_id: PunishmentId, conn: Pool | None = None
+        self,
+        punishment_id: PunishmentId,
+        conn: Pool | None = None,
     ) -> PunishmentRead:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "UPDATE group_punishments SET verified_time = $1 WHERE punishment_id = $2 RETURNING punishment_id"
