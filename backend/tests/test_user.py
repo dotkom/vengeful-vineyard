@@ -135,7 +135,11 @@ class TestUserInGroup:
     async def test_create_punishment_type(self, client: Any) -> None:
         response = await client.post(
             "/group/1/punishmentType",
-            json={"name": "Waffles", "value": 125, "logo_url": "http://example.com"},
+            json={
+                "name": "Waffles",
+                "value": 125,
+                "logo_url": "./assets/beerOutlined.svg",
+            },
         )
         assert response.status_code == 200
         assert response.json() == {"id": 4}
@@ -149,7 +153,7 @@ class TestUserInGroup:
             {
                 "name": "Waffles",
                 "value": 125,
-                "logo_url": "http://example.com",
+                "logo_url": "./assets/beerOutlined.svg",
                 "punishment_type_id": 4,
             },
         ]
