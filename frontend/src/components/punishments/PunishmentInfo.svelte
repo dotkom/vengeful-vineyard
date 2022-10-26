@@ -12,6 +12,10 @@
   import AddNewPunishment from "./AddNewPunishment.svelte";
 
   export let user: User | undefined;
+  let userToPunish: User[] = [];
+  if (user) {
+    userToPunish.push(user);
+  }
   export let punishments: Punishment[];
   export let punishmentTypes: PunishmentType[];
   export let totalSum: number | undefined;
@@ -29,9 +33,7 @@
       return;
     }
     await deletePunishment(id).then(async () => {
-      users.set(
-        await getGroupUsers($group.group_id)
-      );
+      users.set(await getGroupUsers($group.group_id));
     });
 
     punishments = user.punishments.filter(
@@ -46,9 +48,7 @@
       return;
     }
     await postValidatePunishment(id).then(async () => {
-      users.set(
-        await getGroupUsers($group.group_id)
-      );
+      users.set(await getGroupUsers($group.group_id));
     });
 
     punishments = user.punishments.filter((p) => p.punishment_id !== id);
@@ -56,7 +56,7 @@
 </script>
 
 <div class="punishment_info">
-  <AddNewPunishment user="{user}" />
+  <AddNewPunishment user="{userToPunish}" />
   <!-- <slot name="punishments" /> -->
   {#each punishments as punishment}
     <div class="punishment">

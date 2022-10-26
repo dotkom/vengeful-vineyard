@@ -5,7 +5,7 @@
   import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
   import { getGroupUsers, addPunishmentToUser } from "../../lib/api";
 
-  export let user: User | undefined;
+  export let user: User[] | undefined;
 
   let reason = "";
   let punType: string | undefined;
@@ -23,7 +23,7 @@
     );
   };
 
-  const clickNewPunishment = async () => {
+  export const clickNewPunishment = async () => {
     if (!user) {
       console.error("User is undefined");
       return;
@@ -39,15 +39,16 @@
       amount: amount,
     };
 
-    await addPunishmentToUser(
-      new_punishment,
-      $group.group_id,
-      user.user_id
-    ).then(async () => {
-      users.set(
-        await getGroupUsers($group.group_id)
-      );
-    });
+    user.map(
+      async (user) =>
+        await addPunishmentToUser(
+          new_punishment,
+          $group.group_id,
+          user.user_id
+        ).then(async () => {
+          users.set(await getGroupUsers($group.group_id));
+        })
+    );
 
     reason = "";
     punType = undefined;
@@ -88,7 +89,9 @@
     class=" btn text-white bg-green-500 hover:bg-green-600 focus:ring-4
     focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
     inline-flex items-center mr-2"
-    disabled="{punType == undefined || amount == undefined || reason == '' ? true : false}"
+    disabled="{punType == undefined || amount == undefined || reason == ''
+      ? true
+      : false}"
     on:click="{clickNewPunishment}"
   >
     <svg
