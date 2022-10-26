@@ -6,6 +6,7 @@
     LoginButton,
   } from "@dopry/svelte-oidc";
   import Footer from "./components/footer/Footer.svelte";
+  import NewPunishmentBtn from "./components/newPunishmentMultiple/NewPunishmentBtn.svelte";
   import PunishmentGrid from "./components/punishments/PunishmentGrid.svelte";
   import Sidebar from "./components/sidebar/Sidebar.svelte";
   import { getMyOnlineGroups } from "./lib/api";
@@ -30,7 +31,14 @@
     redirect_uri="http://localhost:3000"
     post_logout_redirect_uri="http://localhost:3000"
     scope="openid profile onlineweb4"
-    extraOptions="{{ metadataUrl: 'https://old.online.ntnu.no/openid/.well-known/openid-configuration', filterProtocolClaims: true, loadUserInfo: true, silent_redirect_uri: 'http://localhost:3000', revokeAccessTokenOnSignout: true }}"
+    extraOptions="{{
+      metadataUrl:
+        'https://old.online.ntnu.no/openid/.well-known/openid-configuration',
+      filterProtocolClaims: true,
+      loadUserInfo: true,
+      silent_redirect_uri: 'http://localhost:3000',
+      revokeAccessTokenOnSignout: true,
+    }}"
   >
     {#if $isAuthenticated}
       <div class="body_content">
@@ -38,7 +46,7 @@
         <div class="punishments">
           {#await getMyOnlineGroups($accessToken) then groups}
             {#if groups}
-              <!-- <GroupLogos /> -->
+              <NewPunishmentBtn />
               <PunishmentGrid />
             {:else}
               <div

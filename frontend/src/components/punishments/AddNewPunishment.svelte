@@ -1,34 +1,26 @@
 <script lang="ts">
+  import Svelecte, { addFormatter } from "svelecte";
   import { group } from "../../stores/groups";
-  import Select from "svelte-select";
   import { users } from "../../stores/users";
   import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
   import { getGroupUsers, addPunishmentToUser } from "../../lib/api";
 
-  export let user: User | undefined;
+  export let user: User[] | undefined;
 
   let reason = "";
-  let punType: string | undefined;
+  let punType: PunishmentType | undefined;
   let amount: number | undefined;
+  let value: string | null;
 
-  function handleSelect(event: CustomEvent<{ value: string }>) {
-    punType = event.detail.value;
-  }
+  let displayNoUserError: boolean = false;
 
-  const getPunType = (
-    punName: string | undefined
-  ): PunishmentType | undefined => {
-    return $group.punishment_types.find(
-      (pun: PunishmentType) => pun.name === punName
-    );
-  };
-
-  const clickNewPunishment = async () => {
-    if (!user) {
+  export const clickNewPunishment = async () => {
+    if (!user || user.length < 1) {
       console.error("User is undefined");
+      displayNoUserError = true;
       return;
     }
-    let punishmentType = getPunType(punType);
+    let punishmentType = punType;
     if (!punishmentType || !amount) {
       console.error("Invalid punishment type or amount");
       return;
@@ -39,20 +31,39 @@
       amount: amount,
     };
 
-    await addPunishmentToUser(
-      new_punishment,
-      $group.group_id,
-      user.user_id
-    ).then(async () => {
-      users.set(
-        await getGroupUsers($group.group_id)
-      );
-    });
+    user.map(
+      async (user) =>
+        await addPunishmentToUser(
+          new_punishment,
+          $group.group_id,
+          user.user_id
+        ).then(async () => {
+          users.set(await getGroupUsers($group.group_id));
+        })
+    );
 
     reason = "";
     punType = undefined;
     amount = undefined;
+    displayNoUserError = false;
+    value = null;
   };
+
+  const myI18n = {
+    nomatch: "Ingen matchende straffer",
+  };
+
+  function colorRenderer(punishment: PunishmentType, isSelected: boolean) {
+    if (isSelected) {
+      punType = punishment;
+    }
+    return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
+     `;
+  }
+
+  addFormatter({
+    "pun-blocks": colorRenderer,
+  });
 </script>
 
 <div class="flex flex-row w-full items-center m-1 p-1 justify-between pb-5">
@@ -60,19 +71,24 @@
     <input
       type="text"
       placeholder="Begrunnelse"
-      class="input input-bordered w-full border-[#d1d1d1]"
+      class="w-full border-[#d1d1d1] placeholder-[#D6D6D1]"
+      style="
+    border-radius: 4px;
+    height: 2.4rem;"
       bind:value="{reason}"
+      required
     />
   </div>
   <div class="themed pr-1 w-[15%]">
-    <Select
-      items="{$group.punishment_types.map((pun) => pun.name)}"
-      value="{punType}"
-      on:select="{handleSelect}"
-      isClearable="{false}"
-      showIndicator="{true}"
+    <Svelecte
+      options="{$group.punishment_types}"
+      i18n="{myI18n}"
+      renderer="pun-blocks"
+      inputId="punishment"
+      bind:value
       placeholder="Straff"
-      containerStyles="height: 3rem;"
+      required
+      class="{'svelecte-control w-40'}"
     />
   </div>
   <div class="number-control pr-1">
@@ -80,15 +96,22 @@
       type="number"
       min="1"
       placeholder="Antall"
-      class="input input-bordered w-full border-[#d1d1d1]"
+      class="w-full border-[#d1d1d1] placeholder-[#D6D6D1]"
+      style="
+    border-radius: 4px;
+    height: 2.4rem;"
       bind:value="{amount}"
+      required
     />
   </div>
   <button
-    class=" btn text-white bg-green-500 hover:bg-green-600 focus:ring-4
+    class="text-white bg-green-500 hover:bg-green-600 focus:ring-4
     focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
-    inline-flex items-center mr-2"
-    disabled="{punType == undefined || amount == undefined || reason == '' ? true : false}"
+    inline-flex items-center mr-2 disabled:opacity-30 disabled:hover:bg-green-500 w-auto"
+    style="min-width: fit-content;"
+    disabled="{punType == undefined || amount == undefined || reason == ''
+      ? true
+      : false}"
     on:click="{clickNewPunishment}"
   >
     <svg
@@ -120,6 +143,20 @@
     Legg til
   </button>
 </div>
+
+{#if displayNoUserError}
+  <h4
+    class="text-red-600"
+    style="
+  margin-bottom: 0.5rem;
+  margin-left: 1rem;
+  font-style: italic;
+  margin-top: -1rem;
+"
+  >
+    Velg bruker(e) som skal gis straff.
+  </h4>
+{/if}
 
 <style lang="postcss">
   .input-bordered {
