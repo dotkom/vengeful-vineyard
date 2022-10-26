@@ -35,6 +35,7 @@
     bind:readSelection="{selection}"
     bind:value
     placeholder="Navn på bruker(e)"
+    style="z-index: 100;"
   />
 </div>
 
