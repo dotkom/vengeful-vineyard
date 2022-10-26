@@ -1,4 +1,5 @@
 <script lang="ts">
+  /* eslint-disable no-unused-vars */
   import Svelecte, { addFormatter } from "svelecte";
   import { User } from "../../lib/types";
   import { filteredUsers } from "../../stores/users";

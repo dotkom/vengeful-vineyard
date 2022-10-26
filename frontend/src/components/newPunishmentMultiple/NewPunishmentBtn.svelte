@@ -1,5 +1,5 @@
 <script lang="ts">
-  import AddNewPunishment from "../punishments/AddNewPunishment.svelte";
+  /* eslint-disable no-unused-vars */
   import PunishMultiple from "./PunishMultiple.svelte";
 
   let displayNewPunishment: boolean = true;
