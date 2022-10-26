@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Svelecte, { addFormatter } from "svelecte";
   import { group } from "../../stores/groups";
   import Select from "svelte-select";
   import { users } from "../../stores/users";
@@ -8,22 +9,11 @@
   export let user: User[] | undefined;
 
   let reason = "";
-  let punType: string | undefined;
+  let punType: PunishmentType | undefined;
   let amount: number | undefined;
+  let value: string | null;
 
   let displayNoUserError: boolean = false;
-
-  function handleSelect(event: CustomEvent<{ value: string }>) {
-    punType = event.detail.value;
-  }
-
-  const getPunType = (
-    punName: string | undefined
-  ): PunishmentType | undefined => {
-    return $group.punishment_types.find(
-      (pun: PunishmentType) => pun.name === punName
-    );
-  };
 
   export const clickNewPunishment = async () => {
     if (!user || user.length < 1) {
@@ -31,7 +21,7 @@
       displayNoUserError = true;
       return;
     }
-    let punishmentType = getPunType(punType);
+    let punishmentType = punType;
     if (!punishmentType || !amount) {
       console.error("Invalid punishment type or amount");
       return;
@@ -56,7 +46,25 @@
     reason = "";
     punType = undefined;
     amount = undefined;
+    displayNoUserError = false;
+    value = null;
   };
+
+  const myI18n = {
+    nomatch: "Ingen matchende straffer",
+  };
+
+  function colorRenderer(punishment: PunishmentType, isSelected: boolean) {
+    if (isSelected) {
+      punType = punishment;
+    }
+    return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
+     `;
+  }
+
+  addFormatter({
+    "pun-blocks": colorRenderer,
+  });
 </script>
 
 <div class="flex flex-row w-full items-center m-1 p-1 justify-between pb-5">
@@ -64,21 +72,24 @@
     <input
       type="text"
       placeholder="Begrunnelse"
-      class="input input-bordered w-full border-[#d1d1d1]"
+      class="w-full border-[#d1d1d1] placeholder-[#D6D6D1]"
+      style="
+    border-radius: 4px;
+    height: 2.4rem;"
       bind:value="{reason}"
       required
     />
   </div>
   <div class="themed pr-1 w-[15%]">
-    <Select
-      items="{$group.punishment_types.map((pun) => pun.name)}"
-      value="{punType}"
-      on:select="{handleSelect}"
-      isClearable="{false}"
-      showIndicator="{true}"
+    <Svelecte
+      options="{$group.punishment_types}"
+      i18n="{myI18n}"
+      renderer="pun-blocks"
+      inputId="punishment"
+      bind:value
       placeholder="Straff"
-      containerStyles="height: 3rem;"
       required
+      class="{'svelecte-control w-40'}"
     />
   </div>
   <div class="number-control pr-1">
@@ -86,7 +97,10 @@
       type="number"
       min="1"
       placeholder="Antall"
-      class="input input-bordered w-full border-[#d1d1d1]"
+      class="w-full border-[#d1d1d1] placeholder-[#D6D6D1]"
+      style="
+    border-radius: 4px;
+    height: 2.4rem;"
       bind:value="{amount}"
       required
     />

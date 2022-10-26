@@ -39,10 +39,11 @@
 </div>
 
 <AddNewPunishment user="{selection}" />
+
 <button
   class=" text-[#696969] bg-[#DCDCDC] hover:bg-gray-300 font-medium rounded-2xl text-sm  text-center
 inline-flex items-center mr-2 ml-2 px-2 py-1"
   on:click="{() => setDisplayNewPunishment(!displayNewPunishment)}"
 >
-  Avbryt
+  Ferdig
 </button>
