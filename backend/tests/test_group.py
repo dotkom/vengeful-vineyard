@@ -68,7 +68,7 @@ class TestPunishmentType:
         await TestGroup.test_create_group(self, client)
         response = await client.post(
             f"/group/{self.group_id}/punishmentType",
-            json={"name": "Vin", "value": 123, "logo_url": "http://example.com"},
+            json={"name": "Vin", "value": 123, "logo_url": "./assets/wineOutlined.svg"},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -77,7 +77,7 @@ class TestPunishmentType:
     async def test_create_punishment_type_duplicate(self, client: Any) -> None:
         response = await client.post(
             f"/group/{self.group_id}/punishmentType",
-            json={"name": "Vin", "value": 100, "logo_url": "http://example.com"},
+            json={"name": "Vin", "value": 100, "logo_url": "./assets/wineOutlined.svg"},
         )
         assert response.status_code == 400
         check_response_time(response)
@@ -92,7 +92,7 @@ class TestPunishmentType:
         assert {
             "name": "Vin",
             "value": 123,
-            "logo_url": "http://example.com",
+            "logo_url": "./assets/wineOutlined.svg",
             "punishment_type_id": 4,
         } in json["punishment_types"]
         check_response_time(response)
