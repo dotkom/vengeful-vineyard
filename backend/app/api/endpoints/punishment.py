@@ -2,17 +2,24 @@
 Punishment endpoints
 """
 
-from app.api import Request
+from app.api import APIRoute, Request
 from app.exceptions import NotFound
 from app.models.punishment import PunishmentOut
 from app.types import PunishmentId
 from fastapi import APIRouter, HTTPException
 
-router = APIRouter(prefix="/punishment", tags=["Punishment"])
+router = APIRouter(
+    prefix="/punishment",
+    tags=["Punishment"],
+    route_class=APIRoute,
+)
 
 
 @router.delete("/{punishment_id}", tags=["Punishment"])
-async def delete_punishment(request: Request, punishment_id: PunishmentId) -> None:
+async def delete_punishment(
+    request: Request,
+    punishment_id: PunishmentId,
+) -> None:
     """
     Endpoint to delete a punishment.
     """
@@ -27,7 +34,8 @@ async def delete_punishment(request: Request, punishment_id: PunishmentId) -> No
 
 @router.post("/{punishment_id}/verify", tags=["Punishment"])
 async def verify_punishment(
-    request: Request, punishment_id: PunishmentId
+    request: Request,
+    punishment_id: PunishmentId,
 ) -> PunishmentOut:
     """
     Endpoint to mark a punishment as verified (paid/done).

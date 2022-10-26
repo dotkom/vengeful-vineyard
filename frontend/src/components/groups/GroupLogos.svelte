@@ -5,7 +5,7 @@
   // import { onMount } from "svelte";
 
   import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
-  import { getOnlineProfile, getMyOnlineGroups } from "../../lib/api";
+  import { getMyOnlineGroups } from "../../lib/api";
 
   // let groups: Group[];
   // let userId = 1; //default ig
@@ -17,15 +17,13 @@
 
 <div class="groupLogosContainer">
   {#if $isAuthenticated}
-    {#await getOnlineProfile($accessToken) then value}
-      {#await getMyOnlineGroups($accessToken, value.id) then groups}
-        {#each groups.filter((owGroup) => !owGroup.name_short.includes("permissions")) as group}
-          <div class="flex flex-col justify-center items-center"> 
-            <GroupButton name="{group.name_short}" logoUrl="{group.image.sm}" />
-            <p>{group.name_short}</p>
-          </div>
-        {/each}
-      {/await}
+    {#await getMyOnlineGroups($accessToken) then groups}
+      {#each groups.filter((owGroup) => !owGroup.name_short.includes("permissions")) as group}
+        <div class="flex flex-col justify-center items-center"> 
+          <GroupButton name="{group.name_short}" logoUrl="{group.image.sm}" />
+          <p>{group.name_short}</p>
+        </div>
+      {/each}
     {/await}
   {/if}
 

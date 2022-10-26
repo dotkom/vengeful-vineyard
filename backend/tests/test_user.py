@@ -1,7 +1,11 @@
+# flake8: noqa
+
 import logging
 from typing import Any
 
 import pytest
+from app.models.user import User, UserCreate
+from app.types import UserId
 from tests.fixtures import client
 from tests.response_time import check_response_time
 from tests.rest import rest_create_group, rest_create_user
@@ -33,16 +37,19 @@ createdUserReturn = {
     "id": 1,
 }
 
-createUser = {
-    "first_name": "Joakim",
-    "last_name": "Fremstad",
-    "email": "email@example.com",
-}
+createUser = UserCreate(
+    first_name="Joakim",
+    last_name="Fremstad",
+    email="email@example.com",
+    ow_user_id=1,
+)
 
-createdUser: dict[str, Any] = createUser
-createdUser["user_id"] = 1
-createdUser["active"] = True
-createdUser["punishments"] = []
+createdUser = User(
+    user_id=UserId(1),
+    active=True,
+    punishments=[],
+    **dict(createUser),
+)
 
 
 class TestUser:
@@ -64,7 +71,7 @@ class TestUser:
     async def test_create_user_duplicate(self, client: Any) -> None:
         response = await client.post(
             "/user",
-            json=createUser,
+            json=dict(createUser),
         )
         assert response.status_code == 400
         check_response_time(response)
@@ -73,7 +80,7 @@ class TestUser:
     async def test_get_user(self, client: Any) -> None:
         response = await client.get("/user/1")
         assert response.status_code == 200
-        assert response.json() == createdUser
+        assert response.json() == dict(createdUser)
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -90,7 +97,7 @@ class TestUserInGroup:
 
     @pytest.mark.asyncio
     async def test_create_group(self, client: Any) -> None:
-        response = await rest_create_group(client, "dotkom")
+        response = await rest_create_group(client, "DotkomLong", "DotkomShort")
         assert response.status_code == 200
         assert response.json() == {
             "id": 1,
@@ -114,7 +121,7 @@ class TestUserInGroup:
     async def test_get_user_groups(self, client: Any) -> None:
         response = await client.get(f"user/{self.user_id}/group")
         assert response.status_code == 200
-        assert response.json()["groups"][0]["group"] == "dotkom"
+        assert response.json()[0]["name"] == "DotkomLong"
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -176,6 +183,28 @@ class TestUserInGroup:
         response = await client.get(f"/group/{self.group_id}/user/{self.user_id}")
         assert response.status_code == 200
         punishments = response.json()["punishments"]
+        assert len(punishments) == 1
+        assert punishments[0]["verified_time"] is not None
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_group_with_punishment(self, client: Any) -> None:
+        response = await client.get(f"/group/{self.group_id}")
+        assert response.status_code == 200
+
+        punishments = response.json()["members"][0].get("punishments")
+        assert punishments is not None
+        assert len(punishments) == 1
+        assert punishments[0]["verified_time"] is not None
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_group_users_with_punishment(self, client: Any) -> None:
+        response = await client.get(f"/group/{self.group_id}/users")
+        assert response.status_code == 200
+
+        punishments = response.json()[0].get("punishments")
+        assert punishments is not None
         assert len(punishments) == 1
         assert punishments[0]["verified_time"] is not None
         check_response_time(response)

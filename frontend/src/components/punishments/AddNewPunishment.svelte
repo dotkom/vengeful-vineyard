@@ -3,7 +3,7 @@
   import Select from "svelte-select";
   import { users } from "../../stores/users";
   import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
-  import { getGroupUser, addPunishmentToUser } from "../../lib/api";
+  import { getGroupUsers, addPunishmentToUser } from "../../lib/api";
 
   export let user: User | undefined;
 
@@ -45,11 +45,7 @@
       user.user_id
     ).then(async () => {
       users.set(
-        await Promise.all(
-          $group.members.map(async (member: User) =>
-            getGroupUser($group.group_id, member.user_id)
-          )
-        )
+        await getGroupUsers($group.group_id)
       );
     });
 

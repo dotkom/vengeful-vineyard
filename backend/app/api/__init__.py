@@ -3,31 +3,61 @@
 from typing import Any, Callable, Coroutine
 
 from app.db import Database
+from app.http import HTTPClient
+from app.state import State
+from app.sync import OWSync
 from fastapi import FastAPI as OriginalFastAPI
+from fastapi import HTTPException
 from fastapi import Request as OriginalRequest
 from fastapi import Response
-from fastapi.routing import APIRoute
+from fastapi.routing import APIRoute as OriginalAPIRoute
 from starlette.requests import Request as StarletteRequest
 
 __all__ = (
     "FastAPI",
     "Request",
-    "ModifiedRoute",
+    "APIRoute",
 )
 
 
 class FastAPI(OriginalFastAPI):
     db: Database
+    http: HTTPClient
+    app_state: State
+    ow_sync: OWSync
 
     def set_db(self, db: Database) -> None:
         self.db = db
+
+    def set_http(self, http: HTTPClient) -> None:
+        self.http = http
+
+    def set_app_state(self, state: State) -> None:
+        self.app_state = state
+
+    def set_ow_sync(self, ow_sync: OWSync) -> None:
+        self.ow_sync = ow_sync
 
 
 class Request(OriginalRequest):
     app: FastAPI
 
+    @property
+    def access_token(self) -> str | None:
+        token = self.headers.get("Authorization")
+        if token is not None and token.lower().startswith("bearer "):
+            return str(token[7:])
+        return None
 
-class ModifiedRoute(APIRoute):
+    def raise_if_missing_authorization(self) -> None:
+        if self.access_token is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Missing authorization",
+            )
+
+
+class APIRoute(OriginalAPIRoute):
     def get_route_handler(
         self,
     ) -> Callable[[StarletteRequest], Coroutine[Any, Any, Response]]:

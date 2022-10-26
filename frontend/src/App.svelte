@@ -8,7 +8,7 @@
   import Footer from "./components/footer/Footer.svelte";
   import PunishmentGrid from "./components/punishments/PunishmentGrid.svelte";
   import Sidebar from "./components/sidebar/Sidebar.svelte";
-  import { getOnlineProfile, getMyOnlineGroups } from "./lib/api";
+  import { getMyOnlineGroups } from "./lib/api";
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -36,31 +36,29 @@
       <div class="body_content">
         <Sidebar />
         <div class="punishments">
-          {#await getOnlineProfile($accessToken) then value}
-            {#await getMyOnlineGroups($accessToken, value.id) then groups}
-              {#if groups}
-                <!-- <GroupLogos /> -->
-                <PunishmentGrid />
-              {:else}
-                <div
-                  class="flex flex-row items-center justify-center m-auto h-full"
-                >
-                  <img src="assets/icons/sad.png" alt="sadface" width="100" />
-                  <p class="ml-4">
-                    Kunne ikke finne noen grupper du er medlem i.
-                    <br />
-                    Ta kontakt med
-                    <a
-                      class="hover:underline"
-                      href="mailto:dotkom@online.ntnu.no"
-                    >
-                      Dotkom
-                    </a>
-                    om dette er feil.
-                  </p>
-                </div>
-              {/if}
-            {/await}
+          {#await getMyOnlineGroups($accessToken) then groups}
+            {#if groups}
+              <!-- <GroupLogos /> -->
+              <PunishmentGrid />
+            {:else}
+              <div
+                class="flex flex-row items-center justify-center m-auto h-full"
+              >
+                <img src="assets/icons/sad.png" alt="sadface" width="100" />
+                <p class="ml-4">
+                  Kunne ikke finne noen grupper du er medlem i.
+                  <br />
+                  Ta kontakt med
+                  <a
+                    class="hover:underline"
+                    href="mailto:dotkom@online.ntnu.no"
+                  >
+                    Dotkom
+                  </a>
+                  om dette er feil.
+                </p>
+              </div>
+            {/if}
           {/await}
           <Footer />
         </div>

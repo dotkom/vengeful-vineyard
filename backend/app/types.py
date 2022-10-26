@@ -7,7 +7,15 @@ class UserId(int):
     pass
 
 
+class OWUserId(int):
+    pass
+
+
 class GroupId(int):
+    pass
+
+
+class OWGroupUserId(int):
     pass
 
 
