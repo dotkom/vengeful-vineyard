@@ -11,6 +11,8 @@
   let punType: string | undefined;
   let amount: number | undefined;
 
+  let displayNoUserError: boolean = false;
+
   function handleSelect(event: CustomEvent<{ value: string }>) {
     punType = event.detail.value;
   }
@@ -24,8 +26,9 @@
   };
 
   export const clickNewPunishment = async () => {
-    if (!user) {
+    if (!user || user.length < 1) {
       console.error("User is undefined");
+      displayNoUserError = true;
       return;
     }
     let punishmentType = getPunType(punType);
@@ -63,6 +66,7 @@
       placeholder="Begrunnelse"
       class="input input-bordered w-full border-[#d1d1d1]"
       bind:value="{reason}"
+      required
     />
   </div>
   <div class="themed pr-1 w-[15%]">
@@ -74,6 +78,7 @@
       showIndicator="{true}"
       placeholder="Straff"
       containerStyles="height: 3rem;"
+      required
     />
   </div>
   <div class="number-control pr-1">
@@ -83,12 +88,14 @@
       placeholder="Antall"
       class="input input-bordered w-full border-[#d1d1d1]"
       bind:value="{amount}"
+      required
     />
   </div>
   <button
-    class=" btn text-white bg-green-500 hover:bg-green-600 focus:ring-4
+    class="text-white bg-green-500 hover:bg-green-600 focus:ring-4
     focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
-    inline-flex items-center mr-2"
+    inline-flex items-center mr-2 disabled:opacity-30 disabled:hover:bg-green-500 w-auto"
+    style="min-width: fit-content;"
     disabled="{punType == undefined || amount == undefined || reason == ''
       ? true
       : false}"
@@ -123,6 +130,20 @@
     Legg til
   </button>
 </div>
+
+{#if displayNoUserError}
+  <h4
+    class="text-red-600"
+    style="
+  margin-bottom: 0.5rem;
+  margin-left: 1rem;
+  font-style: italic;
+  margin-top: -1rem;
+"
+  >
+    Velg bruker(e) som skal gis straff.
+  </h4>
+{/if}
 
 <style lang="postcss">
   .input-bordered {

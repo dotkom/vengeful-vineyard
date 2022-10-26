@@ -24,25 +24,25 @@
   });
 </script>
 
-<h2>Ny straff</h2>
-<Svelecte
-  options="{$filteredUsers}"
-  multiple
-  renderer="usersNames"
-  inputId="groupUsers"
-  i18n="{myI18n}"
-  bind:readSelection="{selection}"
-  bind:value
-  placeholder="Navn på bruker"
-/>
+<div class="flex flex-col ml-2 mr-2">
+  <h2 class="text-[#5E6282] font-bold text-lg mb-3">Ny straff</h2>
+  <Svelecte
+    options="{$filteredUsers}"
+    multiple
+    renderer="usersNames"
+    inputId="groupUsers"
+    i18n="{myI18n}"
+    bind:readSelection="{selection}"
+    bind:value
+    placeholder="Navn på bruker(e)"
+  />
+</div>
 
+<AddNewPunishment user="{selection}" />
 <button
-  class=" btn text-white bg-gray-500 hover:bg-gray-600 focus:ring-4
-focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
-inline-flex items-center mr-2"
+  class=" text-[#696969] bg-[#DCDCDC] hover:bg-gray-300 font-medium rounded-2xl text-sm  text-center
+inline-flex items-center mr-2 ml-2 px-2 py-1"
   on:click="{() => setDisplayNewPunishment(!displayNewPunishment)}"
 >
   Avbryt
 </button>
-
-<AddNewPunishment user="{selection}" />
