@@ -3,8 +3,8 @@ Models for group data structures
 """
 
 
+from app.models.group_user import GroupUser
 from app.models.punishment_type import PunishmentTypeRead
-from app.models.user import User
 from app.types import GroupId
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -20,7 +20,7 @@ class GroupBase(BaseModel):
 class Group(GroupBase):
     group_id: GroupId
     punishment_types: list[PunishmentTypeRead]
-    members: list[User]
+    members: list[GroupUser]
 
 
 class GroupCreate(GroupBase):

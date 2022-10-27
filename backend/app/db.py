@@ -16,7 +16,8 @@ from app.exceptions import (
     UserNotInGroup,
 )
 from app.models.group import Group, GroupCreate
-from app.models.group_member import GroupMemberCreate
+from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
+from app.models.group_user import GroupUser
 from app.models.punishment import PunishmentCreate, PunishmentRead
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
@@ -172,7 +173,6 @@ class Database:
         user_id: UserId | OWUserId,
         *,
         is_ow_user_id: bool = False,
-        punishments: bool = True,
         conn: Pool | None = None,
     ) -> User:
         async with MaybeAcquire(conn, self.pool) as conn:
@@ -186,21 +186,7 @@ class Database:
             if db_user is None:
                 raise NotFound
 
-            user = dict(db_user)
-            user["punishments"] = []
-            if punishments:
-                query = """SELECT punishment_id, punishment_type, reason, amount, verified_by, verified_time, created_time
-                        FROM group_punishments
-                        INNER JOIN groups
-                        ON group_punishments.group_id = groups.group_id
-                        WHERE user_id = $1;
-                        """
-                db_punishments = await conn.fetch(query, user_id)
-
-                for db_punishment in db_punishments:
-                    user["punishments"].append(dict(db_punishment))
-
-            return User(**user)
+            return User(**db_user)
 
     async def get_user_groups(
         self,
@@ -293,7 +279,7 @@ class Database:
         *,
         punishments: bool,
         conn: Pool | None = None,
-    ) -> User:
+    ) -> GroupUser:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "SELECT * FROM users WHERE user_id = $1"
             db_user = await conn.fetchrow(query, user_id)
@@ -317,7 +303,7 @@ class Database:
                     conn=conn,
                 )
 
-            return User(**user)
+            return GroupUser(**user)
 
     async def get_raw_group_users(
         self,
@@ -325,11 +311,11 @@ class Database:
         conn: Pool | None = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = """SELECT *
+            query = """SELECT m.active, m.ow_group_user_id, users.*
                     FROM users
-                    INNER JOIN group_members
-                    ON users.user_id = group_members.user_id
-                    WHERE group_members.group_id = $1
+                    INNER JOIN group_members as m
+                    ON users.user_id = m.user_id
+                    WHERE m.group_id = $1
                     """
             db_users = await conn.fetch(query, group_id)
 
@@ -340,7 +326,7 @@ class Database:
         group_id: GroupId,
         punishments: bool = True,
         conn: Pool | None = None,
-    ) -> list[User]:
+    ) -> list[GroupUser]:
         async with MaybeAcquire(conn, self.pool) as conn:
             db_users = await self.get_raw_group_users(group_id, conn=conn)
 
@@ -358,7 +344,7 @@ class Database:
             for db_user in db_users:
                 user = dict(db_user)
                 user["punishments"] = db_punishments.get(user["user_id"], [])
-                users.append(User(**user))
+                users.append(GroupUser(**user))
 
             return users
 
@@ -551,7 +537,7 @@ class Database:
             res = await conn.fetch(
                 query,
                 [
-                    (None, x.ow_user_id, x.first_name, x.last_name, x.email, True)
+                    (None, x.ow_user_id, x.first_name, x.last_name, x.email)
                     for x in users
                 ],
             )
@@ -717,8 +703,29 @@ class Database:
 
             res = await conn.fetch(
                 query,
+                [(x.group_id, x.user_id, x.ow_group_user_id, True) for x in members],
+            )
+            return [dict(r) for r in res]
+
+    async def update_group_members(
+        self,
+        members: list[GroupMemberUpdate],
+        conn: Pool | None = None,
+    ) -> list[dict[str, GroupId | UserId]]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """UPDATE group_members
+                    SET active = m.active
+                    FROM
+                        unnest($1::group_members[]) as m
+                    WHERE
+                        group_members.ow_group_user_id = m.ow_group_user_id
+                    RETURNING m.group_id, m.user_id;
+                    """
+
+            res = await conn.fetch(
+                query,
                 [
-                    (x.group_id, x.user_id, x.ow_group_user_id, False, True)
+                    (x.group_id, x.user_id, x.ow_group_user_id, x.active)
                     for x in members
                 ],
             )

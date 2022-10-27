@@ -2,7 +2,6 @@
 Models for user data structures
 """
 
-from app.models.punishment import PunishmentOut
 from app.types import UserId
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -16,11 +15,10 @@ class UserBase(BaseModel):
 
 class CreatedUserBase(UserBase):
     user_id: UserId
-    active: bool = True
 
 
 class User(CreatedUserBase):
-    punishments: list[PunishmentOut] | None
+    pass
 
 
 class UserCreate(UserBase):

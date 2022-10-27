@@ -7,7 +7,7 @@ from asyncpg import Pool
 
 from .exceptions import DatabaseIntegrityException, NotFound
 from .models.group import GroupCreate
-from .models.group_member import GroupMemberCreate
+from .models.group_member import GroupMemberCreate, GroupMemberUpdate
 from .models.user import UserCreate, UserUpdate
 from .types import GroupId, OWUserId, UserId
 from .utils.db import MaybeAcquire
@@ -46,7 +46,6 @@ class OWSync:
         user = await self.app.db.get_user(
             user_id=ow_user_id,
             is_ow_user_id=True,
-            punishments=False,
         )
         return user.user_id, ow_user_id
 
@@ -297,7 +296,8 @@ class OWSync:
             )
             mapped = {g["ow_user_id"]: g for g in db_group_users}
 
-            to_update = []
+            users_to_update = []
+            group_members_to_update = []
             for group_user_data in group_users:
                 group_user = group_user_data["user"]
                 db_user = mapped.get(group_user["id"])
@@ -305,21 +305,37 @@ class OWSync:
                     continue
 
                 keys = ("first_name", "last_name", "email")
-                if not any(group_user[key] != db_user[key] for key in keys):
-                    continue
-
-                to_update.append(
-                    UserUpdate(
-                        user_id=db_user["user_id"],
-                        ow_user_id=group_user["id"],
-                        first_name=group_user["first_name"],
-                        last_name=group_user["last_name"],
-                        email=group_user["email"],
+                if any(group_user[key] != db_user[key] for key in keys):
+                    users_to_update.append(
+                        UserUpdate(
+                            user_id=db_user["user_id"],
+                            ow_user_id=group_user["id"],
+                            first_name=group_user["first_name"],
+                            last_name=group_user["last_name"],
+                            email=group_user["email"],
+                        )
                     )
+
+                if (
+                    group_user_data["is_retired"] == db_user["active"]
+                ):  # They are opposite, so update if they match
+                    group_members_to_update.append(
+                        GroupMemberUpdate(
+                            group_id=group_id,
+                            user_id=db_user["user_id"],
+                            ow_group_user_id=group_user_data["id"],
+                            active=not group_user_data["is_retired"],
+                        )
+                    )
+
+            if users_to_update:
+                await self.app.db.update_users(
+                    users_to_update,
+                    conn=conn,
                 )
 
-            if to_update:
-                await self.app.db.update_users(
-                    to_update,
+            if group_members_to_update:
+                await self.app.db.update_group_members(
+                    group_members_to_update,
                     conn=conn,
                 )
