@@ -1,12 +1,10 @@
 <script lang="ts">
   import type { Punishment, PunishmentType } from "../../lib/types";
-  import { getGroup } from "../../lib/api";
   import { getLastPunishedDate, shouldDisplay } from "../../lib/functions";
   import {
     filteredUsers,
     onlyShowAfterDate,
     onlyShowBeforeDate,
-    users,
   } from "../../stores/users";
   import { group } from "../../stores/group";
   import PunishmentInfo from "./PunishmentInfo.svelte";
@@ -15,22 +13,6 @@
   import PunishmentsListed from "./PunishmentsListed.svelte";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
-
-  // TODO
-  // Remove groupId once members from OW group from backend is implemented.
-  // let groupId: number = 1;
-
-  // getGroup(groupId).then(async (res) => {
-  //   if (
-  //     window.localStorage.getItem("group") === "null" ||
-  //     window.localStorage.getItem("users") === "null" ||
-  //     window.localStorage.getItem("punishmentsToFilter") === "null"
-  //   ) {
-  //     group.set(res);
-  //     users.set(res.members);
-  //     punishmentsToFilter.set(res.punishment_types);
-  //   }
-  // });
 
   /**
    * Creates a new object that stores punishment ids and punishment values.
