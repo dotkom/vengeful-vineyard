@@ -47,7 +47,7 @@ async def get_user(request: Request, user_id: UserId) -> User:
     """
     app = request.app
     try:
-        return await app.db.get_user(user_id, punishments=True)
+        return await app.db.get_user(user_id)
     except NotFound as exc:
         raise HTTPException(status_code=404, detail="User not found") from exc
 

@@ -13,9 +13,9 @@ from app.exceptions import (
 )
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate
+from app.models.group_user import GroupUser
 from app.models.punishment import PunishmentCreate
 from app.models.punishment_type import PunishmentTypeCreate
-from app.models.user import User
 from app.types import GroupId, OWGroupUserId, PunishmentTypeId, UserId
 from fastapi import APIRouter, HTTPException
 
@@ -58,7 +58,7 @@ async def get_group_user(
     request: Request,
     group_id: GroupId,
     user_id: UserId,
-) -> User:
+) -> GroupUser:
     """
     Endpoint to get a user in the context of a group.
     """
@@ -74,7 +74,7 @@ async def get_group_user(
 
 
 @router.get("/{group_id}/users")
-async def get_group_users(request: Request, group_id: GroupId) -> list[User]:
+async def get_group_users(request: Request, group_id: GroupId) -> list[GroupUser]:
     """
     Endpoint to get all users in a group.
     """

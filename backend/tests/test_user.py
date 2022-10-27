@@ -46,8 +46,6 @@ createUser = UserCreate(
 
 createdUser = User(
     user_id=UserId(1),
-    active=True,
-    punishments=[],
     **dict(createUser),
 )
 
