@@ -1,6 +1,6 @@
 <script lang="ts">
   import Svelecte, { addFormatter } from "svelecte";
-  import { group } from "../../stores/groups";
+  import { group } from "../../stores/group";
   import { users } from "../../stores/users";
   import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
   import { getGroupUsers, addPunishmentToUser } from "../../lib/api";

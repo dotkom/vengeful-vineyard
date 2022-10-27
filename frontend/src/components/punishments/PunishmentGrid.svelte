@@ -1,13 +1,14 @@
 <script lang="ts">
-  import type { Punishment, PunishmentType } from "../../lib/types"
+  import type { Punishment, PunishmentType } from "../../lib/types";
   import { getGroup } from "../../lib/api";
-  import { getLastPunishedDate, shouldDisplay} from "../../lib/functions";
+  import { getLastPunishedDate, shouldDisplay } from "../../lib/functions";
   import {
     filteredUsers,
     onlyShowAfterDate,
     onlyShowBeforeDate,
+    users,
   } from "../../stores/users";
-  import { group } from "../../stores/groups";
+  import { group } from "../../stores/group";
   import PunishmentInfo from "./PunishmentInfo.svelte";
 
   import SvelteTable from "svelte-table";
@@ -17,30 +18,26 @@
 
   // TODO
   // Remove groupId once members from OW group from backend is implemented.
-  let groupId: number = 1;
+  // let groupId: number = 1;
 
-  getGroup(groupId).then(async (res) => {
-    window.localStorage.setItem("group", JSON.stringify(res));
-    window.localStorage.setItem(
-      "users",
-      JSON.stringify(
-        res.members || []
-      )
-    );
-    window.localStorage.setItem(
-      "punishmentFilters",
-      JSON.stringify(res.punishment_types)
-    );
-  });
-
- 
+  // getGroup(groupId).then(async (res) => {
+  //   if (
+  //     window.localStorage.getItem("group") === "null" ||
+  //     window.localStorage.getItem("users") === "null" ||
+  //     window.localStorage.getItem("punishmentsToFilter") === "null"
+  //   ) {
+  //     group.set(res);
+  //     users.set(res.members);
+  //     punishmentsToFilter.set(res.punishment_types);
+  //   }
+  // });
 
   /**
    * Creates a new object that stores punishment ids and punishment values.
    * @returns a dictionary-like object where punishment type id are the keys, and punishment values are values.
    */
-  const mapTypes = (): {[key: string]: number} => {
-    let mappedTypes: {[key: string]: number} = {};
+  const mapTypes = (): { [key: string]: number } => {
+    let mappedTypes: { [key: string]: number } = {};
     $group.punishment_types.map(
       (p: PunishmentType) => (mappedTypes[p.punishment_type_id] = p.value)
     );
@@ -66,13 +63,13 @@
     {
       key: "name",
       title: "Navn",
-      value: (v: { name: string; }) => v.name,
+      value: (v: { name: string }) => v.name,
       sortable: true,
     },
     {
       key: "straffer",
       title: "Straffer",
-      value: (v: { straffer: Punishment[]; }) =>
+      value: (v: { straffer: Punishment[] }) =>
         calculateSum(
           v.straffer
             .filter((pun: Punishment) =>
@@ -80,7 +77,9 @@
                 .map((pun) => pun.punishment_type_id)
                 .includes(pun.punishment_type)
             )
-            .filter((pun: Punishment) => ($showPaid ? pun : pun.verified_time === null))
+            .filter((pun: Punishment) =>
+              $showPaid ? pun : pun.verified_time === null
+            )
         ),
       sortable: true,
       class: "flex justify-center border-none",
@@ -131,7 +130,6 @@
   <SvelteTable
     columns="{columns}"
     rows="{$filteredUsers.map((user) => {
-      
       return {
         id: user.user_id,
         user: user,
@@ -155,7 +153,7 @@
       <PunishmentInfo
         totalSum="{calculateSum(
           row.user.punishments
-          /* @ts-ignore */
+            /* @ts-ignore */
             .filter((pun) =>
               $punishmentsToFilter
                 .map((pun) => pun.punishment_type_id)
@@ -175,7 +173,7 @@
         user="{row.user}"
         punishmentTypes="{$group.punishment_types}"
         punishments="{row.user.punishments
-        /* @ts-ignore */
+          /* @ts-ignore */
           .filter((pun) =>
             $punishmentsToFilter
               .map((pun) => pun.punishment_type_id)

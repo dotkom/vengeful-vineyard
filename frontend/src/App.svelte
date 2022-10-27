@@ -9,7 +9,31 @@
   import NewPunishmentBtn from "./components/newPunishmentMultiple/NewPunishmentBtn.svelte";
   import PunishmentGrid from "./components/punishments/PunishmentGrid.svelte";
   import Sidebar from "./components/sidebar/Sidebar.svelte";
-  import { getMyOnlineGroups } from "./lib/api";
+  import { getGroup, getMyOnlineGroups } from "./lib/api";
+  import { Group, OWGroup } from "./lib/types";
+  import { group } from "./stores/group";
+  import { OWgroups } from "./stores/OWgroups";
+  import { punishmentsToFilter } from "./stores/punishmentToFilter";
+  import { users } from "./stores/users";
+
+  const localStorageEmpty = (): boolean => {
+    return (
+      window.localStorage.getItem("group") === "null" ||
+      window.localStorage.getItem("users") === "null" ||
+      window.localStorage.getItem("punishmentFilters") === "null" ||
+      window.localStorage.getItem("OWgroups") === "null"
+    );
+  };
+
+  const setOWGroups = (groups: OWGroup[]): void => {
+    OWgroups.set(groups);
+  };
+
+  const setStores = (firstGroup: Group): void => {
+    group.set(firstGroup);
+    users.set(firstGroup.members);
+    punishmentsToFilter.set(firstGroup.punishment_types);
+  };
 </script>
 
 <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -24,7 +48,6 @@
 />
 
 <div class="content">
-  <!-- <Navbar /> -->
   <OidcContext
     issuer="https://old.online.ntnu.no/openid"
     client_id="219919"
@@ -41,36 +64,56 @@
     }}"
   >
     {#if $isAuthenticated}
-      <div class="body_content">
-        <Sidebar />
-        <div class="punishments">
-          {#await getMyOnlineGroups($accessToken) then groups}
-            {#if groups}
-              <NewPunishmentBtn />
-              <PunishmentGrid />
-            {:else}
-              <div
-                class="flex flex-row items-center justify-center m-auto h-full"
-              >
-                <img src="assets/icons/sad.png" alt="sadface" width="100" />
-                <p class="ml-4">
-                  Kunne ikke finne noen grupper du er medlem i.
-                  <br />
-                  Ta kontakt med
-                  <a
-                    class="hover:underline"
-                    href="mailto:dotkom@online.ntnu.no"
-                  >
-                    Dotkom
-                  </a>
-                  om dette er feil.
-                </p>
+      {#await getMyOnlineGroups($accessToken)}
+        <h1>LOADING ALL GROUPS</h1>
+      {:then groups}
+        {#await setOWGroups(groups)}
+          <h1>SETTING OW GROUPS</h1>
+        {:then}
+          {#if groups.length < 1}
+            <div
+              class="flex flex-row items-center justify-center m-auto h-full"
+            >
+              <img src="assets/icons/sad.png" alt="sadface" width="100" />
+              <p class="ml-4">
+                Kunne ikke finne noen grupper du er medlem i.
+                <br />
+                Ta kontakt med
+                <a class="hover:underline" href="mailto:dotkom@online.ntnu.no">
+                  Dotkom
+                </a>
+                om dette er feil.
+              </p>
+            </div>
+          {:else if localStorageEmpty()}
+            {#await getGroup(groups[0].group_id)}
+              <h1>LOADING FIRST GROUP</h1>
+            {:then firstGroup}
+              {#await setStores(firstGroup)}
+                <h1>SETTING OTHER STORES</h1>
+              {:then}
+                <div class="body_content">
+                  <Sidebar />
+                  <div class="punishments">
+                    <NewPunishmentBtn />
+                    <PunishmentGrid />
+                    <Footer />
+                  </div>
+                </div>
+              {/await}
+            {/await}
+          {:else}
+            <div class="body_content">
+              <Sidebar />
+              <div class="punishments">
+                <NewPunishmentBtn />
+                <PunishmentGrid />
+                <Footer />
               </div>
-            {/if}
-          {/await}
-          <Footer />
-        </div>
-      </div>
+            </div>
+          {/if}
+        {/await}
+      {/await}
     {:else}
       <LoginButton>Logg inn</LoginButton>
     {/if}
