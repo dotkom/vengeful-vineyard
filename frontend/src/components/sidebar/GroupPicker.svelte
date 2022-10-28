@@ -11,7 +11,7 @@
     nomatch: "Ingen matchende grupper",
   };
 
-  let value: string | null = `${$group}`;
+  let value = $group.group_id;
 
   const changeActiveGroup = async (newGroup: Group) => {
     await getGroup(newGroup.group_id).then((res) => {
@@ -24,11 +24,9 @@
   function colorRenderer(newGroup: Group, isSelected: boolean) {
     if (isSelected) {
       changeActiveGroup(newGroup);
-      return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${newGroup.logo_url}></img><p>${newGroup.name_short}</p></div>
-   `;
+      return `${newGroup.name_short}`;
     }
-    return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${newGroup.logo_url}></img><p>${newGroup.name_short}</p></div>
-   `;
+    return `${newGroup.name_short}`;
   }
 
   addFormatter({
