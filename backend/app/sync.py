@@ -23,7 +23,12 @@ class OWSync:
     def __init__(self, app: "FastAPI"):
         self.app = app
 
-    async def sync_for_access_token(self, access_token: str) -> tuple[UserId, OWUserId]:
+    async def sync_for_access_token(
+        self,
+        access_token: str,
+        *,
+        conn: Pool | None = None,
+    ) -> tuple[UserId, OWUserId]:
         ow_user_id = self.app.app_state.get_ow_user_id_by_access_token(access_token)
         if ow_user_id is None:
             ow_profile = await self.app.http.get_ow_profile_by_access_token(
@@ -40,12 +45,14 @@ class OWSync:
                 first_name=ow_profile["first_name"],
                 last_name=ow_profile["last_name"],
                 email=ow_profile["email"],
+                conn=conn,
             )
             return user_id, ow_user_id
 
         user = await self.app.db.get_user(
             user_id=ow_user_id,
             is_ow_user_id=True,
+            conn=conn,
         )
         return user.user_id, ow_user_id
 
@@ -88,15 +95,18 @@ class OWSync:
         first_name: str,
         last_name: str,
         email: str,
+        *,
+        conn: Pool | None = None,
     ) -> UserId:
-        user_create = UserCreate(
-            ow_user_id=ow_user_id,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-        )
-        res = await self.app.db.insert_or_update_user(user_create)
-        return res["id"]
+        async with MaybeAcquire(conn, self.app.db.pool) as conn:
+            user_create = UserCreate(
+                ow_user_id=ow_user_id,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+            )
+            res = await self.app.db.insert_or_update_user(user_create, conn=conn)
+            return res["id"]
 
     async def add_user_to_group(
         self,

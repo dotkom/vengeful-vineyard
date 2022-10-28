@@ -2,7 +2,7 @@
  * Interface for punishments that are created in the Frontend
  */
 export interface CreatePunishment {
-  punishment_type: number
+  punishment_type_id: number
   reason: string
   amount: number
 }

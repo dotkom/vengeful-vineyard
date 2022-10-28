@@ -29,10 +29,6 @@ class NotFound(VineyardException):
     pass
 
 
-class UserNotInGroup(VineyardException):
-    pass
-
-
 class PunishmentTypeNotExists(VineyardException):
     def __init__(self, **kwargs: Any) -> None:
         self.kwargs = kwargs

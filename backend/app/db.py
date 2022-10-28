@@ -9,12 +9,7 @@ from pathlib import Path
 from typing import Any, TypedDict, cast
 
 from app.config import settings
-from app.exceptions import (
-    DatabaseIntegrityException,
-    NotFound,
-    PunishmentTypeNotExists,
-    UserNotInGroup,
-)
+from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
@@ -209,6 +204,26 @@ class Database:
             result = await conn.fetch(query, user_id)
             return [dict(row) for row in result]
 
+    async def is_in_group(
+        self,
+        user_id: UserId | OWUserId,
+        group_id: GroupId,
+        *,
+        is_ow_user_id: bool = False,
+        conn: Pool | None = None,
+    ) -> bool:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            if not is_ow_user_id:
+                query = """SELECT 1 FROM group_members
+                        WHERE group_id = $1 AND user_id = $2"""
+            else:
+                query = """SELECT 1 FROM group_members
+                        INNER JOIN users ON users.user_id = group_members.user_id
+                        WHERE group_id = $1 AND users.ow_user_id = $2"""
+
+            res = await conn.fetchval(query, group_id, user_id)
+            return res is not None
+
     async def get_group(
         self,
         group_id: GroupId,
@@ -227,7 +242,6 @@ class Database:
             )
             group["members"] = await self.get_group_users(
                 group_id,
-                punishments=True,
                 conn=conn,
             )
 
@@ -277,25 +291,27 @@ class Database:
         group_id: GroupId,
         user_id: UserId,
         *,
-        punishments: bool,
+        punishments: bool = True,
         conn: Pool | None = None,
     ) -> GroupUser:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = "SELECT * FROM users WHERE user_id = $1"
-            db_user = await conn.fetchrow(query, user_id)
+            query = """SELECT m.active, m.ow_group_user_id, users.*
+                    FROM users
+                    INNER JOIN group_members as m
+                    ON users.user_id = m.user_id
+                    WHERE users.user_id = $1 AND m.group_id = $2
+                    """
+            db_user = await conn.fetchrow(
+                query,
+                user_id,
+                group_id,
+            )
 
             if db_user is None:
                 raise NotFound
 
-            query = "SELECT ow_group_user_id FROM group_members WHERE user_id = $1 AND group_id = $2"
-            group_user = await conn.fetchrow(query, user_id, group_id)
-
-            if group_user is None:
-                raise UserNotInGroup
-
             user = dict(db_user)
             user["punishments"] = []
-            user["ow_group_user_id"] = group_user["ow_group_user_id"]
             if punishments:
                 user["punishments"] = await self.get_raw_punishments_for_user(
                     group_id,
@@ -400,18 +416,6 @@ class Database:
             punishment_types = await conn.fetch(query, group_id)
 
         return [PunishmentTypeRead(**dict(x)) for x in punishment_types]
-
-    async def get_punishment(
-        self,
-        punishment_id: PunishmentId,
-        conn: Pool | None = None,
-    ) -> PunishmentRead:
-        async with MaybeAcquire(conn, self.pool) as conn:
-            query = "SELECT * FROM group_punishments WHERE punishment_id = $1"
-            punishments = await conn.fetchrow(query, punishment_id)
-            assert punishments is not None
-
-        return PunishmentRead(**dict(punishments))
 
     async def get_punishments(
         self,
@@ -778,45 +782,73 @@ class Database:
         self,
         group_id: GroupId,
         user_id: UserId,
+        created_by: UserId,
         punishments: list[PunishmentCreate],
         conn: Pool | None = None,
     ) -> dict[str, list[int]]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            # Run a check to make sure that the punishments exists in the groups context
-            for punishment in punishments:
-                query = "SELECT punishment_type_id FROM punishment_types WHERE group_id = $1 AND punishment_type_id = $2"
-                punishment_type = await conn.fetchval(
-                    query,
-                    group_id,
-                    punishment.punishment_type,
-                )
+            query = """SELECT 1 FROM punishment_types
+                WHERE group_id = $1 AND punishment_type_id = ANY($2::int[])
+                """
+            res = await conn.fetch(
+                query,
+                group_id,
+                [x.punishment_type_id for x in punishments],
+            )
+            if len(res) != len(punishments):
+                raise PunishmentTypeNotExists
 
-                if punishment_type is None:
-                    raise PunishmentTypeNotExists(
-                        detail=f"Punishment type {punishment.punishment_type} does not exist in group {group_id}'s context"
+            query = """INSERT INTO group_punishments(group_id,
+                                                     user_id,
+                                                     punishment_type_id,
+                                                     reason,
+                                                     amount,
+                                                     created_by)
+                    (SELECT
+                        p.group_id,
+                        p.user_id,
+                        p.punishment_type_id,
+                        p.reason,
+                        p.amount,
+                        p.created_by
+                    FROM
+                        unnest($1::group_punishments[]) as p
                     )
-
-            ids = []
-            for punishment in punishments:
-                query = """INSERT INTO group_punishments(group_id, user_id, punishment_type, reason, amount)
-                        VALUES ($1, $2, $3, $4, $5)
-                        RETURNING punishment_id
-                        """
-                try:
-                    punishment_id = await conn.fetchval(
-                        query,
+                    RETURNING punishment_id
+                    """
+            res = await conn.fetch(
+                query,
+                [
+                    (
+                        None,
                         group_id,
                         user_id,
-                        punishment.punishment_type,
-                        punishment.reason,
-                        punishment.amount,
+                        p.punishment_type_id,
+                        p.reason,
+                        p.amount,
+                        None,
+                        created_by,
+                        None,
+                        datetime.datetime.utcnow(),
                     )
-                except UniqueViolationError as exc:
-                    raise DatabaseIntegrityException(detail=str(exc)) from exc
-                else:
-                    ids.append(punishment_id)
+                    for p in punishments
+                ],
+            )
+            return {"ids": [r["punishment_id"] for r in res]}
 
-        return {"ids": ids}
+    async def get_punishment(
+        self,
+        punishment_id: PunishmentId,
+        conn: Pool | None = None,
+    ) -> PunishmentRead:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT * FROM group_punishments WHERE punishment_id = $1"""
+            res = await conn.fetchrow(query, punishment_id)
+
+            if res is None:
+                raise NotFound
+
+        return PunishmentRead(**res)
 
     async def delete_punishment(
         self,
@@ -833,12 +865,18 @@ class Database:
     async def verify_punishment(
         self,
         punishment_id: PunishmentId,
+        verified_by: UserId,
         conn: Pool | None = None,
     ) -> PunishmentRead:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = "UPDATE group_punishments SET verified_time = $1 WHERE punishment_id = $2 RETURNING punishment_id"
+            query = """UPDATE group_punishments
+                SET verified_by = $1, verified_time = $2
+                WHERE punishment_id = $3
+                RETURNING punishment_id
+                """
             res = await conn.fetchval(
                 query,
+                verified_by,
                 datetime.datetime.utcnow(),
                 punishment_id,
             )

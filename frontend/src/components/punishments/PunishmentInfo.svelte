@@ -8,6 +8,7 @@
   import { getLogoUrl, formatGivenTime } from "../../lib/functions";
   import { users } from "../../stores/users";
   import { group } from "../../stores/group";
+  import { accessToken } from "@dopry/svelte-oidc";
   import SvelteTooltip from "svelte-tooltip";
   import AddNewPunishment from "./AddNewPunishment.svelte";
 
@@ -32,7 +33,7 @@
       console.error("User is undefined");
       return;
     }
-    await deletePunishment(id).then(async () => {
+    await deletePunishment(id, $accessToken).then(async () => {
       users.set(await getGroupUsers($group.group_id));
     });
 
@@ -47,7 +48,7 @@
       console.error("Error when verifying punishment");
       return;
     }
-    await postValidatePunishment(id).then(async () => {
+    await postValidatePunishment(id, $accessToken).then(async () => {
       users.set(await getGroupUsers($group.group_id));
     });
 
@@ -98,7 +99,7 @@
         {#each Array(punishment.amount) as _, i}
           <img
             class="icon"
-            src="{getLogoUrl(punishment.punishment_type, punishmentTypes)}"
+            src="{getLogoUrl(punishment.punishment_type_id, punishmentTypes)}"
             alt="punishment"
           />
         {/each}

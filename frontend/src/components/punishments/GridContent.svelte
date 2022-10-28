@@ -34,7 +34,7 @@
     let dict = mapTypes();
     let sum = 0;
     punishments.forEach((punishment) => {
-      sum += dict[punishment.punishment_type] * punishment.amount;
+      sum += dict[punishment.punishment_type_id] * punishment.amount;
     });
 
     return sum;
@@ -57,7 +57,7 @@
             .filter((pun: Punishment) =>
               $punishmentsToFilter
                 .map((pun) => pun.punishment_type_id)
-                .includes(pun.punishment_type)
+                .includes(pun.punishment_type_id)
             )
             .filter((pun: Punishment) =>
               $showPaid ? pun : pun.verified_time === null
@@ -138,7 +138,7 @@
           .filter((pun) =>
             $punishmentsToFilter
               .map((pun) => pun.punishment_type_id)
-              .includes(pun.punishment_type)
+              .includes(pun.punishment_type_id)
           )
           /* @ts-ignore */
           .filter((pun) =>
@@ -158,7 +158,7 @@
         .filter((pun) =>
           $punishmentsToFilter
             .map((pun) => pun.punishment_type_id)
-            .includes(pun.punishment_type)
+            .includes(pun.punishment_type_id)
         )
         /* @ts-ignore */
         .filter((pun) =>
