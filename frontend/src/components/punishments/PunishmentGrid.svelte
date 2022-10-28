@@ -6,6 +6,7 @@
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import GridContent from "./GridContent.svelte";
   import { getGroup } from "../../lib/api";
+  import Loader from "../Loader.svelte";
 
   const setStores = (firstGroup: Group): void => {
     users.set(firstGroup.members);
@@ -16,10 +17,10 @@
 <div class="punishment_grid">
   {#if localStorageUsersEmpty()}
     {#await getGroup($group.group_id)}
-      <h1>LOADING GROUP</h1>
+      <Loader />
     {:then firstGroup}
       {#await setStores(firstGroup)}
-        <h1>SETTING OTHER STORES</h1>
+        <Loader />
       {:then}
         <GridContent />
       {/await}

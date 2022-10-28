@@ -6,6 +6,7 @@
     LoginButton,
   } from "@dopry/svelte-oidc";
   import BodyContent from "./components/BodyContent.svelte";
+  import Loader from "./components/Loader.svelte";
   import { getGroup, getMyOnlineGroups } from "./lib/api";
   import { localStorageEmpty } from "./lib/functions";
   import { Group, OWGroup } from "./lib/types";
@@ -51,16 +52,16 @@
     {#if $isAuthenticated}
       {#if localStorageEmpty()}
         {#await getMyOnlineGroups($accessToken)}
-          <h1>LOADING ALL GROUPS</h1>
+          <Loader />
         {:then groups}
           {#await setOWGroups(groups)}
-            <h1>SETTING OW GROUPS</h1>
+            <Loader />
           {:then}
             {#await getGroup(groups[0].group_id)}
-              <h1>LOADING FIRST GROUP</h1>
+              <Loader />
             {:then firstGroup}
               {#await setStores(firstGroup)}
-                <h1>SETTING OTHER STORES</h1>
+                <Loader />
               {:then}
                 <BodyContent />
               {/await}
