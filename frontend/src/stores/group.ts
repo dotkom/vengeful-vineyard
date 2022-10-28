@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store'
-import type { Group, OWGroup } from '../lib/types'
+import type { Group } from '../lib/types'
 
 export const group = writable<Group>(JSON.parse(localStorage.getItem('group')))
 
