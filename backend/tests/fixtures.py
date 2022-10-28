@@ -26,6 +26,10 @@ ow_group_users_response_2 = load_json_response("ow_group_users_2.json")
 ow_groups_for_user_response = load_json_response("ow_groups_for_user.json")
 ow_groups_for_user_response_2 = load_json_response("ow_groups_for_user_2.json")
 ow_profile_response = load_json_response("ow_profile.json")
+ow_profile_other_not_in_group_response = load_json_response(
+    "ow_profile_other_not_in_group.json"
+)
+ow_profile_other_response = load_json_response("ow_profile_other.json")
 
 
 @pytest_asyncio.fixture(scope="class")
@@ -44,11 +48,14 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 async def mock() -> AsyncGenerator[aioresponses, None]:
     with aioresponses() as m:  # type: ignore
         # Register endpoints to mock here
+
+        # TestOW.test_get_my_groups_unauthenticated()
         m.get(
             f"{BASE_OLD_ONLINE}/api/v1/profile",
             status=401,
         )
 
+        # TestOW.test_get_my_groups()
         m.get(
             f"{BASE_OLD_ONLINE}/api/v1/profile",
             status=200,
@@ -69,11 +76,28 @@ async def mock() -> AsyncGenerator[aioresponses, None]:
             payload=ow_group_users_response,
         )
 
+        # TestOW.test_get_my_groups_other_user_in_group()
         m.get(
             f"{BASE_OLD_ONLINE}/api/v1/profile",
             status=200,
-            payload=ow_profile_response,
+            payload=ow_profile_other_response,
         )
+        m.get(
+            re.compile(
+                rf"{ESCAPED_BASE_OLD_ONLINE}/api/v1/group/online-groups\?members__user=\d+"
+            ),
+            status=200,
+            payload=ow_groups_for_user_response,
+        )
+        m.get(
+            re.compile(
+                rf"{ESCAPED_BASE_OLD_ONLINE}\/api\/v1\/group\/online-groups\/\d+\/group-users"
+            ),
+            status=200,
+            payload=ow_group_users_response,
+        )
+
+        # TestOW.test_get_my_groups_update()
         m.get(
             re.compile(
                 rf"{ESCAPED_BASE_OLD_ONLINE}/api/v1/group/online-groups\?members__user=\d+"
@@ -87,6 +111,20 @@ async def mock() -> AsyncGenerator[aioresponses, None]:
             ),
             status=200,
             payload=ow_group_users_response_2,
+        )
+
+        # TestOW.test_get_my_groups_other_not_in_group()
+        m.get(
+            f"{BASE_OLD_ONLINE}/api/v1/profile",
+            status=200,
+            payload=ow_profile_other_not_in_group_response,
+        )
+        m.get(
+            re.compile(
+                rf"{ESCAPED_BASE_OLD_ONLINE}/api/v1/group/online-groups\?members__user=\d+"
+            ),
+            status=200,
+            payload={"count": 0, "next": None, "previous": None, "results": []},
         )
 
         yield m

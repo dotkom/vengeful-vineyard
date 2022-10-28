@@ -23,14 +23,14 @@
       .filter((pun) =>
         $punishmentsToFilter
           .map((pun) => pun.punishment_type_id)
-          .includes(pun.punishment_type)
+          .includes(pun.punishment_type_id)
       )
       .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
       .map((punishment) => {
         //@ts-ignore
-        allPunishments[punishment.punishment_type] =
+        allPunishments[punishment.punishment_type_id] =
           //@ts-ignore
-          (allPunishments[punishment.punishment_type] || 0) + punishment.amount;
+          (allPunishments[punishment.punishment_type_id] || 0) + punishment.amount;
       });
 
     return allPunishments;
@@ -61,7 +61,7 @@
       .filter((pun) =>
         $punishmentsToFilter
           .map((pun) => pun.punishment_type_id)
-          .includes(pun.punishment_type)
+          .includes(pun.punishment_type_id)
       )
       .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) : []}"
   />

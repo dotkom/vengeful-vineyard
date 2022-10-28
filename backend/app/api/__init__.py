@@ -49,12 +49,15 @@ class Request(OriginalRequest):
             return str(token[7:])
         return None
 
-    def raise_if_missing_authorization(self) -> None:
-        if self.access_token is None:
+    def raise_if_missing_authorization(self) -> str:
+        access_token = self.access_token
+        if access_token is None:
             raise HTTPException(
                 status_code=401,
                 detail="Missing authorization",
             )
+
+        return access_token
 
 
 class APIRoute(OriginalAPIRoute):
