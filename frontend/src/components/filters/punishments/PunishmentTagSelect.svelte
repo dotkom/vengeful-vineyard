@@ -3,13 +3,25 @@
   import { group } from "../../../stores/group";
   import Svelecte, { addFormatter } from "svelecte";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
+  import CreateCustomPunishment from "./CreateCustomPunishment.svelte";
 
   const myI18n = {
     empty: `Alle straffer vises`,
     nomatch: "Ingen matchende straffer",
+    createRowLabel: (value: any) => `Opprett straff '${value}'`,
   };
 
   let value: string | null;
+
+  let displayCreatePunishment: boolean = false;
+
+  const setDisplayCreatePunishment: (display: boolean) => void = (
+    display: boolean
+  ) => {
+    displayCreatePunishment = display;
+  };
+
+  let nameOfNewPun: string | null;
 
   const addPunishment = async (punishmentInput: PunishmentType) => {
     $punishmentsToFilter = [
@@ -25,8 +37,14 @@
 
   function colorRenderer(punishment: PunishmentType, isSelected: boolean) {
     if (isSelected) {
-      addPunishment(punishment);
-      value = null;
+      if (!punishment.punishment_type_id) {
+        nameOfNewPun = value;
+        value = null;
+        displayCreatePunishment = true;
+      } else {
+        addPunishment(punishment);
+        value = null;
+      }
     }
     return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
      `;
@@ -54,8 +72,17 @@
       inputId="punishment"
       bind:value
       placeholder="Navn på straff"
+      creatable
     />
   </div>
+
+  {#if displayCreatePunishment}
+    <CreateCustomPunishment
+      name="{nameOfNewPun}"
+      displayCreatePunishment="{displayCreatePunishment}"
+      setDisplayCreatePunishment="{setDisplayCreatePunishment}"
+    />
+  {/if}
 {/if}
 
 <style lang="postcss">

@@ -1,4 +1,10 @@
-import type { CreatePunishment, Group, User, OWGroup } from './types'
+import type {
+  CreatePunishment,
+  Group,
+  User,
+  OWGroup,
+  CreateCustomPunishment
+} from './types'
 
 export async function getGroups() {
   const res = await fetch('http://localhost:8000/group')
@@ -68,6 +74,18 @@ export async function postValidatePunishment(id: number) {
   return res
 }
 
+export async function postCustomPunishmentType(
+  id: number,
+  customPunishment: CreateCustomPunishment
+) {
+  const res = await fetch(`http://localhost:8000/group/${id}/punishmentType`, {
+    headers: new Headers({ 'content-type': 'application/json' }),
+    method: 'POST',
+    body: JSON.stringify([customPunishment])
+  })
+  return res
+}
+
 async function authorizedOnlineFetch(url: string, token: string) {
   const headers: { [header: string]: string | string[] | undefined } = {}
   const request_options: { [key: string]: {} } = {}
@@ -79,7 +97,7 @@ async function authorizedOnlineFetch(url: string, token: string) {
 }
 
 export async function getMyOnlineGroups(token: string): Promise<OWGroup[]> {
-  var endpoint = `http://localhost:8000/group/me`;
-  var groups = await authorizedOnlineFetch(endpoint, token);
-  return groups;
+  var endpoint = `http://localhost:8000/group/me`
+  var groups = await authorizedOnlineFetch(endpoint, token)
+  return groups
 }
