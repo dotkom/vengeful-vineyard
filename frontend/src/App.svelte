@@ -7,20 +7,10 @@
   } from "@dopry/svelte-oidc";
   import BodyContent from "./components/BodyContent.svelte";
   import { getGroup, getMyOnlineGroups } from "./lib/api";
+  import { localStorageEmpty } from "./lib/functions";
   import { Group, OWGroup } from "./lib/types";
   import { group } from "./stores/group";
   import { OWgroups } from "./stores/OWgroups";
-  import { punishmentsToFilter } from "./stores/punishmentToFilter";
-  import { users } from "./stores/users";
-
-  const localStorageEmpty = (): boolean => {
-    return (
-      window.localStorage.getItem("group") === "null" ||
-      window.localStorage.getItem("users") === "null" ||
-      window.localStorage.getItem("punishmentFilters") === "null" ||
-      window.localStorage.getItem("OWgroups") === "null"
-    );
-  };
 
   const setOWGroups = (groups: OWGroup[]): void => {
     OWgroups.set(groups);
@@ -28,8 +18,6 @@
 
   const setStores = (firstGroup: Group): void => {
     group.set(firstGroup);
-    users.set(firstGroup.members);
-    punishmentsToFilter.set(firstGroup.punishment_types);
   };
 </script>
 

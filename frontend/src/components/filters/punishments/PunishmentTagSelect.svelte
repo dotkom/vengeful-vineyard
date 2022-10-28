@@ -37,7 +37,7 @@
   });
 </script>
 
-{#if $group !== null && $punishmentsToFilter !== null}
+{#if $group !== null && $punishmentsToFilter !== null && punishmentsToFilter !== undefined}
   <div class="flex flex-col w-full mt-2">
     <label for="punishment">
       <span class="label-text mb-2">Vis strafftyper</span>
