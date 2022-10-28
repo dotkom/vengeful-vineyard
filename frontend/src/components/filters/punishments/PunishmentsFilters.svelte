@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { group } from "../../../stores/groups";
+  import { group } from "../../../stores/group";
   import PunishmentTag from "./PunishmentTag.svelte";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
   import PunishmentTagSelect from "./PunishmentTagSelect.svelte";

@@ -1,11 +1,37 @@
 <script lang="ts">
-  import Select from "svelte-select";
-  import { accessToken, isAuthenticated } from "@dopry/svelte-oidc";
-  import { getMyOnlineGroups } from "../../lib/api";
+  import { getGroup } from "../../lib/api";
+  import Svelecte, { addFormatter } from "svelecte";
+  import { OWgroups } from "../../stores/OWgroups";
+  import { group } from "../../stores/group";
+  import { Group } from "../../lib/types";
+  import { users } from "../../stores/users";
+  import { punishmentsToFilter } from "../../stores/punishmentToFilter";
 
-  function handleSelect(event: CustomEvent<{ value: string }>) {
-    console.log(event.detail.value);
+  const myI18n = {
+    nomatch: "Ingen matchende grupper",
+  };
+
+  let value = $group.group_id;
+
+  const changeActiveGroup = async (newGroup: Group) => {
+    await getGroup(newGroup.group_id).then((res) => {
+      group.set(res);
+      users.set(res.members);
+      punishmentsToFilter.set(res.punishment_types);
+    });
+  };
+
+  function colorRenderer(newGroup: Group, isSelected: boolean) {
+    if (isSelected) {
+      changeActiveGroup(newGroup);
+      return `${newGroup.name_short}`;
+    }
+    return `${newGroup.name_short}`;
   }
+
+  addFormatter({
+    "group-blocks": colorRenderer,
+  });
 </script>
 
 <div class="flex flex-col justify-center m-auto pt-3">
@@ -13,28 +39,14 @@
   <label class="label">
     <span class="label-text">Viser straffer fra gruppe</span>
   </label>
-  {#if $isAuthenticated}
-    {#await getMyOnlineGroups($accessToken) then groups}
-      <div class="themed">
-        <Select
-          items="{groups
-            .filter(
-              (singGroup) => !singGroup.name_short.includes('permissions')
-            )
-            .map((group) => group.name_short)}"
-          value="{groups
-            .filter(
-              (singGroup) => !singGroup.name_short.includes('permissions')
-            )
-            .map((group) => group.name_short)[0]}"
-          on:select="{handleSelect}"
-          isClearable="{false}"
-          showIndicator="{true}"
-          placeholder="Velg periode"
-        />
-      </div>
-    {/await}
-  {/if}
+
+  <Svelecte
+    options="{$OWgroups}"
+    i18n="{myI18n}"
+    renderer="group-blocks"
+    inputId="groups"
+    bind:value
+  />
 </div>
 
 <style lang="postcss">
@@ -42,14 +54,5 @@
     color: #eeeeee;
     font-size: 18px;
     float: left;
-  }
-
-  .themed {
-    --borderRadius: var(--rounded-btn, 0.5rem);
-    background: var(--borderFocusColor, none);
-    border-color: var(--borderFocusColor, none);
-    border: var(--border, none);
-    --itemIsActiveColor: black;
-    --itemIsActiveBG: #f5f9ff;
   }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PunishmentType } from "../../../lib/types";
-  import { group } from "../../../stores/groups";
+  import { group } from "../../../stores/group";
   import Svelecte, { addFormatter } from "svelecte";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
 
@@ -37,15 +37,18 @@
   });
 </script>
 
-{#if $group !== null && $punishmentsToFilter !== null}
+{#if $group !== null && $punishmentsToFilter !== null && punishmentsToFilter !== undefined && $group.punishment_types !== undefined}
   <div class="flex flex-col w-full mt-2">
     <label for="punishment">
       <span class="label-text mb-2">Vis strafftyper</span>
     </label>
     <Svelecte
-      options="{$group.punishment_types.filter((filterPun) => !$punishmentsToFilter
+      options="{$group.punishment_types.filter(
+        (filterPun) =>
+          !$punishmentsToFilter
             .map((groupPun) => groupPun.punishment_type_id)
-            .includes(filterPun.punishment_type_id))}"
+            .includes(filterPun.punishment_type_id)
+      )}"
       i18n="{myI18n}"
       renderer="pun-blocks"
       inputId="punishment"

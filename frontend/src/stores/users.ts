@@ -3,7 +3,7 @@ import type { User } from '../lib/types'
 
 function getRawUsers(): string {
   const rawUsers = localStorage.getItem('users')
-  return rawUsers !== 'null' ? rawUsers : '[]'
+  return rawUsers === 'null' || rawUsers == 'undefined' ? '[]' : rawUsers
 }
 
 export const term = writable<string>('')

@@ -7,7 +7,7 @@
   import type { Punishment, PunishmentType, User } from "../../lib/types";
   import { getLogoUrl, formatGivenTime } from "../../lib/functions";
   import { users } from "../../stores/users";
-  import { group } from "../../stores/groups";
+  import { group } from "../../stores/group";
   import SvelteTooltip from "svelte-tooltip";
   import AddNewPunishment from "./AddNewPunishment.svelte";
 

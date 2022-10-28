@@ -54,3 +54,25 @@ export const shouldDisplay = (
       new Date(dateGiven).getFullYear() == onlyShowBeforeDate.getFullYear())
   )
 }
+
+export const localStorageEmpty = (): boolean => {
+  return (
+    window.localStorage.getItem('group') === 'null' ||
+    window.localStorage.getItem('group') === 'undefined' ||
+    window.localStorage.getItem('users') === 'null' ||
+    window.localStorage.getItem('users') === 'undefined' ||
+    window.localStorage.getItem('punishmentFilters') === 'null' ||
+    window.localStorage.getItem('punishmentFilters') === 'undefined' ||
+    window.localStorage.getItem('OWgroups') === 'null' ||
+    window.localStorage.getItem('OWgroups') === 'undefined'
+  )
+}
+
+export const localStorageUsersEmpty = (): boolean => {
+  return (
+    window.localStorage.getItem('users') === 'null' ||
+    window.localStorage.getItem('users') === 'undefined' ||
+    window.localStorage.getItem('punishmentFilters') === 'null' ||
+    window.localStorage.getItem('punishmentFilters') === 'undefined'
+  )
+}
