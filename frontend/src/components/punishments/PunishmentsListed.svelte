@@ -25,7 +25,7 @@
         .filter((pun) =>
           $punishmentsToFilter
             .map((pun) => pun.punishment_type_id)
-            .includes(pun.punishment_type)
+            .includes(pun.punishment_type_id)
         )
          /* @ts-ignore */
         .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
@@ -41,7 +41,7 @@
           <img
             class="h-8 w-8 m-[2px]"
             alt="punishment"
-            src="{getLogoUrl(punishment.punishment_type, punishmentTypes)}"
+            src="{getLogoUrl(punishment.punishment_type_id, punishmentTypes)}"
           />
         {/each}
       {/each}

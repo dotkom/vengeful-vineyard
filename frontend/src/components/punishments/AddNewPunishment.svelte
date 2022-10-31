@@ -1,5 +1,6 @@
 <script lang="ts">
   import Svelecte, { addFormatter } from "svelecte";
+  import { accessToken } from "@dopry/svelte-oidc";
   import { group } from "../../stores/group";
   import { users } from "../../stores/users";
   import type { User, CreatePunishment, PunishmentType } from "../../lib/types";
@@ -26,7 +27,7 @@
       return;
     }
     let new_punishment: CreatePunishment = {
-      punishment_type: punishmentType.punishment_type_id,
+      punishment_type_id: punishmentType.punishment_type_id,
       reason: reason,
       amount: amount,
     };
@@ -36,7 +37,8 @@
         await addPunishmentToUser(
           new_punishment,
           $group.group_id,
-          user.user_id
+          user.user_id,
+          $accessToken,
         ).then(async () => {
           users.set(await getGroupUsers($group.group_id));
         })

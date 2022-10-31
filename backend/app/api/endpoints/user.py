@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.get("")
+# @router.get("")  # Disabled
 async def get_users(request: Request) -> dict[str, list[Any]]:
     """
     Endpoint to get all users on the system.
@@ -26,7 +26,7 @@ async def get_users(request: Request) -> dict[str, list[Any]]:
     return await app.db.get_raw_users()
 
 
-@router.post("")  # TODO?: Remove?
+# @router.post("")  # Disabled
 async def post_user(request: Request, user: UserCreate) -> dict[str, int | None]:
     """
     Endpoint to create a user.
@@ -62,5 +62,5 @@ async def get_user_groups(request: Request, user_id: UserId) -> list[dict[str, A
         return await app.db.get_user_groups(user_id)
     except NotFound as exc:
         raise HTTPException(
-            status_code=500, detail="User groups could not be found"
-        ) from exc  # TODO?: 500?
+            status_code=404, detail="User groups could not be found"
+        ) from exc
