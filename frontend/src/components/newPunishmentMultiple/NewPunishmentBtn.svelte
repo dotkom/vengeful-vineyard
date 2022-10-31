@@ -8,7 +8,6 @@
     display: boolean
   ) => {
     displayNewPunishment = display;
-    console.log(displayNewPunishment);
   };
 </script>
 

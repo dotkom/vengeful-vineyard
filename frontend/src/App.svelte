@@ -81,11 +81,13 @@
   .body_content {
     @apply flex;
     margin: 0;
+    height: 100%;
   }
 
   .content {
     background-color: #f7f7f7;
     font-family: "Source Sans Pro", sans-serif;
+    height: 100%;
   }
 
   h1 {

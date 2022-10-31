@@ -1,60 +1,3 @@
-<style lang="postcss">
-  .punishment {
-    @apply grid grid-cols-9 gap-1 bg-white shadow-md h-20;
-    border: 0.3px solid #d9d9d9;
-    box-sizing: border-box;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
-    height: auto;
-  }
-
-  .punishment p {
-    @apply p-4 text-sm font-sspro;
-  }
-
-  .punishment > {
-    @apply items-center m-1 p-1;
-  }
-
-  .icon {
-    @apply h-8 w-8;
-  }
-
-  .sum {
-    @apply m-4 text-right;
-  }
-
-  .verifyBtn {
-    @apply float-left self-center;
-    min-width: 1.5rem;
-  }
-  .verifyBtn:hover {
-    cursor: pointer;
-  }
-
-  .punishment_icons {
-    @apply flex justify-center items-center col-span-4;
-    min-width: 7em;
-    border-right: 1px solid #d9d9d9;
-    height: 100%;
-  }
-
-  .reason_wrapper {
-    @apply flex flex-col m-0 col-start-1 col-end-2 justify-center content-center items-center;
-  }
-
-  .break-spaces {
-    @apply text-center;
-    white-space: break-spaces;
-    max-width: 100%;
-  }
-
-  .border-box {
-    border-right: 1px solid #d9d9d9;
-    border-left: 1px solid #d9d9d9;
-  }
-</style>
-
 <script lang="ts">
   import {
     deletePunishment,
@@ -203,3 +146,61 @@
   {/each}
   <div class="sum">Total sum: {totalSum}</div>
 </div>
+
+<style lang="postcss">
+  .punishment {
+    @apply grid grid-cols-9 gap-1 bg-white shadow-md h-20;
+    border: 0.3px solid #d9d9d9;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    height: auto;
+  }
+
+  .punishment p {
+    @apply p-4 text-sm font-sspro;
+  }
+
+  .punishment > {
+    @apply items-center m-1 p-1;
+  }
+
+  .icon {
+    @apply h-8 w-8;
+    margin: 1px;
+  }
+
+  .sum {
+    @apply m-4 text-right;
+  }
+
+  .verifyBtn {
+    @apply float-left self-center;
+    min-width: 1.5rem;
+  }
+  .verifyBtn:hover {
+    cursor: pointer;
+  }
+
+  .punishment_icons {
+    @apply flex justify-center items-center col-span-4;
+    min-width: 7em;
+    border-right: 1px solid #d9d9d9;
+    height: 100%;
+  }
+
+  .reason_wrapper {
+    @apply flex flex-col m-0 col-start-1 col-end-2 justify-center content-center items-center;
+  }
+
+  .break-spaces {
+    @apply text-center;
+    white-space: break-spaces;
+    max-width: 100%;
+  }
+
+  .border-box {
+    border-right: 1px solid #d9d9d9;
+    border-left: 1px solid #d9d9d9;
+  }
+</style>
