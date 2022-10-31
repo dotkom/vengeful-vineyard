@@ -8,6 +8,7 @@
 
   export let name: string | null;
   export let displayCreatePunishment: boolean;
+  /*eslint-disable no-unused-vars*/
   export let setDisplayCreatePunishment: (display: boolean) => void;
 
   let value: number;
