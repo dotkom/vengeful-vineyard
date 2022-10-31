@@ -4,7 +4,6 @@
   import { CreateCustomPunishment, PunishmentType } from "../../../lib/types";
   import { accessToken } from "@dopry/svelte-oidc";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
-    import { users } from "../../../stores/users"
 
   export let name: string | null;
   export let displayCreatePunishment: boolean;

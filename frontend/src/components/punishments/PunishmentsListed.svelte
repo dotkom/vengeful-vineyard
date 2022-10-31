@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PunishmentType, User } from "../../lib/types";
+  import type { User } from "../../lib/types";
   import { getLogoUrl, shouldDisplay } from "../../lib/functions";
   import { punishmentsToFilter } from "../../stores/punishmentToFilter";
   import { showPaid } from "../../stores/users";
