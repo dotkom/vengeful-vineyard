@@ -1,7 +1,8 @@
 <script lang="ts">
+  /*eslint-ignore no-unused-vars*/
   import { getGroup, postCustomPunishmentType } from "../../../lib/api";
   import { group } from "../../../stores/group";
-  import { CreateCustomPunishment, PunishmentType } from "../../../lib/types";
+  import { CreateCustomPunishment } from "../../../lib/types";
   import { accessToken } from "@dopry/svelte-oidc";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
 

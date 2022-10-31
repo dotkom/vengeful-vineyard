@@ -1,4 +1,5 @@
 <script lang="ts">
+  /*eslint-ignore no-unused-vars*/
   import type { PunishmentType } from "../../../lib/types";
   import { group } from "../../../stores/group";
   import Svelecte, { addFormatter } from "svelecte";
