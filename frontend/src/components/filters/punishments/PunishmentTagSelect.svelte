@@ -23,7 +23,7 @@
 
   let nameOfNewPun: string | null;
 
-  const addPunishment = async (punishmentInput: PunishmentType) => {
+  export const addPunishment = async (punishmentInput: PunishmentType) => {
     $punishmentsToFilter = [
       ...$punishmentsToFilter,
       {

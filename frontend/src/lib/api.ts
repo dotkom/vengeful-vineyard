@@ -48,14 +48,17 @@ export async function getUser(user_id: number): Promise<User> {
 
 export async function postCustomPunishmentType(
   id: number,
-  customPunishment: CreateCustomPunishment
+  customPunishment: CreateCustomPunishment,
+  authToken: string
 ) {
-  const res = await fetch(`http://localhost:8000/group/${id}/punishmentType`, {
-    headers: new Headers({ 'content-type': 'application/json' }),
-    method: 'POST',
-    body: JSON.stringify([customPunishment])
-  })
-  return res
+  const res = await authorizedRequest(
+    'POST',
+    `http://localhost:8000/group/${id}/punishmentType`,
+    authToken,
+    customPunishment
+  )
+  const json = await res.json()
+  return json
 }
 
 export async function addPunishmentToUser(

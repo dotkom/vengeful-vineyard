@@ -2,8 +2,10 @@
   import { postCustomPunishmentType } from "../../../lib/api";
   import { group } from "../../../stores/group";
   import { CreateCustomPunishment } from "../../../lib/types";
+  import { accessToken } from "@dopry/svelte-oidc";
+  import { addPunishment } from "./PunishmentTagSelect.svelte";
 
-  export let name: string;
+  export let name: string | null;
   export let displayCreatePunishment: boolean;
   export let setDisplayCreatePunishment: (display: boolean) => void;
 
@@ -19,11 +21,13 @@
 
     console.log(newPunishment);
 
-    await postCustomPunishmentType($group.group_id, newPunishment).then(
-      (res) => {
-        console.log(res);
-      }
-    );
+    await postCustomPunishmentType(
+      $group.group_id,
+      newPunishment,
+      $accessToken
+    ).then((res) => {
+      console.log(res);
+    });
   };
 </script>
 

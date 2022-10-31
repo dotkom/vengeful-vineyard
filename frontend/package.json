@@ -42,6 +42,8 @@
     "vite": "^2.9.13"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "esbuild-windows-64": "^0.15.12",
     "flatpickr": "^4.4.0",
     "flowbite": "^1.3.4",
     "svelecte": "^3.12.0",
