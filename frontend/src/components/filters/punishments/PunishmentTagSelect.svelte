@@ -37,7 +37,7 @@
 
   function colorRenderer(punishment: PunishmentType, isSelected: boolean) {
     if (isSelected) {
-      if (!punishment.punishment_type_id) {
+      if (punishment.punishment_type_id === undefined) {
         nameOfNewPun = value;
         value = null;
         displayCreatePunishment = true;
@@ -46,7 +46,7 @@
         value = null;
       }
     }
-    return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
+    return `<div class="flex flex-row w-fit"><img class="px-0.5" width="20" height="20" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
      `;
   }
 

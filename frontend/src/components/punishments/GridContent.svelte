@@ -66,10 +66,7 @@
       sortable: true,
       class: "flex justify-center border-none",
       renderComponent: {
-        component: PunishmentsListed,
-        props: {
-          punishmentTypes: $group.punishment_types,
-        },
+        component: PunishmentsListed
       },
     },
     {

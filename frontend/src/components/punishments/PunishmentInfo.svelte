@@ -172,6 +172,7 @@
 
   .icon {
     @apply h-8 w-8;
+    margin: 1px;
   }
 
   .sum {

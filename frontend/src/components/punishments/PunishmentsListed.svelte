@@ -5,8 +5,8 @@
   import { showPaid } from "../../stores/users";
   import { onlyShowAfterDate, onlyShowBeforeDate } from "../../stores/users";
   import { Circle } from "svelte-loading-spinners";
+  import {group} from "../../stores/group"
 
-  export let punishmentTypes: PunishmentType[];
   export let row: Row;
 
   interface Row {
@@ -41,7 +41,7 @@
           <img
             class="h-8 w-8 m-[2px]"
             alt="punishment"
-            src="{getLogoUrl(punishment.punishment_type_id, punishmentTypes)}"
+            src="{getLogoUrl(punishment.punishment_type_id, $group.punishment_types)}"
           />
         {/each}
       {/each}

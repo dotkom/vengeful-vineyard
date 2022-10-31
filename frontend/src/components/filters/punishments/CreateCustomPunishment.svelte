@@ -36,7 +36,11 @@
       },
     ];
 
-    await getGroup($group.group_id).then((res) => group.set(res))
+    await getGroup($group.group_id).then((res) => group.set(res)).then(() => {
+      name=null
+      value=0
+      logoUrl=""
+      setDisplayCreatePunishment(!displayCreatePunishment)})
       }
     
     });
