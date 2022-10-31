@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { postCustomPunishmentType } from "../../../lib/api";
+  import { getGroup, postCustomPunishmentType } from "../../../lib/api";
   import { group } from "../../../stores/group";
-  import { CreateCustomPunishment } from "../../../lib/types";
+  import { CreateCustomPunishment, PunishmentType } from "../../../lib/types";
   import { accessToken } from "@dopry/svelte-oidc";
-  import { addPunishment } from "./PunishmentTagSelect.svelte";
+  import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
+    import { users } from "../../../stores/users"
 
   export let name: string | null;
   export let displayCreatePunishment: boolean;
@@ -19,14 +20,25 @@
       logo_url: logoUrl,
     };
 
-    console.log(newPunishment);
-
     await postCustomPunishmentType(
       $group.group_id,
       newPunishment,
       $accessToken
-    ).then((res) => {
-      console.log(res);
+    ).then(async (res) => {
+      if(newPunishment.name != null){
+      $punishmentsToFilter = [
+      ...$punishmentsToFilter,
+      {
+        name: newPunishment.name,
+        logo_url: newPunishment.logo_url,
+        value: newPunishment.value,
+        punishment_type_id: res.id,
+      },
+    ];
+
+    await getGroup($group.group_id).then((res) => group.set(res))
+      }
+    
     });
   };
 </script>
