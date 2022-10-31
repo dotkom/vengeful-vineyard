@@ -18,6 +18,15 @@ export interface Punishment extends CreatePunishment {
 }
 
 /**
+ * Interface for the creation of custom punishments within groups to be used in requests
+ */
+export interface CreateCustomPunishment {
+  name: string | null
+  value: number
+  logo_url: string
+}
+
+/**
  * Interface for custom Punishment types.
  */
 export interface PunishmentType {

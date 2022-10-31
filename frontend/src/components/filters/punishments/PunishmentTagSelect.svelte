@@ -3,15 +3,28 @@
   import { group } from "../../../stores/group";
   import Svelecte, { addFormatter } from "svelecte";
   import { punishmentsToFilter } from "../../../stores/punishmentToFilter";
+  import CreateCustomPunishment from "./CreateCustomPunishment.svelte";
 
   const myI18n = {
     empty: `Alle straffer vises`,
     nomatch: "Ingen matchende straffer",
+    createRowLabel: (value: any) => `Opprett straff '${value}'`,
   };
 
   let value: string | null;
 
-  const addPunishment = async (punishmentInput: PunishmentType) => {
+  let displayCreatePunishment: boolean = false;
+
+  /*eslint-disable no-unused-vars*/
+  const setDisplayCreatePunishment: (display: boolean) => void = (
+    display: boolean
+  ) => {
+    displayCreatePunishment = display;
+  };
+
+  let nameOfNewPun: string | null;
+
+  export const addPunishment = async (punishmentInput: PunishmentType) => {
     $punishmentsToFilter = [
       ...$punishmentsToFilter,
       {
@@ -25,10 +38,16 @@
 
   function colorRenderer(punishment: PunishmentType, isSelected: boolean) {
     if (isSelected) {
-      addPunishment(punishment);
-      value = null;
+      if (punishment.punishment_type_id === undefined) {
+        nameOfNewPun = value;
+        value = null;
+        displayCreatePunishment = true;
+      } else {
+        addPunishment(punishment);
+        value = null;
+      }
     }
-    return `<div class="flex flex-row w-fit"><img class="px-0.5" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
+    return `<div class="flex flex-row w-fit"><img class="px-0.5" width="20" height="20" src=${punishment.logo_url}></img><p>${punishment.name}</p></div>
      `;
   }
 
@@ -54,8 +73,17 @@
       inputId="punishment"
       bind:value
       placeholder="Navn på straff"
+      creatable
     />
   </div>
+
+  {#if displayCreatePunishment}
+    <CreateCustomPunishment
+      name="{nameOfNewPun}"
+      displayCreatePunishment="{displayCreatePunishment}"
+      setDisplayCreatePunishment="{setDisplayCreatePunishment}"
+    />
+  {/if}
 {/if}
 
 <style lang="postcss">

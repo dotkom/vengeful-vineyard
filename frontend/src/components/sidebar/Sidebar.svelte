@@ -9,8 +9,8 @@
   import VvLogo from "./VvLogo.svelte";
 </script>
 
-<div class="wrapper sticky h-screen top-0">
-  <div class="flex flex-col h-3/4">
+<div class="wrapper h-auto">
+  <div class="flex flex-col h-auto">
     <VvLogo />
     <GroupPicker />
 
