@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
 	ow_user_id INTEGER UNIQUE,
 	first_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
-	email TEXT UNIQUE
+	email TEXT
 );
 
 CREATE TABLE IF NOT EXISTS groups (
