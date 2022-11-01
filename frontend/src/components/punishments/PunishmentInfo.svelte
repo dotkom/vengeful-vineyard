@@ -2,26 +2,27 @@
   import {
     deletePunishment,
     getGroupUsers,
-    postValidatePunishment,
-  } from "../../lib/api";
-  import type { Punishment, PunishmentType, User } from "../../lib/types";
-  import { getLogoUrl, formatGivenTime } from "../../lib/functions";
-  import { users } from "../../stores/users";
-  import { group } from "../../stores/group";
-  import { accessToken } from "@dopry/svelte-oidc";
-  import SvelteTooltip from "svelte-tooltip";
-  import AddNewPunishment from "./AddNewPunishment.svelte";
+    getUser,
+    postValidatePunishment
+  } from '../../lib/api'
+  import type { Punishment, PunishmentType, User } from '../../lib/types'
+  import { getLogoUrl, formatGivenTime } from '../../lib/functions'
+  import { users } from '../../stores/users'
+  import { group } from '../../stores/group'
+  import { accessToken } from '@dopry/svelte-oidc'
+  import SvelteTooltip from 'svelte-tooltip'
+  import AddNewPunishment from './AddNewPunishment.svelte'
 
-  export let user: User | undefined;
-  let userToPunish: User[] = [];
+  export let user: User | undefined
+  let userToPunish: User[] = []
   if (user) {
-    userToPunish.push(user);
+    userToPunish.push(user)
   }
-  export let punishments: Punishment[];
-  export let punishmentTypes: PunishmentType[];
-  export let totalSum: number | undefined;
+  export let punishments: Punishment[]
+  export let punishmentTypes: PunishmentType[]
+  export let totalSum: number | undefined
 
-  let verifyIconPath = "../../assets/checkGreen.svg";
+  let verifyIconPath = '../../assets/checkGreen.svg'
 
   /**
    * Deletes a punishment from database and removes the item from GUI.
@@ -30,57 +31,52 @@
    */
   const removePunishment = async (id: number) => {
     if (!user) {
-      console.error("User is undefined");
-      return;
+      console.error('User is undefined')
+      return
     }
     await deletePunishment(id, $accessToken).then(async () => {
-      users.set(await getGroupUsers($group.group_id));
-    });
+      users.set(await getGroupUsers($group.group_id))
+    })
 
-    punishments = user.punishments.filter(
-      (p: Punishment) => p.punishment_id !== id
-    );
-  };
+    punishments = user.punishments.filter((p: Punishment) => p.punishment_id !== id)
+  }
 
   const verifyPunishment = async (id: number) => {
     if (!user) {
       // TODO add error msg to user here
-      console.error("Error when verifying punishment");
-      return;
+      console.error('Error when verifying punishment')
+      return
     }
     await postValidatePunishment(id, $accessToken).then(async () => {
-      users.set(await getGroupUsers($group.group_id));
-    });
+      users.set(await getGroupUsers($group.group_id))
+    })
 
-    punishments = user.punishments.filter((p) => p.punishment_id !== id);
-  };
+    punishments = user.punishments.filter(p => p.punishment_id !== id)
+  }
 </script>
 
 <div class="punishment_info">
   <AddNewPunishment user="{userToPunish}" />
-  <!-- <slot name="punishments" /> -->
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
         {#if punishment.verified_time}
-          <p class="text-green-600 break-words break-spaces">
-            Verifisert av {punishment.verified_by}
-          </p>
+          {#if punishment.verified_by != null}
+            {#await getUser(Number(punishment.verified_by)) then user}
+              <p class="text-green-600 break-words break-spaces">
+                Verifisert av {user.first_name}
+                {user.last_name}
+                {formatGivenTime(punishment.verified_time)}
+              </p>
+            {/await}
+          {/if}
         {:else}
-          <SvelteTooltip
-            tip="Marker som betalt"
-            bottom
-            color="rgba(117, 191, 148, 0.6)"
-          >
+          <SvelteTooltip tip="Marker som betalt" bottom color="rgba(117, 191, 148, 0.6)">
             <div
               class="verifyBtn"
               on:click="{() => verifyPunishment(punishment.punishment_id)}"
             >
-              <img
-                class="h-7 w-7"
-                src="{verifyIconPath}"
-                alt="Remove punishment"
-              />
+              <img class="h-7 w-7" src="{verifyIconPath}" alt="Remove punishment" />
             </div>
           </SvelteTooltip>
         {/if}
@@ -89,8 +85,10 @@
       <div class="col-span-2 border-box">
         <p class="break-words break-spaces">{punishment.reason}</p>
         <p class="break-words break-spaces">
-          - Gitt av
-          <i>user</i>
+          {#await getUser(Number(punishment.created_by)) then user}
+            - Gitt av
+            <i>{user.first_name} {user.last_name}</i>
+          {/await}
         </p>
       </div>
 
@@ -125,8 +123,7 @@
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012
-                0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-              ></path>
+                0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
             </svg>
           </label>
           <ul
@@ -136,7 +133,7 @@
           >
             <button
               on:click="{() => {
-                removePunishment(punishment.punishment_id);
+                removePunishment(punishment.punishment_id)
               }}"
             >
               Annuler straff
