@@ -90,7 +90,7 @@
         {/if}
       </div>
 
-      <div class="col-span-2 border-box">
+      <div class="col-span-2 border-box flex flex-col justify-center h-full">
         <p class="break-words break-spaces">{punishment.reason}</p>
         <p class="break-words break-spaces">
           {#await getUser(Number(punishment.created_by)) then user}
@@ -190,7 +190,7 @@
   }
 
   .punishment_icons {
-    @apply flex justify-center items-center col-span-4;
+    @apply flex justify-center flex-wrap items-center col-span-4 p-4;
     min-width: 7em;
     border-right: 1px solid #d9d9d9;
     height: 100%;

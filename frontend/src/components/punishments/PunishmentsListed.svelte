@@ -15,7 +15,7 @@
   }
 </script>
 
-<div class="flex justify-center flex-wrap max-w-[13rem]">
+<div class="flex justify-center flex-wrap max-w-[20rem]">
   {#await row.straffer}
     <Circle size="60" color="#153E75" unit="px" duration="1s" />
   {:then}
