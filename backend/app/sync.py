@@ -68,7 +68,7 @@ class OWSync:
         ]
 
         tasks = [
-            asyncio.create_task(self.sync_group_for_user(ow_user_id, user_id, g))
+            asyncio.create_task(self.sync_group_for_user(ow_user_id, g))
             for g in filtered_groups_data
         ]
 
@@ -202,7 +202,6 @@ class OWSync:
     async def sync_group_for_user(
         self,
         ow_user_id: OWUserId,
-        user_id: UserId,
         group_data: dict[str, Any],
     ) -> None:
         group_users = await self.app.http.get_ow_group_users(group_data["id"])
@@ -233,31 +232,13 @@ class OWSync:
             )
             group_id = group_res["id"]
 
-            group_member_create = GroupMemberCreate(
-                group_id=group_id,
-                user_id=user_id,
-                ow_group_user_id=ow_group_user_id,
-            )
-
-            try:
-                await self.app.db.insert_user_in_group(
-                    group_member_create,
-                    conn=conn,
-                )
-            except DatabaseIntegrityException:
-                pass
-
             action = group_res["action"]
             if action == "CREATE":
-                for group_user in group_users:
-                    if group_user["user"]["id"] == ow_user_id:
-                        continue
-
-                    await self.add_user_to_group(
-                        group_id=group_id,
-                        user_data=group_user,
-                        conn=conn,
-                    )
+                await self.add_users_to_group(
+                    group_id,
+                    [u for u in group_users if u["user"]["id"] != ow_group_user_id],
+                    conn=conn,
+                )
 
             elif action == "UPDATE":
                 await self.handle_group_update(
