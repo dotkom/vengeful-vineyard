@@ -40,6 +40,8 @@ export interface PunishmentType {
  * Interface for users in the app.
  */
 export interface User {
+  ow_user_id: number
+  ow_group_user_id: number
   user_id: number
   email: string
   first_name: string
