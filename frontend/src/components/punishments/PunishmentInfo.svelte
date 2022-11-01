@@ -1,15 +1,10 @@
 <script lang="ts">
-  import {
-    deletePunishment,
-    getGroupUsers,
-    getUser,
-    postValidatePunishment
-  } from '../../lib/api'
+  import { deletePunishment, getGroupUsers, getUser, postValidatePunishment } from '../../lib/api'
   import type { Punishment, PunishmentType, User } from '../../lib/types'
   import { getLogoUrl, formatGivenTime } from '../../lib/functions'
   import { users } from '../../stores/users'
   import { group } from '../../stores/group'
-  import { accessToken } from '@dopry/svelte-oidc'
+  import { accessToken, userInfo } from '@dopry/svelte-oidc'
   import SvelteTooltip from 'svelte-tooltip'
   import AddNewPunishment from './AddNewPunishment.svelte'
 
@@ -47,11 +42,14 @@
       console.error('Error when verifying punishment')
       return
     }
-    await postValidatePunishment(id, $accessToken).then(async () => {
-      users.set(await getGroupUsers($group.group_id))
-    })
 
-    punishments = user.punishments.filter(p => p.punishment_id !== id)
+    if (Number($userInfo.sub) !== user?.ow_user_id) {
+      await postValidatePunishment(id, $accessToken).then(async () => {
+        users.set(await getGroupUsers($group.group_id))
+      })
+
+      punishments = user.punishments.filter(p => p.punishment_id !== id)
+    }
   }
 </script>
 
@@ -71,9 +69,19 @@
             {/await}
           {/if}
         {:else}
-          <SvelteTooltip tip="Marker som betalt" bottom color="rgba(117, 191, 148, 0.6)">
+          <SvelteTooltip
+            tip="{Number($userInfo.sub) !== user?.ow_user_id
+              ? 'Marker som betalt'
+              : 'Du kan ikke verifisere egne straffer'}"
+            bottom
+            color="rgba(117, 191, 148, 0.6)"
+          >
             <div
-              class="verifyBtn"
+              class="{`verifyBtn ${
+                Number($userInfo.sub) !== user?.ow_user_id
+                  ? 'hover:cursor-pointer'
+                  : 'hover:cursor-not-allowed'
+              }`}"
               on:click="{() => verifyPunishment(punishment.punishment_id)}"
             >
               <img class="h-7 w-7" src="{verifyIconPath}" alt="Remove punishment" />
@@ -179,9 +187,6 @@
   .verifyBtn {
     @apply float-left self-center;
     min-width: 1.5rem;
-  }
-  .verifyBtn:hover {
-    cursor: pointer;
   }
 
   .punishment_icons {
