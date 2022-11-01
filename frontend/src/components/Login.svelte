@@ -12,8 +12,8 @@
     <div class="bg-green-400 rounded-lg ">
       <LoginButton preserveRoute="true">Logg inn med OW bruker</LoginButton>
     </div>
-    <p class="text-[#333333] mt-5">
-      Fra
+    <p class="text-[#333333] mt-5 text-xs">
+      - Fra
       <a class="hover:underline" href="mailto:dotkom@online.ntnu.no">Dotkom</a>
       med ♥️
     </p>
