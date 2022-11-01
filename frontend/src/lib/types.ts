@@ -15,6 +15,7 @@ export interface Punishment extends CreatePunishment {
   created_time: string
   verified_time: string | null
   verified_by: string | null
+  created_by: string | null
 }
 
 /**

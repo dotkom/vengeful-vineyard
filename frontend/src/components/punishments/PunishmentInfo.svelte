@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { deletePunishment, getGroupUsers, postValidatePunishment } from '../../lib/api'
+  import { deletePunishment, getGroupUsers, getUser, postValidatePunishment } from '../../lib/api'
   import type { Punishment, PunishmentType, User } from '../../lib/types'
   import { getLogoUrl, formatGivenTime } from '../../lib/functions'
   import { users } from '../../stores/users'
@@ -55,14 +55,19 @@
 
 <div class="punishment_info">
   <AddNewPunishment user="{userToPunish}" />
-  <!-- <slot name="punishments" /> -->
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
         {#if punishment.verified_time}
-          <p class="text-green-600 break-words break-spaces">
-            Verifisert av {punishment.verified_by}
-          </p>
+          {#if punishment.verified_by != null}
+            {#await getUser(Number(punishment.verified_by)) then user}
+              <p class="text-green-600 break-words break-spaces">
+                Verifisert av {user.first_name}
+                {user.last_name}
+                {formatGivenTime(punishment.verified_time)}
+              </p>
+            {/await}
+          {/if}
         {:else}
           <SvelteTooltip
             tip="{Number($userInfo.sub) !== user?.ow_user_id
@@ -88,8 +93,10 @@
       <div class="col-span-2 border-box">
         <p class="break-words break-spaces">{punishment.reason}</p>
         <p class="break-words break-spaces">
-          - Gitt av
-          <i>user</i>
+          {#await getUser(Number(punishment.created_by)) then user}
+            - Gitt av
+            <i>{user.first_name} {user.last_name}</i>
+          {/await}
         </p>
       </div>
 
