@@ -1,4 +1,4 @@
-from typing import Awaitable, Callable, Generic, Protocol, TypeVar
+from typing import Awaitable, Generic, Protocol, TypeVar
 
 from app.api import Request
 from asyncpg import Pool
