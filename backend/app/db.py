@@ -13,6 +13,7 @@ from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeN
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
+from app.models.leaderboard import LeaderboardUser
 from app.models.punishment import PunishmentCreate, PunishmentRead
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
@@ -155,6 +156,34 @@ class Database:
 
             await conn.execute(sql_commands)
             await self._set_database_version(file_version)
+
+    async def get_total_users(self, conn: Pool | None = None) -> int:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            return await conn.fetchval("SELECT COUNT(*) FROM users")  # type: ignore
+
+    async def get_leaderboard(
+        self,
+        offset: int,
+        limit: int,
+        conn: Pool | None = None,
+    ) -> list[LeaderboardUser]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT u.*,
+                        array_remove(array_agg(gp.*), NULL) as punishments,
+                        COALESCE(SUM(gp.amount), 0) as amount_punishments
+                    FROM users u
+                    LEFT JOIN group_punishments gp ON gp.user_id = u.user_id
+                    GROUP BY u.user_id
+                    ORDER BY amount_punishments DESC
+                    OFFSET $1
+                    LIMIT $2"""
+            res = await conn.fetch(
+                query,
+                offset,
+                limit,
+            )
+
+            return [LeaderboardUser(**r) for r in res]
 
     async def get_raw_users(self, conn: Pool | None = None) -> dict[str, list[Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
