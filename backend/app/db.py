@@ -163,6 +163,107 @@ class Database:
         users = [dict(row) for row in db_users]
         return {"users": users}
 
+    async def get_user_streaks(
+        self, user_id: UserId, conn: Pool | None = None
+    ) -> dict[str, Any]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT * FROM group_punishments
+                    WHERE user_id = $1
+                    ORDER BY created_time ASC"""
+            res = await conn.fetch(query, user_id)
+
+        # Replace this with when a member was created?
+        # NOT IMPLEMENTED YET
+        COMPARE_TO = datetime.datetime.utcnow() - datetime.timedelta(weeks=16)
+        assert COMPARE_TO  # Shut up mypy. Thanks copilot for suggesting this comment.
+
+        actual_current_streak = 0
+        actual_current_inverse_streak = 0
+
+        streaks = []
+        inverse_streaks = []
+
+        current_streak = 0
+
+        # now_dt = datetime.datetime.utcnow() + datetime.timedelta(weeks=5)
+        now_dt = datetime.datetime.utcnow()
+        now_iso_calendar = now_dt.isocalendar()
+        now_year_week = (now_iso_calendar.year, now_iso_calendar.week)
+
+        pre_dt = None
+        pre_year = None
+        pre_week = None
+
+        is_on_now_streak = False
+
+        for c, row in enumerate(res):
+            dt = row["created_time"]
+            iso_calendar = dt.isocalendar()
+            year = iso_calendar.year
+            week = iso_calendar.week
+
+            if pre_dt is None:
+                if (year, week) == now_year_week:
+                    is_on_now_streak = True
+
+                current_streak += 1
+
+                if c - 1 < 0:
+                    last_iso_calendar = now_iso_calendar
+                else:
+                    try:
+                        last_row = res[c - 1]
+                    except IndexError:
+                        last_iso_calendar = now_iso_calendar
+                    else:
+                        last_dt = last_row["created_time"]
+                        last_iso_calendar = last_dt.isocalendar()
+
+                years = last_iso_calendar.year - year
+                # week = 10
+                # last_week = 15
+
+                # week = 52
+                # last_week = 1
+                weeks = last_iso_calendar.week - (week - (years * 52))
+                inverse_streaks.append(weeks)
+
+            else:
+                if (  # Catch last year
+                    pre_year == year + 1 and pre_week == 1 and week == 52
+                ) or pre_week == week - 1:
+                    current_streak += 1
+                elif week == pre_week and year == pre_year:
+                    continue
+                else:
+                    if is_on_now_streak:
+                        actual_current_streak = current_streak
+                        is_on_now_streak = False
+
+                    streaks.append(current_streak)
+                    current_streak = 0
+
+            pre_dt = dt
+            pre_year = year
+            pre_week = week
+
+        if current_streak > 0:
+            if is_on_now_streak:
+                actual_current_streak = current_streak
+                is_on_now_streak = False
+
+            streaks.append(current_streak)
+
+        if inverse_streaks:
+            actual_current_inverse_streak = inverse_streaks[0]
+
+        return {
+            "current_streak": actual_current_streak,
+            "current_inverse_streak": actual_current_inverse_streak,
+            "longest_streak": max(streaks) if streaks else 0,
+            "longest_inverse_streak": max(inverse_streaks) if inverse_streaks else 0,
+        }
+
     async def get_user(
         self,
         user_id: UserId | OWUserId,
