@@ -8,4 +8,4 @@ from .user import User
 
 class LeaderboardUser(User):
     punishments: list[PunishmentOut]
-    amount_punishments: int
+    total_value: int

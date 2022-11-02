@@ -170,11 +170,14 @@ class Database:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT u.*,
                         array_remove(array_agg(gp.*), NULL) as punishments,
-                        COALESCE(SUM(gp.amount), 0) as amount_punishments
+                        COALESCE(SUM(gp.amount * pt.value), 0) as total_value
                     FROM users u
-                    LEFT JOIN group_punishments gp ON gp.user_id = u.user_id
+                    LEFT JOIN group_punishments gp
+                        ON gp.user_id = u.user_id
+                    LEFT JOIN punishment_types pt
+                        ON pt.punishment_type_id = gp.punishment_type_id
                     GROUP BY u.user_id
-                    ORDER BY amount_punishments DESC
+                    ORDER BY total_value DESC
                     OFFSET $1
                     LIMIT $2"""
             res = await conn.fetch(
