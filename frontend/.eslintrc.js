@@ -10,7 +10,8 @@ module.exports = {
   },
   env: {
     es6: true,
-    browser: true
+    browser: true,
+    jest: true
   },
   overrides: [
     {
@@ -24,9 +25,14 @@ module.exports = {
     // See https://github.com/sveltejs/eslint-plugin-svelte3/issues/70
     'svelte3/ignore-styles': () => true
   },
-  plugins: ['svelte3', '@typescript-eslint'],
+  plugins: ['svelte3', '@typescript-eslint', 'jest'],
   rules: {
-    '@typescript-eslint/ban-ts-comment': 'off'
+    '@typescript-eslint/ban-ts-comment': 'off',
+    'jest/no-disabled-tests': 'warn',
+    'jest/no-focused-tests': 'error',
+    'jest/no-identical-title': 'error',
+    'jest/prefer-to-have-length': 'warn',
+    'jest/valid-expect': 'error'
   },
   ignorePatterns: ['node_modules']
 }

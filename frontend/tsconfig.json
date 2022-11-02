@@ -5,7 +5,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "importsNotUsedAsValues": "remove",
-    "strict": true
+    "strict": true,
+    "types": ["jest"]
   },
   "include": ["src/**/*", "src/node_modules/**/*"],
   "exclude": ["node_modules/*", "static/*"]
