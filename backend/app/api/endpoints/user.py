@@ -87,3 +87,12 @@ async def get_user_groups(request: Request, user_id: UserId) -> list[dict[str, A
         raise HTTPException(
             status_code=404, detail="User groups could not be found"
         ) from exc
+
+
+@router.get("/{user_id}/streaks")
+async def get_user_streaks(request: Request, user_id: UserId) -> dict[str, Any]:
+    """
+    Endpoint to get all streaks for a user.
+    """
+    app = request.app
+    return await app.db.get_user_streaks(user_id)
