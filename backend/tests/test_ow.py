@@ -565,3 +565,66 @@ class TestOW:
         assert response.status_code == 200
         punishments = response.json()[3]["punishments"]
         assert len(punishments) == 1
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_leaderboard(self, client: Any) -> None:
+        response = await client.get(f"user/leaderboard?page_size=2")
+        assert response.status_code == 200
+
+        data = response.json()
+        for res in data["results"]:
+            for punishment in res["punishments"]:
+                punishment["verified_time"] = ""
+                punishment["created_time"] = ""
+
+        assert data == {
+            "next": "http://test/user/leaderboard?page_size=2&page=1",
+            "previous": None,
+            "results": [
+                {
+                    "email": "email4@email.com",
+                    "first_name": "Anna IreneUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 2027,
+                    "punishments": [
+                        {
+                            "amount": 1,
+                            "created_by": 1,
+                            "created_time": "",
+                            "punishment_id": 2,
+                            "punishment_type_id": 2,
+                            "reason": "Very good reason2",
+                            "verified_by": 1,
+                            "verified_time": "",
+                        }
+                    ],
+                    "total_value": 100,
+                    "user_id": 4,
+                },
+                {
+                    "email": "email2@email.com",
+                    "first_name": "AmundUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 1381,
+                    "punishments": [],
+                    "total_value": 0,
+                    "user_id": 2,
+                },
+            ],
+            "total": 9,
+        }
+
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_leaderboard_empty_page(self, client: Any) -> None:
+        response = await client.get(f"user/leaderboard?page=1&page_size=30")
+        assert response.status_code == 200
+        assert response.json() == {
+            "next": None,
+            "previous": "http://test/user/leaderboard?page=0&page_size=30",
+            "results": [],
+            "total": 9,
+        }
+        check_response_time(response)
