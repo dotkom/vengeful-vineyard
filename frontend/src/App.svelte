@@ -2,11 +2,11 @@
   import {
     OidcContext,
     isAuthenticated,
-    accessToken,
-    LoginButton,
+    accessToken
   } from "@dopry/svelte-oidc";
   import BodyContent from "./components/BodyContent.svelte";
   import Loader from "./components/Loader.svelte";
+  import Login from "./components/Login.svelte"
   import { getGroup, getMyOnlineGroups } from "./lib/api";
   import { localStorageEmpty } from "./lib/functions";
   import { Group, OWGroup } from "./lib/types";
@@ -72,7 +72,7 @@
         <BodyContent />
       {/if}
     {:else}
-      <LoginButton>Logg inn</LoginButton>
+      <Login />
     {/if}
   </OidcContext>
 </div>
