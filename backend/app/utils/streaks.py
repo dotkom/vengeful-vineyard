@@ -2,6 +2,8 @@ from datetime import datetime
 
 from asyncpg import Record
 
+from .date import utc_to_oslo
+
 
 def _calc_inverse_streak(
     last_year: int,
@@ -41,7 +43,11 @@ def calculate_punishment_streaks(
     """
 
     if start_time is None:
-        start_time = datetime.utcnow()
+        start_time = utc_to_oslo(datetime.utcnow())
+    else:
+        start_time = utc_to_oslo(start_time)
+
+    assert start_time is not None
 
     streaks = []
     inverse_streaks = []
@@ -49,7 +55,11 @@ def calculate_punishment_streaks(
     current_streak = 0
     has_now_streak = False
 
-    now_dt = compare_to or datetime.utcnow()
+    if compare_to is None:
+        now_dt = utc_to_oslo(datetime.utcnow())
+    else:
+        now_dt = utc_to_oslo(compare_to)
+
     now_iso_calendar = now_dt.isocalendar()
     now_year, now_week, _ = now_iso_calendar
 
@@ -58,7 +68,7 @@ def calculate_punishment_streaks(
     pre_week = None
 
     for c, row in enumerate(rows):
-        dt = row["created_time"]
+        dt = utc_to_oslo(row["created_time"])
         year, week, _ = dt.isocalendar()
 
         if pre_dt is None:
@@ -77,7 +87,7 @@ def calculate_punishment_streaks(
                 except IndexError:
                     last_iso_calendar = now_iso_calendar
                 else:
-                    last_dt = last_row["created_time"]
+                    last_dt = utc_to_oslo(last_row["created_time"])
                     last_iso_calendar = last_dt.isocalendar()
 
             last_year, last_week, _ = last_iso_calendar
@@ -97,7 +107,7 @@ def calculate_punishment_streaks(
                 current_streak = 1  # Start at one since we are already
                 # on a new streak.
 
-                last_dt = rows[c - 1]["created_time"]
+                last_dt = utc_to_oslo(rows[c - 1]["created_time"])
                 last_year, last_week, _ = last_dt.isocalendar()
 
                 weeks = _calc_inverse_streak(last_year, last_week, year, week)
