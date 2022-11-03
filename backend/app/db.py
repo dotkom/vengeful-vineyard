@@ -167,15 +167,18 @@ class Database:
         self, user_id: UserId, conn: Pool | None = None
     ) -> dict[str, Any]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = """SELECT * FROM group_punishments
+            query = """SELECT created_time FROM group_punishments
                     WHERE user_id = $1
-                    ORDER BY created_time ASC"""
+                    ORDER BY created_time DESC"""
             res = await conn.fetch(query, user_id)
 
-        # Replace this with when a member was created?
-        # NOT IMPLEMENTED YET
-        COMPARE_TO = datetime.datetime.utcnow() - datetime.timedelta(weeks=16)
-        assert COMPARE_TO  # Shut up mypy. Thanks copilot for suggesting this comment.
+            if not res:
+                query = """SELECT added_time FROM group_members WHERE user_id = $1"""
+                compare_to = await conn.fetchval(query, user_id)
+                if compare_to is None:
+                    raise NotFound
+            else:
+                compare_to = datetime.datetime.utcnow()
 
         actual_current_streak = 0
         actual_current_inverse_streak = 0
@@ -185,25 +188,32 @@ class Database:
 
         current_streak = 0
 
-        # now_dt = datetime.datetime.utcnow() + datetime.timedelta(weeks=5)
         now_dt = datetime.datetime.utcnow()
         now_iso_calendar = now_dt.isocalendar()
-        now_year_week = (now_iso_calendar.year, now_iso_calendar.week)
+        now_year, now_week, _ = now_iso_calendar
 
         pre_dt = None
         pre_year = None
         pre_week = None
 
         is_on_now_streak = False
+        has_gived_current_week = False
+
+        def calc_inverse_streak(
+            last_year: int, last_week: int, year: int, week: int
+        ) -> int:
+            years = last_year - year
+            weeks = max(last_week - (week - (years * 52)) - 1, 0)
+            return weeks
 
         for c, row in enumerate(res):
             dt = row["created_time"]
-            iso_calendar = dt.isocalendar()
-            year = iso_calendar.year
-            week = iso_calendar.week
+            year, week, _ = dt.isocalendar()
 
             if pre_dt is None:
-                if (year, week) == now_year_week:
+                if (year == now_year - 1 and now_week == 1 and week == 52) or (
+                    year == now_year and week in (now_week, now_week - 1)
+                ):
                     is_on_now_streak = True
 
                 current_streak += 1
@@ -219,21 +229,21 @@ class Database:
                         last_dt = last_row["created_time"]
                         last_iso_calendar = last_dt.isocalendar()
 
-                years = last_iso_calendar.year - year
-                # week = 10
-                # last_week = 15
+                last_year, last_week, _ = last_iso_calendar
 
-                # week = 52
-                # last_week = 1
-                weeks = last_iso_calendar.week - (week - (years * 52))
+                weeks = calc_inverse_streak(last_year, last_week, year, week)
                 inverse_streaks.append(weeks)
 
             else:
                 if (  # Catch last year
                     pre_year == year + 1 and pre_week == 1 and week == 52
-                ) or pre_week == week - 1:
+                ) or pre_week == week + 1:
                     current_streak += 1
                 elif week == pre_week and year == pre_year:
+                    if not has_gived_current_week:
+                        current_streak += 1
+                        has_gived_current_week = True
+
                     continue
                 else:
                     if is_on_now_streak:
@@ -242,6 +252,13 @@ class Database:
 
                     streaks.append(current_streak)
                     current_streak = 0
+                    has_gived_current_week = False
+
+                    last_dt = res[c - 1]["created_time"]
+                    last_year, last_week, _ = last_dt.isocalendar()
+
+                    weeks = calc_inverse_streak(last_year, last_week, year, week)
+                    inverse_streaks.append(weeks)
 
             pre_dt = dt
             pre_year = year
@@ -253,6 +270,11 @@ class Database:
                 is_on_now_streak = False
 
             streaks.append(current_streak)
+
+        if not res:
+            year, week, _ = compare_to.isocalendar()
+            years = now_year - year
+            inverse_streaks.append(now_week - (week - (years * 52)))
 
         if inverse_streaks:
             actual_current_inverse_streak = inverse_streaks[0]
@@ -770,8 +792,8 @@ class Database:
         conn: Pool | None = None,
     ) -> dict[str, GroupId | UserId]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id)
-                    VALUES ($1, $2, $3)
+            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_time)
+                    VALUES ($1, $2, $3, $4)
                     RETURNING group_id, user_id
                     """
             try:
@@ -780,6 +802,7 @@ class Database:
                     member.group_id,
                     member.user_id,
                     member.ow_group_user_id,
+                    datetime.datetime.utcnow(),
                 )
             except UniqueViolationError as exc:
                 raise DatabaseIntegrityException(detail=str(exc)) from exc
@@ -797,9 +820,9 @@ class Database:
         conn: Pool | None = None,
     ) -> list[dict[str, GroupId | UserId]]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id)
+            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_time)
                     (SELECT
-                        m.group_id, m.user_id, m.ow_group_user_id
+                        m.group_id, m.user_id, m.ow_group_user_id, m.added_time
                     FROM
                         unnest($1::group_members[]) as m
                     )
@@ -808,7 +831,16 @@ class Database:
 
             res = await conn.fetch(
                 query,
-                [(x.group_id, x.user_id, x.ow_group_user_id, True) for x in members],
+                [
+                    (
+                        x.group_id,
+                        x.user_id,
+                        x.ow_group_user_id,
+                        True,
+                        datetime.datetime.utcnow(),
+                    )
+                    for x in members
+                ],
             )
             return [dict(r) for r in res]
 
@@ -830,7 +862,7 @@ class Database:
             res = await conn.fetch(
                 query,
                 [
-                    (x.group_id, x.user_id, x.ow_group_user_id, x.active)
+                    (x.group_id, x.user_id, x.ow_group_user_id, x.active, None)
                     for x in members
                 ],
             )

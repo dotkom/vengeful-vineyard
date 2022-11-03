@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS group_members (
 	user_id INTEGER NOT NULL references users(user_id),
 	ow_group_user_id INTEGER UNIQUE,
 	active BOOLEAN DEFAULT True,
+	added_time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
 	PRIMARY KEY (group_id, user_id)
 );
 
@@ -42,5 +43,5 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	verified_by INTEGER references users(user_id),
 	created_by INTEGER references users(user_id),
 	verified_time TIMESTAMP WITHOUT TIME ZONE,
-	created_time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc')
+	created_time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
 );
