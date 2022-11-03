@@ -284,7 +284,7 @@ OTHER_USER_AUTHORIZATION = f"Bearer {OTHER_USER_ACCESS_TOKEN}"
 OTHER_USER_NOT_IN_GROUP_AUTHORIZATION = f"Bearer {OTHER_USER_NOT_IN_GROUP_ACCESS_TOKEN}"
 
 
-class TestOW:
+class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_missing_authorization(self, client: Any) -> None:
         response = await client.get("/group/me")
@@ -565,3 +565,40 @@ class TestOW:
         assert response.status_code == 200
         punishments = response.json()[3]["punishments"]
         assert len(punishments) == 1
+
+    @pytest.mark.asyncio
+    async def test_get_group_user_punishment_streaks_empty(self, client: Any) -> None:
+        response = await client.get(f"/group/1/user/1/punishmentStreaks")
+        assert response.status_code == 200
+        assert response.json() == {
+            "current_streak": 0,
+            "current_inverse_streak": 0,
+            "longest_streak": 0,
+            "longest_inverse_streak": 0,
+        }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_group_user_punishment_streaks(self, client: Any) -> None:
+        response = await client.post(
+            f"/group/1/user/{SELF_USER_ID}/punishment",
+            json=[
+                {
+                    "punishment_type_id": 1,
+                    "reason": "Test",
+                    "amount": 1,
+                }
+            ],
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+
+        response = await client.get(f"/group/1/user/1/punishmentStreaks")
+        assert response.status_code == 200
+        assert response.json() == {
+            "current_streak": 1,
+            "current_inverse_streak": 0,
+            "longest_streak": 1,
+            "longest_inverse_streak": 0,
+        }
+        check_response_time(response)

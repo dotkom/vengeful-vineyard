@@ -13,11 +13,12 @@ from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeN
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
-from app.models.punishment import PunishmentCreate, PunishmentRead
+from app.models.punishment import PunishmentCreate, PunishmentRead, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
 from app.types import GroupId, OWUserId, PunishmentId, PunishmentTypeId, UserId
 from app.utils.db import MaybeAcquire
+from app.utils.streaks import calculate_punishment_streaks
 from asyncpg import Pool, create_pool
 from asyncpg.exceptions import (
     CannotConnectNowError,
@@ -162,129 +163,6 @@ class Database:
 
         users = [dict(row) for row in db_users]
         return {"users": users}
-
-    async def get_user_streaks(
-        self, user_id: UserId, conn: Pool | None = None
-    ) -> dict[str, Any]:
-        async with MaybeAcquire(conn, self.pool) as conn:
-            query = """SELECT created_time FROM group_punishments
-                    WHERE user_id = $1
-                    ORDER BY created_time DESC"""
-            res = await conn.fetch(query, user_id)
-
-            if not res:
-                query = """SELECT added_time FROM group_members WHERE user_id = $1"""
-                compare_to = await conn.fetchval(query, user_id)
-                if compare_to is None:
-                    raise NotFound
-            else:
-                compare_to = datetime.datetime.utcnow()
-
-        actual_current_streak = 0
-        actual_current_inverse_streak = 0
-
-        streaks = []
-        inverse_streaks = []
-
-        current_streak = 0
-
-        now_dt = datetime.datetime.utcnow()
-        now_iso_calendar = now_dt.isocalendar()
-        now_year, now_week, _ = now_iso_calendar
-
-        pre_dt = None
-        pre_year = None
-        pre_week = None
-
-        is_on_now_streak = False
-        has_gived_current_week = False
-
-        def calc_inverse_streak(
-            last_year: int, last_week: int, year: int, week: int
-        ) -> int:
-            years = last_year - year
-            weeks = max(last_week - (week - (years * 52)) - 1, 0)
-            return weeks
-
-        for c, row in enumerate(res):
-            dt = row["created_time"]
-            year, week, _ = dt.isocalendar()
-
-            if pre_dt is None:
-                if (year == now_year - 1 and now_week == 1 and week == 52) or (
-                    year == now_year and week in (now_week, now_week - 1)
-                ):
-                    is_on_now_streak = True
-
-                current_streak += 1
-
-                if c - 1 < 0:
-                    last_iso_calendar = now_iso_calendar
-                else:
-                    try:
-                        last_row = res[c - 1]
-                    except IndexError:
-                        last_iso_calendar = now_iso_calendar
-                    else:
-                        last_dt = last_row["created_time"]
-                        last_iso_calendar = last_dt.isocalendar()
-
-                last_year, last_week, _ = last_iso_calendar
-
-                weeks = calc_inverse_streak(last_year, last_week, year, week)
-                inverse_streaks.append(weeks)
-
-            else:
-                if (  # Catch last year
-                    pre_year == year + 1 and pre_week == 1 and week == 52
-                ) or pre_week == week + 1:
-                    current_streak += 1
-                elif week == pre_week and year == pre_year:
-                    if not has_gived_current_week:
-                        current_streak += 1
-                        has_gived_current_week = True
-
-                    continue
-                else:
-                    if is_on_now_streak:
-                        actual_current_streak = current_streak
-                        is_on_now_streak = False
-
-                    streaks.append(current_streak)
-                    current_streak = 0
-                    has_gived_current_week = False
-
-                    last_dt = res[c - 1]["created_time"]
-                    last_year, last_week, _ = last_dt.isocalendar()
-
-                    weeks = calc_inverse_streak(last_year, last_week, year, week)
-                    inverse_streaks.append(weeks)
-
-            pre_dt = dt
-            pre_year = year
-            pre_week = week
-
-        if current_streak > 0:
-            if is_on_now_streak:
-                actual_current_streak = current_streak
-                is_on_now_streak = False
-
-            streaks.append(current_streak)
-
-        if not res:
-            year, week, _ = compare_to.isocalendar()
-            years = now_year - year
-            inverse_streaks.append(now_week - (week - (years * 52)))
-
-        if inverse_streaks:
-            actual_current_inverse_streak = inverse_streaks[0]
-
-        return {
-            "current_streak": actual_current_streak,
-            "current_inverse_streak": actual_current_inverse_streak,
-            "longest_streak": max(streaks) if streaks else 0,
-            "longest_inverse_streak": max(inverse_streaks) if inverse_streaks else 0,
-        }
 
     async def get_user(
         self,
@@ -486,6 +364,37 @@ class Database:
                 users.append(GroupUser(**user))
 
             return users
+
+    async def get_group_user_punishment_streaks(
+        self, group_id: GroupId, user_id: UserId, conn: Pool | None = None
+    ) -> PunishmentStreaks:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT created_time FROM group_punishments
+                    WHERE group_id = $1 AND user_id = $2
+                    ORDER BY created_time DESC"""
+            res = await conn.fetch(
+                query,
+                group_id,
+                user_id,
+            )
+
+            compare_to = None
+            if not res:
+                query = """SELECT added_time FROM group_members
+                        WHERE group_id = $1 AND user_id = $2"""
+                compare_to = await conn.fetchval(
+                    query,
+                    group_id,
+                    user_id,
+                )
+                if compare_to is None:
+                    raise NotFound
+
+        streaks = calculate_punishment_streaks(
+            res,
+            compare_to=compare_to,
+        )
+        return PunishmentStreaks(**streaks)
 
     async def get_group_members_raw(
         self,

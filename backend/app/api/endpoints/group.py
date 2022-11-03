@@ -9,7 +9,7 @@ from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeN
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate
 from app.models.group_user import GroupUser
-from app.models.punishment import PunishmentCreate
+from app.models.punishment import PunishmentCreate, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate
 from app.types import GroupId, OWGroupUserId, PunishmentTypeId, UserId
 from fastapi import APIRouter, HTTPException
@@ -59,6 +59,27 @@ async def get_group_user(
     app = request.app
     try:
         return await app.db.get_group_user(group_id, user_id)
+    except NotFound as exc:
+        raise HTTPException(
+            status_code=404, detail="User not found or not in group"
+        ) from exc
+
+
+@router.get(
+    "/{group_id}/user/{user_id}/punishmentStreaks",
+    response_model=PunishmentStreaks,
+)
+async def get_group_user_punishment_streaks(
+    request: Request,
+    group_id: GroupId,
+    user_id: UserId,
+) -> PunishmentStreaks:
+    """
+    Endpoint to get a user's punishment streaks in the context of a group.
+    """
+    app = request.app
+    try:
+        return await app.db.get_group_user_punishment_streaks(group_id, user_id)
     except NotFound as exc:
         raise HTTPException(
             status_code=404, detail="User not found or not in group"
