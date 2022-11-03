@@ -324,7 +324,9 @@ async def get_group_events(request: Request, group_id: GroupId) -> list[GroupEve
 
 
 @router.post("/{group_id}/events")
-async def post_group_event(request: Request, group_id: GroupId, event: GroupEventCreate) -> None:
+async def post_group_event(
+    request: Request, group_id: GroupId, event: GroupEventCreate
+) -> None:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
@@ -350,7 +352,9 @@ async def post_group_event(request: Request, group_id: GroupId, event: GroupEven
 
 
 @router.delete("/{group_id}/events/{event_id}")
-async def delete_group_event(request: Request, group_id: GroupId, event_id: int) -> None:
+async def delete_group_event(
+    request: Request, group_id: GroupId, event_id: int
+) -> None:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app

@@ -11,14 +11,21 @@ from typing import Any, Optional, TypedDict, Union, cast
 from app.config import settings
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
-from app.models.group_event import GroupEventCreate, GroupEvent
+from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
 from app.models.leaderboard import LeaderboardUser
 from app.models.punishment import PunishmentCreate, PunishmentRead, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
-from app.types import GroupId, OWUserId, PunishmentId, PunishmentTypeId, UserId, GroupEventId
+from app.types import (
+    GroupEventId,
+    GroupId,
+    OWUserId,
+    PunishmentId,
+    PunishmentTypeId,
+    UserId,
+)
 from app.utils.db import MaybeAcquire
 from app.utils.streaks import calculate_punishment_streaks
 from asyncpg import Pool, create_pool
@@ -1148,7 +1155,9 @@ class Database:
 
         return {"id": group_event_id}
 
-    async def get_group_events(self, group_id: GroupId, conn: Optional[Pool]) -> list[GroupEvent]:
+    async def get_group_events(
+        self, group_id: GroupId, conn: Optional[Pool]
+    ) -> list[GroupEvent]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT * FROM group_events WHERE group_id = $1"""
             res = await conn.fetch(query, group_id)
