@@ -2,7 +2,7 @@
 
 import asyncio
 import functools
-from typing import Any
+from typing import Any, Optional
 
 from aiohttp import ClientSession
 
@@ -81,7 +81,7 @@ class HTTPClient:
             except asyncio.TimeoutError:
                 pass
 
-    async def get_ow_profile_by_access_token(self, access_token: str) -> Any | None:
+    async def get_ow_profile_by_access_token(self, access_token: str) -> Optional[Any]:
         async with self._session.get(
             f"{BASE_OLD_ONLINE}/api/v1/profile",
             headers={"Authorization": f"Bearer {access_token}"},
@@ -96,8 +96,8 @@ class HTTPClient:
         self,
         user_id: int,
         *,
-        access_token: str | None = None,
-    ) -> Any | None:
+        access_token: Optional[str] = None,
+    ) -> Optional[Any]:
         headers = {}
         if access_token is not None:
             headers["Authorization"] = f"Bearer {access_token}"
@@ -117,8 +117,8 @@ class HTTPClient:
         self,
         query: str,
         *,
-        access_token: str | None = None,
-    ) -> Any | None:
+        access_token: Optional[str] = None,
+    ) -> Optional[Any]:
         headers = {}
         if access_token is not None:
             headers["Authorization"] = f"Bearer {access_token}"

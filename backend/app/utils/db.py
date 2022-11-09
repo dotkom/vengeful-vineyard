@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from asyncpg.pool import Pool, PoolAcquireContext
 
@@ -9,7 +9,11 @@ class MaybeAcquire:
     a new connection multiple times during a single function.
     """
 
-    def __init__(self, connection: PoolAcquireContext | None, pool: Pool) -> None:
+    def __init__(
+        self,
+        connection: Optional[PoolAcquireContext],
+        pool: Pool,
+    ) -> None:
         self.connection = connection
         self.pool = pool
         self._cleanup = False

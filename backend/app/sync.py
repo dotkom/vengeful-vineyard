@@ -1,7 +1,7 @@
 """Contains methods for syncing users from OW."""
 
 import asyncio
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Optional, cast
 
 from asyncpg import Pool
 
@@ -27,7 +27,7 @@ class OWSync:
         self,
         access_token: str,
         *,
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> tuple[UserId, OWUserId]:
         ow_user_id = self.app.app_state.get_ow_user_id_by_access_token(access_token)
         if ow_user_id is None:
@@ -96,7 +96,7 @@ class OWSync:
         last_name: str,
         email: str,
         *,
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> UserId:
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             user_create = UserCreate(
@@ -112,7 +112,7 @@ class OWSync:
         self,
         group_id: GroupId,
         user_data: dict[str, Any],
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> None:
         user_create = UserCreate(
             ow_user_id=user_data["user"]["id"],
@@ -140,7 +140,7 @@ class OWSync:
         self,
         group_id: GroupId,
         users_data: list[dict[str, Any]],
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> None:
         user_creates = {}
         for user_data in users_data:
@@ -173,7 +173,7 @@ class OWSync:
         group_id: GroupId,
         group_users: list[dict[str, Any]],
         member_ids: list[int],
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> None:
         group_members = await self.app.db.get_group_members_raw(group_id)
         ids = [m["ow_group_user_id"] for m in group_members]
@@ -258,7 +258,7 @@ class OWSync:
         self,
         user_id: UserId,
         user_data: dict[str, Any],
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> None:
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             user_update = UserUpdate(
@@ -278,7 +278,7 @@ class OWSync:
         self,
         group_id: GroupId,
         group_users: list[dict[str, Any]],
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> None:
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             db_group_users = await self.app.db.get_raw_group_users(

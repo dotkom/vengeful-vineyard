@@ -3,6 +3,8 @@ Models for group data structures
 """
 
 
+from typing import Optional
+
 from app.models.group_user import GroupUser
 from app.models.punishment_type import PunishmentTypeRead
 from app.types import GroupId
@@ -13,7 +15,7 @@ class GroupBase(BaseModel):
     name: str
     name_short: str
     rules: str
-    ow_group_id: int | None
+    ow_group_id: Optional[int]
     image: str
 
 

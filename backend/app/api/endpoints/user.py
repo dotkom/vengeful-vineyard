@@ -2,7 +2,7 @@
 User endpoints
 """
 
-from typing import Any
+from typing import Any, Optional
 
 from app.api import APIRoute, Request
 from app.exceptions import DatabaseIntegrityException, NotFound
@@ -27,7 +27,10 @@ async def get_users(request: Request) -> dict[str, list[Any]]:
 
 
 # @router.post("")  # Disabled
-async def post_user(request: Request, user: UserCreate) -> dict[str, int | None]:
+async def post_user(
+    request: Request,
+    user: UserCreate,
+) -> dict[str, Optional[int]]:
     """
     Endpoint to create a user.
     """

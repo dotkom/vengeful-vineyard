@@ -3,6 +3,7 @@ Models for punishment data structures
 """
 
 from datetime import datetime
+from typing import Optional
 
 from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
@@ -22,8 +23,8 @@ class PunishmentOut(PunishmentCreate):
     punishment_id: PunishmentId
     created_time: datetime
     created_by: UserId
-    verified_time: datetime | None
-    verified_by: UserId | None
+    verified_time: Optional[datetime]
+    verified_by: Optional[UserId]
 
 
 class PunishmentRead(PunishmentOut):
