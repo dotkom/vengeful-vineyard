@@ -13,6 +13,7 @@ from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeN
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
+from app.models.leaderboard import LeaderboardUser
 from app.models.punishment import PunishmentCreate, PunishmentRead, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
@@ -156,6 +157,37 @@ class Database:
 
             await conn.execute(sql_commands)
             await self._set_database_version(file_version)
+
+    async def get_total_users(self, conn: Pool | None = None) -> int:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            return await conn.fetchval("SELECT COUNT(*) FROM users")  # type: ignore
+
+    async def get_leaderboard(
+        self,
+        offset: int,
+        limit: int,
+        conn: Pool | None = None,
+    ) -> list[LeaderboardUser]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT u.*,
+                        array_remove(array_agg(gp.*), NULL) as punishments,
+                        COALESCE(SUM(gp.amount * pt.value), 0) as total_value
+                    FROM users u
+                    LEFT JOIN group_punishments gp
+                        ON gp.user_id = u.user_id
+                    LEFT JOIN punishment_types pt
+                        ON pt.punishment_type_id = gp.punishment_type_id
+                    GROUP BY u.user_id
+                    ORDER BY total_value DESC
+                    OFFSET $1
+                    LIMIT $2"""
+            res = await conn.fetch(
+                query,
+                offset,
+                limit,
+            )
+
+            return [LeaderboardUser(**r) for r in res]
 
     async def get_raw_users(self, conn: Pool | None = None) -> dict[str, list[Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
@@ -544,6 +576,17 @@ class Database:
             )
             return {"id": user_id, "action": "UPDATE"}
 
+    def compare_user(self, user: UserCreate, db_user: User | dict[str, Any]) -> bool:
+        if isinstance(db_user, User):
+            db_user = db_user.dict()
+
+        is_the_same = (
+            user.first_name == db_user["first_name"]
+            and user.last_name == db_user["last_name"]
+            and user.email == db_user["email"]
+        )
+        return is_the_same is True  # mypy, smh
+
     async def insert_or_update_user(
         self,
         user: UserCreate,
@@ -551,9 +594,19 @@ class Database:
     ) -> InsertOrUpdateUser:
         async with MaybeAcquire(conn, self.pool) as conn:
             try:
+                db_user = await self.get_user(
+                    user.ow_user_id,
+                    is_ow_user_id=True,
+                    conn=conn,
+                )
+            except NotFound:
                 return await self.insert_user(user, conn=conn)
-            except DatabaseIntegrityException:
+
+            is_changed = not self.compare_user(user, db_user)
+            if is_changed:
                 return await self.update_user_by_ow_user_id(user, conn=conn)
+
+            return {"id": db_user.user_id, "action": "NO_CHANGE"}
 
     async def insert_many_users(
         self,
@@ -606,18 +659,23 @@ class Database:
         conn: Pool | None = None,
     ) -> dict[OWUserId, UserId]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = "SELECT ow_user_id FROM users WHERE ow_user_id = ANY($1)"
-            existing = await conn.fetch(query, [x.ow_user_id for x in users])
-
-            existing_ow_user_ids = [r["ow_user_id"] for r in existing]
+            query = """SELECT * FROM users WHERE ow_user_id = ANY($1)"""
+            res = await conn.fetch(query, [x.ow_user_id for x in users])
+            existing = {r["ow_user_id"]: r for r in res}
 
             to_create = []
             to_update = []
+            not_updated = {}
             for user in users:
-                if user.ow_user_id not in existing_ow_user_ids:
+                if user.ow_user_id not in existing:
                     to_create.append(user)
                 else:
-                    to_update.append(user)
+                    is_changed = not self.compare_user(user, existing[user.ow_user_id])
+                    if is_changed:
+                        to_update.append(user)
+                    else:
+                        user_id = existing[user.ow_user_id]["user_id"]
+                        not_updated[user.ow_user_id] = user_id
 
             created = {}
             updated = {}
@@ -632,7 +690,7 @@ class Database:
                     conn=conn,
                 )
 
-            return created | updated
+            return created | updated | not_updated
 
     async def insert_group(
         self,

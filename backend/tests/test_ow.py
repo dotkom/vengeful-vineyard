@@ -90,6 +90,16 @@ ME_GROUPS_RESPONSE = [
                 "punishments": [],
             },
             {
+                "ow_user_id": 2027,
+                "first_name": "Anna Irene",
+                "last_name": "",
+                "ow_group_user_id": 1552,
+                "email": "email4@email.com",
+                "user_id": 4,
+                "active": True,
+                "punishments": [],
+            },
+            {
                 "ow_user_id": 2219,
                 "first_name": "Billy Steen",
                 "last_name": "",
@@ -116,16 +126,6 @@ ME_GROUPS_RESPONSE = [
                 "ow_group_user_id": 1551,
                 "email": "email7@email.com",
                 "user_id": 7,
-                "active": True,
-                "punishments": [],
-            },
-            {
-                "ow_user_id": 2027,
-                "first_name": "Anna Irene",
-                "last_name": "",
-                "ow_group_user_id": 1552,
-                "email": "email4@email.com",
-                "user_id": 4,
                 "active": True,
                 "punishments": [],
             },
@@ -229,7 +229,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "last_name": "Original",
                 "ow_group_user_id": 1399,
                 "email": "email8@email.com",
-                "user_id": 9,  # Serial double incremented as anna is attempted created
+                "user_id": 8,
                 "active": True,
                 "punishments": [],
             },
@@ -600,5 +600,67 @@ class TestWithDB_OW:
             "current_inverse_streak": 0,
             "longest_streak": 1,
             "longest_inverse_streak": 0,
+
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_leaderboard(self, client: Any) -> None:
+        response = await client.get(f"user/leaderboard?page_size=2")
+        assert response.status_code == 200
+
+        data = response.json()
+        for res in data["results"]:
+            for punishment in res["punishments"]:
+                punishment["verified_time"] = ""
+                punishment["created_time"] = ""
+
+        assert data == {
+            "next": "http://test/user/leaderboard?page_size=2&page=1",
+            "previous": None,
+            "results": [
+                {
+                    "email": "email4@email.com",
+                    "first_name": "Anna IreneUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 2027,
+                    "punishments": [
+                        {
+                            "amount": 1,
+                            "created_by": 1,
+                            "created_time": "",
+                            "punishment_id": 2,
+                            "punishment_type_id": 2,
+                            "reason": "Very good reason2",
+                            "verified_by": 1,
+                            "verified_time": "",
+                        }
+                    ],
+                    "total_value": 100,
+                    "user_id": 4,
+                },
+                {
+                    "email": "email2@email.com",
+                    "first_name": "AmundUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 1381,
+                    "punishments": [],
+                    "total_value": 0,
+                    "user_id": 2,
+                },
+            ],
+            "total": 9,
+        }
+
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_leaderboard_empty_page(self, client: Any) -> None:
+        response = await client.get(f"user/leaderboard?page=1&page_size=30")
+        assert response.status_code == 200
+        assert response.json() == {
+            "next": None,
+            "previous": "http://test/user/leaderboard?page=0&page_size=30",
+            "results": [],
+            "total": 9,
         }
         check_response_time(response)
