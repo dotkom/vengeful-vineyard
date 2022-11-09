@@ -12,7 +12,7 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     vengeful_database: str = ":memory:"
     postgres_host: str = "127.0.0.1"
-    postgres_port: int = 5432
+    postgres_port: int = 5433
     postgres_user: str = "postgres"
     postgres_password: str = "postgres"
     postgres_db: str = "dev"
