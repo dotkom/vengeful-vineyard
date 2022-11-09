@@ -600,7 +600,7 @@ class TestWithDB_OW:
             "current_inverse_streak": 0,
             "longest_streak": 1,
             "longest_inverse_streak": 0,
-
+        }
         check_response_time(response)
 
     @pytest.mark.asyncio
