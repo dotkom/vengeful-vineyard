@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional, Union
 
 from asyncpg import Record
 
@@ -17,22 +18,22 @@ def _calc_inverse_streak(
 
 
 def calculate_punishment_streaks(
-    rows: list[Record | dict[str, datetime]],
-    compare_to: datetime | None = None,
-    start_time: datetime | None = None,
+    rows: list[Union[Record, dict[str, datetime]]],
+    compare_to: Optional[datetime] = None,
+    start_time: Optional[datetime] = None,
 ) -> dict[str, int]:
     """
     Calculate the streaks for a user.
 
     Parameters
     ----------
-    rows: list[Record | dict[str, datetime.datetime]]
+    rows: list[Union[Record, dict[str, datetime.datetime]]]
         The rows to calculate the streaks from. It is important that
         the rows are in descending order. That means that the newest
         punishment should be first in the list.
-    compare_to: datetime.datetime | None
+    compare_to: Optional[datetime.datetime]
         The datetime to compare to. Defaults to datetime.utcnow().
-    start_time: datetime.datetime | None
+    start_time: Optional[datetime.datetime]
         The datetime to use for calculating inverse streaks if
         rows is empty. Defaults to datetime.utcnow().
 

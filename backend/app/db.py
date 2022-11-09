@@ -398,7 +398,7 @@ class Database:
             return users
 
     async def get_group_user_punishment_streaks(
-        self, group_id: GroupId, user_id: UserId, conn: Pool | None = None
+        self, group_id: GroupId, user_id: UserId, conn: Optional[Pool] = None
     ) -> PunishmentStreaks:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT created_time FROM group_punishments
