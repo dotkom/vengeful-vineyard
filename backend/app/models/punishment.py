@@ -29,3 +29,10 @@ class PunishmentOut(PunishmentCreate):
 class PunishmentRead(PunishmentOut):
     group_id: GroupId
     user_id: UserId
+
+
+class PunishmentStreaks(BaseModel):
+    current_streak: int
+    longest_streak: int
+    current_inverse_streak: int
+    longest_inverse_streak: int
