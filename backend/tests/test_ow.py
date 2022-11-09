@@ -605,7 +605,7 @@ class TestWithDB_OW:
 
     @pytest.mark.asyncio
     async def test_leaderboard(self, client: Any) -> None:
-        response = await client.get(f"user/leaderboard?page_size=2")
+        response = await client.get(f"user/leaderboard?page_size=3")
         assert response.status_code == 200
 
         data = response.json()
@@ -615,7 +615,7 @@ class TestWithDB_OW:
                 punishment["created_time"] = ""
 
         assert data == {
-            "next": "http://test/user/leaderboard?page_size=2&page=1",
+            "next": "http://test/user/leaderboard?page_size=3&page=1",
             "previous": None,
             "results": [
                 {
@@ -639,13 +639,33 @@ class TestWithDB_OW:
                     "user_id": 4,
                 },
                 {
-                    "email": "email2@email.com",
-                    "first_name": "AmundUpdated",
+                    "email": "email1@email.com",
+                    "first_name": "BrageUpdated",
                     "last_name": "Updated",
-                    "ow_user_id": 1381,
+                    "ow_user_id": 2581,
+                    "punishments": [
+                        {
+                            "amount": 1,
+                            "created_by": 1,
+                            "created_time": "",
+                            "punishment_id": 3,
+                            "punishment_type_id": 1,
+                            "reason": "Test",
+                            "verified_by": None,
+                            "verified_time": "",
+                        }
+                    ],
+                    "total_value": 33,
+                    "user_id": 1,
+                },
+                {
+                    "email": "email3@email.com",
+                    "first_name": "Anh-Kha NguyenUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 1383,
                     "punishments": [],
                     "total_value": 0,
-                    "user_id": 2,
+                    "user_id": 3,
                 },
             ],
             "total": 9,
