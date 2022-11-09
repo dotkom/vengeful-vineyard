@@ -1,4 +1,4 @@
-from typing import Awaitable, Generic, Protocol, TypeVar
+from typing import Awaitable, Generic, Optional, Protocol, TypeVar
 
 from app.api import Request
 from asyncpg import Pool
@@ -8,7 +8,7 @@ T = TypeVar("T")
 
 
 class TotalCoro(Protocol):
-    def __call__(self, conn: Pool | None) -> Awaitable[int]:
+    def __call__(self, conn: Optional[Pool]) -> Awaitable[int]:
         ...
 
 
@@ -17,15 +17,15 @@ class ResultsCoro(Protocol, Generic[T]):
         self,
         offset: int,
         limit: int,
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> Awaitable[list[T]]:
         ...
 
 
 class Page(GenericModel, Generic[T]):
     total: int
-    next: str | None
-    previous: str | None
+    next: Optional[str]
+    previous: Optional[str]
     results: list[T]
 
 

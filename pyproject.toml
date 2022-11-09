@@ -8,7 +8,7 @@ description = ""
 authors = ["Dotkom"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 fastapi = "^0.71.0"
 pydantic = "^1.9.0"
 uvicorn = "^0.16.0"

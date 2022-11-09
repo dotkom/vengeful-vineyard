@@ -2,7 +2,7 @@
 Group endpoints
 """
 
-from typing import Any
+from typing import Any, Optional, Union
 
 from app.api import APIRoute, Request
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
@@ -112,7 +112,7 @@ async def get_group(request: Request, group_id: GroupId) -> Group:
 async def post_group(
     request: Request,
     group: GroupCreate,
-) -> dict[str, int | None]:
+) -> dict[str, Optional[int]]:
     """
     Endpoint to create a new group.
     """
@@ -204,8 +204,8 @@ async def add_user_to_group(
     request: Request,
     group_id: GroupId,
     user_id: UserId,
-    ow_group_user_id: OWGroupUserId | None = None,
-) -> dict[str, GroupId | UserId]:
+    ow_group_user_id: Optional[OWGroupUserId] = None,
+) -> dict[str, Union[GroupId, UserId]]:
     """
     Endpoint to add a user to a group.
     """

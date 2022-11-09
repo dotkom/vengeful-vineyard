@@ -1,6 +1,6 @@
 """API related functions and classes."""
 
-from typing import Any, Callable, Coroutine
+from typing import Any, Callable, Coroutine, Optional
 
 from app.db import Database
 from app.http import HTTPClient
@@ -43,7 +43,7 @@ class Request(OriginalRequest):
     app: FastAPI
 
     @property
-    def access_token(self) -> str | None:
+    def access_token(self) -> Optional[str]:
         token = self.headers.get("Authorization")
         if token is not None and token.lower().startswith("bearer "):
             return str(token[7:])
