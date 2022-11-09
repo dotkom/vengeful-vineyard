@@ -4,7 +4,7 @@ set -e
 set -u
 
 names=`ls /tests/test*.py`
-tomatch="class Test"
+tomatch="class TestWithDB"
 amount=0
 
 for file in $names

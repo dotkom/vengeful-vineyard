@@ -13,11 +13,13 @@ from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeN
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
-from app.models.punishment import PunishmentCreate, PunishmentRead
+from app.models.leaderboard import LeaderboardUser
+from app.models.punishment import PunishmentCreate, PunishmentRead, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
 from app.types import GroupId, OWUserId, PunishmentId, PunishmentTypeId, UserId
 from app.utils.db import MaybeAcquire
+from app.utils.streaks import calculate_punishment_streaks
 from asyncpg import Pool, create_pool
 from asyncpg.exceptions import (
     CannotConnectNowError,
@@ -155,6 +157,37 @@ class Database:
 
             await conn.execute(sql_commands)
             await self._set_database_version(file_version)
+
+    async def get_total_users(self, conn: Optional[Pool] = None) -> int:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            return await conn.fetchval("SELECT COUNT(*) FROM users")  # type: ignore
+
+    async def get_leaderboard(
+        self,
+        offset: int,
+        limit: int,
+        conn: Optional[Pool] = None,
+    ) -> list[LeaderboardUser]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT u.*,
+                        array_remove(array_agg(gp.*), NULL) as punishments,
+                        COALESCE(SUM(gp.amount * pt.value), 0) as total_value
+                    FROM users u
+                    LEFT JOIN group_punishments gp
+                        ON gp.user_id = u.user_id
+                    LEFT JOIN punishment_types pt
+                        ON pt.punishment_type_id = gp.punishment_type_id
+                    GROUP BY u.user_id
+                    ORDER BY total_value DESC
+                    OFFSET $1
+                    LIMIT $2"""
+            res = await conn.fetch(
+                query,
+                offset,
+                limit,
+            )
+
+            return [LeaderboardUser(**r) for r in res]
 
     async def get_raw_users(self, conn: Optional[Pool] = None) -> dict[str, list[Any]]:
         async with MaybeAcquire(conn, self.pool) as conn:
@@ -363,6 +396,37 @@ class Database:
                 users.append(GroupUser(**user))
 
             return users
+
+    async def get_group_user_punishment_streaks(
+        self, group_id: GroupId, user_id: UserId, conn: Pool | None = None
+    ) -> PunishmentStreaks:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT created_time FROM group_punishments
+                    WHERE group_id = $1 AND user_id = $2
+                    ORDER BY created_time DESC"""
+            res = await conn.fetch(
+                query,
+                group_id,
+                user_id,
+            )
+
+            compare_to = None
+            if not res:
+                query = """SELECT added_time FROM group_members
+                        WHERE group_id = $1 AND user_id = $2"""
+                compare_to = await conn.fetchval(
+                    query,
+                    group_id,
+                    user_id,
+                )
+                if compare_to is None:
+                    raise NotFound
+
+        streaks = calculate_punishment_streaks(
+            res,
+            compare_to=compare_to,
+        )
+        return PunishmentStreaks(**streaks)
 
     async def get_group_members_raw(
         self,
@@ -697,8 +761,8 @@ class Database:
         conn: Optional[Pool] = None,
     ) -> dict[str, Union[GroupId, UserId]]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id)
-                    VALUES ($1, $2, $3)
+            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_time)
+                    VALUES ($1, $2, $3, $4)
                     RETURNING group_id, user_id
                     """
             try:
@@ -707,6 +771,7 @@ class Database:
                     member.group_id,
                     member.user_id,
                     member.ow_group_user_id,
+                    datetime.datetime.utcnow(),
                 )
             except UniqueViolationError as exc:
                 raise DatabaseIntegrityException(detail=str(exc)) from exc
@@ -724,9 +789,9 @@ class Database:
         conn: Optional[Pool] = None,
     ) -> list[dict[str, Union[GroupId, UserId]]]:
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id)
+            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_time)
                     (SELECT
-                        m.group_id, m.user_id, m.ow_group_user_id
+                        m.group_id, m.user_id, m.ow_group_user_id, m.added_time
                     FROM
                         unnest($1::group_members[]) as m
                     )
@@ -735,7 +800,16 @@ class Database:
 
             res = await conn.fetch(
                 query,
-                [(x.group_id, x.user_id, x.ow_group_user_id, True) for x in members],
+                [
+                    (
+                        x.group_id,
+                        x.user_id,
+                        x.ow_group_user_id,
+                        True,
+                        datetime.datetime.utcnow(),
+                    )
+                    for x in members
+                ],
             )
             return [dict(r) for r in res]
 
@@ -757,7 +831,7 @@ class Database:
             res = await conn.fetch(
                 query,
                 [
-                    (x.group_id, x.user_id, x.ow_group_user_id, x.active)
+                    (x.group_id, x.user_id, x.ow_group_user_id, x.active, None)
                     for x in members
                 ],
             )

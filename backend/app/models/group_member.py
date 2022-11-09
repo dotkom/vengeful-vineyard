@@ -3,6 +3,7 @@ Models for group member data structures. Group members only contain fields
 from the table 'group_members'.
 """
 
+import datetime
 from typing import Optional
 
 from app.types import GroupId, OWGroupUserId, UserId
@@ -17,7 +18,7 @@ class BaseGroupMember(BaseModel):
 
 
 class GroupMember(BaseGroupMember):
-    pass
+    added_time: datetime.datetime
 
 
 class GroupMemberCreate(BaseGroupMember):

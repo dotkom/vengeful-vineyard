@@ -284,7 +284,7 @@ OTHER_USER_AUTHORIZATION = f"Bearer {OTHER_USER_ACCESS_TOKEN}"
 OTHER_USER_NOT_IN_GROUP_AUTHORIZATION = f"Bearer {OTHER_USER_NOT_IN_GROUP_ACCESS_TOKEN}"
 
 
-class TestOW:
+class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_missing_authorization(self, client: Any) -> None:
         response = await client.get("/group/me")
@@ -565,3 +565,122 @@ class TestOW:
         assert response.status_code == 200
         punishments = response.json()[3]["punishments"]
         assert len(punishments) == 1
+
+    @pytest.mark.asyncio
+    async def test_get_group_user_punishment_streaks_empty(self, client: Any) -> None:
+        response = await client.get(f"/group/1/user/1/punishmentStreaks")
+        assert response.status_code == 200
+        assert response.json() == {
+            "current_streak": 0,
+            "current_inverse_streak": 0,
+            "longest_streak": 0,
+            "longest_inverse_streak": 0,
+        }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_group_user_punishment_streaks(self, client: Any) -> None:
+        response = await client.post(
+            f"/group/1/user/{SELF_USER_ID}/punishment",
+            json=[
+                {
+                    "punishment_type_id": 1,
+                    "reason": "Test",
+                    "amount": 1,
+                }
+            ],
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+
+        response = await client.get(f"/group/1/user/1/punishmentStreaks")
+        assert response.status_code == 200
+        assert response.json() == {
+            "current_streak": 1,
+            "current_inverse_streak": 0,
+            "longest_streak": 1,
+            "longest_inverse_streak": 0,
+        }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_leaderboard(self, client: Any) -> None:
+        response = await client.get(f"user/leaderboard?page_size=3")
+        assert response.status_code == 200
+
+        data = response.json()
+        for res in data["results"]:
+            for punishment in res["punishments"]:
+                punishment["verified_time"] = ""
+                punishment["created_time"] = ""
+
+        assert data == {
+            "next": "http://test/user/leaderboard?page_size=3&page=1",
+            "previous": None,
+            "results": [
+                {
+                    "email": "email4@email.com",
+                    "first_name": "Anna IreneUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 2027,
+                    "punishments": [
+                        {
+                            "amount": 1,
+                            "created_by": 1,
+                            "created_time": "",
+                            "punishment_id": 2,
+                            "punishment_type_id": 2,
+                            "reason": "Very good reason2",
+                            "verified_by": 1,
+                            "verified_time": "",
+                        }
+                    ],
+                    "total_value": 100,
+                    "user_id": 4,
+                },
+                {
+                    "email": "email1@email.com",
+                    "first_name": "BrageUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 2581,
+                    "punishments": [
+                        {
+                            "amount": 1,
+                            "created_by": 1,
+                            "created_time": "",
+                            "punishment_id": 3,
+                            "punishment_type_id": 1,
+                            "reason": "Test",
+                            "verified_by": None,
+                            "verified_time": "",
+                        }
+                    ],
+                    "total_value": 33,
+                    "user_id": 1,
+                },
+                {
+                    "email": "email3@email.com",
+                    "first_name": "Anh-Kha NguyenUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 1383,
+                    "punishments": [],
+                    "total_value": 0,
+                    "user_id": 3,
+                },
+            ],
+            "total": 9,
+        }
+
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_leaderboard_empty_page(self, client: Any) -> None:
+        response = await client.get(f"user/leaderboard?page=1&page_size=30")
+        assert response.status_code == 200
+        assert response.json() == {
+            "next": None,
+            "previous": "http://test/user/leaderboard?page=0&page_size=30",
+            "results": [],
+            "total": 9,
+        }
+        check_response_time(response)

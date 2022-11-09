@@ -6,15 +6,35 @@ from typing import Any, Optional
 
 from app.api import APIRoute, Request
 from app.exceptions import DatabaseIntegrityException, NotFound
+from app.models.leaderboard import LeaderboardUser
 from app.models.user import User, UserCreate
 from app.types import UserId
-from fastapi import APIRouter, HTTPException
+from app.utils.pagination import Page, Pagination
+from fastapi import APIRouter, HTTPException, Query
 
 router = APIRouter(
     prefix="/user",
     tags=["User"],
     route_class=APIRoute,
 )
+
+
+@router.get("/leaderboard", response_model=Page[LeaderboardUser])
+async def get_leadeboard(
+    request: Request,
+    page: int = Query(title="Page number", default=0, ge=0),
+    page_size: int = Query(title="Page size", default=30, ge=1, le=50),
+) -> Page[LeaderboardUser]:
+    app = request.app
+
+    pagination = Pagination[LeaderboardUser](
+        request=request,
+        total_coro=app.db.get_total_users,
+        results_coro=app.db.get_leaderboard,
+        page=page,
+        page_size=page_size,
+    )
+    return await pagination.paginate()
 
 
 # @router.get("")  # Disabled
