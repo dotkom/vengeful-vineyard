@@ -11,12 +11,18 @@ from fastapi import HTTPException
 from fastapi import Request as OriginalRequest
 from fastapi import Response
 from fastapi.routing import APIRoute as OriginalAPIRoute
+from fastapi.security import OpenIdConnect
 from starlette.requests import Request as StarletteRequest
 
 __all__ = (
     "FastAPI",
     "Request",
     "APIRoute",
+)
+
+
+oidc = OpenIdConnect(
+    openIdConnectUrl="https://old.online.ntnu.no/openid/.well-known/openid-configuration",
 )
 
 

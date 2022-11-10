@@ -288,8 +288,8 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_missing_authorization(self, client: Any) -> None:
         response = await client.get("/group/me")
-        assert response.status_code == 401 and response.json() == {
-            "detail": "Missing authorization"
+        assert response.status_code == 403 and response.json() == {
+            "detail": "Not authenticated"
         }
         check_response_time(response)
 
