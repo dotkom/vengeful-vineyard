@@ -11,13 +11,14 @@ from typing import Any, Optional, TypedDict, Union, cast
 from app.config import settings
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
+from app.models.group_event import GroupEventCreate, GroupEvent
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
 from app.models.leaderboard import LeaderboardUser
 from app.models.punishment import PunishmentCreate, PunishmentRead, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
-from app.types import GroupId, OWUserId, PunishmentId, PunishmentTypeId, UserId
+from app.types import GroupId, OWUserId, PunishmentId, PunishmentTypeId, UserId, GroupEventId
 from app.utils.db import MaybeAcquire
 from app.utils.streaks import calculate_punishment_streaks
 from asyncpg import Pool, create_pool
@@ -1110,3 +1111,54 @@ class Database:
                 raise NotFound
 
             return await self.get_punishment(punishment_id, conn=conn)
+
+    async def insert_group_event(
+        self,
+        group_id: GroupId,
+        event: GroupEventCreate,
+        created_by: UserId,
+        conn: Pool | None = None,
+    ) -> dict[str, int]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """INSERT INTO group_events(group_id,
+                                                name,
+                                                description,
+                                                start_time,
+                                                end_time,
+                                                created_by,
+                                                created_time)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    RETURNING group_event_id
+                    """
+            try:
+                group_event_id = await conn.fetchval(
+                    query,
+                    group_id,
+                    event.name,
+                    event.description,
+                    event.start_time,
+                    event.end_time,
+                    created_by,
+                    datetime.datetime.utcnow(),
+                )
+            except UniqueViolationError as exc:
+                raise DatabaseIntegrityException(detail=str(exc)) from exc
+            except ForeignKeyViolationError as exc:
+                raise DatabaseIntegrityException(detail=str(exc)) from exc
+
+        return {"id": group_event_id}
+
+    async def get_group_events(self, group_id: GroupId, conn: Optional[Pool]) -> list[GroupEvent]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT * FROM group_events WHERE group_id = $1"""
+            res = await conn.fetch(query, group_id)
+
+        return [GroupEvent(**r) for r in res]
+
+    async def delete_group_event(self, event_id: GroupEventId) -> None:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = "DELETE FROM group_events WHERE event_id = $1 RETURNING 1"
+            res = await conn.fetchval(query, event_id)
+
+            if res is None:
+                raise NotFound

@@ -7,6 +7,7 @@ from typing import Any, Optional, Union
 from app.api import APIRoute, Request, oidc
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
+from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_member import GroupMemberCreate
 from app.models.group_user import GroupUser
 from app.models.punishment import PunishmentCreate, PunishmentStreaks
@@ -292,3 +293,82 @@ async def add_punishment(
             raise HTTPException(status_code=400, detail=exc.detail) from exc
         except PunishmentTypeNotExists as exc:
             raise HTTPException(status_code=400, **exc.kwargs) from exc
+
+
+@router.get("/{group_id}/events")
+async def get_group_events(request: Request, group_id: GroupId) -> list[GroupEvent]:
+    """
+    Endpoint to get the events of a group.
+    """
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to view this information.",
+            )
+
+        try:
+            return await app.db.get_group_events(group_id, conn=conn)
+        except NotFound as exc:
+            raise HTTPException(status_code=404, detail="Group not found") from exc
+
+
+@router.post("/{group_id}/events")
+async def post_group_event(request: Request, group_id: GroupId, event: GroupEventCreate) -> None:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        await app.db.insert_group_event(
+            group_id,
+            event,
+            conn=conn,
+        )
+
+
+@router.delete("/{group_id}/events/{event_id}")
+async def delete_group_event(request: Request, group_id: GroupId, event_id: int) -> None:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        await app.db.delete_group_event(
+            event_id,
+            conn=conn,
+        )
