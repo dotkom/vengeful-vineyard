@@ -86,7 +86,17 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
 
 
 def init_api(**db_settings: str) -> FastAPI:
-    app = FastAPI()
+    oauth = {
+        "clientId": "219919",
+        "appName": "Vengeful Vineyard Docs",
+        "usePkceWithAuthorizationCodeGrant": True,
+        "scopes": "openid profile onlineweb4",
+    }
+
+    app = FastAPI(
+        swagger_ui_init_oauth=oauth,
+        swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect",
+    )
     app.router.route_class = APIRoute
     init_middlewares(app)
     init_routes(app)

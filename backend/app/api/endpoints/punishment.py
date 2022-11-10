@@ -2,11 +2,11 @@
 Punishment endpoints
 """
 
-from app.api import APIRoute, Request
+from app.api import APIRoute, Request, oidc
 from app.exceptions import NotFound
 from app.models.punishment import PunishmentOut
 from app.types import PunishmentId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(
     prefix="/punishment",
@@ -15,7 +15,11 @@ router = APIRouter(
 )
 
 
-@router.delete("/{punishment_id}", tags=["Punishment"])
+@router.delete(
+    "/{punishment_id}",
+    tags=["Punishment"],
+    dependencies=[Depends(oidc)],
+)
 async def delete_punishment(
     request: Request,
     punishment_id: PunishmentId,
@@ -48,7 +52,11 @@ async def delete_punishment(
         )
 
 
-@router.post("/{punishment_id}/verify", tags=["Punishment"])
+@router.post(
+    "/{punishment_id}/verify",
+    tags=["Punishment"],
+    dependencies=[Depends(oidc)],
+)
 async def verify_punishment(
     request: Request,
     punishment_id: PunishmentId,

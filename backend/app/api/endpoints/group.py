@@ -4,7 +4,7 @@ Group endpoints
 
 from typing import Any, Optional, Union
 
-from app.api import APIRoute, Request
+from app.api import APIRoute, Request, oidc
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate
@@ -12,7 +12,7 @@ from app.models.group_user import GroupUser
 from app.models.punishment import PunishmentCreate, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate
 from app.types import GroupId, OWGroupUserId, PunishmentTypeId, UserId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(
     prefix="/group",
@@ -21,7 +21,7 @@ router = APIRouter(
 )
 
 
-@router.get("/me")
+@router.get("/me", dependencies=[Depends(oidc)])
 async def get_my_groups(
     request: Request,
     wait_for_updates: bool = True,
@@ -124,7 +124,7 @@ async def post_group(
         raise HTTPException(status_code=400, detail=exc.detail) from exc
 
 
-@router.post("/{group_id}/punishmentType")
+@router.post("/{group_id}/punishmentType", dependencies=[Depends(oidc)])
 async def add_punishment_type_to_group(
     request: Request,
     group_id: GroupId,
@@ -160,7 +160,9 @@ async def add_punishment_type_to_group(
             raise HTTPException(status_code=400, detail=exc.detail) from exc
 
 
-@router.delete("/{group_id}/punishmentType/{punishment_type_id}")
+@router.delete(
+    "/{group_id}/punishmentType/{punishment_type_id}", dependencies=[Depends(oidc)]
+)
 async def delete_punishment_type_to_group(
     request: Request,
     group_id: GroupId,
@@ -240,7 +242,7 @@ async def add_user_to_group(
         ) from exc
 
 
-@router.post("/{group_id}/user/{user_id}/punishment")
+@router.post("/{group_id}/user/{user_id}/punishment", dependencies=[Depends(oidc)])
 async def add_punishment(
     request: Request,
     group_id: GroupId,
