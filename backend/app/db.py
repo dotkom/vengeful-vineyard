@@ -1157,6 +1157,20 @@ class Database:
 
         return {"id": group_event_id}
 
+    async def group_event_exists_between(
+        self,
+        group_id: GroupId,
+        start_time: datetime.datetime,
+        end_time: datetime.datetime,
+        conn: Optional[Pool] = None,
+    ) -> bool:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT 1 FROM group_events
+                WHERE group_id = $1 AND start_time < $2 AND end_time > $3
+                """
+            res = await conn.fetchrow(query, group_id, end_time, start_time)
+            return res is not None
+
     async def get_total_group_events(
         self,
         group_id: GroupId,

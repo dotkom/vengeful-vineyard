@@ -366,6 +366,18 @@ async def post_group_event(
                 detail="You must be a member of the group to perform this action.",
             )
 
+        res = await app.db.group_event_exists_between(
+            group_id,
+            event.start_time,
+            event.end_time,
+            conn=conn,
+        )
+        if res:
+            raise HTTPException(
+                status_code=400,
+                detail="There is already an event in this time frame",
+            )
+
         await app.db.insert_group_event(
             group_id,
             event,
