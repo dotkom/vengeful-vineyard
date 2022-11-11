@@ -45,3 +45,14 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	verified_time TIMESTAMP WITHOUT TIME ZONE,
 	created_time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS group_events (
+	event_id SERIAL PRIMARY KEY,
+	group_id INTEGER NOT NULL references groups(group_id),
+	name TEXT NOT NULL,
+	description TEXT NOT NULL,
+	start_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+	end_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+	created_by INTEGER NOT NULL references users(user_id),
+	created_time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
+);

@@ -205,7 +205,9 @@ class Database:
         return {"users": users}
 
     async def get_user_streaks(
-        self, user_id: UserId, conn: Pool | None = None
+        self,
+        user_id: UserId,
+        conn: Optional[Pool] = None,
     ) -> dict[str, Any]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT created_time FROM group_punishments
@@ -1124,7 +1126,7 @@ class Database:
         group_id: GroupId,
         event: GroupEventCreate,
         created_by: UserId,
-        conn: Pool | None = None,
+        conn: Optional[Pool] = None,
     ) -> dict[str, int]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """INSERT INTO group_events(group_id,
@@ -1135,7 +1137,7 @@ class Database:
                                                 created_by,
                                                 created_time)
                     VALUES ($1, $2, $3, $4, $5, $6, $7)
-                    RETURNING group_event_id
+                    RETURNING event_id
                     """
             try:
                 group_event_id = await conn.fetchval(
@@ -1155,8 +1157,22 @@ class Database:
 
         return {"id": group_event_id}
 
+    async def get_total_group_events(
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool] = None,
+    ) -> int:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = "SELECT COUNT(*) FROM group_events WHERE group_id = $1"
+            return await conn.fetchval(  # type: ignore
+                query,
+                group_id,
+            )
+
     async def get_group_events(
-        self, group_id: GroupId, conn: Optional[Pool]
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool],
     ) -> list[GroupEvent]:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT * FROM group_events WHERE group_id = $1"""
@@ -1164,7 +1180,33 @@ class Database:
 
         return [GroupEvent(**r) for r in res]
 
-    async def delete_group_event(self, event_id: GroupEventId) -> None:
+    async def get_group_events_with_offset(
+        self,
+        group_id: GroupId,
+        offset: int,
+        limit: int,
+        conn: Optional[Pool] = None,
+    ) -> list[GroupEvent]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT * FROM group_events
+                    WHERE group_id = $1
+                    OFFSET $2
+                    LIMIT $3
+                    """
+            res = await conn.fetch(
+                query,
+                group_id,
+                offset,
+                limit,
+            )
+
+            return [GroupEvent(**r) for r in res]
+
+    async def delete_group_event(
+        self,
+        event_id: GroupEventId,
+        conn: Optional[Pool] = None,
+    ) -> None:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = "DELETE FROM group_events WHERE event_id = $1 RETURNING 1"
             res = await conn.fetchval(query, event_id)
