@@ -1190,6 +1190,7 @@ class Database:
         async with MaybeAcquire(conn, self.pool) as conn:
             query = """SELECT * FROM group_events
                     WHERE group_id = $1
+                    ORDER BY start_time DESC
                     OFFSET $2
                     LIMIT $3
                     """
