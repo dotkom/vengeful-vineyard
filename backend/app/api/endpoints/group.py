@@ -2,17 +2,20 @@
 Group endpoints
 """
 
+from functools import partial
 from typing import Any, Optional, Union
 
 from app.api import APIRoute, Request, oidc
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
+from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_member import GroupMemberCreate
 from app.models.group_user import GroupUser
 from app.models.punishment import PunishmentCreate, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate
-from app.types import GroupId, OWGroupUserId, PunishmentTypeId, UserId
-from fastapi import APIRouter, Depends, HTTPException
+from app.types import GroupEventId, GroupId, OWGroupUserId, PunishmentTypeId, UserId
+from app.utils.pagination import Page, Pagination
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 router = APIRouter(
     prefix="/group",
@@ -292,3 +295,155 @@ async def add_punishment(
             raise HTTPException(status_code=400, detail=exc.detail) from exc
         except PunishmentTypeNotExists as exc:
             raise HTTPException(status_code=400, **exc.kwargs) from exc
+
+
+@router.get(
+    "/{group_id}/events",
+    dependencies=[Depends(oidc)],
+    response_model=Page[GroupEvent],
+)
+async def get_group_events(
+    request: Request,
+    group_id: GroupId,
+    page: int = Query(title="Page number", default=0, ge=0),
+    page_size: int = Query(title="Page size", default=30, ge=1, le=50),
+) -> Page[GroupEvent]:
+    """
+    Endpoint to get the events of a group.
+    """
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to view this information.",
+            )
+
+    pagination = Pagination[GroupEvent](
+        request=request,
+        total_coro=partial(app.db.get_total_group_events, group_id),
+        results_coro=partial(app.db.get_group_events_with_offset, group_id),
+        page=page,
+        page_size=page_size,
+    )
+    return await pagination.paginate()
+
+
+@router.post("/{group_id}/events", dependencies=[Depends(oidc)])
+async def post_group_event(
+    request: Request, group_id: GroupId, event: GroupEventCreate
+) -> None:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    if event.end_time is not None:
+        if event.start_time >= event.end_time:
+            raise HTTPException(
+                status_code=400,
+                detail="The start time must be before the end time",
+            )
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        res = await app.db.group_event_exists_between(
+            group_id,
+            event.start_time,
+            event.end_time,
+            conn=conn,
+        )
+        if res:
+            raise HTTPException(
+                status_code=400,
+                detail="There is already an event in this time frame",
+            )
+
+        await app.db.insert_group_event(
+            group_id,
+            event,
+            user_id,
+            conn=conn,
+        )
+
+
+@router.delete(
+    "/{group_id}/events/{event_id}",
+    dependencies=[Depends(oidc)],
+)
+async def delete_group_event(
+    request: Request, group_id: GroupId, event_id: GroupEventId
+) -> None:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        await app.db.delete_group_event(
+            event_id,
+            conn=conn,
+        )
+
+
+@router.get(
+    "/{group_id}/totalPunishmentValue",
+    dependencies=[Depends(oidc)],
+)
+async def total_punishment_value(
+    request: Request,
+    group_id: GroupId,
+    includeVerified: bool = Query(default=False),
+) -> dict[str, int]:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to view this information.",
+            )
+
+        return await app.db.get_group_total_punishment_value(
+            group_id,
+            include_verified=includeVerified,
+            conn=conn,
+        )

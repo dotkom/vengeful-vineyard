@@ -523,6 +523,28 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
+    async def test_get_group_total_punishment_value(self, client: Any) -> None:
+        response = await client.get(
+            "/group/1/totalPunishmentValue",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        assert response.json()["value"] == 33
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_group_total_punishment_value_include_verified(
+        self, client: Any
+    ) -> None:
+        response = await client.get(
+            "/group/1/totalPunishmentValue?includeVerified=true",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        assert response.json()["value"] == 133
+        check_response_time(response)
+
+    @pytest.mark.asyncio
     async def test_delete_own_punishment_created_by_other(self, client: Any) -> None:
         response = await client.delete(
             "/punishment/2",
@@ -682,5 +704,115 @@ class TestWithDB_OW:
             "previous": "http://test/user/leaderboard?page=0&page_size=30",
             "results": [],
             "total": 9,
+        }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_create_group_event(self, client: Any) -> None:
+        response = await client.post(
+            "/group/1/events",
+            json={
+                "name": "Test",
+                "description": "Test",
+                "start_time": "2021-01-01T00:00:00.000Z",
+                "end_time": "2021-02-01T00:00:00",
+            },
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_create_group_event_invalid_times(self, client: Any) -> None:
+        response = await client.post(
+            "/group/1/events",
+            json={
+                "name": "TestInvalid",
+                "description": "Test",
+                "start_time": "2021-02-01T00:00:00.000Z",
+                "end_time": "2021-01-01T00:00:00",
+            },
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 400
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_create_group_event_duplicate_time(self, client: Any) -> None:
+        response = await client.post(
+            "/group/1/events",
+            json={
+                "name": "Test",
+                "description": "Test",
+                "start_time": "2021-01-01T10:00:00.000Z",
+                "end_time": "2021-02-01T00:00:00",
+            },
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 400
+        assert response.json() == {
+            "detail": "There is already an event in this time frame"
+        }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_group_events(self, client: Any) -> None:
+        response = await client.get(
+            "/group/1/events?page0&page_size=30",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        for res in data["results"]:
+            res["created_time"] = ""
+
+        assert data == {
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "name": "Test",
+                    "description": "Test",
+                    "start_time": "2021-01-01T00:00:00",
+                    "end_time": "2021-02-01T00:00:00",
+                    "event_id": 1,
+                    "group_id": 1,
+                    "created_by": 1,
+                    "created_time": "",
+                }
+            ],
+            "total": 1,
+        }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_missing_auth_get_group_events(self, client: Any) -> None:
+        response = await client.get("/group/1/events?page0&page_size=30")
+        assert response.status_code == 403
+        assert response.json() == {"detail": "Not authenticated"}
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_forbidden_get_group_events(self, client: Any) -> None:
+        response = await client.get(
+            f"group/1/events?page0&page_size=30",
+            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+        )
+        assert response.status_code == 403
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_group_events_empty_page(self, client: Any) -> None:
+        response = await client.get(
+            f"group/1/events?page=1&page_size=30",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        assert response.json() == {
+            "next": None,
+            "previous": "http://test/group/1/events?page=0&page_size=30",
+            "results": [],
+            "total": 1,
         }
         check_response_time(response)

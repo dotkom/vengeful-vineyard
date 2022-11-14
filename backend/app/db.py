@@ -11,13 +11,21 @@ from typing import Any, Optional, TypedDict, Union, cast
 from app.config import settings
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
+from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_member import GroupMemberCreate, GroupMemberUpdate
 from app.models.group_user import GroupUser
 from app.models.leaderboard import LeaderboardUser
 from app.models.punishment import PunishmentCreate, PunishmentRead, PunishmentStreaks
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.models.user import User, UserCreate, UserUpdate
-from app.types import GroupId, OWUserId, PunishmentId, PunishmentTypeId, UserId
+from app.types import (
+    GroupEventId,
+    GroupId,
+    OWUserId,
+    PunishmentId,
+    PunishmentTypeId,
+    UserId,
+)
 from app.utils.db import MaybeAcquire
 from app.utils.streaks import calculate_punishment_streaks
 from asyncpg import Pool, create_pool
@@ -318,6 +326,26 @@ class Database:
                 punishments[db_punishment["user_id"]].append(dict(db_punishment))
 
             return punishments
+
+    async def get_group_total_punishment_value(
+        self,
+        group_id: GroupId,
+        include_verified: bool = False,
+        conn: Optional[Pool] = None,
+    ) -> dict[str, int]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            extra = "" if include_verified else " AND verified_by IS NULL"
+
+            query = f"""SELECT COALESCE(SUM(gp.amount * pt.value), 0) FROM group_punishments AS gp
+                    LEFT JOIN punishment_types AS pt
+                        ON gp.punishment_type_id = pt.punishment_type_id
+                    WHERE gp.group_id = $1{extra}
+                    """
+
+            val = await conn.fetchval(query, group_id)
+            assert isinstance(val, int)
+
+            return {"value": val}
 
     async def get_group_user(
         self,
@@ -987,3 +1015,111 @@ class Database:
                 raise NotFound
 
             return await self.get_punishment(punishment_id, conn=conn)
+
+    async def insert_group_event(
+        self,
+        group_id: GroupId,
+        event: GroupEventCreate,
+        created_by: UserId,
+        conn: Optional[Pool] = None,
+    ) -> dict[str, int]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """INSERT INTO group_events(group_id,
+                                                name,
+                                                description,
+                                                start_time,
+                                                end_time,
+                                                created_by,
+                                                created_time)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    RETURNING event_id
+                    """
+            try:
+                group_event_id = await conn.fetchval(
+                    query,
+                    group_id,
+                    event.name,
+                    event.description,
+                    event.start_time,
+                    event.end_time,
+                    created_by,
+                    datetime.datetime.utcnow(),
+                )
+            except UniqueViolationError as exc:
+                raise DatabaseIntegrityException(detail=str(exc)) from exc
+            except ForeignKeyViolationError as exc:
+                raise DatabaseIntegrityException(detail=str(exc)) from exc
+
+        return {"id": group_event_id}
+
+    async def group_event_exists_between(
+        self,
+        group_id: GroupId,
+        start_time: datetime.datetime,
+        end_time: datetime.datetime,
+        conn: Optional[Pool] = None,
+    ) -> bool:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT 1 FROM group_events
+                WHERE group_id = $1 AND start_time < $2 AND end_time > $3
+                """
+            res = await conn.fetchrow(query, group_id, end_time, start_time)
+            return res is not None
+
+    async def get_total_group_events(
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool] = None,
+    ) -> int:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = "SELECT COUNT(*) FROM group_events WHERE group_id = $1"
+            return await conn.fetchval(  # type: ignore
+                query,
+                group_id,
+            )
+
+    async def get_group_events(
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool],
+    ) -> list[GroupEvent]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT * FROM group_events WHERE group_id = $1"""
+            res = await conn.fetch(query, group_id)
+
+        return [GroupEvent(**r) for r in res]
+
+    async def get_group_events_with_offset(
+        self,
+        group_id: GroupId,
+        offset: int,
+        limit: int,
+        conn: Optional[Pool] = None,
+    ) -> list[GroupEvent]:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = """SELECT * FROM group_events
+                    WHERE group_id = $1
+                    ORDER BY start_time DESC
+                    OFFSET $2
+                    LIMIT $3
+                    """
+            res = await conn.fetch(
+                query,
+                group_id,
+                offset,
+                limit,
+            )
+
+            return [GroupEvent(**r) for r in res]
+
+    async def delete_group_event(
+        self,
+        event_id: GroupEventId,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            query = "DELETE FROM group_events WHERE event_id = $1 RETURNING 1"
+            res = await conn.fetchval(query, event_id)
+
+            if res is None:
+                raise NotFound

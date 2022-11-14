@@ -112,7 +112,7 @@ class TestStreaks:
             ),
         ),
     )
-    def test_treaks(
+    def test_streaks(
         self,
         week_nums: list[int],
         compare_to_week: int,
