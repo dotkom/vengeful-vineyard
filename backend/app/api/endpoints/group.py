@@ -414,3 +414,36 @@ async def delete_group_event(
             event_id,
             conn=conn,
         )
+
+
+@router.get(
+    "/{group_id}/totalPunishmentValue",
+    dependencies=[Depends(oidc)],
+)
+async def total_punishment_value(
+    request: Request,
+    group_id: GroupId,
+    includeVerified: bool = Query(default=False),
+) -> int:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to view this information.",
+            )
+
+        return await app.db.get_group_total_punishment_value(
+            group_id,
+            include_verified=includeVerified,
+            conn=conn,
+        )

@@ -452,6 +452,25 @@ class Database:
 
             return punishments
 
+    async def get_group_total_punishment_value(
+        self,
+        group_id: GroupId,
+        include_verified: bool = False,
+        conn: Optional[Pool] = None,
+    ) -> int:
+        async with MaybeAcquire(conn, self.pool) as conn:
+            extra = "" if include_verified else " AND verified_by IS NULL"
+
+            query = f"""SELECT COALESCE(SUM(gp.amount * pt.value), 0) FROM group_punishments AS gp
+                    LEFT JOIN punishment_types AS pt
+                        ON gp.punishment_type_id = pt.punishment_type_id
+                    WHERE gp.group_id = $1{extra}
+                    """
+
+            val = await conn.fetchval(query, group_id)
+            assert isinstance(val, int)
+            return val
+
     async def get_group_user(
         self,
         group_id: GroupId,
