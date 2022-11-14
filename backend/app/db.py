@@ -457,7 +457,7 @@ class Database:
         group_id: GroupId,
         include_verified: bool = False,
         conn: Optional[Pool] = None,
-    ) -> int:
+    ) -> dict[str, int]:
         async with MaybeAcquire(conn, self.pool) as conn:
             extra = "" if include_verified else " AND verified_by IS NULL"
 
@@ -469,7 +469,8 @@ class Database:
 
             val = await conn.fetchval(query, group_id)
             assert isinstance(val, int)
-            return val
+
+            return {"value": val}
 
     async def get_group_user(
         self,

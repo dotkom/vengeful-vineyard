@@ -424,7 +424,7 @@ async def total_punishment_value(
     request: Request,
     group_id: GroupId,
     includeVerified: bool = Query(default=False),
-) -> int:
+) -> dict[str, int]:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
