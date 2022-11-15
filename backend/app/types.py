@@ -3,6 +3,9 @@ Some newtype definitions for extra type safety
 """
 
 
+from typing import TypedDict
+
+
 class UserId(int):
     pass
 
@@ -29,3 +32,13 @@ class PunishmentTypeId(int):
 
 class GroupEventId(int):
     pass
+
+
+class InsertOrUpdateUser(TypedDict):
+    id: UserId
+    action: str
+
+
+class InsertOrUpdateGroup(TypedDict):
+    id: GroupId
+    action: str

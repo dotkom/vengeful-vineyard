@@ -6,8 +6,7 @@ from typing import Any, Optional
 
 from app.api import APIRoute, Request
 from app.exceptions import DatabaseIntegrityException, NotFound
-from app.models.leaderboard import LeaderboardUser
-from app.models.user import User, UserCreate
+from app.models.user import LeaderboardUser, User, UserCreate
 from app.types import UserId
 from app.utils.pagination import Page, Pagination
 from fastapi import APIRouter, HTTPException, Query
@@ -29,8 +28,8 @@ async def get_leadeboard(
 
     pagination = Pagination[LeaderboardUser](
         request=request,
-        total_coro=app.db.get_total_users,
-        results_coro=app.db.get_leaderboard,
+        total_coro=app.db.users.get_count,
+        results_coro=app.db.users.get_leaderboard,
         page=page,
         page_size=page_size,
     )
@@ -43,7 +42,7 @@ async def get_users(request: Request) -> dict[str, list[Any]]:
     Endpoint to get all users on the system.
     """
     app = request.app
-    return await app.db.get_raw_users()
+    return await app.db.users.get_all_raw()
 
 
 # @router.post("")  # Disabled
@@ -56,7 +55,7 @@ async def post_user(
     """
     app = request.app
     try:
-        data = await app.db.insert_user(user)
+        data = await app.db.users.insert(user)
     except DatabaseIntegrityException as exc:
         raise HTTPException(status_code=400, detail=exc.detail) from exc
     else:
@@ -70,7 +69,7 @@ async def get_user(request: Request, user_id: UserId) -> User:
     """
     app = request.app
     try:
-        return await app.db.get_user(user_id)
+        return await app.db.users.get(user_id)
     except NotFound as exc:
         raise HTTPException(status_code=404, detail="User not found") from exc
 
@@ -82,7 +81,7 @@ async def get_user_groups(request: Request, user_id: UserId) -> list[dict[str, A
     """
     app = request.app
     try:
-        return await app.db.get_user_groups(user_id)
+        return await app.db.users.get_groups(user_id)
     except NotFound as exc:
         raise HTTPException(
             status_code=404, detail="User groups could not be found"
