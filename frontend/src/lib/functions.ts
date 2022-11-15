@@ -32,7 +32,7 @@ export const getLastPunishedDate = (user?: User): string => {
     return 'No date'
   }
   try {
-    return user.punishments[user.punishments.length - 1].created_time.split('T')[0]
+    return user.punishments[user.punishments.length - 1].created_at.split('T')[0]
   } catch (TypeError) {
     return 'No date'
   }

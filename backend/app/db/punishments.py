@@ -121,7 +121,7 @@ class Punishments:
     ) -> PunishmentRead:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """UPDATE group_punishments
-                SET verified_by = $1, verified_time = $2
+                SET verified_by = $1, verified_at = $2
                 WHERE punishment_id = $3
                 RETURNING punishment_id
                 """

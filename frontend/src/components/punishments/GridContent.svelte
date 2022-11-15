@@ -60,7 +60,7 @@
                 .includes(pun.punishment_type_id)
             )
             .filter((pun: Punishment) =>
-              $showPaid ? pun : pun.verified_time === null
+              $showPaid ? pun : pun.verified_at === null
             )
         ),
       sortable: true,
@@ -140,13 +140,13 @@
           /* @ts-ignore */
           .filter((pun) =>
             shouldDisplay(
-              new Date(pun.created_time),
+              new Date(pun.created_at),
               $onlyShowAfterDate,
               $onlyShowBeforeDate
             )
           )
           /* @ts-ignore */
-          .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+          .filter((pun) => ($showPaid ? pun : pun.verified_at === null))
       )}"
       user="{row.user}"
       punishmentTypes="{$group.punishment_types}"
@@ -160,13 +160,13 @@
         /* @ts-ignore */
         .filter((pun) =>
           shouldDisplay(
-            new Date(pun.created_time),
+            new Date(pun.created_at),
             $onlyShowAfterDate,
             $onlyShowBeforeDate
           )
         )
         /* @ts-ignore */
-        .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) ||
+        .filter((pun) => ($showPaid ? pun : pun.verified_at === null)) ||
         null}"
     /></svelte:fragment
   >

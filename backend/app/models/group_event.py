@@ -23,7 +23,7 @@ class GroupEvent(GroupEventBase):
     group_id: GroupId
     event_id: GroupEventId
     created_by: UserId
-    created_time: datetime.datetime
+    created_at: datetime.datetime
 
 
 class GroupEventCreate(GroupEventBase):

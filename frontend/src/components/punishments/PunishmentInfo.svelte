@@ -58,13 +58,13 @@
   {#each punishments as punishment}
     <div class="punishment">
       <div class="reason_wrapper">
-        {#if punishment.verified_time}
+        {#if punishment.verified_at}
           {#if punishment.verified_by != null}
             {#await getUser(Number(punishment.verified_by)) then user}
               <p class="text-green-600 break-words break-spaces">
                 Verifisert av {user.first_name}
                 {user.last_name}
-                {formatGivenTime(punishment.verified_time)}
+                {formatGivenTime(punishment.verified_at)}
               </p>
             {/await}
           {/if}
@@ -148,7 +148,7 @@
             </button>
           </ul>
         </div>
-        <div>{formatGivenTime(punishment.created_time)}</div>
+        <div>{formatGivenTime(punishment.created_at)}</div>
       </div>
     </div>
   {:else}

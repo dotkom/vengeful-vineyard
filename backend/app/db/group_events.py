@@ -30,7 +30,7 @@ class GroupEvents:
                                                 start_time,
                                                 end_time,
                                                 created_by,
-                                                created_time)
+                                                created_at)
                     VALUES ($1, $2, $3, $4, $5, $6, $7)
                     RETURNING event_id
                     """

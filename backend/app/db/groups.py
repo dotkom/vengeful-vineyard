@@ -161,7 +161,7 @@ class Groups:
         conn: Optional[Pool] = None,
     ) -> dict[str, Union[GroupId, UserId]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_time)
+            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_at)
                     VALUES ($1, $2, $3, $4)
                     RETURNING group_id, user_id
                     """
@@ -189,9 +189,9 @@ class Groups:
         conn: Optional[Pool] = None,
     ) -> list[dict[str, Union[GroupId, UserId]]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_time)
+            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_at)
                     (SELECT
-                        m.group_id, m.user_id, m.ow_group_user_id, m.added_time
+                        m.group_id, m.user_id, m.ow_group_user_id, m.added_at
                     FROM
                         unnest($1::group_members[]) as m
                     )

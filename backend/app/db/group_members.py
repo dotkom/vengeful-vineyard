@@ -24,9 +24,9 @@ class GroupMembers:
         conn: Optional[Pool] = None,
     ) -> PunishmentStreaks:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT created_time FROM group_punishments
+            query = """SELECT created_at FROM group_punishments
                     WHERE group_id = $1 AND user_id = $2
-                    ORDER BY created_time DESC"""
+                    ORDER BY created_at DESC"""
             res = await conn.fetch(
                 query,
                 group_id,
@@ -35,7 +35,7 @@ class GroupMembers:
 
             compare_to = None
             if not res:
-                query = """SELECT added_time FROM group_members
+                query = """SELECT added_at FROM group_members
                         WHERE group_id = $1 AND user_id = $2"""
                 compare_to = await conn.fetchval(
                     query,

@@ -18,7 +18,7 @@ class BaseGroupMember(BaseModel):
 
 
 class GroupMember(BaseGroupMember):
-    added_time: datetime.datetime
+    added_at: datetime.datetime
 
 
 class GroupMemberCreate(BaseGroupMember):

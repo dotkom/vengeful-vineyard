@@ -25,7 +25,7 @@
           .map((pun) => pun.punishment_type_id)
           .includes(pun.punishment_type_id)
       )
-      .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+      .filter((pun) => ($showPaid ? pun : pun.verified_at === null))
       .map((punishment) => {
         //@ts-ignore
         allPunishments[punishment.punishment_type_id] =
@@ -63,7 +63,7 @@
           .map((pun) => pun.punishment_type_id)
           .includes(pun.punishment_type_id)
       )
-      .filter((pun) => ($showPaid ? pun : pun.verified_time === null)) : []}"
+      .filter((pun) => ($showPaid ? pun : pun.verified_at === null)) : []}"
   />
 </div>
 

@@ -69,7 +69,7 @@ def calculate_punishment_streaks(
     pre_week = None
 
     for c, row in enumerate(rows):
-        dt = utc_to_oslo(row["created_time"])
+        dt = utc_to_oslo(row["created_at"])
         year, week, _ = dt.isocalendar()
 
         if pre_dt is None:
@@ -88,7 +88,7 @@ def calculate_punishment_streaks(
                 except IndexError:
                     last_iso_calendar = now_iso_calendar
                 else:
-                    last_dt = utc_to_oslo(last_row["created_time"])
+                    last_dt = utc_to_oslo(last_row["created_at"])
                     last_iso_calendar = last_dt.isocalendar()
 
             last_year, last_week, _ = last_iso_calendar
@@ -108,7 +108,7 @@ def calculate_punishment_streaks(
                 current_streak = 1  # Start at one since we are already
                 # on a new streak.
 
-                last_dt = utc_to_oslo(rows[c - 1]["created_time"])
+                last_dt = utc_to_oslo(rows[c - 1]["created_at"])
                 last_year, last_week, _ = last_dt.isocalendar()
 
                 weeks = _calc_inverse_streak(last_year, last_week, year, week)

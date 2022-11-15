@@ -28,11 +28,11 @@
             .includes(pun.punishment_type_id)
         )
          /* @ts-ignore */
-        .filter((pun) => ($showPaid ? pun : pun.verified_time === null))
+        .filter((pun) => ($showPaid ? pun : pun.verified_at === null))
          /* @ts-ignore */
         .filter((pun) =>
           shouldDisplay(
-            new Date(pun.created_time),
+            new Date(pun.created_at),
             $onlyShowAfterDate,
             $onlyShowBeforeDate
           )
