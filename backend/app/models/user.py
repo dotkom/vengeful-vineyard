@@ -4,6 +4,7 @@ Models for user data structures
 
 from typing import Optional
 
+from app.models.punishment import PunishmentOut
 from app.types import OWUserId, UserId
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -29,3 +30,8 @@ class UserCreate(UserBase):
 
 class UserUpdate(CreatedUserBase):
     pass
+
+
+class LeaderboardUser(User):
+    punishments: list[PunishmentOut]
+    total_value: int

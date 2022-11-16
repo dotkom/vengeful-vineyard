@@ -3,7 +3,7 @@ Group endpoints
 """
 
 from functools import partial
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from app.api import APIRoute, Request, oidc
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
@@ -24,11 +24,15 @@ router = APIRouter(
 )
 
 
-@router.get("/me", dependencies=[Depends(oidc)])
+@router.get(
+    "/me",
+    response_model=list[Group],
+    dependencies=[Depends(oidc)],
+)
 async def get_my_groups(
     request: Request,
     wait_for_updates: bool = True,
-) -> list[dict[str, Any]]:
+) -> list[Group]:
     app = request.app
     access_token = request.raise_if_missing_authorization()
 
@@ -46,11 +50,14 @@ async def get_my_groups(
         wait_for_updates=wait_for_updates,
     )
 
-    groups = await app.db.get_user_groups(user_id)
+    groups = await app.db.users.get_groups(user_id)
     return groups
 
 
-@router.get("/{group_id}/user/{user_id}")
+@router.get(
+    "/{group_id}/user/{user_id}",
+    response_model=GroupUser,
+)
 async def get_group_user(
     request: Request,
     group_id: GroupId,
@@ -61,7 +68,7 @@ async def get_group_user(
     """
     app = request.app
     try:
-        return await app.db.get_group_user(group_id, user_id)
+        return await app.db.group_users.get(group_id, user_id)
     except NotFound as exc:
         raise HTTPException(
             status_code=404, detail="User not found or not in group"
@@ -82,31 +89,37 @@ async def get_group_user_punishment_streaks(
     """
     app = request.app
     try:
-        return await app.db.get_group_user_punishment_streaks(group_id, user_id)
+        return await app.db.group_members.get_punishment_streaks(group_id, user_id)
     except NotFound as exc:
         raise HTTPException(
             status_code=404, detail="User not found or not in group"
         ) from exc
 
 
-@router.get("/{group_id}/users")
+@router.get(
+    "/{group_id}/users",
+    response_model=list[GroupUser],
+)
 async def get_group_users(request: Request, group_id: GroupId) -> list[GroupUser]:
     """
     Endpoint to get all users in a group.
     """
     app = request.app
 
-    return await app.db.get_group_users(group_id)
+    return await app.db.group_users.get_all(group_id)
 
 
-@router.get("/{group_id}")
+@router.get(
+    "/{group_id}",
+    response_model=Group,
+)
 async def get_group(request: Request, group_id: GroupId) -> Group:
     """
     Endpoint to get a specific group.
     """
     app = request.app
     try:
-        return await app.db.get_group(group_id)
+        return await app.db.groups.get(group_id)
     except NotFound as exc:
         raise HTTPException(status_code=404, detail="Group not found") from exc
 
@@ -121,13 +134,16 @@ async def post_group(
     """
     app = request.app
     try:
-        data = await app.db.insert_group(group)
+        data = await app.db.groups.insert(group)
         return {"id": data["id"]}
     except DatabaseIntegrityException as exc:
         raise HTTPException(status_code=400, detail=exc.detail) from exc
 
 
-@router.post("/{group_id}/punishmentType", dependencies=[Depends(oidc)])
+@router.post(
+    "/{group_id}/punishmentType",
+    dependencies=[Depends(oidc)],
+)
 async def add_punishment_type_to_group(
     request: Request,
     group_id: GroupId,
@@ -142,7 +158,7 @@ async def add_punishment_type_to_group(
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id,
             group_id,
             conn=conn,
@@ -154,7 +170,7 @@ async def add_punishment_type_to_group(
             )
 
         try:
-            return await app.db.insert_punishment_type(
+            return await app.db.punishment_types.insert(
                 group_id,
                 punishment_type,
                 conn=conn,
@@ -164,7 +180,8 @@ async def add_punishment_type_to_group(
 
 
 @router.delete(
-    "/{group_id}/punishmentType/{punishment_type_id}", dependencies=[Depends(oidc)]
+    "/{group_id}/punishmentType/{punishment_type_id}",
+    dependencies=[Depends(oidc)],
 )
 async def delete_punishment_type_to_group(
     request: Request,
@@ -180,7 +197,7 @@ async def delete_punishment_type_to_group(
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id,
             group_id,
             conn=conn,
@@ -192,7 +209,7 @@ async def delete_punishment_type_to_group(
             )
 
         try:
-            await app.db.delete_punishment_type(
+            await app.db.punishment_types.delete(
                 group_id,
                 punishment_type_id,
                 conn=conn,
@@ -218,7 +235,7 @@ async def add_user_to_group(
 
     if ow_group_user_id is None:
         try:
-            group = await app.db.get_group(group_id)
+            group = await app.db.groups.get(group_id)
         except NotFound as exc:
             raise HTTPException(status_code=404, detail="Group not found") from exc
         else:
@@ -229,7 +246,7 @@ async def add_user_to_group(
                 )
 
     try:
-        return await app.db.insert_user_in_group(
+        return await app.db.groups.insert_member(
             GroupMemberCreate(
                 group_id=group_id,
                 user_id=user_id,
@@ -245,7 +262,10 @@ async def add_user_to_group(
         ) from exc
 
 
-@router.post("/{group_id}/user/{user_id}/punishment", dependencies=[Depends(oidc)])
+@router.post(
+    "/{group_id}/user/{user_id}/punishment",
+    dependencies=[Depends(oidc)],
+)
 async def add_punishment(
     request: Request,
     group_id: GroupId,
@@ -261,7 +281,7 @@ async def add_punishment(
     created_by, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             created_by,
             group_id,
             conn=conn,
@@ -272,7 +292,7 @@ async def add_punishment(
                 detail="You must be a member of the group to perform this action",
             )
 
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id,
             group_id,
             conn=conn,
@@ -284,7 +304,7 @@ async def add_punishment(
             )
 
         try:
-            return await app.db.insert_punishments(
+            return await app.db.punishments.insert_multiple(
                 group_id,
                 user_id,
                 created_by,
@@ -317,7 +337,7 @@ async def get_group_events(
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id,
             group_id,
             conn=conn,
@@ -330,18 +350,21 @@ async def get_group_events(
 
     pagination = Pagination[GroupEvent](
         request=request,
-        total_coro=partial(app.db.get_total_group_events, group_id),
-        results_coro=partial(app.db.get_group_events_with_offset, group_id),
+        total_coro=partial(app.db.group_events.get_count, group_id),
+        results_coro=partial(app.db.group_events.get_all_with_offset, group_id),
         page=page,
         page_size=page_size,
     )
     return await pagination.paginate()
 
 
-@router.post("/{group_id}/events", dependencies=[Depends(oidc)])
+@router.post(
+    "/{group_id}/events",
+    dependencies=[Depends(oidc)],
+)
 async def post_group_event(
     request: Request, group_id: GroupId, event: GroupEventCreate
-) -> None:
+) -> dict[str, GroupEventId]:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
@@ -355,7 +378,7 @@ async def post_group_event(
             )
 
     async with app.db.pool.acquire() as conn:
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id,
             group_id,
             conn=conn,
@@ -366,7 +389,7 @@ async def post_group_event(
                 detail="You must be a member of the group to perform this action.",
             )
 
-        res = await app.db.group_event_exists_between(
+        res = await app.db.group_events.exists_between(
             group_id,
             event.start_time,
             event.end_time,
@@ -378,7 +401,7 @@ async def post_group_event(
                 detail="There is already an event in this time frame",
             )
 
-        await app.db.insert_group_event(
+        return await app.db.group_events.insert(
             group_id,
             event,
             user_id,
@@ -399,7 +422,7 @@ async def delete_group_event(
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id,
             group_id,
             conn=conn,
@@ -410,7 +433,7 @@ async def delete_group_event(
                 detail="You must be a member of the group to perform this action.",
             )
 
-        await app.db.delete_group_event(
+        await app.db.group_events.delete(
             event_id,
             conn=conn,
         )
@@ -431,7 +454,7 @@ async def total_punishment_value(
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id,
             group_id,
             conn=conn,
@@ -442,7 +465,7 @@ async def total_punishment_value(
                 detail="You must be a member of the group to view this information.",
             )
 
-        return await app.db.get_group_total_punishment_value(
+        return await app.db.groups.get_total_punishment_value(
             group_id,
             include_verified=includeVerified,
             conn=conn,

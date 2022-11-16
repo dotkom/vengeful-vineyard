@@ -34,7 +34,7 @@ async def delete_punishment(
 
     async with app.db.pool.acquire() as conn:
         try:
-            punishment = await app.db.get_punishment(punishment_id, conn=conn)
+            punishment = await app.db.punishments.get(punishment_id, conn=conn)
         except NotFound as exc:
             raise HTTPException(status_code=404, detail="Punishment not found") from exc
 
@@ -46,7 +46,7 @@ async def delete_punishment(
                     detail="You cannot delete this punishment",
                 )
 
-        await app.db.delete_punishment(
+        await app.db.punishments.delete(
             punishment_id,
             conn=conn,
         )
@@ -55,6 +55,7 @@ async def delete_punishment(
 @router.post(
     "/{punishment_id}/verify",
     tags=["Punishment"],
+    response_model=PunishmentOut,
     dependencies=[Depends(oidc)],
 )
 async def verify_punishment(
@@ -71,7 +72,7 @@ async def verify_punishment(
 
     async with app.db.pool.acquire() as conn:
         try:
-            punishment = await app.db.get_punishment(
+            punishment = await app.db.punishments.get(
                 punishment_id=punishment_id,
                 conn=conn,
             )
@@ -80,7 +81,7 @@ async def verify_punishment(
                 status_code=404, detail="The punishment could not be found."
             ) from exc
 
-        res = await app.db.is_in_group(
+        res = await app.db.groups.is_in_group(
             user_id=user_id,
             group_id=punishment.group_id,
             conn=conn,
@@ -98,7 +99,7 @@ async def verify_punishment(
                 status_code=403, detail="You can't verify your own punishment."
             )
 
-        return await app.db.verify_punishment(
+        return await app.db.punishments.verify(
             punishment_id=punishment_id,
             verified_by=user_id,
             conn=conn,

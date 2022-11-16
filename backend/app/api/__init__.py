@@ -3,7 +3,7 @@
 import json
 from typing import Any, Callable, Coroutine, Optional
 
-from app.db import Database
+from app.db.core import Database
 from app.http import HTTPClient
 from app.state import State
 from app.sync import OWSync

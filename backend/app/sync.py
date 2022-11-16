@@ -49,7 +49,7 @@ class OWSync:
             )
             return user_id, ow_user_id
 
-        user = await self.app.db.get_user(
+        user = await self.app.db.users.get(
             user_id=ow_user_id,
             is_ow_user_id=True,
             conn=conn,
@@ -77,12 +77,12 @@ class OWSync:
         else:
             # Only wait for the tasks if the user needs to me added or removed from
             # one or more groups.
-            db_groups_res = await self.app.db.get_user_groups(user_id)
-            db_groups = {g["ow_group_id"]: g for g in db_groups_res if g is not None}
+            db_groups_res = await self.app.db.users.get_groups(user_id)
+            db_groups = {g.ow_group_id: g for g in db_groups_res if g is not None}
 
             sum_ow_groups = 0
             for group in filtered_groups_data:
-                if group["id"] in db_groups:
+                if group.id in db_groups:
                     sum_ow_groups += 1
 
             # Only wait for the tasks if we need to add or remove the user from one or more groups
@@ -105,7 +105,7 @@ class OWSync:
                 last_name=last_name,
                 email=email,
             )
-            res = await self.app.db.insert_or_update_user(user_create, conn=conn)
+            res = await self.app.db.users.insert_or_update(user_create, conn=conn)
             return res["id"]
 
     async def add_user_to_group(
@@ -121,11 +121,11 @@ class OWSync:
             email=user_data["user"]["email"],
         )
 
-        res = await self.app.db.insert_or_update_user(user_create, conn=conn)
+        res = await self.app.db.users.insert_or_update(user_create, conn=conn)
         user_id = res["id"]
 
         try:
-            await self.app.db.insert_user_in_group(
+            await self.app.db.groups.insert_member(
                 GroupMemberCreate(
                     group_id=group_id,
                     user_id=user_id,
@@ -151,7 +151,7 @@ class OWSync:
                 email=user_data["user"]["email"],
             )
 
-        res = await self.app.db.insert_or_update_users(
+        res = await self.app.db.users.insert_or_update_multiple(
             list(user_creates.values()), conn=conn
         )
 
@@ -166,7 +166,7 @@ class OWSync:
                 )
             )
 
-        await self.app.db.insert_users_in_group(group_member_creates, conn=conn)
+        await self.app.db.groups.insert_members(group_member_creates, conn=conn)
 
     async def handle_group_update(
         self,
@@ -175,7 +175,7 @@ class OWSync:
         member_ids: list[int],
         conn: Optional[Pool] = None,
     ) -> None:
-        group_members = await self.app.db.get_group_members_raw(group_id)
+        group_members = await self.app.db.group_members.get_all_raw(group_id)
         ids = [m["ow_group_user_id"] for m in group_members]
 
         to_add = [u for u in group_users if u["id"] not in ids]
@@ -193,7 +193,7 @@ class OWSync:
                 )
 
             if to_remove:
-                await self.app.db.delete_users_from_group(
+                await self.app.db.group_members.delete_multiple(
                     group_id,
                     to_remove,
                     conn=conn,
@@ -226,7 +226,7 @@ class OWSync:
         assert ow_group_user_id is not None
 
         async with self.app.db.pool.acquire() as conn:
-            group_res = await self.app.db.insert_or_update_group(
+            group_res = await self.app.db.groups.insert_or_update(
                 group_create,
                 conn=conn,
             )
@@ -248,7 +248,7 @@ class OWSync:
                     conn=conn,
                 )
 
-                await self.update_users(
+                await self.update_multiple(
                     group_id=group_id,
                     group_users=group_users,
                     conn=conn,
@@ -268,20 +268,20 @@ class OWSync:
                 last_name=user_data["user"]["last_name"],
                 email=user_data["user"]["email"],
             )
-            await self.app.db.update_user(
+            await self.app.db.users.update(
                 user_id,
                 user_update,
                 conn=conn,
             )
 
-    async def update_users(
+    async def update_multiple(
         self,
         group_id: GroupId,
         group_users: list[dict[str, Any]],
         conn: Optional[Pool] = None,
     ) -> None:
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
-            db_group_users = await self.app.db.get_raw_group_users(
+            db_group_users = await self.app.db.group_users.get_all_raw(
                 group_id=group_id,
                 conn=conn,
             )
@@ -320,13 +320,13 @@ class OWSync:
                     )
 
             if users_to_update:
-                await self.app.db.update_users(
+                await self.app.db.users.update_multiple(
                     users_to_update,
                     conn=conn,
                 )
 
             if group_members_to_update:
-                await self.app.db.update_group_members(
+                await self.app.db.group_members.update_multiple(
                     group_members_to_update,
                     conn=conn,
                 )

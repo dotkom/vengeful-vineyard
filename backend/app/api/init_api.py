@@ -11,7 +11,7 @@ from typing import Any
 
 from app.api.endpoints import group, punishment, user
 from app.config import settings
-from app.db import Database
+from app.db.core import Database
 from app.http import HTTPClient
 from app.state import State
 from app.sync import OWSync

@@ -120,7 +120,7 @@ class TestStreaks:
     ) -> None:
         rows = [
             {
-                "created_time": (
+                "created_at": (
                     get_first_day_of_week(*((n, 2022) if isinstance(n, int) else n))
                 )
             }

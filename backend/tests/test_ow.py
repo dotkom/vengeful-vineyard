@@ -13,6 +13,8 @@ ME_RESPONSE = [
         "name": "Drifts- og Utviklingskomiteen",
         "name_short": "Dotkom",
         "rules": "No rules",
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
     }
 ]
@@ -24,6 +26,8 @@ ME_UPDATED_RESPONSE = [
         "name": "Drifts- og Utviklingskomiteen",
         "name_short": "DotkomUpdated",
         "rules": "No rules",
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
     }
 ]
@@ -36,6 +40,8 @@ ME_GROUPS_RESPONSE = [
         "name_short": "Dotkom",
         "rules": "No rules",
         "ow_group_id": 4,
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
         "group_id": 1,
         "punishment_types": [
@@ -139,6 +145,8 @@ ME_GROUPS_UPDATED_RESPONSE = [
         "name_short": "DotkomUpdated",
         "rules": "No rules",
         "ow_group_id": 4,
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
         "group_id": 1,
         "punishment_types": [
@@ -506,7 +514,7 @@ class TestWithDB_OW:
             headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
         assert response.status_code == 200
-        assert response.json()["verified_time"] is not None
+        assert response.json()["verified_at"] is not None
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -633,8 +641,8 @@ class TestWithDB_OW:
         data = response.json()
         for res in data["results"]:
             for punishment in res["punishments"]:
-                punishment["verified_time"] = ""
-                punishment["created_time"] = ""
+                punishment["verified_at"] = ""
+                punishment["created_at"] = ""
 
         assert data == {
             "next": "http://test/user/leaderboard?page_size=3&page=1",
@@ -649,12 +657,12 @@ class TestWithDB_OW:
                         {
                             "amount": 1,
                             "created_by": 1,
-                            "created_time": "",
+                            "created_at": "",
                             "punishment_id": 2,
                             "punishment_type_id": 2,
                             "reason": "Very good reason2",
                             "verified_by": 1,
-                            "verified_time": "",
+                            "verified_at": "",
                         }
                     ],
                     "total_value": 100,
@@ -669,12 +677,12 @@ class TestWithDB_OW:
                         {
                             "amount": 1,
                             "created_by": 1,
-                            "created_time": "",
+                            "created_at": "",
                             "punishment_id": 3,
                             "punishment_type_id": 1,
                             "reason": "Test",
                             "verified_by": None,
-                            "verified_time": "",
+                            "verified_at": "",
                         }
                     ],
                     "total_value": 33,
@@ -765,7 +773,7 @@ class TestWithDB_OW:
 
         data = response.json()
         for res in data["results"]:
-            res["created_time"] = ""
+            res["created_at"] = ""
 
         assert data == {
             "next": None,
@@ -779,7 +787,7 @@ class TestWithDB_OW:
                     "event_id": 1,
                     "group_id": 1,
                     "created_by": 1,
-                    "created_time": "",
+                    "created_at": "",
                 }
             ],
             "total": 1,
