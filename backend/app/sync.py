@@ -78,11 +78,11 @@ class OWSync:
             # Only wait for the tasks if the user needs to me added or removed from
             # one or more groups.
             db_groups_res = await self.app.db.users.get_groups(user_id)
-            db_groups = {g["ow_group_id"]: g for g in db_groups_res if g is not None}
+            db_groups = {g.ow_group_id: g for g in db_groups_res if g is not None}
 
             sum_ow_groups = 0
             for group in filtered_groups_data:
-                if group["id"] in db_groups:
+                if group.id in db_groups:
                     sum_ow_groups += 1
 
             # Only wait for the tasks if we need to add or remove the user from one or more groups

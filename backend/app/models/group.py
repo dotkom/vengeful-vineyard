@@ -21,8 +21,8 @@ class GroupBase(BaseModel):
 
 class Group(GroupBase):
     group_id: GroupId
-    punishment_types: list[PunishmentTypeRead]
-    members: list[GroupUser]
+    punishment_types: list[PunishmentTypeRead] = []
+    members: list[GroupUser] = []
 
 
 class GroupCreate(GroupBase):

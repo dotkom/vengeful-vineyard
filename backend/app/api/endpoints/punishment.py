@@ -55,6 +55,7 @@ async def delete_punishment(
 @router.post(
     "/{punishment_id}/verify",
     tags=["Punishment"],
+    response_model=PunishmentOut,
     dependencies=[Depends(oidc)],
 )
 async def verify_punishment(

@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 from app.exceptions import DatabaseIntegrityException, NotFound
+from app.models.group import Group
 from app.models.user import LeaderboardUser, User, UserCreate, UserUpdate
 from app.types import InsertOrUpdateUser, OWUserId, UserId
 from app.utils.db import MaybeAcquire
@@ -286,7 +287,7 @@ class Users:
         *,
         is_ow_user_id: bool = False,
         conn: Optional[Pool] = None,
-    ) -> list[dict[str, Any]]:
+    ) -> list[Group]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             if not is_ow_user_id:
                 query = """SELECT groups.* FROM groups
@@ -299,4 +300,4 @@ class Users:
                         WHERE users.ow_user_id = $1"""
 
             result = await conn.fetch(query, user_id)
-            return [dict(row) for row in result]
+            return [Group(**row) for row in result]

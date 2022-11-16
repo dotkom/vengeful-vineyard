@@ -22,7 +22,7 @@ class GroupEvents:
         event: GroupEventCreate,
         created_by: UserId,
         conn: Optional[Pool] = None,
-    ) -> dict[str, int]:
+    ) -> dict[str, GroupEventId]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """INSERT INTO group_events(group_id,
                                                 name,

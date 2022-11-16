@@ -13,6 +13,8 @@ ME_RESPONSE = [
         "name": "Drifts- og Utviklingskomiteen",
         "name_short": "Dotkom",
         "rules": "No rules",
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
     }
 ]
@@ -24,6 +26,8 @@ ME_UPDATED_RESPONSE = [
         "name": "Drifts- og Utviklingskomiteen",
         "name_short": "DotkomUpdated",
         "rules": "No rules",
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
     }
 ]
@@ -36,6 +40,8 @@ ME_GROUPS_RESPONSE = [
         "name_short": "Dotkom",
         "rules": "No rules",
         "ow_group_id": 4,
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
         "group_id": 1,
         "punishment_types": [
@@ -139,6 +145,8 @@ ME_GROUPS_UPDATED_RESPONSE = [
         "name_short": "DotkomUpdated",
         "rules": "No rules",
         "ow_group_id": 4,
+        "members": [],
+        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
         "group_id": 1,
         "punishment_types": [

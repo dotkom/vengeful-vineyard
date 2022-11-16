@@ -3,7 +3,7 @@ Group endpoints
 """
 
 from functools import partial
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from app.api import APIRoute, Request, oidc
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
@@ -24,11 +24,15 @@ router = APIRouter(
 )
 
 
-@router.get("/me", dependencies=[Depends(oidc)])
+@router.get(
+    "/me",
+    response_model=list[Group],
+    dependencies=[Depends(oidc)],
+)
 async def get_my_groups(
     request: Request,
     wait_for_updates: bool = True,
-) -> list[dict[str, Any]]:
+) -> list[Group]:
     app = request.app
     access_token = request.raise_if_missing_authorization()
 
@@ -50,7 +54,10 @@ async def get_my_groups(
     return groups
 
 
-@router.get("/{group_id}/user/{user_id}")
+@router.get(
+    "/{group_id}/user/{user_id}",
+    response_model=GroupUser,
+)
 async def get_group_user(
     request: Request,
     group_id: GroupId,
@@ -89,7 +96,10 @@ async def get_group_user_punishment_streaks(
         ) from exc
 
 
-@router.get("/{group_id}/users")
+@router.get(
+    "/{group_id}/users",
+    response_model=list[GroupUser],
+)
 async def get_group_users(request: Request, group_id: GroupId) -> list[GroupUser]:
     """
     Endpoint to get all users in a group.
@@ -99,7 +109,10 @@ async def get_group_users(request: Request, group_id: GroupId) -> list[GroupUser
     return await app.db.group_users.get_all(group_id)
 
 
-@router.get("/{group_id}")
+@router.get(
+    "/{group_id}",
+    response_model=Group,
+)
 async def get_group(request: Request, group_id: GroupId) -> Group:
     """
     Endpoint to get a specific group.
@@ -127,7 +140,10 @@ async def post_group(
         raise HTTPException(status_code=400, detail=exc.detail) from exc
 
 
-@router.post("/{group_id}/punishmentType", dependencies=[Depends(oidc)])
+@router.post(
+    "/{group_id}/punishmentType",
+    dependencies=[Depends(oidc)],
+)
 async def add_punishment_type_to_group(
     request: Request,
     group_id: GroupId,
@@ -164,7 +180,8 @@ async def add_punishment_type_to_group(
 
 
 @router.delete(
-    "/{group_id}/punishmentType/{punishment_type_id}", dependencies=[Depends(oidc)]
+    "/{group_id}/punishmentType/{punishment_type_id}",
+    dependencies=[Depends(oidc)],
 )
 async def delete_punishment_type_to_group(
     request: Request,
@@ -245,7 +262,10 @@ async def add_user_to_group(
         ) from exc
 
 
-@router.post("/{group_id}/user/{user_id}/punishment", dependencies=[Depends(oidc)])
+@router.post(
+    "/{group_id}/user/{user_id}/punishment",
+    dependencies=[Depends(oidc)],
+)
 async def add_punishment(
     request: Request,
     group_id: GroupId,
@@ -338,10 +358,13 @@ async def get_group_events(
     return await pagination.paginate()
 
 
-@router.post("/{group_id}/events", dependencies=[Depends(oidc)])
+@router.post(
+    "/{group_id}/events",
+    dependencies=[Depends(oidc)],
+)
 async def post_group_event(
     request: Request, group_id: GroupId, event: GroupEventCreate
-) -> None:
+) -> dict[str, GroupEventId]:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
@@ -378,7 +401,7 @@ async def post_group_event(
                 detail="There is already an event in this time frame",
             )
 
-        await app.db.group_events.insert(
+        return await app.db.group_events.insert(
             group_id,
             event,
             user_id,

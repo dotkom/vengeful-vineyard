@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 from app.api import APIRoute, Request
 from app.exceptions import DatabaseIntegrityException, NotFound
+from app.models.group import Group
 from app.models.user import LeaderboardUser, User, UserCreate
 from app.types import UserId
 from app.utils.pagination import Page, Pagination
@@ -18,7 +19,10 @@ router = APIRouter(
 )
 
 
-@router.get("/leaderboard", response_model=Page[LeaderboardUser])
+@router.get(
+    "/leaderboard",
+    response_model=Page[LeaderboardUser],
+)
 async def get_leadeboard(
     request: Request,
     page: int = Query(title="Page number", default=0, ge=0),
@@ -62,7 +66,10 @@ async def post_user(
         return {"id": data["id"]}
 
 
-@router.get("/{user_id}")
+@router.get(
+    "/{user_id}",
+    response_model=User,
+)
 async def get_user(request: Request, user_id: UserId) -> User:
     """
     Endpoint to get a specific user.
@@ -74,8 +81,12 @@ async def get_user(request: Request, user_id: UserId) -> User:
         raise HTTPException(status_code=404, detail="User not found") from exc
 
 
-@router.get("/{user_id}/group", tags=["User"])
-async def get_user_groups(request: Request, user_id: UserId) -> list[dict[str, Any]]:
+@router.get(
+    "/{user_id}/group",
+    tags=["User"],
+    response_model=Group,
+)
+async def get_user_groups(request: Request, user_id: UserId) -> list[Group]:
     """
     Endpoint to get all groups a user is a member of.
     """
