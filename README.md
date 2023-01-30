@@ -11,22 +11,28 @@ their respective tasks.
 Their failure shall be documented on our page as a 'vinstraff' (wine punishment).
 The old and outdated version can be found here: [RedWine](https://online.ntnu.no/redwine/).
 
-## Installation - Git Repository and Setup
+## Project Status
 
-Run the following code in Git Bash:
+Under development 🚧
 
-```bash
-git config user.name "<your github username>"
-git config user.email your.github@email.com
-git clone https://github.com/dotkom/vengeful-vineyard.git
-cd vengeful-vineyard
-```
+## Development
 
-### Installation for Frontend and Backend
-You need npm, poetry and Python >= 3.9 installed on your computer. You also need docker for testing and running dev versions.
+### Built with
 
-* [Frontend](frontend/README.md)
-* [Backend](backend/README.md)
+- [Typescript](https://www.typescriptlang.org/)
+- [React](https://reactjs.org/)
+- [Tailwind](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
+
+### Installation
+
+...
+
+### Running locally
+
+...
 
 ## Contributing
+
 Please take a look at our issues if you want to contribute to this project. Pull requests are welcome!
+
