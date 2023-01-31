@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { AuthProvider } from "react-oidc-context";
 import "./index.css";
+import { onSigninCallback } from "./helpers/auth";
 
 const configuration = {
   client_id: "219919",
@@ -16,6 +17,7 @@ const configuration = {
   loadUserInfo: true,
   revokeTokensOnSignout: true,
   post_logout_redirect_uri: "http://localhost:3000",
+  onSigninCallback: onSigninCallback
 };
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
