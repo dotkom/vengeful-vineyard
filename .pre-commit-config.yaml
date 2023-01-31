@@ -50,12 +50,3 @@ repos:
         types: [python]
         pass_filenames: false
         language: system
-      - id: eslint
-        name: Lint frontend code
-        entry: bash -c "cd frontend && npm ci &&  npm run lint"
-        language: system
-    #   - id: svelte-validate
-    #     name: Validate svelte
-    #     entry: bash -c "cd frontend && npm ci && npm run validate"
-    #     pass_filenames: false
-    #     language: system
