@@ -1,6 +1,6 @@
 import { useAuth } from "react-oidc-context";
 
-function App() {
+const App = () => {
   const auth = useAuth();
 
   switch (auth.activeNavigator) {
@@ -21,7 +21,7 @@ function App() {
   if (auth.isAuthenticated) {
     return (
       <div className="text-white">
-        Hello {auth.user?.profile.sub}{" "}
+        Hello {auth.user?.profile.name}{" "}
         <button onClick={() => void auth.removeUser()}>Log out</button>
       </div>
     );
@@ -32,6 +32,6 @@ function App() {
       Log in
     </button>
   );
-}
+};
 
 export default App;
