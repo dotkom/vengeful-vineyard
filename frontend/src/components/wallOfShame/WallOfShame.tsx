@@ -14,7 +14,7 @@ export const WallOfShame = () => {
         <h1 className="text-5xl text-center font-bold py-32">
           Wall of Shame🦋
         </h1>
-        <p>Loading...</p>
+        <p className="text-center py-16">Loading...</p>
       </article>
     );
 
@@ -24,7 +24,9 @@ export const WallOfShame = () => {
         <h1 className="text-5xl text-center font-bold py-32">
           Wall of Shame🦋
         </h1>
-        <p>An error has occurred: {error.message}</p>
+        <p className="text-center py-16">
+          An error has occurred: {error.message}
+        </p>
       </article>
     );
 
