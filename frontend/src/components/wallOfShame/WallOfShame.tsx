@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { LEADERBOARD_URL } from "../../helpers/api";
+import { GROUPS_URL } from "../../helpers/api";
 
 export const WallOfShame = () => {
   const { isLoading, error, data } = useQuery({
     queryKey: ["leaderboardData"],
-    queryFn: () => axios.get(LEADERBOARD_URL).then((res: any) => res.data),
+    queryFn: () => axios.get(GROUPS_URL).then((res: any) => res.data),
   });
 
   if (isLoading)

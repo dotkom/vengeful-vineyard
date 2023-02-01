@@ -25,7 +25,7 @@ const App = () => {
   if (auth.isAuthenticated) {
     axios.defaults.headers.common[
       "Authorization"
-    ] = `Bearer ${auth.user?.id_token}`;
+    ] = `Bearer ${auth.user?.access_token}`;
 
     return (
       <Layout auth={auth}>
