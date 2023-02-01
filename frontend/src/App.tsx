@@ -23,7 +23,7 @@ const App = () => {
 
   if (auth.isAuthenticated) {
     return (
-      <Layout>
+      <Layout auth={auth}>
         <AuthenticatedHero auth={auth} />
         <LeaderboardView />
       </Layout>
@@ -31,7 +31,7 @@ const App = () => {
   }
 
   return (
-    <Layout>
+    <Layout auth={auth}>
       <DefaultHero auth={auth} />
     </Layout>
   );
