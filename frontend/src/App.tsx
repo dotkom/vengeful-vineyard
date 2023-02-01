@@ -1,8 +1,11 @@
 import axios from "axios";
 import { useAuth } from "react-oidc-context";
 import { Button } from "./components/button";
+import { DebtClock } from "./components/debtClock";
+import { Footer } from "./components/footer";
+import { Leaderboard } from "./components/leaderboard";
 import { Navbar } from "./components/navbar";
-import { HomeView } from "./views/HomeView";
+import { Tabbar } from "./components/tabbar";
 
 const App = () => {
   const auth = useAuth();
@@ -27,11 +30,31 @@ const App = () => {
       Authorization: "Bearer " + auth.user?.id_token,
     };
     return (
-      <div>
-        <HomeView />
-        Hello {auth.user?.profile.name}{" "}
-        <Button clickHandler={() => void auth.removeUser()} label="Log out" />
-      </div>
+      <main>
+        <Navbar />
+        <section className="bg-blue-900 pb-32">
+          <div className="flex flex-col gap-4 px-4 py-16 sm:block">
+            <div className="max-w-5xl md:m-auto">
+              <Button
+                clickHandler={() => void auth.removeUser()}
+                label="Logg ut"
+              />
+              <h1 className="text-white text-2xl font-medium my-4">
+                Hei hei {auth.user?.profile.name} 😌
+              </h1>
+
+              <DebtClock />
+            </div>
+          </div>
+        </section>
+
+        <section className="-mt-32">
+          <Tabbar />
+          <Leaderboard />
+        </section>
+
+        <Footer />
+      </main>
     );
   }
 
