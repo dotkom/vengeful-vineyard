@@ -4,6 +4,9 @@ import App from "./App";
 import { AuthProvider } from "react-oidc-context";
 import "./index.css";
 import { onSigninCallback } from "./helpers/auth";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const configuration = {
   client_id: "219919",
@@ -17,13 +20,15 @@ const configuration = {
   loadUserInfo: true,
   revokeTokensOnSignout: true,
   post_logout_redirect_uri: "http://localhost:3000",
-  onSigninCallback: onSigninCallback
+  onSigninCallback: onSigninCallback,
 };
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <AuthProvider {...configuration}>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     </AuthProvider>
   </React.StrictMode>
 );
