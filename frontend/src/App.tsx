@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useAuth } from "react-oidc-context";
 import { AuthenticatedHero, DefaultHero } from "./views/hero";
 import { Layout } from "./views/layout";
@@ -22,6 +23,10 @@ const App = () => {
   }
 
   if (auth.isAuthenticated) {
+    axios.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${auth.user?.id_token}`;
+
     return (
       <Layout auth={auth}>
         <AuthenticatedHero auth={auth} />
