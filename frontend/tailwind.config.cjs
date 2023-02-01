@@ -1,4 +1,4 @@
-const brand = {}
+const brand = {};
 
 const slate = {
   1: "#151718",
@@ -13,7 +13,7 @@ const slate = {
   10: "#787f85",
   11: "#9ba1a6",
   12: "#ecedee",
-}
+};
 
 const blue = {
   1: "#0f1720",
@@ -28,7 +28,7 @@ const blue = {
   10: "#369eff",
   11: "#52a9ff",
   12: "#eaf6ff",
-}
+};
 
 const amber = {
   1: "#1f1300",
@@ -43,7 +43,7 @@ const amber = {
   10: "#ffcb47",
   11: "#f1a10d",
   12: "#fef3dd",
-}
+};
 
 const green = {
   1: "#0d1912",
@@ -58,7 +58,7 @@ const green = {
   10: "#3cb179",
   11: "#4cc38a",
   12: "#e5fbeb",
-}
+};
 
 const red = {
   1: "#1d1412",
@@ -73,64 +73,11 @@ const red = {
   10: "#ec5e41",
   11: "#f16a50",
   12: "#feefec",
-}
+};
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
-  theme: {
-    fontFamily: {
-      poppins: ['"Poppins"'],
-      sans: ['"Inter var"', "sans-serif"],
-    },
-    colors: {
-      slate,
-      blue,
-      amber,
-      red,
-      green,
-      brand,
-    },
-    extend: {
-      fontFamily: {
-        poppins: ['"Poppins"', "sans-serif"],
-        mono: ["Roboto Mono", "monospace"],
-        sans: ['"Inter var"', "sans-serif"],
-      },
-      colors: {
-        inherit: "inherit",
-        current: "current",
-        white: "#ffffff",
-        transparent: "transparent",
-        background: "#000212",
-        foreground: slate[12],
-        accent: "#FFEDB3",
-        slate: {
-          DEFAULT: slate[3],
-        },
-        blue: {
-          DEFAULT: blue[3],
-        },
-        amber: {
-          DEFAULT: amber[3],
-        },
-        red: {
-          DEFAULT: red[3],
-        },
-        green: {
-          DEFAULT: green[3],
-        },
-      },
-      ringColor: {
-        DEFAULT: blue[7],
-      },
-      borderRadius: {
-        md: "4px",
-      },
-    },
-  },
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  theme: {},
   plugins: [],
-}
+};

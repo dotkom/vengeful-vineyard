@@ -1,4 +1,8 @@
+import axios from "axios";
 import { useAuth } from "react-oidc-context";
+import { AuthenticatedHero, DefaultHero } from "./views/hero";
+import { Layout } from "./views/layout";
+import { LeaderboardView } from "./views/leaderboard";
 
 const App = () => {
   const auth = useAuth();
@@ -11,26 +15,30 @@ const App = () => {
   }
 
   if (auth.isLoading) {
-    return <p className="text-white">Loading...</p>;
+    return <p>Loading...</p>;
   }
 
   if (auth.error) {
-    return <p className="text-white">Oops... {auth.error.message}</p>;
+    return <p>Oops... {auth.error.message}</p>;
   }
 
   if (auth.isAuthenticated) {
+    axios.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${auth.user?.access_token}`;
+
     return (
-      <div className="text-white">
-        Hello {auth.user?.profile.name}{" "}
-        <button onClick={() => void auth.removeUser()}>Log out</button>
-      </div>
+      <Layout auth={auth}>
+        <AuthenticatedHero auth={auth} />
+        <LeaderboardView />
+      </Layout>
     );
   }
 
   return (
-    <button onClick={() => void auth.signinRedirect()} className="text-white">
-      Log in
-    </button>
+    <Layout auth={auth}>
+      <DefaultHero auth={auth} />
+    </Layout>
   );
 };
 
