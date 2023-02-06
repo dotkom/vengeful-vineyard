@@ -1,31 +1,33 @@
 import React, { useState } from "react";
 import { Person } from "../../helpers/mockData";
+import { LeaderboardUser } from "../../helpers/types";
 import { PunishmentList } from "./PunishmentList";
 
 interface LeaderboardItemProps {
-  person: Person;
+  user: LeaderboardUser;
 }
 
-export const LeaderboardItem = ({ person }: LeaderboardItemProps) => {
+export const LeaderboardItem = ({ user }: LeaderboardItemProps) => {
   const [showPunishments, setShowPunishments] = useState(false);
 
   const togglePunishments = () => setShowPunishments(!showPunishments);
 
   return (
-    <React.Fragment key={person.name}>
+    <React.Fragment>
       <tr
-        key={person.name}
         className="font-thin hover:bg-gray-100 cursor-pointer border-b"
         onClick={togglePunishments}
       >
         <th className="text-left flex items-center gap-2 text-slate-800">
           <figure className="w-8 h-8 rounded-full bg-pink-300 my-4 ml-8" />
-          {person.name}
+          {user.first_name} {user.last_name}
         </th>
-        <th>🍺{person.numOfBeers}</th>
-        <th>🍷{person.numOfWine}</th>
+        <th>
+          🍺{user.punishments.length}
+        </th>
+        <th>🍷0</th>
       </tr>
-      {showPunishments && <PunishmentList punishments={person.punishments} />}
+      {showPunishments && <PunishmentList punishments={user.punishments} />}
     </React.Fragment>
   );
 };

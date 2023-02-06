@@ -4,7 +4,7 @@ import { GROUPS_URL } from "../../helpers/api";
 
 export const WallOfShame = () => {
   const { isLoading, error, data } = useQuery({
-    queryKey: ["leaderboardData"],
+    queryKey: ["groupsData"],
     queryFn: () => axios.get(GROUPS_URL).then((res: any) => res.data),
   });
 

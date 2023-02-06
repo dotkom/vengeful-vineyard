@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Leaderboard } from "../../components/leaderboard";
 import { Tabbar } from "../../components/tabbar";
+import { WallOfRequests } from "../../components/wallOfRequests";
 import { WallOfShame } from "../../components/wallOfShame";
 
 export const LeaderboardView = () => {
@@ -14,6 +15,7 @@ export const LeaderboardView = () => {
       />
       {selectedTabIndex === 0 && <Leaderboard />}
       {selectedTabIndex === 1 && <WallOfShame />}
+      {selectedTabIndex === 2 && <WallOfRequests />}
     </section>
   );
 };
