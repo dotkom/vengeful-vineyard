@@ -40,9 +40,18 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	punishment_type_id INTEGER NOT NULL references punishment_types(punishment_type_id),
 	reason TEXT NOT NULL,
 	amount INTEGER NOT NULL,
-	verified_by INTEGER references users(user_id),
+	-- verified_by INTEGER references users(user_id),
 	created_by INTEGER references users(user_id),
-	verified_at TIMESTAMP WITHOUT TIME ZONE,
+	-- verified_at TIMESTAMP WITHOUT TIME ZONE,
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS paid_punishments_logs (
+	paid_punishment_log_id SERIAL PRIMARY KEY,
+	group_id INTEGER NOT NULL references groups(group_id),
+	user_id INTEGER NOT NULL references users(user_id),
+	value INTEGER NOT NULL,
+	created_by INTEGER references users(user_id),
 	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
 );
 

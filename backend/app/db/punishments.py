@@ -91,9 +91,7 @@ class Punishments:
                         p.punishment_type_id,
                         p.reason,
                         p.amount,
-                        None,
                         created_by,
-                        None,
                         datetime.datetime.utcnow(),
                     )
                     for p in punishments
@@ -113,29 +111,29 @@ class Punishments:
             if res is None:
                 raise NotFound
 
-    async def verify(
-        self,
-        punishment_id: PunishmentId,
-        verified_by: UserId,
-        conn: Optional[Pool] = None,
-    ) -> PunishmentRead:
-        async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """UPDATE group_punishments
-                SET verified_by = $1, verified_at = $2
-                WHERE punishment_id = $3
-                RETURNING punishment_id
-                """
-            res = await conn.fetchval(
-                query,
-                verified_by,
-                datetime.datetime.utcnow(),
-                punishment_id,
-            )
+    # async def verify(
+    #     self,
+    #     punishment_id: PunishmentId,
+    #     verified_by: UserId,
+    #     conn: Optional[Pool] = None,
+    # ) -> PunishmentRead:
+    #     async with MaybeAcquire(conn, self.db.pool) as conn:
+    #         query = """UPDATE group_punishments
+    #             SET verified_by = $1, verified_at = $2
+    #             WHERE punishment_id = $3
+    #             RETURNING punishment_id
+    #             """
+    #         res = await conn.fetchval(
+    #             query,
+    #             verified_by,
+    #             datetime.datetime.utcnow(),
+    #             punishment_id,
+    #         )
 
-            if res is None:
-                raise NotFound
+    #         if res is None:
+    #             raise NotFound
 
-            return await self.db.punishments.get(
-                punishment_id,
-                conn=conn,
-            )
+    #         return await self.db.punishments.get(
+    #             punishment_id,
+    #             conn=conn,
+    #         )

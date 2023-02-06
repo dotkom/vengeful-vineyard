@@ -12,6 +12,7 @@ from .group_events import GroupEvents
 from .group_members import GroupMembers
 from .group_users import GroupUsers
 from .groups import Groups
+from .paid_punishment_logs import PaidPunishmentsLogs
 from .punishment_types import PunishmentTypes
 from .punishments import Punishments
 from .users import Users
@@ -45,6 +46,7 @@ class Database:
         self.groups = Groups(self)
         self.punishments = Punishments(self)
         self.punishment_types = PunishmentTypes(self)
+        self.paid_punishments_logs = PaidPunishmentsLogs(self)
         self.group_members = GroupMembers(self)
         self.group_users = GroupUsers(self)
         self.group_events = GroupEvents(self)

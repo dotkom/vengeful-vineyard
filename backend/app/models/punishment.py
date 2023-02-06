@@ -23,8 +23,8 @@ class PunishmentOut(PunishmentCreate):
     punishment_id: PunishmentId
     created_at: datetime
     created_by: UserId
-    verified_at: Optional[datetime]
-    verified_by: Optional[UserId]
+    # verified_at: Optional[datetime]
+    # verified_by: Optional[UserId]
 
 
 class PunishmentRead(PunishmentOut):

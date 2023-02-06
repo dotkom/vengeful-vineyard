@@ -79,7 +79,7 @@ class Groups:
         group_id: GroupId,
         include_verified: bool = False,
         conn: Optional[Pool] = None,
-    ) -> dict[str, int]:
+    ) -> dict[str, int]:  # TODO: FIX
         async with MaybeAcquire(conn, self.db.pool) as conn:
             extra = "" if include_verified else " AND verified_by IS NULL"
 
