@@ -30,6 +30,10 @@ class PunishmentTypeId(int):
     pass
 
 
+class PaidPunishmentLogId(int):
+    pass
+
+
 class GroupEventId(int):
     pass
 
