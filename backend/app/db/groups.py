@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Optional, Union, cast
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate
+from app.models.punishment import TotalPunishmentValue
 from app.models.punishment_type import PunishmentTypeCreate
 from app.types import GroupId, InsertOrUpdateGroup, OWUserId, UserId
 from app.utils.db import MaybeAcquire
@@ -77,22 +78,21 @@ class Groups:
     async def get_total_punishment_value(
         self,
         group_id: GroupId,
-        include_verified: bool = False,
         conn: Optional[Pool] = None,
-    ) -> dict[str, int]:  # TODO: FIX
+    ) -> TotalPunishmentValue:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            extra = "" if include_verified else " AND verified_by IS NULL"
+            query = """
+            SELECT COALESCE(SUM(gp.amount * pt.value), 0) AS total_value,
+                   (SELECT COALESCE(SUM(value), 0) FROM paid_punishments_logs WHERE group_id = gp.group_id) AS total_paid_value
+                FROM group_punishments AS gp
+            LEFT JOIN punishment_types AS pt
+                ON gp.punishment_type_id = pt.punishment_type_id
+            WHERE gp.group_id = $1
+            GROUP BY gp.group_id
+            """
 
-            query = f"""SELECT COALESCE(SUM(gp.amount * pt.value), 0) FROM group_punishments AS gp
-                    LEFT JOIN punishment_types AS pt
-                        ON gp.punishment_type_id = pt.punishment_type_id
-                    WHERE gp.group_id = $1{extra}
-                    """
-
-            val = await conn.fetchval(query, group_id)
-            assert isinstance(val, int)
-
-            return {"value": val}
+            row = await conn.fetchrow(query, group_id)
+            return TotalPunishmentValue(**dict(row))
 
     async def insert(
         self,

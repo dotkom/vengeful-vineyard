@@ -11,7 +11,15 @@ from app.models.group import Group, GroupCreate
 from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_member import GroupMemberCreate
 from app.models.group_user import GroupUser
-from app.models.punishment import PunishmentCreate, PunishmentStreaks
+from app.models.paid_punishment_log import (
+    PaidPunishmentsLogCreate,
+    PaidPunishmentsLogRead,
+)
+from app.models.punishment import (
+    PunishmentCreate,
+    PunishmentStreaks,
+    TotalPunishmentValue,
+)
 from app.models.punishment_type import PunishmentTypeCreate
 from app.types import GroupEventId, GroupId, OWGroupUserId, PunishmentTypeId, UserId
 from app.utils.pagination import Page, Pagination
@@ -442,12 +450,12 @@ async def delete_group_event(
 @router.get(
     "/{group_id}/totalPunishmentValue",
     dependencies=[Depends(oidc)],
+    response_model=TotalPunishmentValue,
 )
 async def total_punishment_value(
     request: Request,
     group_id: GroupId,
-    includeVerified: bool = Query(default=False),
-) -> dict[str, int]:
+) -> TotalPunishmentValue:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
@@ -467,6 +475,204 @@ async def total_punishment_value(
 
         return await app.db.groups.get_total_punishment_value(
             group_id,
-            include_verified=includeVerified,
+            conn=conn,
+        )
+
+
+@router.get(
+    "/{group_id}/user/{user_id}/punishments/paid",
+    tags=["Group"],
+    dependencies=[Depends(oidc)],
+    response_model=list[PaidPunishmentsLogRead],
+)
+async def get_paid_punishments_logs(
+    request: Request,
+    group_id: GroupId,
+    user_id: UserId,
+) -> list[PaidPunishmentsLogRead]:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.groups.is_in_group(
+            requester_user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        res = await app.db.groups.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=400,
+                detail="The user is not a member of the group",
+            )
+
+        value = await app.db.paid_punishments_logs.get_all_for_user(
+            group_id,
+            user_id,
+            conn=conn,
+        )
+        return value
+
+
+@router.get(
+    "/{group_id}/user/{user_id}/punishments/paid/totalPaid",
+    tags=["Group"],
+    dependencies=[Depends(oidc)],
+    response_model=int,
+)
+async def get_paid_punishments_total_paid(
+    request: Request,
+    group_id: GroupId,
+    user_id: UserId,
+) -> int:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.groups.is_in_group(
+            requester_user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        res = await app.db.groups.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=400,
+                detail="The user is not a member of the group",
+            )
+
+        value = await app.db.paid_punishments_logs.get_total_paid(
+            group_id,
+            user_id,
+            conn=conn,
+        )
+        return value
+
+
+@router.get(
+    "/{group_id}/user/{user_id}/punishments/paid/totalUnpaid",
+    tags=["Group"],
+    dependencies=[Depends(oidc)],
+    response_model=int,
+)
+async def get_paid_punishments_total_unpaid(
+    request: Request,
+    group_id: GroupId,
+    user_id: UserId,
+) -> int:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.groups.is_in_group(
+            requester_user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        res = await app.db.groups.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=400,
+                detail="The user is not a member of the group",
+            )
+
+        value = await app.db.paid_punishments_logs.get_total_unpaid(
+            group_id,
+            user_id,
+            conn=conn,
+        )
+        return value
+
+
+@router.post(
+    "/{group_id}/user/{user_id}/punishments/paid",
+    tags=["Group"],
+    dependencies=[Depends(oidc)],
+)
+async def post_paid_punishments_logs(
+    request: Request,
+    group_id: GroupId,
+    user_id: UserId,
+    paid_punishments_log: PaidPunishmentsLogCreate,
+) -> None:
+    """
+    Endpoint to create a paid punishment log entry.
+    """
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    if not 0 <= paid_punishments_log.value:
+        raise HTTPException(
+            status_code=400,
+            detail="Value must be a positive integer",
+        )
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.groups.is_in_group(
+            requester_user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action.",
+            )
+
+        res = await app.db.groups.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=400,
+                detail="The user is not a member of the group",
+            )
+
+        # raise RuntimeError(requester_user_id)
+        await app.db.paid_punishments_logs.insert_multiple(
+            group_id,
+            user_id,
+            [paid_punishments_log],
+            requester_user_id,
             conn=conn,
         )

@@ -499,35 +499,74 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
-    async def test_verify_own_punishment(self, client: Any) -> None:
+    async def test_add_paid_log_entry(self, client: Any) -> None:
         response = await client.post(
-            f"/punishment/1/verify",
+            "group/1/user/1/punishments/paid",
             headers={"Authorization": SELF_USER_AUTHORIZATION},
+            json={"value": 4},
         )
-        assert response.status_code == 403
-        check_response_time(response)
+        assert response.status_code == 200
+        assert response.json() == None
 
     @pytest.mark.asyncio
-    async def test_verify_other_user_punishment(self, client: Any) -> None:
+    async def test_add_paid_log_entry_from_other_user(self, client: Any) -> None:
         response = await client.post(
-            "/punishment/2/verify",
+            "group/1/user/1/punishments/paid",
+            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+            json={"value": 9},
+        )
+        assert response.status_code == 200
+        assert response.json() == None
+
+    @pytest.mark.asyncio
+    async def test_get_paid_logs(self, client: Any) -> None:
+        response = await client.get(
+            "group/1/user/1/punishments/paid",
             headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
         assert response.status_code == 200
-        assert response.json()["verified_at"] is not None
+
+        data = response.json()
+        for log in data:
+            log["created_at"] = ""
+
+        assert data == [
+            {
+                "value": 4,
+                "user_id": 1,
+                "group_id": 1,
+                "paid_punishment_log_id": 1,
+                "created_at": "",
+                "created_by": 1,
+            },
+            {
+                "value": 9,
+                "user_id": 1,
+                "group_id": 1,
+                "paid_punishment_log_id": 2,
+                "created_at": "",
+                "created_by": 4,
+            },
+        ]
+
+    @pytest.mark.asyncio
+    async def test_get_group_total_paid_for_user(self, client: Any) -> None:
+        response = await client.get(
+            "/group/1/user/1/punishments/paid/totalPaid",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        assert response.json() == 13
         check_response_time(response)
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    async def test_verify_other_user_punishment_already_verified(
-        self,
-        client: Any,
-    ) -> None:
-        response = await client.post(
-            "/punishment/2/verify",
+    async def test_get_group_total_unpaid_for_user(self, client: Any) -> None:
+        response = await client.get(
+            "/group/1/user/1/punishments/paid/totalUnpaid",
             headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
+        assert response.json() == 20  # 33 - 13
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -537,19 +576,10 @@ class TestWithDB_OW:
             headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
         assert response.status_code == 200
-        assert response.json()["value"] == 33
-        check_response_time(response)
-
-    @pytest.mark.asyncio
-    async def test_get_group_total_punishment_value_include_verified(
-        self, client: Any
-    ) -> None:
-        response = await client.get(
-            "/group/1/totalPunishmentValue?includeVerified=true",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
-        )
-        assert response.status_code == 200
-        assert response.json()["value"] == 133
+        assert response.json() == {
+            "total_value": 133,
+            "total_paid_value": 13,  # 4 + 9
+        }
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -641,7 +671,6 @@ class TestWithDB_OW:
         data = response.json()
         for res in data["results"]:
             for punishment in res["punishments"]:
-                punishment["verified_at"] = ""
                 punishment["created_at"] = ""
 
         assert data == {
@@ -661,8 +690,6 @@ class TestWithDB_OW:
                             "punishment_id": 2,
                             "punishment_type_id": 2,
                             "reason": "Very good reason2",
-                            "verified_by": 1,
-                            "verified_at": "",
                         }
                     ],
                     "total_value": 100,
@@ -681,8 +708,6 @@ class TestWithDB_OW:
                             "punishment_id": 3,
                             "punishment_type_id": 1,
                             "reason": "Test",
-                            "verified_by": None,
-                            "verified_at": "",
                         }
                     ],
                     "total_value": 33,
