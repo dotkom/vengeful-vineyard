@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Person } from "../../helpers/mockData";
 import { LeaderboardUser } from "../../helpers/types";
 import { PunishmentList } from "./PunishmentList";
 
