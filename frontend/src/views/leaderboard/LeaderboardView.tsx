@@ -8,7 +8,7 @@ export const LeaderboardView = () => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   return (
-    <section className="-mt-32">
+    <section className="-mt-32 z-10">
       <Tabbar
         selectedTabIndex={selectedTabIndex}
         setSelectedTabIndex={setSelectedTabIndex}
