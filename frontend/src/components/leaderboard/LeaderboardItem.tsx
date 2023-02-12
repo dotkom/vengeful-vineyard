@@ -22,7 +22,9 @@ export const LeaderboardItem = ({ user }: LeaderboardItemProps) => {
           {user.first_name} {user.last_name}
         </th>
         <th>
-          🍺{user.punishments.length}
+          {Array.from({ length: user.punishments.length }, (_, i) => (
+            <span key={i}>🍺</span>
+          ))}
         </th>
         <th>🍷0</th>
       </tr>

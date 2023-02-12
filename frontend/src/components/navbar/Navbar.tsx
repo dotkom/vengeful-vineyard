@@ -1,6 +1,6 @@
 import { AuthContextProps } from "react-oidc-context";
 import OnlineIcon from "../onlineIcon/OnlineIcon";
-import { ProfileToggle } from "./ProfileToggle";
+import { ProfileModal } from "./ProfileModal";
 
 interface NavbarProps {
   auth: AuthContextProps;
@@ -11,6 +11,8 @@ export const Navbar = ({ auth }: NavbarProps) => (
     <a href="/">
       <OnlineIcon className="w-32" />
     </a>
-    <ProfileToggle auth={auth} />
+    <div className="absolute top-4 right-4">
+      <ProfileModal auth={auth} />
+    </div>
   </nav>
 );
