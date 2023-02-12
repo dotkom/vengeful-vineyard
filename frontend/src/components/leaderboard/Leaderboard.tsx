@@ -36,16 +36,19 @@ export const Leaderboard = () => {
       </article>
     );
 
+  console.log(data);
+
   return (
     <article className="bg-white h-full max-w-5xl md:m-auto md:rounded shadow-inner">
-      <table className="w-full border-collapse">
+      <table className="w-full text-sm">
         <thead>
-          <tr className="text-slate-600 border-b">
+          <tr className="text-slate-600 border-b text-md">
             <th className="text-left">
-              <p className="ml-8 my-4">Navn</p>
+              <p className="ml-4 my-4">Navn</p>
             </th>
-            <th>Øl</th>
-            <th>Vin</th>
+            <th>
+              <p>Gjeld</p>
+            </th>
           </tr>
         </thead>
         <tbody>

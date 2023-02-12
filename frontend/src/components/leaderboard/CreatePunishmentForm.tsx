@@ -42,37 +42,12 @@ export const CreatePunishmentForm = ({
   };
 
   return (
-    <tr className="bg-gray-100">
-      <th className="flex gap-2 font-normal px-4">
-        <select
-          className="p-2 border rounded my-4 w-12 bg-white"
-          value={newPunishment.punishment_type_id}
-          onChange={(evt) =>
-            setNewPunishment({
-              ...newPunishment,
-              punishment_type_id: Number(evt.currentTarget.value),
-            })
-          }
-        >
-          <option value="1">🍺</option>
-          <option value="2">🍷</option>
-        </select>
-        <input
-          type="number"
-          placeholder="0"
-          className="p-2 border rounded my-4 w-20"
-          value={newPunishment.amount}
-          onChange={(evt) =>
-            setNewPunishment({
-              ...newPunishment,
-              amount: Number(evt.currentTarget.value),
-            })
-          }
-        />
+    <tr className="border-b">
+      <th className="flex flex-col font-normal px-4 pt-4">
         <input
           type="text"
           placeholder="Begrunnelse for staff"
-          className="p-2 border rounded my-4"
+          className="p-2 border rounded"
           value={newPunishment.reason}
           onChange={(evt) =>
             setNewPunishment({
@@ -81,11 +56,38 @@ export const CreatePunishmentForm = ({
             })
           }
         />
+        <div className="flex gap-2">
+          <select
+            className="p-2 border rounded my-4 w-12 bg-white"
+            value={newPunishment.punishment_type_id}
+            onChange={(evt) =>
+              setNewPunishment({
+                ...newPunishment,
+                punishment_type_id: Number(evt.currentTarget.value),
+              })
+            }
+          >
+            <option value="1">🍺</option>
+            <option value="2">🍷</option>
+          </select>
+          <input
+            type="number"
+            placeholder="0"
+            className="p-2 border rounded my-4 w-20"
+            value={newPunishment.amount}
+            onChange={(evt) =>
+              setNewPunishment({
+                ...newPunishment,
+                amount: Number(evt.currentTarget.value),
+              })
+            }
+          />
+          <div className="py-4 w-full">
+            <Button label="+" clickHandler={handleCreateClick} />
+          </div>
+        </div>
       </th>
-      <th>
-        <Button label="+" clickHandler={handleCreateClick} />
-      </th>
-      <th />
+      <th className="bg-[url('https://mir-s3-cdn-cf.behance.net/project_modules/1400/6c9df071379043.5bc3ae398a894.gif')] bg-no-repeat bg-cover bg-center" />
     </tr>
   );
 };
