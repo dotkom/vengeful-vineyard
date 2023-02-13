@@ -41,6 +41,7 @@ jobs:
 
     - name: Install Project Dependencies
       run: |
+        cd backend
         poetry install --no-interaction --no-root
       if: steps.cache-poetry-envs.outputs.cache-hit != 'true'
 
