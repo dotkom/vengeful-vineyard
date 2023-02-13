@@ -6,10 +6,11 @@ from typing import Any, AsyncGenerator
 
 import pytest_asyncio
 from aioresponses import aioresponses
-from app.api.init_api import init_api
-from app.http import BASE_OLD_ONLINE
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
+
+from app.api.init_api import init_api
+from app.http import BASE_OLD_ONLINE
 
 
 def load_json_response(filename: str) -> Any:

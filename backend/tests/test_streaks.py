@@ -2,6 +2,7 @@ from collections import namedtuple
 from datetime import datetime
 
 import pytest
+
 from app.utils.streaks import calculate_punishment_streaks
 
 _TestCase = namedtuple(

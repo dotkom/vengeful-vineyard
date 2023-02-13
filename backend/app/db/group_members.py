@@ -1,13 +1,14 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Optional, Union
 
+from asyncpg import Pool
+
 from app.exceptions import NotFound
 from app.models.group_member import GroupMemberUpdate
 from app.models.punishment import PunishmentStreaks
 from app.types import GroupId, UserId
 from app.utils.db import MaybeAcquire
 from app.utils.streaks import calculate_punishment_streaks
-from asyncpg import Pool
 
 if TYPE_CHECKING:
     from app.db.core import Database

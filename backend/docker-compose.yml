@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    tty: true
+    volumes:
+     - .:/app
+    ports:
+      - "8000:8000"
+    command: [ "poetry", "run", "uvicorn", "--reload", "--reload-dir", "app", "app.api.init_api:asgi_app", "--host", "0.0.0.0" ]
+
+  db:
+    image: postgres:11.3-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: dev
+      POSTGRES_PASSWORD: postgres
+
+volumes:
+  postgres-data: null

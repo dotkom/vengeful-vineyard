@@ -5,6 +5,8 @@ Group endpoints
 from functools import partial
 from typing import Optional, Union
 
+from fastapi import APIRouter, Depends, HTTPException, Query
+
 from app.api import APIRoute, Request, oidc
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate
@@ -23,7 +25,6 @@ from app.models.punishment import (
 from app.models.punishment_type import PunishmentTypeCreate
 from app.types import GroupEventId, GroupId, OWGroupUserId, PunishmentTypeId, UserId
 from app.utils.pagination import Page, Pagination
-from fastapi import APIRouter, Depends, HTTPException, Query
 
 router = APIRouter(
     prefix="/group",

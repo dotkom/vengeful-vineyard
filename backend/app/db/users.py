@@ -1,12 +1,13 @@
 from typing import TYPE_CHECKING, Any, Optional, Union
 
+from asyncpg import Pool
+from asyncpg.exceptions import UniqueViolationError
+
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group
 from app.models.user import LeaderboardUser, User, UserCreate, UserUpdate
 from app.types import InsertOrUpdateUser, OWUserId, UserId
 from app.utils.db import MaybeAcquire
-from asyncpg import Pool
-from asyncpg.exceptions import UniqueViolationError
 
 if TYPE_CHECKING:
     from app.db.core import Database

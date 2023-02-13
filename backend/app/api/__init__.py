@@ -3,10 +3,6 @@
 import json
 from typing import Any, Callable, Coroutine, Optional
 
-from app.db.core import Database
-from app.http import HTTPClient
-from app.state import State
-from app.sync import OWSync
 from fastapi import FastAPI as OriginalFastAPI
 from fastapi import HTTPException
 from fastapi import Request as OriginalRequest
@@ -17,6 +13,11 @@ from fastapi.routing import APIRoute as OriginalAPIRoute
 from fastapi.security import OpenIdConnect
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import HTMLResponse
+
+from app.db.core import Database
+from app.http import HTTPClient
+from app.state import State
+from app.sync import OWSync
 
 __all__ = (
     "FastAPI",

@@ -1,11 +1,12 @@
 from typing import TYPE_CHECKING, Optional
 
+from asyncpg import Pool
+from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
+
 from app.exceptions import DatabaseIntegrityException, PunishmentTypeNotExists
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.types import GroupId, PunishmentTypeId
 from app.utils.db import MaybeAcquire
-from asyncpg import Pool
-from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 
 if TYPE_CHECKING:
     from app.db.core import Database

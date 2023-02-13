@@ -4,8 +4,9 @@ Models for punishment data structures
 
 from datetime import datetime
 
-from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
+from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 
 
 class PunishmentBase(BaseModel):

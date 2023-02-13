@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+
 from app.utils.date import parse_naive_datetime, utc_to_oslo
 
 

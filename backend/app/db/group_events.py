@@ -1,12 +1,13 @@
 import datetime
 from typing import TYPE_CHECKING, Optional
 
+from asyncpg import Pool
+from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
+
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group_event import GroupEvent, GroupEventCreate
 from app.types import GroupEventId, GroupId, UserId
 from app.utils.db import MaybeAcquire
-from asyncpg import Pool
-from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 
 if TYPE_CHECKING:
     from app.db.core import Database

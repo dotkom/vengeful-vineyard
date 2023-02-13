@@ -6,8 +6,9 @@ from the table 'group_members'.
 import datetime
 from typing import Optional
 
-from app.types import GroupId, OWGroupUserId, UserId
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
+from app.types import GroupId, OWGroupUserId, UserId
 
 
 class BaseGroupMember(BaseModel):

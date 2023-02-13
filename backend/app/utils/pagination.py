@@ -1,8 +1,9 @@
 from typing import Awaitable, Generic, Optional, Protocol, TypeVar
 
-from app.api import Request
 from asyncpg import Pool
 from pydantic.generics import GenericModel
+
+from app.api import Request
 
 T = TypeVar("T")
 

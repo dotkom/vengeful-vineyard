@@ -4,13 +4,14 @@ User endpoints
 
 from typing import Any, Optional
 
+from fastapi import APIRouter, HTTPException, Query
+
 from app.api import APIRoute, Request
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group
 from app.models.user import LeaderboardUser, User, UserCreate
 from app.types import UserId
 from app.utils.pagination import Page, Pagination
-from fastapi import APIRouter, HTTPException, Query
 
 router = APIRouter(
     prefix="/user",
