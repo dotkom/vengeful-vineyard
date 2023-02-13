@@ -1,6 +1,9 @@
 import datetime
 from typing import TYPE_CHECKING, Optional, Union, cast
 
+from asyncpg import Pool
+from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
+
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group, GroupCreate
 from app.models.group_member import GroupMemberCreate
@@ -8,8 +11,6 @@ from app.models.punishment import TotalPunishmentValue
 from app.models.punishment_type import PunishmentTypeCreate
 from app.types import GroupId, InsertOrUpdateGroup, OWUserId, UserId
 from app.utils.db import MaybeAcquire
-from asyncpg import Pool
-from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 
 if TYPE_CHECKING:
     from app.db.core import Database

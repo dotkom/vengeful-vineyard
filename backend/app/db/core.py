@@ -3,10 +3,11 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from app.config import settings
-from app.utils.db import MaybeAcquire
 from asyncpg import Pool, create_pool
 from asyncpg.exceptions import CannotConnectNowError, UndefinedObjectError
+
+from app.config import settings
+from app.utils.db import MaybeAcquire
 
 from .group_events import GroupEvents
 from .group_members import GroupMembers

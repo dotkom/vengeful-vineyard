@@ -2,10 +2,11 @@
 Punishment endpoints
 """
 
+from fastapi import APIRouter, Depends, HTTPException
+
 from app.api import APIRoute, Request, oidc
 from app.exceptions import NotFound
 from app.types import PunishmentId
-from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(
     prefix="/punishment",

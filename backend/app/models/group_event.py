@@ -4,9 +4,10 @@ Models for group event data structures.
 
 import datetime
 
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
 from app.types import GroupEventId, GroupId, UserId
 from app.utils.validator import validate_naive_datetime
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
 class GroupEventBase(BaseModel):

@@ -1,0 +1,7 @@
+
+
+version: '3.8'
+
+services:
+  app:
+    command: [ "poetry", "run", "pytest", "--ignore=postgres-data", "--asyncio-mode=strict", "-vv", "--cov=app", "--cov-report", "term:skip-covered", "--cov-report", "html" ]

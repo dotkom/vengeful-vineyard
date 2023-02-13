@@ -1,11 +1,12 @@
 import datetime
 from typing import TYPE_CHECKING, Optional
 
+from asyncpg import Pool
+
 from app.exceptions import NotFound, PunishmentTypeNotExists
 from app.models.punishment import PunishmentCreate, PunishmentRead
 from app.types import GroupId, PunishmentId, UserId
 from app.utils.db import MaybeAcquire
-from asyncpg import Pool
 
 if TYPE_CHECKING:
     from app.db.core import Database

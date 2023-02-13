@@ -8,30 +8,24 @@ prod: .prod-reqs
 	VENGEFUL_DATABASE="vengeful_vineyard.db" poetry run uvicorn app.api.init_api:asgi_app --host 0.0.0.0
 	# PROD NOT FOR USE
 
-dev: .dev-reqs
-	trap 'docker stop dev-db' EXIT
-	docker run -d --rm --name dev-db -p 5433:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=dev -v ${PWD}/postgres-data:/var/lib/postgresql/data postgres:11.3-alpine
-	POSTGRES_DB=dev poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
+devv:
+	docker-compose up
 
-dev-memory: .dev-reqs
-	trap 'docker stop test-db' EXIT
-	docker run -d --rm --name test-db -p 5433:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
-	POSTGRES_DB=test poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app
+dev: .dev-reqs
+	# docker-compose rm -f
+	docker-compose up
 
 test: .dev-reqs
-	trap 'docker stop test-db' EXIT
-	docker run -d --rm --name test-db -p 5433:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DEFAULT_DATABASE_NAME=db -v ${PWD}/create-databases.sh:/docker-entrypoint-initdb.d/temp.sh -v ${PWD}/tests:/tests postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
-	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict
+	docker-compose rm -f
+	docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
 testv: .dev-reqs
-	trap 'docker stop test-db' EXIT
-	docker run -d --rm --name test-db -p 5433:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DEFAULT_DATABASE_NAME=db -v ${PWD}/create-databases.sh:/docker-entrypoint-initdb.d/temp.sh -v ${PWD}/tests:/tests postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
-	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict -v --cov=app --cov-report term:skip-covered --cov-report html
+	docker-compose rm -f
+	docker-compose -f docker-compose.test.yml -f docker-compose.testv.yml up --abort-on-container-exit
 
 testvv: .dev-reqs
-	trap 'docker stop test-db' EXIT
-	docker run -d --rm --name test-db -p 5433:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DEFAULT_DATABASE_NAME=db -v ${PWD}/create-databases.sh:/docker-entrypoint-initdb.d/temp.sh -v ${PWD}/tests:/tests postgres:11.3-alpine -c shared_buffers=500MB -c fsync=off
-	POSTGRES_DB=test poetry run pytest --ignore=postgres-data --asyncio-mode=strict -vv --cov=app --cov-report term:skip-covered --cov-report html
+	docker-compose rm -f
+	docker-compose -f docker-compose.test.yml -f docker-compose.testvv.yml up --abort-on-container-exit
 
 .prod-reqs:
 	poetry install --no-root --no-dev && touch .prod-reqs

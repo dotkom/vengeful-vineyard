@@ -2,8 +2,9 @@
 Models for punishment type data structures
 """
 
-from app.types import PunishmentTypeId
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
+from app.types import PunishmentTypeId
 
 
 class PunishmentTypeBase(BaseModel):

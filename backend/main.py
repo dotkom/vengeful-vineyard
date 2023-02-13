@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 import uvicorn
+
 from app.config import settings
 
 

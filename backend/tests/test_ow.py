@@ -3,6 +3,7 @@
 from typing import Any
 
 import pytest
+
 from tests.fixtures import client, mock
 from tests.response_time import check_response_time
 

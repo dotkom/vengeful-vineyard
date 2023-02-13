@@ -9,14 +9,15 @@ import logging
 from timeit import default_timer as timer
 from typing import Any
 
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+
 from app.api.endpoints import group, punishment, user
 from app.config import settings
 from app.db.core import Database
 from app.http import HTTPClient
 from app.state import State
 from app.sync import OWSync
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
 
 from . import APIRoute, FastAPI, Request
 

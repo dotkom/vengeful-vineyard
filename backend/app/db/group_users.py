@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING, Any, Optional
 
+from asyncpg import Pool
+
 from app.exceptions import NotFound
 from app.models.group_user import GroupUser
 from app.types import GroupId, UserId
 from app.utils.db import MaybeAcquire
-from asyncpg import Pool
 
 if TYPE_CHECKING:
     from app.db.core import Database
