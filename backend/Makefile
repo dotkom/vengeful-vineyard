@@ -12,7 +12,7 @@ devv:
 	docker-compose up
 
 dev: .dev-reqs
-	# docker-compose rm -f
+	docker-compose rm -f
 	docker-compose up
 
 test: .dev-reqs
