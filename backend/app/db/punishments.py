@@ -69,14 +69,16 @@ class Punishments:
                                                      punishment_type_id,
                                                      reason,
                                                      amount,
-                                                     created_by)
+                                                     created_by,
+                                                     created_at)
                     (SELECT
                         p.group_id,
                         p.user_id,
                         p.punishment_type_id,
                         p.reason,
                         p.amount,
-                        p.created_by
+                        p.created_by,
+                        p.created_at
                     FROM
                         unnest($1::group_punishments[]) as p
                     )
