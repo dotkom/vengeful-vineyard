@@ -9,7 +9,7 @@ interface ProfileModalProps {
 }
 
 export const ProfileModal = ({ auth }: ProfileModalProps) => {
-  const [isShowing, setIsShowing] = useState(true);
+  const [isShowing, setIsShowing] = useState(false);
 
   const toggleModal = () => setIsShowing(!isShowing);
 

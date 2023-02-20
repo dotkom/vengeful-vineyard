@@ -10,7 +10,7 @@ export const PunishmentItem = ({ punishment }: PunishmentItemProps) => {
   const formattedDate = date.format("DD. MMM YY");
 
   return (
-    <tr className="border-b relative">
+    <tr className="border-b border-l-8 border-l-lime-800 md:border-l-4 relative">
       <th className="font-light text-left">
         <p className="m-4">
           <span className="block">{punishment.reason}</span>

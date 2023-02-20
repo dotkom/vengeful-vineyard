@@ -42,7 +42,7 @@ export const CreatePunishmentForm = ({
   };
 
   return (
-    <tr className="border-b">
+    <tr className="border-b border-l-8 md:border-l-4 border-l-lime-800">
       <th className="flex flex-col font-normal px-4 pt-4">
         <input
           type="text"

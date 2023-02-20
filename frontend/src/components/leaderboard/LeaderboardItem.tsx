@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import { Transition } from "@headlessui/react";
+import React, { Fragment, useState } from "react";
 import { LeaderboardUser } from "../../helpers/types";
+import { CreatePunishmentForm } from "./CreatePunishmentForm";
 import { PunishmentList } from "./PunishmentList";
 
 interface LeaderboardItemProps {
