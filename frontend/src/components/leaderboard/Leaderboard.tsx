@@ -1,5 +1,4 @@
 import { LeaderboardItem } from "./LeaderboardItem";
-import { leaderboardData } from "../../helpers/mockData";
 import { LEADERBOARD_URL } from "../../helpers/api";
 import { useQuery } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
@@ -16,38 +15,36 @@ export const Leaderboard = () => {
 
   if (isLoading)
     return (
-      <article className="bg-white h-full max-w-5xl md:m-auto md:rounded shadow-inner">
-        <h1 className="text-5xl text-center font-bold py-32">
+      <article className="h-full max-w-5xl bg-white shadow-inner md:m-auto md:rounded">
+        <h1 className="py-32 text-center text-5xl font-bold">
           Wall of Shame🦋
         </h1>
-        <p className="text-center py-16">Loading...</p>
+        <p className="py-16 text-center">Loading...</p>
       </article>
     );
 
   if (error)
     return (
-      <article className="bg-white h-full max-w-5xl md:m-auto md:rounded shadow-inner">
-        <h1 className="text-5xl text-center font-bold py-32">
+      <article className="h-full max-w-5xl bg-white shadow-inner md:m-auto md:rounded">
+        <h1 className="py-32 text-center text-5xl font-bold">
           Wall of Shame🦋
         </h1>
-        <p className="text-center py-16">
+        <p className="py-16 text-center">
           An error has occurred: {error.message}
         </p>
       </article>
     );
 
-  console.log(data);
-
   return (
-    <article className="bg-white h-full max-w-5xl md:m-auto md:rounded shadow-inner">
+    <article className="h-full max-w-5xl bg-white shadow-inner md:m-auto md:rounded">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-slate-600 border-b text-md">
+          <tr className="text-md border-b text-slate-600">
             <th className="text-left">
-              <p className="ml-4 my-4">Navn</p>
+              <p className="my-4 ml-4">Navn</p>
             </th>
             <th>
-              <p>Gjeld</p>
+              <p className="mr-8 text-right">Gjeld</p>
             </th>
           </tr>
         </thead>

@@ -1,7 +1,5 @@
-import { Transition } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { LeaderboardUser } from "../../helpers/types";
-import { CreatePunishmentForm } from "./CreatePunishmentForm";
 import { PunishmentList } from "./PunishmentList";
 
 interface LeaderboardItemProps {
@@ -16,22 +14,22 @@ export const LeaderboardItem = ({ user }: LeaderboardItemProps) => {
   return (
     <React.Fragment>
       <tr
-        className={`font-thin hover:bg-gray-100 cursor-pointer border-b ${
+        className={`cursor-pointer border-b font-thin hover:bg-gray-100 ${
           showPunishments ? "bg-gray-50" : "bg-white"
         }`}
         onClick={togglePunishments}
       >
-        <th className="text-left flex items-center gap-2 text-slate-800">
-          <figure className="w-8 h-8 rounded-full bg-pink-300 my-4 ml-4" />
+        <td className="flex items-center gap-2 text-left font-normal text-slate-800">
+          <figure className="my-4 ml-4 h-8 w-8 rounded-full bg-pink-300" />
           {user.first_name} {user.last_name}
-        </th>
-        <th>
-          <div className="mr-4">
+        </td>
+        <td>
+          <div className="mr-8 text-right">
             {Array.from({ length: user.punishments.length }, (_, i) => (
               <span key={i}>🍺</span>
             ))}
           </div>
-        </th>
+        </td>
       </tr>
       {showPunishments && <PunishmentList user={user} />}
     </React.Fragment>
