@@ -8,6 +8,7 @@ interface TabbarProps {
 const mockData = [
   { index: 0, text: "Dotkom" },
   { index: 1, text: "Wall of Shame" },
+  { index: 2, text: "Wall of Requests" },
 ];
 
 export const Tabbar = ({

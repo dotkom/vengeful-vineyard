@@ -1,38 +1,29 @@
 import { Fragment } from "react";
-import { Punishment } from "../../helpers/mockData";
+import { LeaderboardUser } from "../../helpers/types";
+import { CreatePunishmentTableRow } from "./createPunishmentTableRow";
+import { PunishmentItem } from "./PunishmentItem";
 
 interface PunishmentListProps {
-  punishments: Punishment[];
+  user: LeaderboardUser;
 }
 
-export const PunishmentList = ({ punishments }: PunishmentListProps) => {
-  if (punishments.length === 0) {
+export const PunishmentList = ({ user }: PunishmentListProps) => {
+  if (user.punishments.length === 0) {
     return (
-      <tr className="border-b-2">
-        <th>
-          <p className="font-light p-2 text-left m-4">Ingen straffer 😇</p>
-        </th>
-      </tr>
+      <Fragment>
+        <CreatePunishmentTableRow groupId={1} userId={user.user_id} />
+      </Fragment>
     );
   }
 
   return (
     <Fragment>
-      {punishments.map((punishment) => (
-        <tr className="border-b-2 relative" key={punishment.reason}>
-          <th className="font-light text-left">
-            <p className="m-4">
-              <span className="block">{punishment.reason}</span>
-              <span className="block text-gray-500">
-                - Gitt av {punishment.author}
-              </span>
-            </p>
-          </th>
-          <th />
-          <th className="absolute font-normal text-gray-500' right-8 top-4">
-            {punishment.date}
-          </th>
-        </tr>
+      <CreatePunishmentTableRow groupId={1} userId={user.user_id} />
+      {user.punishments.map((punishment) => (
+        <PunishmentItem
+          punishment={punishment}
+          key={punishment.punishment_id}
+        />
       ))}
     </Fragment>
   );

@@ -79,5 +79,5 @@ const red = {
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {},
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };

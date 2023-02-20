@@ -1,31 +1,37 @@
 import React, { useState } from "react";
-import { Person } from "../../helpers/mockData";
+import { LeaderboardUser } from "../../helpers/types";
 import { PunishmentList } from "./PunishmentList";
 
 interface LeaderboardItemProps {
-  person: Person;
+  user: LeaderboardUser;
 }
 
-export const LeaderboardItem = ({ person }: LeaderboardItemProps) => {
+export const LeaderboardItem = ({ user }: LeaderboardItemProps) => {
   const [showPunishments, setShowPunishments] = useState(false);
 
   const togglePunishments = () => setShowPunishments(!showPunishments);
 
   return (
-    <React.Fragment key={person.name}>
+    <React.Fragment>
       <tr
-        key={person.name}
-        className="font-thin hover:bg-gray-100 cursor-pointer border-b"
+        className={`cursor-pointer border-b font-thin hover:bg-gray-100 ${
+          showPunishments ? "bg-gray-50" : "bg-white"
+        }`}
         onClick={togglePunishments}
       >
-        <th className="text-left flex items-center gap-2 text-slate-800">
-          <figure className="w-8 h-8 rounded-full bg-pink-300 my-4 ml-8" />
-          {person.name}
-        </th>
-        <th>🍺{person.numOfBeers}</th>
-        <th>🍷{person.numOfWine}</th>
+        <td className="flex items-center gap-2 text-left font-normal text-slate-800">
+          <figure className="my-4 ml-4 h-8 w-8 rounded-full bg-pink-300" />
+          {user.first_name} {user.last_name}
+        </td>
+        <td>
+          <div className="mr-8 text-right">
+            {Array.from({ length: user.punishments.length }, (_, i) => (
+              <span key={i}>🍺</span>
+            ))}
+          </div>
+        </td>
       </tr>
-      {showPunishments && <PunishmentList punishments={person.punishments} />}
+      {showPunishments && <PunishmentList user={user} />}
     </React.Fragment>
   );
 };
