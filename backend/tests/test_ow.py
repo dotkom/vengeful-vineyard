@@ -454,6 +454,7 @@ class TestWithDB_OW:
                 {
                     "punishment_type_id": 1,
                     "reason": "Very good reason",
+                    "reason_hidden": False,
                     "amount": 1,
                 }
             ],
@@ -471,6 +472,7 @@ class TestWithDB_OW:
                 {
                     "punishment_type_id": 2,
                     "reason": "Very good reason2",
+                    "reason_hidden": False,
                     "amount": 1,
                 }
             ],
@@ -478,6 +480,26 @@ class TestWithDB_OW:
         )
         assert response.status_code == 200
         assert response.json()["ids"] == [2]
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_create_punishment_hidden_reason_on_other_user(
+        self, client: Any
+    ) -> None:
+        response = await client.post(
+            f"/group/1/user/{OTHER_USER_ID}/punishment",
+            json=[
+                {
+                    "punishment_type_id": 2,
+                    "reason": "This is a very good hidden reason!!",
+                    "reason_hidden": True,
+                    "amount": 1,
+                }
+            ],
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        assert response.json()["ids"] == [3]
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -491,6 +513,7 @@ class TestWithDB_OW:
                 {
                     "punishment_type_id": 2,
                     "reason": "Very good reason2",
+                    "reason_hidden": False,
                     "amount": 1,
                 }
             ],
@@ -578,7 +601,7 @@ class TestWithDB_OW:
         )
         assert response.status_code == 200
         assert response.json() == {
-            "total_value": 133,
+            "total_value": 233,
             "total_paid_value": 13,  # 4 + 9
         }
         check_response_time(response)
@@ -617,7 +640,14 @@ class TestWithDB_OW:
     async def test_check_punishments_exists(self, client: Any) -> None:
         response = await client.get(f"/group/1/user/{OTHER_USER_ID}")
         punishments = response.json()["punishments"]
-        assert len(punishments) == 1
+        assert len(punishments) == 2
+
+        not_hidden_count = len([x for x in punishments if not x["reason_hidden"]])
+        hidden_count = len([x for x in punishments if x["reason_hidden"]])
+
+        assert not_hidden_count == 1
+        assert hidden_count == 1
+
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -625,7 +655,11 @@ class TestWithDB_OW:
         response = await client.get(f"/group/1/users")
         assert response.status_code == 200
         punishments = response.json()[3]["punishments"]
-        assert len(punishments) == 1
+        assert len(punishments) == 2
+        not_hidden_count = len([x for x in punishments if not x["reason_hidden"]])
+        hidden_count = len([x for x in punishments if x["reason_hidden"]])
+        assert not_hidden_count == 1
+        assert hidden_count == 1
 
     @pytest.mark.asyncio
     async def test_get_group_user_punishment_streaks_empty(self, client: Any) -> None:
@@ -647,6 +681,7 @@ class TestWithDB_OW:
                 {
                     "punishment_type_id": 1,
                     "reason": "Test",
+                    "reason_hidden": False,
                     "amount": 1,
                 }
             ],
@@ -688,12 +723,22 @@ class TestWithDB_OW:
                             "amount": 1,
                             "created_by": 1,
                             "created_at": "",
+                            "punishment_id": 3,
+                            "punishment_type_id": 2,
+                            "reason": "",
+                            "reason_hidden": True,
+                        },
+                        {
+                            "amount": 1,
+                            "created_by": 1,
+                            "created_at": "",
                             "punishment_id": 2,
                             "punishment_type_id": 2,
                             "reason": "Very good reason2",
-                        }
+                            "reason_hidden": False,
+                        },
                     ],
-                    "total_value": 100,
+                    "total_value": 200,
                     "user_id": 4,
                 },
                 {
@@ -706,9 +751,10 @@ class TestWithDB_OW:
                             "amount": 1,
                             "created_by": 1,
                             "created_at": "",
-                            "punishment_id": 3,
+                            "punishment_id": 4,
                             "punishment_type_id": 1,
                             "reason": "Test",
+                            "reason_hidden": False,
                         }
                     ],
                     "total_value": 33,

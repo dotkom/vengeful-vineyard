@@ -1,10 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
-import { useState } from "react";
-import { getAddPunishmentUrl } from "../../../helpers/api";
-import { Button } from "../../button";
 import { AlcoholInput, TextInput } from "../../input";
+import axios, { AxiosResponse } from "axios";
+
+import { Button } from "../../button";
 import { InputForm } from "./InputForm";
+import { getAddPunishmentUrl } from "../../../helpers/api";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface CreatePunishmentTableRowProps {
   groupId: number;
@@ -19,6 +20,7 @@ export const CreatePunishmentTableRow = ({
   const [newPunishment, setNewPunishment] = useState({
     punishment_type_id: 1,
     reason: "",
+    reason_hidden: false,
     amount: 0,
   });
 

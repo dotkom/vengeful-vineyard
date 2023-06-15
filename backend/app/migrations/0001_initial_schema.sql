@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	user_id INTEGER NOT NULL references users(user_id),
 	punishment_type_id INTEGER NOT NULL references punishment_types(punishment_type_id),
 	reason TEXT NOT NULL,
+	reason_hidden BOOLEAN DEFAULT false,
 	amount INTEGER NOT NULL,
 	-- verified_by INTEGER references users(user_id),
 	created_by INTEGER references users(user_id),

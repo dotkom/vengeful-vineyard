@@ -68,6 +68,7 @@ class Punishments:
                                                      user_id,
                                                      punishment_type_id,
                                                      reason,
+                                                     reason_hidden,
                                                      amount,
                                                      created_by,
                                                      created_at)
@@ -76,6 +77,7 @@ class Punishments:
                         p.user_id,
                         p.punishment_type_id,
                         p.reason,
+                        p.reason_hidden,
                         p.amount,
                         p.created_by,
                         p.created_at
@@ -93,6 +95,7 @@ class Punishments:
                         user_id,
                         p.punishment_type_id,
                         p.reason,
+                        p.reason_hidden,
                         p.amount,
                         created_by,
                         datetime.datetime.utcnow(),

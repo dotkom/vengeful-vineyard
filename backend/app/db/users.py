@@ -28,6 +28,7 @@ class Users:
         self,
         offset: int,
         limit: int,
+        force_include_reasons: bool = False,
         conn: Optional[Pool] = None,
     ) -> list[LeaderboardUser]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
@@ -49,7 +50,15 @@ class Users:
                 limit,
             )
 
-            return [LeaderboardUser(**r) for r in res]
+            users = [LeaderboardUser(**r) for r in res]
+
+            if not force_include_reasons:
+                for user in users:
+                    for punishment in user.punishments:
+                        if punishment.reason_hidden:
+                            punishment.reason = ""
+
+            return users
 
     async def get_all_raw(
         self,

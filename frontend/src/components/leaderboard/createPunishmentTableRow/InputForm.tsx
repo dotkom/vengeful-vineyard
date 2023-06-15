@@ -1,17 +1,20 @@
-import { UseMutateFunction } from "@tanstack/react-query";
-import { Button } from "../../button";
 import { AlcoholInput, TextInput } from "../../input";
+
+import { Button } from "../../button";
+import { UseMutateFunction } from "@tanstack/react-query";
 
 interface InputFormProps {
   newPunishment: {
     punishment_type_id: number;
     reason: string;
+    reason_hidden: boolean;
     amount: number;
   };
   setNewPunishment: React.Dispatch<
     React.SetStateAction<{
       punishment_type_id: number;
       reason: string;
+      reason_hidden: boolean;
       amount: number;
     }>
   >;
