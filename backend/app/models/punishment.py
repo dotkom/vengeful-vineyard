@@ -12,6 +12,7 @@ from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 class PunishmentBase(BaseModel):
     punishment_type_id: PunishmentTypeId
     reason: str
+    reason_hidden: bool
     amount: int
 
 
