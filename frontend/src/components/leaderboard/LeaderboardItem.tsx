@@ -11,6 +11,20 @@ export const LeaderboardItem = ({ user }: LeaderboardItemProps) => {
 
   const togglePunishments = () => setShowPunishments(!showPunishments);
 
+  const totalPunishment: React.ReactNode[] = [];
+  user.punishments.forEach((punishment) => {
+    {
+      Array.from({ length: punishment.amount }, (_, i) =>
+        totalPunishment.push(
+          <span key={`${punishment.punishment_id}/${i}`} className="text-4xl">
+            {punishment.punishment_type_id === 1 && <span>🍺</span>}
+            {punishment.punishment_type_id === 2 && <span>🍷</span>}
+          </span>
+        )
+      );
+    }
+  });
+
   return (
     <React.Fragment>
       <tr
@@ -19,15 +33,19 @@ export const LeaderboardItem = ({ user }: LeaderboardItemProps) => {
         }`}
         onClick={togglePunishments}
       >
-        <td className="flex items-center gap-2 text-left font-normal text-slate-800">
-          <figure className="my-4 ml-4 h-8 w-8 rounded-full bg-pink-300" />
-          {user.first_name} {user.last_name}
+        <td className="text-left font-normal">
+          <p className="m-4">
+            <span className="block">
+              <span className="text-lg">👤</span> {user.first_name}{" "}
+              {user.last_name}
+            </span>
+          </p>
         </td>
         <td>
           <div className="mr-8 text-right">
-            {Array.from({ length: user.punishments.length }, (_, i) => (
-              <span key={i}>🍺</span>
-            ))}
+            <div className="max-w-xs float-right py-4">
+              {totalPunishment.map((punishment) => punishment)}
+            </div>
           </div>
         </td>
       </tr>
