@@ -37,7 +37,7 @@ export const Leaderboard = () => {
 
   return (
     <article className="h-full max-w-5xl bg-white shadow-inner md:m-auto md:rounded">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm shadow">
         <thead>
           <tr className="text-md border-b text-slate-600">
             <th className="text-left">

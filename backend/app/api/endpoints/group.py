@@ -286,6 +286,8 @@ async def add_punishment(
     """
     access_token = request.raise_if_missing_authorization()
 
+    print("💃")
+
     app = request.app
     created_by, _ = await app.ow_sync.sync_for_access_token(access_token)
 
