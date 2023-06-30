@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { LeaderboardUser } from "../../helpers/types";
-import { CreatePunishmentTableRow } from "./createPunishmentTableRow";
 import { PunishmentItem } from "./PunishmentItem";
 
 interface PunishmentListProps {
@@ -11,14 +10,13 @@ export const PunishmentList = ({ user }: PunishmentListProps) => {
   if (user.punishments.length === 0) {
     return (
       <Fragment>
-        <CreatePunishmentTableRow groupId={1} userId={user.user_id} />
+        <p className="p-4">Ingen straffer</p>
       </Fragment>
     );
   }
 
   return (
     <Fragment>
-      <CreatePunishmentTableRow groupId={1} userId={user.user_id} />
       {user.punishments.map((punishment) => (
         <PunishmentItem
           punishment={punishment}
