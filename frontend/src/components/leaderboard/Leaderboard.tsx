@@ -3,6 +3,7 @@ import { LEADERBOARD_URL } from "../../helpers/api";
 import { useQuery } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
 import { Leaderboard as LeaderboardType } from "../../helpers/types";
+import { mockData } from "../../helpers/tmpMock";
 
 export const Leaderboard = () => {
   const { isLoading, error, data } = useQuery({
@@ -13,6 +14,7 @@ export const Leaderboard = () => {
         .then((res: AxiosResponse<LeaderboardType>) => res.data),
   });
 
+  /*
   if (isLoading)
     return (
       <article className="h-full max-w-5xl bg-white shadow-inner md:m-auto md:rounded">
@@ -34,6 +36,7 @@ export const Leaderboard = () => {
         </p>
       </article>
     );
+  */
 
   return (
     <article className="h-full max-w-5xl bg-white shadow-inner md:m-auto md:rounded">
@@ -49,7 +52,7 @@ export const Leaderboard = () => {
           </tr>
         </thead>
         <tbody>
-          {data?.results.map((user) => (
+          {mockData.results.map((user) => (
             <LeaderboardItem user={user} key={user.user_id} />
           ))}
         </tbody>

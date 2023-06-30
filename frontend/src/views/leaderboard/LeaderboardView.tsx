@@ -1,21 +1,9 @@
-import { useState } from "react";
-import { Tabbar } from "../../components/tabbar";
 import { Table } from "../../components/table";
-import { WallOfRequests } from "../../components/wallOfRequests";
-import { WallOfShame } from "../../components/wallOfShame";
+import { Tabs } from "../../components/tabs";
 
-export const LeaderboardView = () => {
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-
-  return (
-    <section className="-mt-32 z-10">
-      <Tabbar
-        selectedTabIndex={selectedTabIndex}
-        setSelectedTabIndex={setSelectedTabIndex}
-      />
-      {selectedTabIndex === 0 && <Table />}
-      {selectedTabIndex === 1 && <WallOfShame />}
-      {selectedTabIndex === 2 && <WallOfRequests />}
-    </section>
-  );
-};
+export const LeaderboardView = () => (
+  <section className="-mt-16 md:-mt-32 z-10">
+    <Tabs />
+    <Table />
+  </section>
+);
