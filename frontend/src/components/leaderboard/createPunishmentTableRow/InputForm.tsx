@@ -1,5 +1,4 @@
 import { AlcoholInput, TextInput } from "../../input";
-
 import { Button } from "../../button";
 import { UseMutateFunction } from "@tanstack/react-query";
 
@@ -42,26 +41,18 @@ export const InputForm = ({
     });
 
   return (
-    <td className="mb-4 flex max-w-xs flex-col gap-2 px-4 pt-4 font-normal">
-      <div className="text-left">
-        <TextInput
-          label="Ny straff"
-          placeholder="Begrunnelse"
-          value={newPunishment.reason}
-          changeHandler={textInputHandler}
-        />
-      </div>
-      <div className="flex gap-2 text-left">
-        <AlcoholInput
-          type={newPunishment.punishment_type_id}
-          amount={newPunishment.amount}
-          typeInputHandler={typeInputHandler}
-          amountInputHandler={amountInputHandler}
-        />
-        <div>
-          <Button label="Straff" clickHandler={submitClickHandler} />
-        </div>
-      </div>
-    </td>
+    <div className="mb-4 flex flex-col gap-2 font-normal">
+      <TextInput
+        placeholder="Begrunnelse"
+        value={newPunishment.reason}
+        changeHandler={textInputHandler}
+      />
+      <AlcoholInput
+        type={newPunishment.punishment_type_id}
+        amount={newPunishment.amount}
+        typeInputHandler={typeInputHandler}
+        amountInputHandler={amountInputHandler}
+      />
+    </div>
   );
 };

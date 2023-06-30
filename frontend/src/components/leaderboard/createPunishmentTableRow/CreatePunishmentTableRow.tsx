@@ -1,7 +1,4 @@
-import { AlcoholInput, TextInput } from "../../input";
 import axios, { AxiosResponse } from "axios";
-
-import { Button } from "../../button";
 import { InputForm } from "./InputForm";
 import { getAddPunishmentUrl } from "../../../helpers/api";
 import { useMutation } from "@tanstack/react-query";
@@ -41,12 +38,10 @@ export const CreatePunishmentTableRow = ({
   });
 
   return (
-    <tr className="border-b border-l-8 border-l-indigo-600 md:border-l-4">
-      <InputForm
-        newPunishment={newPunishment}
-        setNewPunishment={setNewPunishment}
-        submitClickHandler={mutate}
-      />
-    </tr>
+    <InputForm
+      newPunishment={newPunishment}
+      setNewPunishment={setNewPunishment}
+      submitClickHandler={mutate}
+    />
   );
 };
