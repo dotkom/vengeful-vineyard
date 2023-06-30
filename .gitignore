@@ -15,7 +15,6 @@ yarn-debug.log*
 yarn-error.log*
 /.changelog
 .npm/
-yarn.lock
 .next
 */__pycache__/*
 
@@ -49,3 +48,4 @@ dist-ssr
 *.sln
 *.sw?
 
+tmpMock.ts
