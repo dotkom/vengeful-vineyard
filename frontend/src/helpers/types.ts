@@ -18,13 +18,10 @@ export interface LeaderboardUser {
 export interface Punishment {
   punishment_type_id: number;
   reason: string;
-  reason_hidden: boolean;
   amount: number;
   punishment_id: number;
   created_at: string;
   created_by: number;
-  verified_at: string;
-  verified_by: number;
 }
 
 export interface User {
