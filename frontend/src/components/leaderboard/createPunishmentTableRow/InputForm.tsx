@@ -1,6 +1,8 @@
 import { AlcoholInput, TextInput } from "../../input";
 import { Button } from "../../button";
 import { UseMutateFunction } from "@tanstack/react-query";
+import { Select } from "../../select";
+import { Leaderboard } from "../../../helpers/types";
 
 interface InputFormProps {
   newPunishment: {
@@ -18,12 +20,14 @@ interface InputFormProps {
     }>
   >;
   submitClickHandler: UseMutateFunction<string, unknown, void, unknown>;
+  data: Leaderboard;
 }
 
 export const InputForm = ({
   newPunishment,
   setNewPunishment,
   submitClickHandler,
+  data
 }: InputFormProps) => {
   const textInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({ ...newPunishment, reason: evt.currentTarget.value });
@@ -42,6 +46,7 @@ export const InputForm = ({
 
   return (
     <div className="mb-4 flex flex-col gap-2 font-normal">
+      <Select data={data} />
       <TextInput
         placeholder="Begrunnelse"
         value={newPunishment.reason}

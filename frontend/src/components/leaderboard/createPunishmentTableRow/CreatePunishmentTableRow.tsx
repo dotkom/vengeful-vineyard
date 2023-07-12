@@ -3,15 +3,18 @@ import { InputForm } from "./InputForm";
 import { getAddPunishmentUrl } from "../../../helpers/api";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { Leaderboard } from "../../../helpers/types";
 
 interface CreatePunishmentTableRowProps {
   groupId: number;
   userId: number;
+  data: Leaderboard;
 }
 
 export const CreatePunishmentTableRow = ({
   groupId,
   userId,
+  data,
 }: CreatePunishmentTableRowProps) => {
   const ADD_PUNISHMENT_URL = getAddPunishmentUrl(groupId, userId);
   const [newPunishment, setNewPunishment] = useState({
@@ -37,11 +40,14 @@ export const CreatePunishmentTableRow = ({
     },
   });
 
+  console.log(newPunishment);
+
   return (
     <InputForm
       newPunishment={newPunishment}
       setNewPunishment={setNewPunishment}
       submitClickHandler={mutate}
+      data={data}
     />
   );
 };
