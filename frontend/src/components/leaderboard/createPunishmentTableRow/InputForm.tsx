@@ -1,7 +1,6 @@
 import { AlcoholInput, TextInput } from "../../input";
-
-import { Button } from "../../button";
-import { UseMutateFunction } from "@tanstack/react-query";
+import { Select } from "../../select";
+import { Leaderboard } from "../../../helpers/types";
 
 interface InputFormProps {
   newPunishment: {
@@ -18,13 +17,13 @@ interface InputFormProps {
       amount: number;
     }>
   >;
-  submitClickHandler: UseMutateFunction<string, unknown, void, unknown>;
+  data: Leaderboard;
 }
 
 export const InputForm = ({
   newPunishment,
   setNewPunishment,
-  submitClickHandler,
+  data
 }: InputFormProps) => {
   const textInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({ ...newPunishment, reason: evt.currentTarget.value });
@@ -42,26 +41,19 @@ export const InputForm = ({
     });
 
   return (
-    <td className="mb-4 flex max-w-xs flex-col gap-2 px-4 pt-4 font-normal">
-      <div className="text-left">
-        <TextInput
-          label="Ny straff"
-          placeholder="Begrunnelse"
-          value={newPunishment.reason}
-          changeHandler={textInputHandler}
-        />
-      </div>
-      <div className="flex gap-2 text-left">
-        <AlcoholInput
-          type={newPunishment.punishment_type_id}
-          amount={newPunishment.amount}
-          typeInputHandler={typeInputHandler}
-          amountInputHandler={amountInputHandler}
-        />
-        <div>
-          <Button label="Straff" clickHandler={submitClickHandler} />
-        </div>
-      </div>
-    </td>
+    <div className="mb-4 flex flex-col gap-2 font-normal">
+      <Select data={data} />
+      <TextInput
+        placeholder="Begrunnelse"
+        value={newPunishment.reason}
+        changeHandler={textInputHandler}
+      />
+      <AlcoholInput
+        type={newPunishment.punishment_type_id}
+        amount={newPunishment.amount}
+        typeInputHandler={typeInputHandler}
+        amountInputHandler={amountInputHandler}
+      />
+    </div>
   );
 };
