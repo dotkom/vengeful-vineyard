@@ -1,14 +1,41 @@
-import React, { forwardRef, Fragment } from "react";
+import React, { forwardRef, Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { SunIcon } from "@radix-ui/react-icons";
 import { CreatePunishmentTableRow } from "../leaderboard/createPunishmentTableRow";
 import { mockData } from "../../helpers/tmpMock";
+import { getAddPunishmentUrl } from "../../helpers/api";
+import axios, { AxiosResponse } from "axios";
+import { useMutation } from "@tanstack/react-query";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Modal = forwardRef(({ setOpen }: ModalProps, ref) => {
+  const ADD_PUNISHMENT_URL = getAddPunishmentUrl(1, 1);
+  const [newPunishment, setNewPunishment] = useState({
+    punishment_type_id: 1,
+    reason: "",
+    reason_hidden: false,
+    amount: 0,
+  });
+
+  const createPunishmentCall = async () => {
+    const res: AxiosResponse<string> = await axios.post(ADD_PUNISHMENT_URL, [
+      newPunishment,
+    ]);
+    return res.data;
+  };
+
+  const { mutate } = useMutation(createPunishmentCall, {
+    onSuccess: () => {
+      console.log("Todo: Handle success");
+    },
+    onError: () => {
+      console.log("Todo: Handle error");
+    },
+  });
+
   const data = mockData;
 
   return (
@@ -61,7 +88,11 @@ export const Modal = forwardRef(({ setOpen }: ModalProps, ref) => {
                       <p className="text-sm text-gray-500">
                         Her kan du lage en ny vinstraff
                       </p>
-                      <CreatePunishmentTableRow groupId={1} userId={1} data={data} />
+                      <CreatePunishmentTableRow
+                        newPunishment={newPunishment}
+                        setNewPunishment={setNewPunishment}
+                        data={data}
+                      />
                     </div>
                   </div>
                 </div>
@@ -70,7 +101,10 @@ export const Modal = forwardRef(({ setOpen }: ModalProps, ref) => {
                 <button
                   type="button"
                   className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    mutate(); 
+                    setOpen(false);
+                  }}
                 >
                   Gi straff
                 </button>

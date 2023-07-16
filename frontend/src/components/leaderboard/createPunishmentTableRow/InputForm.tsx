@@ -1,6 +1,4 @@
 import { AlcoholInput, TextInput } from "../../input";
-import { Button } from "../../button";
-import { UseMutateFunction } from "@tanstack/react-query";
 import { Select } from "../../select";
 import { Leaderboard } from "../../../helpers/types";
 
@@ -19,14 +17,12 @@ interface InputFormProps {
       amount: number;
     }>
   >;
-  submitClickHandler: UseMutateFunction<string, unknown, void, unknown>;
   data: Leaderboard;
 }
 
 export const InputForm = ({
   newPunishment,
   setNewPunishment,
-  submitClickHandler,
   data
 }: InputFormProps) => {
   const textInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>

@@ -11,8 +11,6 @@ interface SelectProps {
 export const Select = ({ data }: SelectProps) => {
   const [selected, setSelected] = useState(data.results[2]);
 
-  console.log(data.results);
-
   return (
     <Listbox value={selected} onChange={setSelected}>
       {({ open }) => (
