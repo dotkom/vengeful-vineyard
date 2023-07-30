@@ -15,7 +15,7 @@ The old and outdated version can be found here: [RedWine](https://online.ntnu.no
 
 Under development 🚧
 
-## Development
+## Frontend
 
 ### Built with
 
@@ -24,13 +24,22 @@ Under development 🚧
 - [Tailwind](https://tailwindcss.com/)
 - [Vite](https://vitejs.dev/)
 
-### Installation
+### Installation and running locally
 
-...
+* `cd frontend`
+* `yarn`
+* `yarn dev`
 
-### Running locally
 
-...
+## Backend
+
+Created with [FastAPI](https://fastapi.tiangolo.com) and PostgreSQL.
+
+### (Recommended) Running locally with docker compose
+* Make sure you have docker and docker compose installed.
+* `cd backend`
+* Start server with: `make dev`
+* Go to: http://localhost:8000/docs for Swagger docs
 
 ## Contributing
 

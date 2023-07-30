@@ -49,3 +49,4 @@ dist-ssr
 *.sw?
 
 tmpMock.ts
+.python-version
