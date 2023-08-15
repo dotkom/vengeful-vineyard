@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useAuth } from "react-oidc-context";
-import { AuthenticatedHero } from "./views/hero";
+import { AuthenticatedHero, DefaultHero } from "./views/hero";
 import { Layout } from "./views/layout";
-import { LeaderboardView } from "./views/leaderboard";
+import { GroupsView } from "./views/groups";
 
 const App = () => {
   const auth = useAuth();
@@ -29,15 +29,14 @@ const App = () => {
 
     return (
       <Layout auth={auth}>
-        <AuthenticatedHero auth={auth} />
-        <LeaderboardView />
+        <GroupsView />
       </Layout>
     );
   }
 
   return (
     <Layout auth={auth}>
-      <AuthenticatedHero auth={auth} />
+      <DefaultHero auth={auth} />
     </Layout>
   );
 };

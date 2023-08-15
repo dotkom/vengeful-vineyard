@@ -1,6 +1,6 @@
 import { AlcoholInput, TextInput } from "../../input";
 import { Select } from "../../select";
-import { Leaderboard } from "../../../helpers/types";
+import { Leaderboard, LeaderboardUser } from "../../../helpers/types";
 
 interface InputFormProps {
   newPunishment: {
@@ -18,12 +18,17 @@ interface InputFormProps {
     }>
   >;
   data: Leaderboard;
+
+  selectedPerson: LeaderboardUser;
+  setSelectedPerson: React.Dispatch<React.SetStateAction<LeaderboardUser>>;
 }
 
 export const InputForm = ({
   newPunishment,
   setNewPunishment,
-  data
+  data,
+  selectedPerson,
+  setSelectedPerson,
 }: InputFormProps) => {
   const textInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({ ...newPunishment, reason: evt.currentTarget.value });
@@ -33,7 +38,6 @@ export const InputForm = ({
       ...newPunishment,
       punishment_type_id: Number(evt.currentTarget.value),
     });
-
   const amountInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({
       ...newPunishment,
@@ -42,7 +46,11 @@ export const InputForm = ({
 
   return (
     <div className="mb-4 flex flex-col gap-2 font-normal">
-      <Select data={data} />
+      <Select
+        data={data}
+        selectedPerson={selectedPerson}
+        setSelectedPerson={setSelectedPerson}
+      />
       <TextInput
         placeholder="Begrunnelse"
         value={newPunishment.reason}

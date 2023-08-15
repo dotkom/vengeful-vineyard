@@ -10,30 +10,23 @@ export const WallOfShame = () => {
 
   if (isLoading)
     return (
-      <article className="bg-white h-full max-w-5xl md:m-auto md:rounded shadow-inner">
-        <h1 className="text-5xl text-center font-bold py-32">
-          Wall of Shame🦋
-        </h1>
-        <p className="text-center py-16">Loading...</p>
+      <article className="h-full max-w-5xl bg-white shadow-inner md:m-auto md:rounded">
+        <p className="py-16 text-center">Loading...</p>
       </article>
     );
 
   if (error)
     return (
-      <article className="bg-white h-full max-w-5xl md:m-auto md:rounded shadow-inner">
-        <h1 className="text-5xl text-center font-bold py-32">
-          Wall of Shame🦋
-        </h1>
-        <p className="text-center py-16">
+      <article className="h-full max-w-5xl bg-white md:m-auto md:rounded">
+        <p className="py-16 text-center">
           An error has occurred: {error.message}
         </p>
       </article>
     );
 
   return (
-    <article className="bg-white h-full max-w-5xl md:m-auto md:rounded shadow-inner">
-      <h1 className="text-5xl text-center font-bold pt-32">Wall of Shame🦋</h1>
-      <p className="text-center py-16">
+    <article className="md:roundead mt-16 h-full  max-w-5xl bg-white md:m-auto">
+      <p className="py-16 text-center">
         Data bra backend: {JSON.stringify(data)}
       </p>
     </article>
