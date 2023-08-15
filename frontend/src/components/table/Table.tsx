@@ -1,11 +1,7 @@
 import * as Accordion from "@radix-ui/react-accordion";
-import { useQuery } from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
-import { LEADERBOARD_URL } from "../../helpers/api";
-import { mockData } from "../../helpers/tmpMock";
 import { TableItem } from "./TableItem";
 import { Leaderboard as LeaderboardType } from "../../helpers/types";
-import { Spinner } from "../spinner";
+import { SkeletonTableItem } from "./SkeletonTableItem";
 
 interface TableProps {
   data: LeaderboardType | undefined;
@@ -27,9 +23,11 @@ export const Table = ({ data }: TableProps) => (
           ))}
         </>
       ) : (
-        <div className="flex justify-center p-16 ">
-          <Spinner />
-        </div>
+        <>
+          {[...Array(3)].map((e, i) => (
+            <SkeletonTableItem key={i} />
+          ))}
+        </>
       )}
     </Accordion.Root>
   </ul>

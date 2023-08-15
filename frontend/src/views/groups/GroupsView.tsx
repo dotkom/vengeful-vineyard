@@ -6,7 +6,6 @@ import { GROUPS_URL, LEADERBOARD_URL } from "../../helpers/api";
 import axios, { AxiosResponse } from "axios";
 import { Group, Leaderboard as LeaderboardType } from "../../helpers/types";
 import { useState } from "react";
-import { mockData } from "../../helpers/tmpMock";
 
 /**
  * base
