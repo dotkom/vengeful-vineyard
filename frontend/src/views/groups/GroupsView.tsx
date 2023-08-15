@@ -23,13 +23,12 @@ export const GroupsView = () => {
     undefined
   );
 
-  const { isLoading, data: groups } = useQuery({
+  const { data: groups } = useQuery({
     queryKey: ["groupsData"],
     queryFn: () =>
       axios.get(GROUPS_URL).then((res: AxiosResponse<Group[]>) => res.data),
   });
 
-  /*
   const { isLoading, error, data } = useQuery({
     queryKey: ["groupLeaderboard"],
     queryFn: () =>
@@ -38,7 +37,6 @@ export const GroupsView = () => {
         .then((res: AxiosResponse<LeaderboardType>) => res.data),
     enabled: !!groups,
   });
-   */
 
   return (
     <section className="mt-16">
@@ -47,7 +45,7 @@ export const GroupsView = () => {
         setSelectedGroup={setSelectedGroup}
         groups={groups}
       />
-      <Table data={mockData} isLoading={isLoading} />
+      <Table data={data} isLoading={isLoading} />
     </section>
   );
 };

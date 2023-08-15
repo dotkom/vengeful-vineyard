@@ -8,9 +8,9 @@ interface LayoutProps {
 }
 
 export const Layout = ({ auth, children }: LayoutProps) => (
-  <main>
+  <main className="flex h-screen flex-col justify-between">
     <Nav auth={auth} />
-    {children}
+    <div className="mb-auto">{children}</div>
     <Footer />
   </main>
 );
