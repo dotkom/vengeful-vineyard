@@ -4,6 +4,8 @@ import { Modal } from "../modal/Modal";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { Group } from "../../helpers/types";
+import { TabItem } from "./TabItem";
+import { SkeletonTabItem } from "./SkeletonTabItem";
 
 interface TabsProps {
   selectedGroup: Group | undefined;
@@ -36,33 +38,15 @@ export const Tabs = ({
               {groups !== undefined ? (
                 <>
                   {groups.map((group) => (
-                    <a
-                      key={group.name_short}
-                      className={classNames(
-                        group.group_id === selectedGroup?.group_id
-                          ? "border-black text-gray-900"
-                          : "border-transparent text-gray-500 hover:border-gray-500 hover:text-gray-900",
-                        "group inline-flex cursor-pointer items-center border-b-4 px-1 py-2 text-sm font-medium"
-                      )}
-                      aria-current={group.group_id ? "page" : undefined}
-                    >
-                      <ComputerDesktopIcon
-                        className={classNames(
-                          group.group_id === selectedGroup?.group_id
-                            ? "text-gray-900"
-                            : "text-gray-500 group-hover:text-gray-900",
-                          "-ml-0.5 mr-2 h-5 w-5"
-                        )}
-                        aria-hidden="true"
-                      />
-                      <span>{group.name_short}</span>
-                    </a>
+                    <TabItem
+                      key={group.group_id}
+                      group={group}
+                      selectedGroup={selectedGroup}
+                    />
                   ))}
                 </>
               ) : (
-                <>
-                  <span className="mx-1 my-2 h-6 w-20 animate-pulse rounded-full bg-slate-300 text-sm" />
-                </>
+                <SkeletonTabItem />
               )}
 
               <div className="w-full">
