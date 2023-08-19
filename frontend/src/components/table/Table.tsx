@@ -1,10 +1,10 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { TableItem } from "./TableItem";
-import { Leaderboard as LeaderboardType } from "../../helpers/types";
+import { Group } from "../../helpers/types";
 import { SkeletonTableItem } from "./SkeletonTableItem";
 
 interface TableProps {
-  data: LeaderboardType | undefined;
+  data: Group | undefined;
   isLoading: boolean;
 }
 
@@ -18,7 +18,7 @@ export const Table = ({ data }: TableProps) => (
     >
       {data ? (
         <>
-          {data.results.map((user) => (
+          {data.members.map((user) => (
             <TableItem key={user.user_id} user={user} />
           ))}
         </>

@@ -1,6 +1,6 @@
 import { AlcoholInput, TextInput } from "../../input";
 import { Select } from "../../select";
-import { Leaderboard, LeaderboardUser } from "../../../helpers/types";
+import { Group, GroupUser } from "../../../helpers/types";
 
 interface InputFormProps {
   newPunishment: {
@@ -17,10 +17,9 @@ interface InputFormProps {
       amount: number;
     }>
   >;
-  data: Leaderboard;
-
-  selectedPerson: LeaderboardUser;
-  setSelectedPerson: React.Dispatch<React.SetStateAction<LeaderboardUser>>;
+  data: Group;
+  selectedPerson: GroupUser;
+  setSelectedPerson: React.Dispatch<React.SetStateAction<GroupUser>>;
 }
 
 export const InputForm = ({

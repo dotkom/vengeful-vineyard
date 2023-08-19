@@ -1,9 +1,5 @@
-import axios, { AxiosResponse } from "axios";
 import { InputForm } from "./InputForm";
-import { getAddPunishmentUrl } from "../../../helpers/api";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
-import { Leaderboard, LeaderboardUser } from "../../../helpers/types";
+import { Group, GroupUser } from "../../../helpers/types";
 
 interface CreatePunishmentTableRowProps {
   newPunishment: {
@@ -20,9 +16,9 @@ interface CreatePunishmentTableRowProps {
       amount: number;
     }>
   >;
-  data: Leaderboard;
-  selectedPerson: LeaderboardUser;
-  setSelectedPerson: React.Dispatch<React.SetStateAction<LeaderboardUser>>;
+  data: Group;
+  selectedPerson: GroupUser;
+  setSelectedPerson: React.Dispatch<React.SetStateAction<GroupUser>>;
 }
 
 export const CreatePunishmentTableRow = ({

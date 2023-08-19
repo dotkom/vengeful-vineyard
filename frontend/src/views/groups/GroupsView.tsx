@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Table } from "../../components/table";
 import { Tabs } from "../../components/tabs";
-import { WallOfShame } from "../../components/wallOfShame";
-import { GROUPS_URL, LEADERBOARD_URL } from "../../helpers/api";
+import { GROUPS_URL, getGroupLeaderboardUrl } from "../../helpers/api";
 import axios, { AxiosResponse } from "axios";
-import { Group, Leaderboard as LeaderboardType } from "../../helpers/types";
+import { Group } from "../../helpers/types";
 import { useState } from "react";
 
 /**
@@ -32,8 +31,8 @@ export const GroupsView = () => {
     queryKey: ["groupLeaderboard"],
     queryFn: () =>
       axios
-        .get(LEADERBOARD_URL)
-        .then((res: AxiosResponse<LeaderboardType>) => res.data),
+        .get(getGroupLeaderboardUrl(groups[0].group_id))
+        .then((res: AxiosResponse<Group>) => res.data),
     enabled: !!groups,
   });
 

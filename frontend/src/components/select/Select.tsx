@@ -1,14 +1,13 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { classNames } from "../../helpers/classNames";
-import { Leaderboard, LeaderboardUser } from "../../helpers/types";
+import { Group, GroupUser } from "../../helpers/types";
 
 interface SelectProps {
-  data: Leaderboard;
-
-  selectedPerson: LeaderboardUser;
-  setSelectedPerson: React.Dispatch<React.SetStateAction<LeaderboardUser>>;
+  data: Group;
+  selectedPerson: GroupUser;
+  setSelectedPerson: React.Dispatch<React.SetStateAction<GroupUser>>;
 }
 
 export const Select = ({
@@ -49,7 +48,7 @@ export const Select = ({
                 leaveTo="opacity-0"
               >
                 <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                  {data.results.map((person) => (
+                  {data.members.map((person) => (
                     <Listbox.Option
                       key={person.ow_user_id}
                       className={({ active }) =>

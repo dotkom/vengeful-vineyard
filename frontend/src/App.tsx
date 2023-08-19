@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useAuth } from "react-oidc-context";
-import { AuthenticatedHero, DefaultHero } from "./views/hero";
+import { DefaultHero } from "./views/hero";
 import { Layout } from "./views/layout";
 import { GroupsView } from "./views/groups";
 
