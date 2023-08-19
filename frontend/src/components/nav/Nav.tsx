@@ -7,6 +7,7 @@ import { AuthContextProps } from "react-oidc-context";
 import { classNames } from "../../helpers/classNames";
 import { AvatarIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
+import { NavLink } from "./NavLink";
 
 interface NavProps {
   auth: AuthContextProps;
@@ -46,18 +47,8 @@ export const Nav = ({ auth }: NavProps) => (
                 </Link>
               </div>
               <div className="hidden md:ml-6 md:flex md:space-x-8">
-                <a
-                  href="#"
-                  className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900"
-                >
-                  Hjem
-                </a>
-                <a
-                  href="#"
-                  className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                >
-                  Wall of Shame
-                </a>
+                <NavLink label="Hjem" url="/" />
+                <NavLink label="Wall of Shame" url="/wall-of-shame" />
               </div>
             </div>
             <div className="flex items-center">
@@ -131,14 +122,14 @@ export const Nav = ({ auth }: NavProps) => (
           <div className="space-y-1 pb-3 pt-2">
             <Disclosure.Button
               as="a"
-              href="#"
+              href="/"
               className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700 sm:pl-5 sm:pr-6"
             >
               Hjem
             </Disclosure.Button>
             <Disclosure.Button
               as="a"
-              href="#"
+              href="/wall-of-shame"
               className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 sm:pl-5 sm:pr-6"
             >
               Wall of Shame
