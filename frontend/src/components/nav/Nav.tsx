@@ -6,6 +6,7 @@ import OnlineLogo from "../../assets/online.png";
 import { AuthContextProps } from "react-oidc-context";
 import { classNames } from "../../helpers/classNames";
 import { AvatarIcon } from "@radix-ui/react-icons";
+import { Link } from "react-router-dom";
 
 interface NavProps {
   auth: AuthContextProps;
@@ -29,16 +30,20 @@ export const Nav = ({ auth }: NavProps) => (
                 </Disclosure.Button>
               </div>
               <div className="flex flex-shrink-0 items-center">
-                <img
-                  className="block h-8 w-auto cursor-pointer lg:hidden"
-                  src={OnlineLogo}
-                  alt="Online Logo"
-                />
-                <img
-                  className="hidden h-8 w-auto cursor-pointer lg:block"
-                  src={OnlineLogo}
-                  alt="Online Logo"
-                />
+                <Link to="/">
+                  <img
+                    className="block h-8 w-auto cursor-pointer lg:hidden"
+                    src={OnlineLogo}
+                    alt="Online Logo"
+                  />
+                </Link>
+                <Link to="/">
+                  <img
+                    className="hidden h-8 w-auto cursor-pointer lg:block"
+                    src={OnlineLogo}
+                    alt="Online Logo"
+                  />
+                </Link>
               </div>
               <div className="hidden md:ml-6 md:flex md:space-x-8">
                 <a
@@ -76,15 +81,15 @@ export const Nav = ({ auth }: NavProps) => (
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <Link
+                            to="/profil"
                             className={classNames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
                             Profil
-                          </a>
+                          </Link>
                         )}
                       </Menu.Item>
                       <Menu.Item>
@@ -160,7 +165,7 @@ export const Nav = ({ auth }: NavProps) => (
             <div className="mt-3 space-y-1">
               <Disclosure.Button
                 as="a"
-                href="#"
+                href="/profil"
                 className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6"
               >
                 Profil
