@@ -29,12 +29,12 @@ export const Nav = ({ auth }: NavProps) => (
               </div>
               <div className="flex flex-shrink-0 items-center">
                 <img
-                  className="block h-8 w-auto lg:hidden cursor-pointer"
+                  className="block h-8 w-auto cursor-pointer lg:hidden"
                   src={OnlineLogo}
                   alt="Online Logo"
                 />
                 <img
-                  className="hidden h-8 w-auto lg:block cursor-pointer"
+                  className="hidden h-8 w-auto cursor-pointer lg:block"
                   src={OnlineLogo}
                   alt="Online Logo"
                 />

@@ -1,4 +1,4 @@
-import { LeaderboardUser } from "../../helpers/types";
+import { GroupUser } from "../../helpers/types";
 import { PunishmentList } from "../leaderboard/PunishmentList";
 import {
   AccordionContent,
@@ -7,7 +7,7 @@ import {
 } from "./accordion/Accordion";
 
 interface TableItemProps {
-  user: LeaderboardUser;
+  user: GroupUser;
 }
 
 export const TableItem = ({ user }: TableItemProps) => {
@@ -27,8 +27,8 @@ export const TableItem = ({ user }: TableItemProps) => {
 
   return (
     <AccordionItem value={user.user_id}>
-      <AccordionTrigger className="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 cursor-pointer sm:px-6">
-        <div className="flex gap-x-2 items-center">
+      <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
+        <div className="flex items-center gap-x-2">
           <img
             className="h-12 w-12 flex-none rounded-full bg-gray-50"
             src="https://media.licdn.com/dms/image/D4E03AQGhozXJkpG0JA/profile-displayphoto-shrink_800_800/0/1664545360034?e=2147483647&v=beta&t=AERDN5WsH6qFhpnUjD7dovDOtsOYJ7mQ0g0aXijSFQw"
