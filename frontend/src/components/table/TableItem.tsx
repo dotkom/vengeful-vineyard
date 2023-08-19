@@ -5,6 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./accordion/Accordion";
+import { textToEmoji } from "../../helpers/emojies";
 
 interface TableItemProps {
   user: GroupUser;
@@ -29,11 +30,9 @@ export const TableItem = ({ user }: TableItemProps) => {
     <AccordionItem value={user.user_id}>
       <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
         <div className="flex items-center gap-x-2">
-          <img
-            className="h-12 w-12 flex-none rounded-full bg-gray-50"
-            src="https://media.licdn.com/dms/image/D4E03AQGhozXJkpG0JA/profile-displayphoto-shrink_800_800/0/1664545360034?e=2147483647&v=beta&t=AERDN5WsH6qFhpnUjD7dovDOtsOYJ7mQ0g0aXijSFQw"
-            alt=""
-          />
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 align-middle text-4xl">
+            {textToEmoji(user.first_name + user.last_name)}
+          </span>
           <p className="text-sm font-semibold leading-6 text-gray-900">
             {user.first_name} {user.last_name}
           </p>
