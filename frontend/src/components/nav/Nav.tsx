@@ -5,6 +5,7 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import OnlineLogo from "../../assets/online.png";
 import { AuthContextProps } from "react-oidc-context";
 import { classNames } from "../../helpers/classNames";
+import { AvatarIcon } from "@radix-ui/react-icons";
 
 interface NavProps {
   auth: AuthContextProps;
@@ -60,11 +61,7 @@ export const Nav = ({ auth }: NavProps) => (
                   <div>
                     <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://media.licdn.com/dms/image/D4E03AQGhozXJkpG0JA/profile-displayphoto-shrink_800_800/0/1664545360034?e=2147483647&v=beta&t=AERDN5WsH6qFhpnUjD7dovDOtsOYJ7mQ0g0aXijSFQw"
-                        alt="B-Rage"
-                      />
+                      <AvatarIcon className="h-10 w-10" />
                     </Menu.Button>
                   </div>
                   <Transition
