@@ -1,4 +1,4 @@
-import { AuthContextProps, useAuth } from "react-oidc-context";
+import { useAuth } from "react-oidc-context";
 import { Footer } from "../../components/footer";
 import { Nav } from "../../components/nav";
 import axios from "axios";
@@ -28,7 +28,15 @@ export const Layout = () => {
   }
 
   if (auth.error) {
-    return <p>Oops... {auth.error.message}</p>;
+    return (
+      <main className="flex h-screen flex-col justify-between">
+        <Nav auth={auth} />
+        <div className="flex items-center justify-center">
+          <h1>Ai ai ai ai ai!!!</h1>
+        </div>
+        <Footer />
+      </main>
+    );
   }
 
   if (auth.isAuthenticated) {

@@ -5,17 +5,26 @@ import { Transition } from "@headlessui/react";
 import { Group } from "../../helpers/types";
 import { TabItem } from "./TabItem";
 import { SkeletonTabItem } from "./SkeletonTabItem";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "@tanstack/react-query";
 
 interface TabsProps {
   selectedGroup: Group | undefined;
   setSelectedGroup: React.Dispatch<React.SetStateAction<Group | undefined>>;
   groups?: Group[];
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>;
 }
 
 export const Tabs = ({
   selectedGroup,
   setSelectedGroup,
   groups,
+  dataRefetch,
 }: TabsProps) => {
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
@@ -31,6 +40,7 @@ export const Tabs = ({
           setOpen={setOpen}
           ref={cancelButtonRef}
           selectedGroup={selectedGroup}
+          dataRefetch={dataRefetch}
         />
       </Transition.Root>
 

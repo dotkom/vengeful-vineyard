@@ -27,7 +27,7 @@ export const GroupsView = () => {
       axios.get(GROUPS_URL).then((res: AxiosResponse<Group[]>) => res.data),
   });
 
-  const { isLoading, error, data } = useQuery({
+  const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["groupLeaderboard"],
     queryFn: () =>
       axios
@@ -42,6 +42,7 @@ export const GroupsView = () => {
         selectedGroup={selectedGroup}
         setSelectedGroup={setSelectedGroup}
         groups={groups}
+        dataRefetch={refetch}
       />
       <Table data={data} isLoading={isLoading} />
     </section>

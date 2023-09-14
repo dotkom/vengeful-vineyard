@@ -4,16 +4,25 @@ import { SunIcon } from "@radix-ui/react-icons";
 import { CreatePunishmentTableRow } from "../leaderboard/createPunishmentTableRow";
 import { getAddPunishmentUrl, getGroupLeaderboardUrl } from "../../helpers/api";
 import axios, { AxiosResponse } from "axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
 import { Group, GroupUser } from "../../helpers/types";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedGroup: Group;
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>;
 }
 
 export const Modal = forwardRef(
-  ({ setOpen, selectedGroup }: ModalProps, ref) => {
+  ({ setOpen, selectedGroup, dataRefetch }: ModalProps, ref) => {
     const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(
       undefined
     );
@@ -58,7 +67,7 @@ export const Modal = forwardRef(
 
     const { mutate } = useMutation(createPunishmentCall, {
       onSuccess: () => {
-        console.log("Todo: Handle success");
+        dataRefetch();
       },
       onError: () => {
         console.log("Todo: Handle error");
