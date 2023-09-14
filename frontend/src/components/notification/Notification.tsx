@@ -2,7 +2,7 @@ import { Fragment, useContext } from "react";
 import { Transition } from "@headlessui/react";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import { NotificationContext } from "../../helpers/notificationContet";
+import { NotificationContext } from "../../helpers/notificationContext";
 
 export const Notification = () => {
   const { notification, setNotification } = useContext(NotificationContext);

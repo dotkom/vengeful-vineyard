@@ -6,7 +6,7 @@ import { Outlet } from "react-router-dom";
 import { Spinner } from "../../components/spinner";
 import { Notification } from "../../components/notification";
 import { useState } from "react";
-import { NotificationContext } from "../../helpers/notificationContet";
+import { NotificationContext } from "../../helpers/notificationContext";
 
 export const Layout = () => {
   const auth = useAuth();

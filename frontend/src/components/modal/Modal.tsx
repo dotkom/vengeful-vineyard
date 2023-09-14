@@ -12,7 +12,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { Group, GroupUser } from "../../helpers/types";
-import { NotificationContext } from "../../helpers/notificationContet";
+import { NotificationContext } from "../../helpers/notificationContext";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
