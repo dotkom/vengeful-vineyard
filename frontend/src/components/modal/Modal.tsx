@@ -1,4 +1,4 @@
-import React, { forwardRef, Fragment, useState } from "react";
+import React, { forwardRef, Fragment, useContext, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { SunIcon } from "@radix-ui/react-icons";
 import { CreatePunishmentTableRow } from "../leaderboard/createPunishmentTableRow";
@@ -12,6 +12,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { Group, GroupUser } from "../../helpers/types";
+import { NotificationContext } from "../../helpers/notificationContet";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,6 +33,7 @@ export const Modal = forwardRef(
       reason_hidden: false,
       amount: 1,
     });
+    const { setNotification } = useContext(NotificationContext);
 
     const { isLoading, error, data } = useQuery({
       queryKey: ["groupLeaderboard"],
@@ -68,6 +70,11 @@ export const Modal = forwardRef(
     const { mutate } = useMutation(createPunishmentCall, {
       onSuccess: () => {
         dataRefetch();
+        setNotification({
+          show: true,
+          title: "Straff registrert!",
+          text: `Du ga en straff til ${selectedPerson?.first_name}`,
+        });
       },
       onError: () => {
         console.log("Todo: Handle error");
