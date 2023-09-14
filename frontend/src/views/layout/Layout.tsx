@@ -3,6 +3,7 @@ import { Footer } from "../../components/footer";
 import { Nav } from "../../components/nav";
 import axios from "axios";
 import { Outlet } from "react-router-dom";
+import { Spinner } from "../../components/spinner";
 
 export const Layout = () => {
   const auth = useAuth();
@@ -15,7 +16,15 @@ export const Layout = () => {
   }
 
   if (auth.isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <main className="flex h-screen flex-col justify-between">
+        <Nav auth={auth} />
+        <div className="flex items-center justify-center">
+          <Spinner />
+        </div>
+        <Footer />
+      </main>
+    );
   }
 
   if (auth.error) {
