@@ -17,7 +17,7 @@ export const AlcoholInput = ({
         type="number"
         name="price"
         id="price"
-        className="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+        className="block w-full rounded-md border-gray-300 pl-3 pr-12 text-sm focus:border-indigo-500 focus:ring-indigo-500"
         placeholder="0"
         value={amount.toString()}
         onChange={amountInputHandler}
@@ -29,7 +29,7 @@ export const AlcoholInput = ({
         <select
           id="currency"
           name="currency"
-          className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+          className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-sm text-gray-500 focus:border-indigo-500 focus:ring-indigo-500"
           value={type}
           onChange={typeInputHandler}
         >

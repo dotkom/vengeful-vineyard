@@ -1,6 +1,7 @@
 import { Group, GroupUser } from "../../../../helpers/types";
 import { Select } from "../../../../components/select";
-import { AlcoholInput, TextInput } from "../../../../components/input";
+import { TextInput } from "./TextInput";
+import { AlcoholInput } from "./AlcoholInput";
 
 interface ModalInputProps {
   newPunishment: {
