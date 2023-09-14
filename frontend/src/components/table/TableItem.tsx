@@ -1,11 +1,11 @@
 import { GroupUser } from "../../helpers/types";
-import { PunishmentList } from "../leaderboard/PunishmentList";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "./accordion/Accordion";
 import { textToEmoji } from "../../helpers/emojies";
+import { PunishmentList } from "./punishment/PunishmentList";
 
 interface TableItemProps {
   user: GroupUser;
