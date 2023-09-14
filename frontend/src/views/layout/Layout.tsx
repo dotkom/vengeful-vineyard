@@ -4,9 +4,17 @@ import { Nav } from "../../components/nav";
 import axios from "axios";
 import { Outlet } from "react-router-dom";
 import { Spinner } from "../../components/spinner";
+import { Notification } from "../../components/notification";
+import { useState } from "react";
+import { NotificationContext } from "../../helpers/notificationContet";
 
 export const Layout = () => {
   const auth = useAuth();
+  const [notification, setNotification] = useState({
+    show: false,
+    title: "",
+    text: "",
+  });
 
   switch (auth.activeNavigator) {
     case "signinSilent":
@@ -47,11 +55,14 @@ export const Layout = () => {
 
   return (
     <main className="flex h-screen flex-col justify-between">
-      <Nav auth={auth} />
-      <div className="mb-auto">
-        <Outlet />
-      </div>
-      <Footer />
+      <NotificationContext.Provider value={{ notification, setNotification }}>
+        <Nav auth={auth} />
+        <div className="mb-auto">
+          <Outlet />
+        </div>
+        <Footer />
+        <Notification />
+      </NotificationContext.Provider>
     </main>
   );
 };
