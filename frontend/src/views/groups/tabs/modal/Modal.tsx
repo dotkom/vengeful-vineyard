@@ -1,7 +1,6 @@
 import React, { forwardRef, Fragment, useContext, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { SunIcon } from "@radix-ui/react-icons";
-import { CreatePunishmentTableRow } from "./createPunishmentTableRow";
 import {
   getAddPunishmentUrl,
   getGroupLeaderboardUrl,
@@ -16,6 +15,7 @@ import {
 } from "@tanstack/react-query";
 import { Group, GroupUser } from "../../../../helpers/types";
 import { NotificationContext } from "../../../../helpers/notificationContext";
+import { ModalInput } from "./ModalInput";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -135,7 +135,7 @@ export const Modal = forwardRef(
                           <p className="text-sm text-gray-500">
                             Her kan du lage en ny vinstraff
                           </p>
-                          <CreatePunishmentTableRow
+                          <ModalInput
                             newPunishment={newPunishment}
                             setNewPunishment={setNewPunishment}
                             data={data}

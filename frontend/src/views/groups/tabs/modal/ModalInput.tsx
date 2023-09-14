@@ -1,8 +1,8 @@
-import { AlcoholInput, TextInput } from "../../../../../components/input";
-import { Select } from "../../../../../components/select";
-import { Group, GroupUser } from "../../../../../helpers/types";
+import { Group, GroupUser } from "../../../../helpers/types";
+import { Select } from "../../../../components/select";
+import { AlcoholInput, TextInput } from "../../../../components/input";
 
-interface InputFormProps {
+interface ModalInputProps {
   newPunishment: {
     punishment_type_id: number;
     reason: string;
@@ -22,13 +22,13 @@ interface InputFormProps {
   setSelectedPerson: React.Dispatch<React.SetStateAction<GroupUser>>;
 }
 
-export const InputForm = ({
+export const ModalInput = ({
   newPunishment,
   setNewPunishment,
   data,
   selectedPerson,
   setSelectedPerson,
-}: InputFormProps) => {
+}: ModalInputProps) => {
   const textInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({ ...newPunishment, reason: evt.currentTarget.value });
 
