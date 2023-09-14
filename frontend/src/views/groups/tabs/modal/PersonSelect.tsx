@@ -1,21 +1,21 @@
 import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { classNames } from "../../helpers/classNames";
-import { Group, GroupUser } from "../../helpers/types";
-import { textToEmoji } from "../../helpers/emojies";
+import { classNames } from "../../../../helpers/classNames";
+import { Group, GroupUser } from "../../../../helpers/types";
+import { textToEmoji } from "../../../../helpers/emojies";
 
-interface SelectProps {
+interface PersonSelectProps {
   data: Group;
   selectedPerson: GroupUser;
   setSelectedPerson: React.Dispatch<React.SetStateAction<GroupUser>>;
 }
 
-export const Select = ({
+export const PersonSelect = ({
   data,
   selectedPerson,
   setSelectedPerson,
-}: SelectProps) => {
+}: PersonSelectProps) => {
   if (selectedPerson)
     return (
       <Listbox value={selectedPerson} onChange={setSelectedPerson}>

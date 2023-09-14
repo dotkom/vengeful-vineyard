@@ -1,6 +1,6 @@
 import { ComputerDesktopIcon } from "@heroicons/react/24/outline";
-import { classNames } from "../../helpers/classNames";
-import { Group } from "../../helpers/types";
+import { classNames } from "../../../helpers/classNames";
+import { Group } from "../../../helpers/types";
 
 interface TabItemProps {
   group: Group;

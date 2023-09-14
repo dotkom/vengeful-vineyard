@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Table } from "../../components/table";
-import { Tabs } from "../../components/tabs";
 import { GROUPS_URL, getGroupLeaderboardUrl } from "../../helpers/api";
 import axios, { AxiosResponse } from "axios";
 import { Group } from "../../helpers/types";
 import { useState } from "react";
+import { Tabs } from "./tabs/Tabs";
 
 /**
  * base
