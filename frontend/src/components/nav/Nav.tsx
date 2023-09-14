@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { PlusIcon } from "@heroicons/react/20/solid";
 import OnlineLogo from "../../assets/online.png";
 import { AuthContextProps } from "react-oidc-context";
 import { classNames } from "../../helpers/classNames";
