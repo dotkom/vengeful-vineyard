@@ -1,5 +1,5 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { Modal } from "../../../components/modal/Modal";
+import { Modal } from "./modal/Modal";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { Group } from "../../../helpers/types";

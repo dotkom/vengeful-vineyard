@@ -1,8 +1,11 @@
 import React, { forwardRef, Fragment, useContext, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { SunIcon } from "@radix-ui/react-icons";
-import { CreatePunishmentTableRow } from "../leaderboard/createPunishmentTableRow";
-import { getAddPunishmentUrl, getGroupLeaderboardUrl } from "../../helpers/api";
+import { CreatePunishmentTableRow } from "../../../../components/leaderboard/createPunishmentTableRow";
+import {
+  getAddPunishmentUrl,
+  getGroupLeaderboardUrl,
+} from "../../../../helpers/api";
 import axios, { AxiosResponse } from "axios";
 import {
   QueryObserverResult,
@@ -11,8 +14,8 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { Group, GroupUser } from "../../helpers/types";
-import { NotificationContext } from "../../helpers/notificationContext";
+import { Group, GroupUser } from "../../../../helpers/types";
+import { NotificationContext } from "../../../../helpers/notificationContext";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
