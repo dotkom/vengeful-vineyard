@@ -1,5 +1,5 @@
 import { InputForm } from "./InputForm";
-import { Group, GroupUser } from "../../../helpers/types";
+import { Group, GroupUser } from "../../../../../helpers/types";
 
 interface CreatePunishmentTableRowProps {
   newPunishment: {

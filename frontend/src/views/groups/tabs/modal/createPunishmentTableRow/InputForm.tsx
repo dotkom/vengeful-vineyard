@@ -1,6 +1,6 @@
-import { AlcoholInput, TextInput } from "../../input";
-import { Select } from "../../select";
-import { Group, GroupUser } from "../../../helpers/types";
+import { AlcoholInput, TextInput } from "../../../../../components/input";
+import { Select } from "../../../../../components/select";
+import { Group, GroupUser } from "../../../../../helpers/types";
 
 interface InputFormProps {
   newPunishment: {

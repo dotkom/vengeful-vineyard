@@ -1,7 +1,7 @@
 import React, { forwardRef, Fragment, useContext, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { SunIcon } from "@radix-ui/react-icons";
-import { CreatePunishmentTableRow } from "../../../../components/leaderboard/createPunishmentTableRow";
+import { CreatePunishmentTableRow } from "./createPunishmentTableRow";
 import {
   getAddPunishmentUrl,
   getGroupLeaderboardUrl,
