@@ -1,7 +1,7 @@
 import { Group, GroupUser } from "../../../../helpers/types";
-import { Select } from "../../../../components/select";
 import { TextInput } from "./TextInput";
 import { AlcoholInput } from "./AlcoholInput";
+import { PersonSelect } from "./PersonSelect";
 
 interface ModalInputProps {
   newPunishment: {
@@ -46,7 +46,7 @@ export const ModalInput = ({
 
   return (
     <div className="mb-4 flex flex-col gap-2 font-normal">
-      <Select
+      <PersonSelect
         data={data}
         selectedPerson={selectedPerson}
         setSelectedPerson={setSelectedPerson}
