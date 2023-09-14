@@ -15,6 +15,14 @@ export interface LeaderboardUser {
   punishments: Punishment[];
 }
 
+export interface PunishmentReaction {
+  punishment_reaction_id: number;
+  punishment_id: number;
+  created_by: number;
+  created_at: string;
+  emoji: string;
+}
+
 export interface Punishment {
   punishment_type_id: number;
   reason: string;
@@ -22,6 +30,7 @@ export interface Punishment {
   punishment_id: number;
   created_at: string;
   created_by: number;
+  reactions: PunishmentReaction[];
 }
 
 export interface User {

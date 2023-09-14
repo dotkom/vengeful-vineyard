@@ -6,6 +6,7 @@ from datetime import datetime
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
+from app.models.punishment_reaction import PunishmentReactionRead
 from app.types import GroupId, PunishmentId, PunishmentTypeId, UserId
 
 
@@ -24,6 +25,7 @@ class PunishmentOut(PunishmentCreate):
     punishment_id: PunishmentId
     created_at: datetime
     created_by: UserId
+    reactions: list[PunishmentReactionRead] = []
     # verified_at: Optional[datetime]
     # verified_by: Optional[UserId]
 

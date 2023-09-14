@@ -38,6 +38,10 @@ class GroupEventId(int):
     pass
 
 
+class PunishmentReactionId(int):
+    pass
+
+
 class InsertOrUpdateUser(TypedDict):
     id: UserId
     action: str
