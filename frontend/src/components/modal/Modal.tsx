@@ -21,7 +21,7 @@ export const Modal = forwardRef(
       punishment_type_id: 1,
       reason: "",
       reason_hidden: false,
-      amount: 0,
+      amount: 1,
     });
 
     const { isLoading, error, data } = useQuery({
@@ -31,6 +31,11 @@ export const Modal = forwardRef(
           .get(getGroupLeaderboardUrl(selectedGroup.group_id))
           .then((res: AxiosResponse<Group>) => {
             setSelectedPerson(res.data.members[0]);
+            setNewPunishment((prev) => ({
+              ...prev,
+              punishment_type_id:
+                res.data.punishment_types[0].punishment_type_id,
+            }));
             return res.data;
           }),
     });
@@ -38,8 +43,8 @@ export const Modal = forwardRef(
     const createPunishmentCall = async () => {
       if (selectedPerson) {
         const ADD_PUNISHMENT_URL = getAddPunishmentUrl(
-          selectedGroup.ow_group_id,
-          selectedPerson.ow_user_id
+          selectedGroup.group_id,
+          selectedPerson.user_id
         );
         const res: AxiosResponse<string> = await axios.post(
           ADD_PUNISHMENT_URL,
