@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { Punishment } from "../../../helpers/types";
-import { EmojiPicker } from "./emojiPicker/EmojiPicker";
+import { EmojiPicker } from "./emojies/EmojiPicker";
+import { ReactionsDisplay } from "./emojies/ReactionDisplay";
 
 interface PunishmentItemProps {
   punishment: Punishment;
@@ -33,7 +34,10 @@ export const PunishmentItem = ({ punishment }: PunishmentItemProps) => {
       <div className="text-gray-500' absolute right-8 top-4 font-normal">
         {formattedDate}
       </div>
-      <EmojiPicker punishment={punishment} />
+      <div>
+        <EmojiPicker punishment={punishment} />
+        <ReactionsDisplay reactions={punishment.reactions} />
+      </div>
     </div>
   );
 };
