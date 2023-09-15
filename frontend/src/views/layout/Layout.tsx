@@ -25,7 +25,7 @@ export const Layout = () => {
 
   if (auth.isLoading) {
     return (
-      <main className="flex h-screen flex-col justify-between">
+      <main className="flex h-screen flex-col justify-between bg-gray-50">
         <Nav auth={auth} />
         <div className="flex items-center justify-center">
           <Spinner />
@@ -37,7 +37,7 @@ export const Layout = () => {
 
   if (auth.error) {
     return (
-      <main className="flex h-screen flex-col justify-between">
+      <main className="flex h-screen flex-col justify-between bg-gray-50">
         <Nav auth={auth} />
         <div className="flex items-center justify-center">
           <h1>Ai ai ai ai ai!!!</h1>
