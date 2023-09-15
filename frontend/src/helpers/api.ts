@@ -11,3 +11,6 @@ export const ADD_PUNISHMENT = BASE_URL + "/group/1/user/1/punishment";
 
 export const getAddPunishmentUrl = (groupId: number, userId: number) =>
   BASE_URL + `/group/${groupId}/user/${userId}/punishment`;
+
+export const getAddReactionUrl = (punishmentId: number) =>
+  BASE_URL + `/punishment/${punishmentId}/reaction`;

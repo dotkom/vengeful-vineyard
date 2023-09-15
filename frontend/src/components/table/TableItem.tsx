@@ -1,4 +1,4 @@
-import { GroupUser } from "../../helpers/types";
+import { Group, GroupUser } from "../../helpers/types";
 import {
   AccordionContent,
   AccordionItem,
@@ -6,12 +6,20 @@ import {
 } from "./accordion/Accordion";
 import { textToEmoji } from "../../helpers/emojies";
 import { PunishmentList } from "./punishment/PunishmentList";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "@tanstack/react-query";
 
 interface TableItemProps {
   user: GroupUser;
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>;
 }
 
-export const TableItem = ({ user }: TableItemProps) => {
+export const TableItem = ({ user, dataRefetch }: TableItemProps) => {
   const totalPunishment: React.ReactNode[] = [];
   user.punishments.forEach((punishment) => {
     {
@@ -46,7 +54,7 @@ export const TableItem = ({ user }: TableItemProps) => {
         </div>
       </AccordionTrigger>
       <AccordionContent>
-        <PunishmentList user={user} />
+        <PunishmentList user={user} dataRefetch={dataRefetch} />
       </AccordionContent>
     </AccordionItem>
   );

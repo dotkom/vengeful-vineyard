@@ -2,13 +2,21 @@ import * as Accordion from "@radix-ui/react-accordion";
 import { TableItem } from "./TableItem";
 import { Group } from "../../helpers/types";
 import { SkeletonTableItem } from "./SkeletonTableItem";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "@tanstack/react-query";
 
 interface TableProps {
   data: Group | undefined;
   isLoading: boolean;
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>;
 }
 
-export const Table = ({ data }: TableProps) => (
+export const Table = ({ data, dataRefetch }: TableProps) => (
   <ul role="list">
     <Accordion.Root
       type="single"
@@ -19,7 +27,11 @@ export const Table = ({ data }: TableProps) => (
       {data ? (
         <>
           {data.members.map((user) => (
-            <TableItem key={user.user_id} user={user} />
+            <TableItem
+              key={user.user_id}
+              user={user}
+              dataRefetch={dataRefetch}
+            />
           ))}
         </>
       ) : (
