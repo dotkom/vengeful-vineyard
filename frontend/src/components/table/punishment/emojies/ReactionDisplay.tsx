@@ -1,4 +1,3 @@
-import { useAuth } from "react-oidc-context";
 import { PunishmentReaction } from "../../../../helpers/types";
 
 interface ReactionsDisplayProps {
@@ -10,7 +9,6 @@ interface EmojiCounts {
 }
 
 export const ReactionsDisplay = ({ reactions }: ReactionsDisplayProps) => {
-  const auth = useAuth();
   const emojiCounts = reactions.reduce((acc: EmojiCounts, reaction) => {
     acc[reaction.emoji] = (acc[reaction.emoji] || 0) + 1;
     return acc;
