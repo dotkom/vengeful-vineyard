@@ -12,7 +12,7 @@ interface PunishmentItemProps {
   punishment: Punishment;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<Group, unknown>>;
+  ) => Promise<QueryObserverResult<any, unknown>>;
 }
 
 export const PunishmentItem = ({
