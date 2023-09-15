@@ -1,12 +1,21 @@
 import { Fragment } from "react";
 import { LeaderboardUser } from "../../helpers/types";
 import { PunishmentItem } from "./PunishmentItem";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "@tanstack/react-query";
+import { Group } from "../../../helpers/types";
 
 interface PunishmentListProps {
   user: LeaderboardUser;
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>;
 }
 
-export const PunishmentList = ({ user }: PunishmentListProps) => {
+export const PunishmentList = ({ user, dataRefetch }: PunishmentListProps) => {
   if (user.punishments.length === 0) {
     return (
       <Fragment>
@@ -21,6 +30,7 @@ export const PunishmentList = ({ user }: PunishmentListProps) => {
         <PunishmentItem
           punishment={punishment}
           key={punishment.punishment_id}
+          dataRefetch={dataRefetch}
         />
       ))}
     </Fragment>

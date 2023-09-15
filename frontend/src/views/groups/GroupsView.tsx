@@ -44,7 +44,7 @@ export const GroupsView = () => {
         groups={groups}
         dataRefetch={refetch}
       />
-      <Table data={data} isLoading={isLoading} />
+      <Table data={data} isLoading={isLoading} dataRefetch={refetch} />
     </section>
   );
 };

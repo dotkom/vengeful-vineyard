@@ -1,15 +1,24 @@
 import { Fragment, useState } from "react";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import { Menu, Transition } from "@headlessui/react";
-import { Punishment } from "../../../../helpers/types";
+import { Group, Punishment } from "../../../../helpers/types";
 import { getAddReactionUrl } from "../../../../helpers/api";
 import axios, { AxiosResponse } from "axios";
-import { useMutation } from "@tanstack/react-query";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useMutation,
+} from "@tanstack/react-query";
 
 interface EmojiPickerProps {
   punishment: Punishment;
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>;
 }
-export const EmojiPicker = ({ punishment }: EmojiPickerProps) => {
+
+export const EmojiPicker = ({ punishment, dataRefetch }: EmojiPickerProps) => {
   const [selectedEmoji, setSelectedEmoji] = useState("👍");
   const emojis = ["👍", "👎", "😂", "❤️", "🔥", "🚀"];
 
@@ -23,7 +32,7 @@ export const EmojiPicker = ({ punishment }: EmojiPickerProps) => {
 
   const { mutate } = useMutation(addReactionCall, {
     onSuccess: () => {
-      console.log("Todo: Handle success");
+      dataRefetch();
     },
     onError: () => {
       console.log("Todo: Handle error");

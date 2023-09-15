@@ -1,13 +1,24 @@
 import dayjs from "dayjs";
-import { Punishment } from "../../../helpers/types";
+import { Group, Punishment } from "../../../helpers/types";
 import { EmojiPicker } from "./emojies/EmojiPicker";
 import { ReactionsDisplay } from "./emojies/ReactionDisplay";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "@tanstack/react-query";
 
 interface PunishmentItemProps {
   punishment: Punishment;
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>;
 }
 
-export const PunishmentItem = ({ punishment }: PunishmentItemProps) => {
+export const PunishmentItem = ({
+  punishment,
+  dataRefetch,
+}: PunishmentItemProps) => {
   const date = dayjs(punishment.created_at);
   const formattedDate = date.format("DD. MMM YY");
 
@@ -35,7 +46,7 @@ export const PunishmentItem = ({ punishment }: PunishmentItemProps) => {
         {formattedDate}
       </div>
       <div>
-        <EmojiPicker punishment={punishment} />
+        <EmojiPicker punishment={punishment} dataRefetch={dataRefetch} />
         <ReactionsDisplay reactions={punishment.reactions} />
       </div>
     </div>
