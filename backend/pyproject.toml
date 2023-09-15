@@ -18,6 +18,7 @@ pytz = "^2022.6"
 types-pytz = "^2022.6.0.1"
 fastapi = "^0.86.0"
 pyyaml = ">=6.0.1"
+emoji = "^2.8.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"

@@ -22,7 +22,9 @@ class Users:
         conn: Optional[Pool] = None,
     ) -> int:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            return await conn.fetchval("SELECT COUNT(*) FROM users")  # type: ignore
+            res = await conn.fetchval("SELECT COUNT(*) FROM users")
+            assert isinstance(res, int)
+            return res
 
     async def get_leaderboard(
         self,

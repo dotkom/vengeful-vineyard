@@ -74,10 +74,12 @@ class GroupEvents:
     ) -> int:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = "SELECT COUNT(*) FROM group_events WHERE group_id = $1"
-            return await conn.fetchval(  # type: ignore
+            res = await conn.fetchval(
                 query,
                 group_id,
             )
+            assert isinstance(res, int)
+            return res
 
     async def get_all(
         self,

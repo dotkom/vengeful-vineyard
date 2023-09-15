@@ -1,3 +1,4 @@
+import json
 from typing import Any, Optional
 
 from asyncpg.pool import Pool, PoolAcquireContext
@@ -14,16 +15,19 @@ class MaybeAcquire:
         connection: Optional[PoolAcquireContext],
         pool: Pool,
     ) -> None:
-        self.connection = connection
+        self._connection = connection
         self.pool = pool
         self._cleanup = False
 
     async def __aenter__(self) -> PoolAcquireContext:
-        if self.connection is None:
+        if self._connection is None:
             self._cleanup = True
             self._connection = c = await self.pool.acquire()
+            await c.set_type_codec(
+                "json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
+            )
             return c
-        return self.connection
+        return self._connection
 
     async def __aexit__(self, *args: Any) -> None:
         if self._cleanup:

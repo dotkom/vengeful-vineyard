@@ -523,6 +523,59 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
+    async def test_create_punishment_reaction_on_self_user_invalid_emoji(
+        self, client: Any
+    ) -> None:
+        response = await client.post(
+            f"/punishment/1/reaction",
+            json={
+                "emoji": "g",
+            },
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 400
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_create_punishment_reaction_on_self_user(self, client: Any) -> None:
+        response = await client.post(
+            f"/punishment/1/reaction",
+            json={
+                "emoji": "👍",
+            },
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_punishment_reaction_exists(self, client: Any) -> None:
+        response = await client.get(
+            f"/group/1/user/{SELF_USER_ID}",
+        )
+        assert response.status_code == 200
+        assert len(response.json()["punishments"][0]["reactions"]) == 1
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_delete_reaction_from_wrong_user(self, client: Any) -> None:
+        response = await client.delete(
+            f"/punishment/1/reaction",
+            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 404
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_delete_reaction_from_self_user(self, client: Any) -> None:
+        response = await client.delete(
+            f"/punishment/1/reaction",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        check_response_time(response)
+
+    @pytest.mark.asyncio
     async def test_add_paid_log_entry(self, client: Any) -> None:
         response = await client.post(
             "group/1/user/1/punishments/paid",
@@ -725,6 +778,7 @@ class TestWithDB_OW:
                             "created_at": "",
                             "punishment_id": 3,
                             "punishment_type_id": 2,
+                            "reactions": [],
                             "reason": "",
                             "reason_hidden": True,
                         },
@@ -734,6 +788,7 @@ class TestWithDB_OW:
                             "created_at": "",
                             "punishment_id": 2,
                             "punishment_type_id": 2,
+                            "reactions": [],
                             "reason": "Very good reason2",
                             "reason_hidden": False,
                         },
@@ -753,6 +808,7 @@ class TestWithDB_OW:
                             "created_at": "",
                             "punishment_id": 4,
                             "punishment_type_id": 1,
+                            "reactions": [],
                             "reason": "Test",
                             "reason_hidden": False,
                         }
