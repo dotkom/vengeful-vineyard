@@ -6,16 +6,6 @@ import { Group } from "../../helpers/types";
 import { useState } from "react";
 import { Tabs } from "./tabs/Tabs";
 
-/**
- * base
- 1: /group/me
- 2: /group/{group_id}
- 3: /group/{group_id}/totalPunishmentValue
-
- *  wall of shame
- 1: /user/leaderboard
- */
-
 export const GroupsView = () => {
   const [selectedGroup, setSelectedGroup] = useState<Group | undefined>(
     undefined
@@ -44,7 +34,7 @@ export const GroupsView = () => {
         groups={groups}
         dataRefetch={refetch}
       />
-      <Table data={data} isLoading={isLoading} dataRefetch={refetch} />
+      <Table groupData={data} isLoading={isLoading} dataRefetch={refetch} />
     </section>
   );
 };

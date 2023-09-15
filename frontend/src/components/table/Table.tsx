@@ -1,6 +1,6 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { TableItem } from "./TableItem";
-import { Group } from "../../helpers/types";
+import { Group, Leaderboard, LeaderboardUser } from "../../helpers/types";
 import { SkeletonTableItem } from "./SkeletonTableItem";
 import {
   QueryObserverResult,
@@ -9,14 +9,19 @@ import {
 } from "@tanstack/react-query";
 
 interface TableProps {
-  data: Group | undefined;
+  groupData?: Group | undefined;
+  leaderboardData?: Leaderboard | undefined;
   isLoading: boolean;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<Group, unknown>>;
+  ) => Promise<QueryObserverResult<any, unknown>>;
 }
 
-export const Table = ({ data, dataRefetch }: TableProps) => (
+export const Table = ({
+  groupData = undefined,
+  leaderboardData = undefined,
+  dataRefetch,
+}: TableProps) => (
   <ul role="list">
     <Accordion.Root
       type="single"
@@ -24,9 +29,9 @@ export const Table = ({ data, dataRefetch }: TableProps) => (
       collapsible
       className="max-w-5xl divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:m-auto"
     >
-      {data ? (
+      {groupData ? (
         <>
-          {data.members.map((user) => (
+          {groupData.members.map((user) => (
             <TableItem
               key={user.user_id}
               user={user}
@@ -36,9 +41,23 @@ export const Table = ({ data, dataRefetch }: TableProps) => (
         </>
       ) : (
         <>
-          {[...Array(3)].map((e, i) => (
-            <SkeletonTableItem key={i} />
-          ))}
+          {leaderboardData ? (
+            <>
+              {leaderboardData.results.map((user) => (
+                <TableItem
+                  key={user.user_id}
+                  user={user}
+                  dataRefetch={dataRefetch}
+                />
+              ))}
+            </>
+          ) : (
+            <>
+              {[...Array(3)].map((e, i) => (
+                <SkeletonTableItem key={i} />
+              ))}
+            </>
+          )}
         </>
       )}
     </Accordion.Root>

@@ -6,13 +6,12 @@ import {
   RefetchOptions,
   RefetchQueryFilters,
 } from "@tanstack/react-query";
-import { Group } from "../../../helpers/types";
 
 interface PunishmentListProps {
   user: LeaderboardUser;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<Group, unknown>>;
+  ) => Promise<QueryObserverResult<any, unknown>>;
 }
 
 export const PunishmentList = ({ user, dataRefetch }: PunishmentListProps) => {

@@ -16,7 +16,7 @@ interface TableItemProps {
   user: GroupUser;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<Group, unknown>>;
+  ) => Promise<QueryObserverResult<any, unknown>>;
 }
 
 export const TableItem = ({ user, dataRefetch }: TableItemProps) => {

@@ -15,7 +15,7 @@ interface EmojiPickerProps {
   punishment: Punishment;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<Group, unknown>>;
+  ) => Promise<QueryObserverResult<any, unknown>>;
 }
 
 export const EmojiPicker = ({ punishment, dataRefetch }: EmojiPickerProps) => {
