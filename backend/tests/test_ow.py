@@ -1,5 +1,6 @@
 # flake8: noqa
 
+import copy
 from typing import Any
 
 import pytest
@@ -7,7 +8,7 @@ import pytest
 from tests.fixtures import client, mock
 from tests.response_time import check_response_time
 
-ME_RESPONSE = [
+GROUPS_ME_RESPONSE = [
     {
         "group_id": 1,
         "ow_group_id": 4,
@@ -19,6 +20,17 @@ ME_RESPONSE = [
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
     }
 ]
+
+USERS_ME_RESPONSE = {
+    "ow_user_id": 2581,
+    "first_name": "Brage",
+    "last_name": "",
+    "email": "email1@email.com",
+    "groups": GROUPS_ME_RESPONSE,
+}
+
+USERS_ME_RESPONSE_EMPTY_GROUPS = copy.copy(USERS_ME_RESPONSE)
+USERS_ME_RESPONSE_EMPTY_GROUPS["groups"] = []
 
 ME_UPDATED_RESPONSE = [
     {
@@ -322,7 +334,38 @@ class TestWithDB_OW:
         )
 
         assert response.status_code == 200
-        assert response.json() == ME_RESPONSE
+        assert response.json() == GROUPS_ME_RESPONSE
+
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_my_user(
+        self,
+        client: Any,
+        mock: Any,
+    ) -> None:
+        response = await client.get(
+            "/user/me", headers={"Authorization": SELF_USER_AUTHORIZATION}
+        )
+
+        assert response.status_code == 200
+        assert response.json() == USERS_ME_RESPONSE
+
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_get_my_user_empty_groups(
+        self,
+        client: Any,
+        mock: Any,
+    ) -> None:
+        response = await client.get(
+            "/user/me?include_groups=false",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == USERS_ME_RESPONSE_EMPTY_GROUPS
 
         check_response_time(response)
 
@@ -337,13 +380,13 @@ class TestWithDB_OW:
         )
 
         assert response.status_code == 200
-        assert response.json() == ME_RESPONSE
+        assert response.json() == GROUPS_ME_RESPONSE
 
         check_response_time(response)
 
     @pytest.mark.asyncio
     async def test_get_my_groups_members(self, client: Any) -> None:
-        for c, group in enumerate(ME_RESPONSE):
+        for c, group in enumerate(GROUPS_ME_RESPONSE):
             response = await client.get(f"/group/{group['group_id']}")
 
             assert response.status_code == 200

@@ -4,11 +4,11 @@ User endpoints
 
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.api import APIRoute, Request
+from app.api import APIRoute, Request, oidc
 from app.exceptions import DatabaseIntegrityException, NotFound
-from app.models.group import Group
+from app.models.group import Group, UserWithGroups
 from app.models.user import LeaderboardUser, User, UserCreate
 from app.types import UserId
 from app.utils.pagination import Page, Pagination
@@ -18,6 +18,46 @@ router = APIRouter(
     tags=["User"],
     route_class=APIRoute,
 )
+
+
+@router.get(
+    "/me",
+    response_model=UserWithGroups,
+    dependencies=[Depends(oidc)],
+)
+async def get_me(
+    request: Request,
+    include_groups: bool = Query(title="Include groups", default=True),
+    wait_for_updates: bool = Query(title="Wait for updates", default=True),
+) -> UserWithGroups:
+    app = request.app
+    access_token = request.raise_if_missing_authorization()
+
+    if access_token is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+
+    try:
+        user_id, ow_user_id = await app.ow_sync.sync_for_access_token(access_token)
+    except NotFound as exc:
+        raise HTTPException(status_code=401, detail="Invalid access token") from exc
+
+    await app.ow_sync.sync_for_user(
+        ow_user_id,
+        user_id,
+        wait_for_updates=wait_for_updates,
+    )
+
+    async with app.db.pool.acquire() as conn:
+        groups = []
+        if include_groups:
+            groups = await app.db.users.get_groups(user_id, conn=conn)
+
+        user = await app.db.users.get(user_id=user_id, conn=conn)
+
+        return UserWithGroups(
+            groups=groups,
+            **dict(user),
+        )
 
 
 @router.get(

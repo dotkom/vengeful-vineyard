@@ -77,6 +77,38 @@ async def mock() -> AsyncGenerator[aioresponses, None]:
             payload=ow_group_users_response,
         )
 
+        # TestOW.test_get_my_user()
+        m.get(
+            re.compile(
+                rf"{ESCAPED_BASE_OLD_ONLINE}/api/v1/group/online-groups\?members__user=\d+"
+            ),
+            status=200,
+            payload=ow_groups_for_user_response,
+        )
+        m.get(
+            re.compile(
+                rf"{ESCAPED_BASE_OLD_ONLINE}\/api\/v1\/group\/online-groups\/\d+\/group-users"
+            ),
+            status=200,
+            payload=ow_group_users_response,
+        )
+
+        # TestOW.test_get_my_user_empty_groups()
+        m.get(
+            re.compile(
+                rf"{ESCAPED_BASE_OLD_ONLINE}/api/v1/group/online-groups\?members__user=\d+"
+            ),
+            status=200,
+            payload=ow_groups_for_user_response,
+        )
+        m.get(
+            re.compile(
+                rf"{ESCAPED_BASE_OLD_ONLINE}\/api\/v1\/group\/online-groups\/\d+\/group-users"
+            ),
+            status=200,
+            payload=ow_group_users_response,
+        )
+
         # TestOW.test_get_my_groups_other_user_in_group()
         m.get(
             f"{BASE_OLD_ONLINE}/api/v1/profile",

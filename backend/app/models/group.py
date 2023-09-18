@@ -9,6 +9,7 @@ from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 from app.models.group_user import GroupUser
 from app.models.punishment_type import PunishmentTypeRead
+from app.models.user import UserBase
 from app.types import GroupId
 
 
@@ -28,3 +29,7 @@ class Group(GroupBase):
 
 class GroupCreate(GroupBase):
     pass
+
+
+class UserWithGroups(UserBase):
+    groups: list[Group]
