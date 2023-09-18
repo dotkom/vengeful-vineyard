@@ -765,6 +765,14 @@ optional = false
 python-versions = ">=3.6,<4.0"
 
 [[package]]
+name = "types-emoji"
+version = "2.1.0.3"
+description = "Typing stubs for emoji"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "types-pytz"
 version = "2022.6.0.1"
 description = "Typing stubs for pytz"
@@ -849,7 +857,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0e2f084dc1e9a09cb278326a54b45f4610d8c0549744a26cf01b66c31698251e"
+content-hash = "b94391936be177d1f53381c18ff2190320fe1ec31f68ddeaefdf62cc5b7b7c8a"
 
 [metadata.files]
 aiohttp = [
@@ -1550,6 +1558,10 @@ tomli = [
 tomlkit = [
     {file = "tomlkit-0.11.1-py3-none-any.whl", hash = "sha256:1c5bebdf19d5051e2e1de6cf70adfc5948d47221f097fcff7a3ffc91e953eaf5"},
     {file = "tomlkit-0.11.1.tar.gz", hash = "sha256:61901f81ff4017951119cd0d1ed9b7af31c821d6845c8c477587bbdcd5e5854e"},
+]
+types-emoji = [
+    {file = "types-emoji-2.1.0.3.tar.gz", hash = "sha256:98ddb0ff5f48622550c431206e4dbfcbde8ca8bc03fcfbb9962a778d2049aa13"},
+    {file = "types_emoji-2.1.0.3-py3-none-any.whl", hash = "sha256:32fe5cf02c4834bb59579380f600a89d1471571fb56e36465cbd0c7d95f669ca"},
 ]
 types-pytz = [
     {file = "types-pytz-2022.6.0.1.tar.gz", hash = "sha256:d078196374d1277e9f9984d49373ea043cf2c64d5d5c491fbc86c258557bd46f"},

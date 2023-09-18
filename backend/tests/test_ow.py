@@ -558,6 +558,28 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
+    async def test_replace_punishment_reaction_on_self_user(self, client: Any) -> None:
+        response = await client.post(
+            f"/punishment/1/reaction",
+            json={
+                "emoji": "🧡",
+            },
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_punishment_reaction_was_replaced(self, client: Any) -> None:
+        response = await client.get(
+            f"/group/1/user/{SELF_USER_ID}",
+        )
+        assert response.status_code == 200
+        assert len(response.json()["punishments"][0]["reactions"]) == 1
+        assert response.json()["punishments"][0]["reactions"][0]["emoji"] == "🧡"
+        check_response_time(response)
+
+    @pytest.mark.asyncio
     async def test_delete_reaction_from_wrong_user(self, client: Any) -> None:
         response = await client.delete(
             f"/punishment/1/reaction",
