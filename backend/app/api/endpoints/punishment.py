@@ -91,21 +91,24 @@ async def post_punishment_reaction(
                 detail="You must be a member of the group to perform this action.",
             )
 
-        res = await app.db.punishments.has_reaction_for_punishment(
-            punishment_id,
-            user_id,
-            conn=conn,
-        )
-        if res:
-            raise HTTPException(
-                status_code=403,
-                detail="You have already reacted to this punishment.",
-            )
-
         if not is_emoji(punishment_reaction.emoji):
             raise HTTPException(
                 status_code=400,
                 detail="Emoji is invalid.",
+            )
+
+        try:
+            reaction = await app.db.punishments.get_punishment_reaction_for_user(
+                punishment_id=punishment_id,
+                user_id=user_id,
+                conn=conn,
+            )
+        except NotFound:
+            pass
+        else:
+            await app.db.punishment_reactions.delete(
+                punishment_reaction_id=reaction.punishment_reaction_id,
+                conn=conn,
             )
 
         res_punishment_reaction = await app.db.punishment_reactions.insert(
