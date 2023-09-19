@@ -23,6 +23,7 @@ GROUPS_ME_RESPONSE = [
 
 USERS_ME_RESPONSE = {
     "ow_user_id": 2581,
+    "user_id": 1,
     "first_name": "Brage",
     "last_name": "",
     "email": "email1@email.com",
