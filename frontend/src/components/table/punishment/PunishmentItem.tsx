@@ -52,8 +52,14 @@ export const PunishmentItem = ({
   const date = dayjs(punishment.created_at);
   const formattedDate = date.format("DD. MMM YY");
 
+  const isWallOfShame = /wall-of-shame/.test(window.location.href);
+
   return (
-    <div className="relative flex border-b border-l-8 border-l-indigo-600 pb-8 md:border-l-4">
+    <div
+      className={`relative flex border-b border-l-8 border-l-indigo-600 ${
+        isWallOfShame ? "pb-0" : "pb-8"
+      } md:border-l-4`}
+    >
       <div className="text-left font-light">
         <p className="m-4">
           <span className="block">{punishment.reason}</span>
@@ -75,15 +81,17 @@ export const PunishmentItem = ({
       <div className="text-gray-500' absolute right-8 top-4 font-normal">
         {formattedDate}
       </div>
-      <div>
-        <EmojiPicker mutate={mutate} setSelectedEmoji={setSelectedEmoji} />
-        <ReactionsDisplay
-          mutate={mutate}
-          removeMutation={removeMutation}
-          setSelectedEmoji={setSelectedEmoji}
-          reactions={punishment.reactions}
-        />
-      </div>
+      {!isWallOfShame && (
+        <div>
+          <EmojiPicker mutate={mutate} setSelectedEmoji={setSelectedEmoji} />
+          <ReactionsDisplay
+            mutate={mutate}
+            removeMutation={removeMutation}
+            setSelectedEmoji={setSelectedEmoji}
+            reactions={punishment.reactions}
+          />
+        </div>
+      )}
     </div>
   );
 };
