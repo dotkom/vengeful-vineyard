@@ -1,43 +1,15 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import { Menu, Transition } from "@headlessui/react";
-import { Group, Punishment } from "../../../../helpers/types";
-import { getAddReactionUrl } from "../../../../helpers/api";
-import axios, { AxiosResponse } from "axios";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-  useMutation,
-} from "@tanstack/react-query";
+import { UseMutateFunction } from "@tanstack/react-query";
 
 interface EmojiPickerProps {
-  punishment: Punishment;
-  dataRefetch: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<any, unknown>>;
+  mutate: UseMutateFunction<string, unknown, void, unknown>;
+  setSelectedEmoji: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const EmojiPicker = ({ punishment, dataRefetch }: EmojiPickerProps) => {
-  const [selectedEmoji, setSelectedEmoji] = useState("👍");
+export const EmojiPicker = ({ mutate, setSelectedEmoji }: EmojiPickerProps) => {
   const emojis = ["👍", "👎", "😂", "❤️", "🔥", "🚀"];
-
-  const addReactionCall = async () => {
-    const ADD_REACTION_URL = getAddReactionUrl(punishment.punishment_id);
-    const res: AxiosResponse<string> = await axios.post(ADD_REACTION_URL, {
-      emoji: selectedEmoji,
-    });
-    return res.data;
-  };
-
-  const { mutate } = useMutation(addReactionCall, {
-    onSuccess: () => {
-      dataRefetch();
-    },
-    onError: () => {
-      console.log("Todo: Handle error");
-    },
-  });
 
   return (
     <div className="absolute -bottom-1 left-0">

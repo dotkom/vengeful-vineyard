@@ -7,6 +7,7 @@ import { Spinner } from "../../components/spinner";
 import { Notification } from "../../components/notification";
 import { useState } from "react";
 import { NotificationContext } from "../../helpers/notificationContext";
+import { UserContext } from "../../helpers/userContext";
 
 export const Layout = () => {
   const auth = useAuth();
@@ -14,6 +15,9 @@ export const Layout = () => {
     show: false,
     title: "",
     text: "",
+  });
+  const [user, setUser] = useState({
+    user_id: 0,
   });
 
   switch (auth.activeNavigator) {
@@ -55,14 +59,16 @@ export const Layout = () => {
 
   return (
     <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50">
-      <NotificationContext.Provider value={{ notification, setNotification }}>
-        <Nav auth={auth} />
-        <div className="mb-auto">
-          <Outlet />
-        </div>
-        <Footer />
-        <Notification />
-      </NotificationContext.Provider>
+      <UserContext.Provider value={{ user, setUser }}>
+        <NotificationContext.Provider value={{ notification, setNotification }}>
+          <Nav auth={auth} />
+          <div className="mb-auto">
+            <Outlet />
+          </div>
+          <Footer />
+          <Notification />
+        </NotificationContext.Provider>
+      </UserContext.Provider>
     </main>
   );
 };

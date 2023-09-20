@@ -1,12 +1,16 @@
 import dayjs from "dayjs";
-import { Group, Punishment } from "../../../helpers/types";
+import { Punishment } from "../../../helpers/types";
 import { EmojiPicker } from "./emojies/EmojiPicker";
 import { ReactionsDisplay } from "./emojies/ReactionDisplay";
 import {
   QueryObserverResult,
   RefetchOptions,
   RefetchQueryFilters,
+  useMutation,
 } from "@tanstack/react-query";
+import { useState } from "react";
+import { getAddReactionUrl } from "../../../helpers/api";
+import axios, { AxiosResponse } from "axios";
 
 interface PunishmentItemProps {
   punishment: Punishment;
@@ -19,6 +23,32 @@ export const PunishmentItem = ({
   punishment,
   dataRefetch,
 }: PunishmentItemProps) => {
+  const [selectedEmoji, setSelectedEmoji] = useState("👍");
+
+  const addReactionCall = async () => {
+    const ADD_REACTION_URL = getAddReactionUrl(punishment.punishment_id);
+    const res: AxiosResponse<string> = await axios.post(ADD_REACTION_URL, {
+      emoji: selectedEmoji,
+    });
+    return res.data;
+  };
+
+  const removeReactionCall = async () => {
+    const REMOVE_REACTION_URL = getAddReactionUrl(punishment.punishment_id);
+    const res: AxiosResponse<string> = await axios.delete(REMOVE_REACTION_URL);
+    return res.data;
+  };
+
+  const { mutate } = useMutation(addReactionCall, {
+    onSuccess: () => dataRefetch(),
+    onError: () => console.log("Todo: Handle error"),
+  });
+
+  const { mutate: removeMutation } = useMutation(removeReactionCall, {
+    onSuccess: () => dataRefetch(),
+    onError: () => console.log("Todo: Handle error"),
+  });
+
   const date = dayjs(punishment.created_at);
   const formattedDate = date.format("DD. MMM YY");
 
@@ -46,8 +76,13 @@ export const PunishmentItem = ({
         {formattedDate}
       </div>
       <div>
-        <EmojiPicker punishment={punishment} dataRefetch={dataRefetch} />
-        <ReactionsDisplay reactions={punishment.reactions} />
+        <EmojiPicker mutate={mutate} setSelectedEmoji={setSelectedEmoji} />
+        <ReactionsDisplay
+          mutate={mutate}
+          removeMutation={removeMutation}
+          setSelectedEmoji={setSelectedEmoji}
+          reactions={punishment.reactions}
+        />
       </div>
     </div>
   );
