@@ -1,3 +1,12 @@
+export interface User {
+  ow_user_id: number;
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  groups: Group[];
+}
+
 export interface Leaderboard {
   total: number;
   next: string;
@@ -31,14 +40,6 @@ export interface Punishment {
   created_at: string;
   created_by: number;
   reactions: PunishmentReaction[];
-}
-
-export interface User {
-  ow_user_id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  user_id: number;
 }
 
 export interface Group {

@@ -1,29 +1,34 @@
 import { useQuery } from "@tanstack/react-query";
 import { Table } from "../../components/table";
-import { GROUPS_URL, getGroupLeaderboardUrl } from "../../helpers/api";
+import { ME_URL, getGroupLeaderboardUrl } from "../../helpers/api";
 import axios, { AxiosResponse } from "axios";
-import { Group } from "../../helpers/types";
-import { useState } from "react";
+import { Group, User } from "../../helpers/types";
+import { useContext, useState } from "react";
 import { Tabs } from "./tabs/Tabs";
+import { UserContext } from "../../helpers/userContext";
 
 export const GroupsView = () => {
   const [selectedGroup, setSelectedGroup] = useState<Group | undefined>(
     undefined
   );
+  const { setUser } = useContext(UserContext);
 
-  const { data: groups } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["groupsData"],
     queryFn: () =>
-      axios.get(GROUPS_URL).then((res: AxiosResponse<Group[]>) => res.data),
+      axios.get(ME_URL).then((res: AxiosResponse<User>) => {
+        setUser({ user_id: res.data.user_id });
+        return res.data;
+      }),
   });
 
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["groupLeaderboard"],
     queryFn: () =>
       axios
-        .get(getGroupLeaderboardUrl(groups[0].group_id))
+        .get(getGroupLeaderboardUrl(user.groups[0].group_id))
         .then((res: AxiosResponse<Group>) => res.data),
-    enabled: !!groups,
+    enabled: !!user,
   });
 
   return (
@@ -31,7 +36,7 @@ export const GroupsView = () => {
       <Tabs
         selectedGroup={selectedGroup}
         setSelectedGroup={setSelectedGroup}
-        groups={groups}
+        groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />
       <Table groupData={data} isLoading={isLoading} dataRefetch={refetch} />

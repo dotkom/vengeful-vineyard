@@ -5,6 +5,8 @@ export const getGroupLeaderboardUrl = (groupId: number) =>
 
 export const LEADERBOARD_URL = BASE_URL + "/user/leaderboard";
 
+export const ME_URL = BASE_URL + "/user/me";
+
 export const GROUPS_URL = BASE_URL + "/group/me";
 
 export const ADD_PUNISHMENT = BASE_URL + "/group/1/user/1/punishment";
