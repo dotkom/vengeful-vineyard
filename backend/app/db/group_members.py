@@ -127,7 +127,7 @@ class GroupMembers:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """SELECT gp.*, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions FROM group_punishments gp
                         LEFT JOIN punishment_reactions pr ON pr.punishment_id = gp.punishment_id
-                        WHERE group_id = $1 AND user_id = $2
+                        WHERE group_id = $1 AND user_id = $2 AND pr.created_by IN (SELECT user_id FROM group_members WHERE group_id = $1)
                         GROUP BY gp.punishment_id
                     """
 
@@ -145,11 +145,11 @@ class GroupMembers:
         conn: Optional[Pool] = None,
     ) -> dict[UserId, list[dict[UserId, Any]]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT gp.*, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions FROM group_punishments gp
-                        LEFT JOIN punishment_reactions pr ON pr.punishment_id = gp.punishment_id
-                        WHERE group_id = $1 AND user_id = ANY($2)
-                        GROUP BY gp.punishment_id
-                    """
+            query = """SELECT gp.*, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
+                    FROM group_punishments gp
+                    LEFT JOIN punishment_reactions pr ON pr.punishment_id = gp.punishment_id
+                    WHERE group_id = $1 AND user_id = ANY($2) AND pr.created_by IN (SELECT user_id FROM group_members WHERE group_id = $1)
+                    GROUP BY gp.punishment_id;"""
 
             db_punishments = await conn.fetch(query, group_id, user_ids)
 
