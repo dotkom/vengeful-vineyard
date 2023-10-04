@@ -5,9 +5,10 @@ import { Group } from "../../../helpers/types";
 interface TabItemProps {
   group: Group;
   selectedGroup: Group | undefined;
+  onClick: () => void;
 }
 
-export const TabItem = ({ group, selectedGroup }: TabItemProps) => (
+export const TabItem = ({ group, selectedGroup, onClick }: TabItemProps) => (
   <a
     className={classNames(
       group.group_id === selectedGroup?.group_id
@@ -16,6 +17,7 @@ export const TabItem = ({ group, selectedGroup }: TabItemProps) => (
       "group inline-flex cursor-pointer items-center border-b-4 px-1 py-2 text-sm font-medium"
     )}
     aria-current={group.group_id ? "page" : undefined}
+    onClick={onClick}
   >
     <ComputerDesktopIcon
       className={classNames(

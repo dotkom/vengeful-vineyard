@@ -55,6 +55,7 @@ export const Tabs = ({
                       key={group.group_id}
                       group={group}
                       selectedGroup={selectedGroup}
+                      onClick={() => setSelectedGroup(group)}
                     />
                   ))}
                   <div className="w-full">
