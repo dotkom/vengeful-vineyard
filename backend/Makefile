@@ -11,19 +11,19 @@ prod: .prod-reqs
 devv:
 	docker-compose up
 
-dev: .dev-reqs
+dev:
 	docker-compose rm -f
 	docker-compose up
 
-test: .dev-reqs
+test:
 	docker-compose rm -f
 	docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
-testv: .dev-reqs
+testv:
 	docker-compose rm -f
 	docker-compose -f docker-compose.test.yml -f docker-compose.testv.yml up --abort-on-container-exit
 
-testvv: .dev-reqs
+testvv:
 	docker-compose rm -f
 	docker-compose -f docker-compose.test.yml -f docker-compose.testvv.yml up --abort-on-container-exit
 
