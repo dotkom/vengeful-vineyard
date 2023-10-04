@@ -6,11 +6,14 @@ import { Group, User } from "../../helpers/types";
 import { useContext, useEffect, useState } from "react";
 import { Tabs } from "./tabs/Tabs";
 import { UserContext } from "../../helpers/userContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-export const GroupsView = (props: { selectedGroupId?: number }) => {
+export const GroupsView = () => {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
+
+  const params = useParams<{ groupId?: string }>();
+  const selectedGroupId = parseInt(params.groupId ?? "") || undefined;
 
   const { data: user } = useQuery({
     queryKey: ["groupsData"],
@@ -22,14 +25,13 @@ export const GroupsView = (props: { selectedGroupId?: number }) => {
   });
 
   useEffect(() => {
-    if (user && props.selectedGroupId === undefined) {
-      console.log("hei");
+    if (user && selectedGroupId === undefined) {
       navigate(`/groups/${user.groups[0].group_id}`);
     }
-  }, [user, props.selectedGroupId]);
+  }, [user, selectedGroupId]);
 
   const selectedGroup = user?.groups.find(
-    (group) => group.group_id === props.selectedGroupId
+    (group) => group.group_id === selectedGroupId
   );
 
   const { isLoading, error, data, refetch } = useQuery({
@@ -45,7 +47,7 @@ export const GroupsView = (props: { selectedGroupId?: number }) => {
     <section className="mt-16">
       <Tabs
         selectedGroup={selectedGroup}
-        setSelectedGroup={a => navigate(`/groups/${a.group_id}`)}
+        setSelectedGroup={group => group && navigate(`/groups/${group.group_id}`)}
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />
