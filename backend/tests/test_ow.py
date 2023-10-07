@@ -593,12 +593,86 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
+    async def test_create_punishment_reaction_by_user_not_in_group(
+        self, client: Any
+    ) -> None:
+        response = await client.post(
+            f"/punishment/1/reaction",
+            json={
+                "emoji": "👍",
+            },
+            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        check_response_time(response)
+
+    @pytest.mark.asyncio
     async def test_punishment_reaction_exists(self, client: Any) -> None:
         response = await client.get(
             f"/group/1/user/{SELF_USER_ID}",
         )
         assert response.status_code == 200
+
+        # Gotten in a group context. Should be 1 and not two.
         assert len(response.json()["punishments"][0]["reactions"]) == 1
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_all_reactions_exist_on_leaderboard(self, client: Any) -> None:
+        response = await client.get(f"user/leaderboard?page_size=1&page=1")
+        assert response.status_code == 200
+
+        data = response.json()
+        for res in data["results"]:
+            for punishment in res["punishments"]:
+                punishment["created_at"] = ""
+
+                for punishment_reaction in punishment["reactions"]:
+                    punishment_reaction["created_at"] = ""
+
+        assert data == {
+            "next": "http://test/user/leaderboard?page_size=1&page=2",
+            "previous": "http://test/user/leaderboard?page_size=1&page=0",
+            "results": [
+                {
+                    "email": "email1@email.com",
+                    "first_name": "BrageUpdated",
+                    "last_name": "Updated",
+                    "ow_user_id": 2581,
+                    "punishments": [
+                        {
+                            "amount": 1,
+                            "created_by": 1,
+                            "created_at": "",
+                            "punishment_id": 1,
+                            "punishment_type_id": 1,
+                            "reactions": [
+                                {
+                                    "emoji": "👍",
+                                    "punishment_id": 1,
+                                    "punishment_reaction_id": 1,
+                                    "created_by": 1,
+                                    "created_at": "",
+                                },
+                                {
+                                    "emoji": "👍",
+                                    "punishment_id": 1,
+                                    "punishment_reaction_id": 2,
+                                    "created_by": 9,
+                                    "created_at": "",
+                                },
+                            ],
+                            "reason": "Very good reason",
+                            "reason_hidden": False,
+                        },
+                    ],
+                    "total_value": 33,
+                    "user_id": 1,
+                },
+            ],
+            "total": 9,
+        }
+
         check_response_time(response)
 
     @pytest.mark.asyncio

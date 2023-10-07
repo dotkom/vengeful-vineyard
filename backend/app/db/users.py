@@ -34,14 +34,37 @@ class Users:
         conn: Optional[Pool] = None,
     ) -> list[LeaderboardUser]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT u.*,
-                        array_remove(array_agg(gp.*), NULL) as punishments,
-                        COALESCE(SUM(gp.amount * pt.value), 0) as total_value
+            query = """
+                    WITH punishments_with_reactions AS (
+                        SELECT
+                            gp.*,
+                            array_remove(array_agg(pr.*), NULL) as reactions
+                        FROM group_punishments gp
+                        LEFT JOIN punishment_reactions pr
+                            ON pr.punishment_id = gp.punishment_id
+                        GROUP BY gp.punishment_id
+                    )
+                    SELECT u.*,
+                        COALESCE(json_agg(
+                            json_build_object(
+                                'punishment_id', pwr.punishment_id,
+                                'group_id', pwr.group_id,
+                                'user_id', pwr.user_id,
+                                'punishment_type_id', pwr.punishment_type_id,
+                                'reason', pwr.reason,
+                                'reason_hidden', pwr.reason_hidden,
+                                'amount', pwr.amount,
+                                'created_by', pwr.created_by,
+                                'created_at', pwr.created_at,
+                                'reactions', pwr.reactions
+                            )
+                        ) FILTER (WHERE pwr.punishment_id IS NOT NULL), '[]') AS punishments,
+                        COALESCE(SUM(pwr.amount * pt.value), 0) as total_value
                     FROM users u
-                    LEFT JOIN group_punishments gp
-                        ON gp.user_id = u.user_id
+                    LEFT JOIN punishments_with_reactions pwr
+                        ON pwr.user_id = u.user_id
                     LEFT JOIN punishment_types pt
-                        ON pt.punishment_type_id = gp.punishment_type_id
+                        ON pt.punishment_type_id = pwr.punishment_type_id
                     GROUP BY u.user_id
                     ORDER BY total_value DESC
                     OFFSET $1

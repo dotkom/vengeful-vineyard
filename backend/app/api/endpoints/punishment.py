@@ -74,22 +74,9 @@ async def post_punishment_reaction(
 
     async with app.db.pool.acquire() as conn:
         try:
-            punishment = await app.db.punishments.get(punishment_id, conn=conn)
+            await app.db.punishments.get(punishment_id, conn=conn)
         except NotFound as exc:
             raise HTTPException(status_code=404, detail="Punishment not found") from exc
-
-        group_id = punishment.group_id
-
-        res = await app.db.groups.is_in_group(
-            user_id,
-            group_id,
-            conn=conn,
-        )
-        if not res:
-            raise HTTPException(
-                status_code=403,
-                detail="You must be a member of the group to perform this action.",
-            )
 
         if not is_emoji(punishment_reaction.emoji):
             raise HTTPException(
