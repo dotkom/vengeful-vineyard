@@ -88,6 +88,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 1,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1381,
@@ -98,6 +99,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 2,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1383,
@@ -108,6 +110,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 3,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2027,
@@ -118,6 +121,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 4,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2219,
@@ -128,6 +132,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 5,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1705,
@@ -138,6 +143,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 6,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1395,
@@ -148,6 +154,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 7,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
         ],
     }
@@ -193,6 +200,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 1,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1381,
@@ -203,6 +211,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 2,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1383,
@@ -213,6 +222,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 3,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2027,
@@ -223,6 +233,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 4,
                 "active": False,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2219,
@@ -233,6 +244,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 5,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             # Removed user here
             {
@@ -244,6 +256,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 7,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
             {  # Added user here
                 "ow_user_id": 1998,
@@ -254,6 +267,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 8,
                 "active": True,
                 "punishments": [],
+                "total_paid_amount": 0,
             },
         ],
     }
@@ -797,6 +811,32 @@ class TestWithDB_OW:
             "total_value": 233,
             "total_paid_value": 13,  # 4 + 9
         }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_total_paid_amount_on_group_user(self, client: Any) -> None:
+        response = await client.get(
+            f"/group/1/user/{SELF_USER_ID}",
+        )
+        assert response.status_code == 200
+
+        assert response.json()["total_paid_amount"] == 13
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_total_paid_amount_on_group_users(self, client: Any) -> None:
+        response = await client.get(
+            f"/group/1/users",
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        for user in data:
+            if user["user_id"] == SELF_USER_ID:
+                assert user["total_paid_amount"] == 13
+            else:
+                assert user["total_paid_amount"] == 0
+
         check_response_time(response)
 
     @pytest.mark.asyncio
