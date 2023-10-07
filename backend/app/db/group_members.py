@@ -125,10 +125,16 @@ class GroupMembers:
         conn: Optional[Pool] = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT gp.*, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions FROM group_punishments gp
-                        LEFT JOIN punishment_reactions pr ON pr.punishment_id = gp.punishment_id
-                        WHERE group_id = $1 AND user_id = $2
-                        GROUP BY gp.punishment_id
+            query = """SELECT gp.*, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
+                    FROM group_punishments gp
+                    LEFT JOIN (
+                        SELECT pr1.*
+                        FROM punishment_reactions pr1
+                        JOIN group_members gm ON pr1.created_by = gm.user_id
+                        WHERE gm.group_id = $1
+                    ) pr ON pr.punishment_id = gp.punishment_id
+                    WHERE group_id = $1 AND user_id = $2
+                    GROUP BY gp.punishment_id;
                     """
 
             punishments = []
@@ -145,11 +151,16 @@ class GroupMembers:
         conn: Optional[Pool] = None,
     ) -> dict[UserId, list[dict[UserId, Any]]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT gp.*, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions FROM group_punishments gp
-                        LEFT JOIN punishment_reactions pr ON pr.punishment_id = gp.punishment_id
-                        WHERE group_id = $1 AND user_id = ANY($2)
-                        GROUP BY gp.punishment_id
-                    """
+            query = """SELECT gp.*, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
+                    FROM group_punishments gp
+                    LEFT JOIN (
+                        SELECT pr1.*
+                        FROM punishment_reactions pr1
+                        JOIN group_members gm ON pr1.created_by = gm.user_id
+                        WHERE gm.group_id = $1
+                    ) pr ON pr.punishment_id = gp.punishment_id
+                    WHERE user_id IN (SELECT unnest($2::int[]))  -- $2 should be an array of user IDs
+                    GROUP BY gp.punishment_id;"""
 
             db_punishments = await conn.fetch(query, group_id, user_ids)
 
