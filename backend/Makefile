@@ -15,6 +15,10 @@ dev:
 	docker-compose rm -f
 	docker-compose up
 
+db:
+	docker-compose rm -f
+	docker-compose up -d db
+
 test:
 	docker-compose rm -f
 	docker-compose -f docker-compose.test.yml up --abort-on-container-exit
