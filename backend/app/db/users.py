@@ -55,6 +55,7 @@ class Users:
                                 'reason_hidden', pwr.reason_hidden,
                                 'amount', pwr.amount,
                                 'created_by', pwr.created_by,
+                                'created_by_name', CONCAT(u.first_name, ' ', u.last_name),
                                 'created_at', pwr.created_at,
                                 'reactions', pwr.reactions,
                                 'punishment_type', (SELECT json_build_object(

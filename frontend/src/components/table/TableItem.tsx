@@ -42,9 +42,11 @@ export const TableItem = ({
   const totalPunishment: React.ReactNode[] = [];
   const punishmentTypeMap = new Map<number, PunishmentType>();
 
-  punishmentTypes.forEach((type) => {
-    punishmentTypeMap.set(type.punishment_type_id, type);
-  });
+  if (punishmentTypes !== undefined) {
+    punishmentTypes.forEach((type) => {
+      punishmentTypeMap.set(type.punishment_type_id, type);
+    });
+  }
 
   function isGroupUser(user: GroupUser | LeaderboardUser): user is GroupUser {
     return (user as GroupUser).total_paid_amount !== undefined;
@@ -111,7 +113,7 @@ export const TableItem = ({
         <PunishmentList
           groupUser={groupUser}
           leaderboardUser={leaderboardUser}
-          punishmentTypes={punishmentTypes}
+          punishmentTypes={punishmentTypes ?? []}
           dataRefetch={dataRefetch}
         />
       </AccordionContent>

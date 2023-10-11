@@ -25,6 +25,7 @@ class PunishmentOut(PunishmentCreate):
     punishment_id: PunishmentId
     created_at: datetime
     created_by: UserId
+    created_by_name: str
     reactions: list[PunishmentReactionRead] = []
     # verified_at: Optional[datetime]
     # verified_by: Optional[UserId]
