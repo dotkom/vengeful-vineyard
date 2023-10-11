@@ -64,10 +64,10 @@ class Groups:
                 group_id, conn=conn
             )
 
-            group["members"] = sorted(await self.db.group_users.get_all(
+            group["members"] = await self.db.group_users.get_all(
                 group_id,
                 conn=conn,
-            ), key=lambda x: (len(x.punishments), x.user_id))
+            )
 
             return Group(**group)
 
