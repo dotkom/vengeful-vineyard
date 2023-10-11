@@ -1,7 +1,8 @@
 import { Group, GroupUser } from "../../../../helpers/types";
-import { TextInput } from "./TextInput";
+
 import { AlcoholInput } from "./AlcoholInput";
 import { PersonSelect } from "./PersonSelect";
+import { TextInput } from "./TextInput";
 
 interface ModalInputProps {
   newPunishment: {
@@ -59,6 +60,7 @@ export const ModalInput = ({
       <AlcoholInput
         type={newPunishment.punishment_type_id}
         amount={newPunishment.amount}
+        data={data}
         typeInputHandler={typeInputHandler}
         amountInputHandler={amountInputHandler}
       />

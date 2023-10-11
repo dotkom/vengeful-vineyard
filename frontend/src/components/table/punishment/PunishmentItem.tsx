@@ -1,19 +1,21 @@
-import dayjs from "dayjs";
-import { Punishment } from "../../../helpers/types";
-import { EmojiPicker } from "./emojies/EmojiPicker";
-import { ReactionsDisplay } from "./emojies/ReactionDisplay";
+import { Punishment, PunishmentType } from "../../../helpers/types";
 import {
   QueryObserverResult,
   RefetchOptions,
   RefetchQueryFilters,
   useMutation,
 } from "@tanstack/react-query";
-import { useState } from "react";
-import { getAddReactionUrl } from "../../../helpers/api";
 import axios, { AxiosResponse } from "axios";
+
+import { EmojiPicker } from "./emojies/EmojiPicker";
+import { ReactionsDisplay } from "./emojies/ReactionDisplay";
+import dayjs from "dayjs";
+import { getAddReactionUrl } from "../../../helpers/api";
+import { useState } from "react";
 
 interface PunishmentItemProps {
   punishment: Punishment;
+  punishmentTypes: PunishmentType[];
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>;
@@ -21,6 +23,7 @@ interface PunishmentItemProps {
 
 export const PunishmentItem = ({
   punishment,
+  punishmentTypes,
   dataRefetch,
 }: PunishmentItemProps) => {
   const [selectedEmoji, setSelectedEmoji] = useState("👍");
@@ -54,6 +57,10 @@ export const PunishmentItem = ({
 
   const isWallOfShame = /wall-of-shame/.test(window.location.href);
 
+  const punishmentType = punishmentTypes.find(
+    (type) => type.punishment_type_id === punishment.punishment_type_id
+  );
+
   return (
     <div
       className={`relative flex border-b border-l-8 border-l-indigo-600 ${
@@ -71,9 +78,12 @@ export const PunishmentItem = ({
       <div className="max-w-xs">
         <div className="py-4">
           {Array.from({ length: punishment.amount }, (_, i) => (
-            <span key={`${punishment.punishment_id}/${i}`} className="text-xl">
-              {punishment.punishment_type_id === 1 && <span>🍺</span>}
-              {punishment.punishment_type_id === 2 && <span>🍷</span>}
+            <span
+              key={`${punishment.punishment_id}/${i}`}
+              className="text-xl"
+              title={`${punishmentType?.name} (${punishmentType?.value}kr)`}
+            >
+              {punishmentType?.logo_url}
             </span>
           ))}
         </div>

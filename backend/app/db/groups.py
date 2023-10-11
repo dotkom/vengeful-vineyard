@@ -17,15 +17,9 @@ if TYPE_CHECKING:
 
 
 DEFAULT_PUSHISHMENT_TYPES = [
-    PunishmentTypeCreate(
-        name="Ølstraff", value=33, logo_url="./assets/beerOutlined.svg"
-    ),
-    PunishmentTypeCreate(
-        name="Vinstraff", value=100, logo_url="./assets/wineOutlined.svg"
-    ),
-    PunishmentTypeCreate(
-        name="Spritstraff", value=300, logo_url="./assets/spiritOutlined.svg"
-    ),
+    PunishmentTypeCreate(name="Ølstraff", value=33, logo_url="🍺"),
+    PunishmentTypeCreate(name="Vinstraff", value=100, logo_url="🍷"),
+    PunishmentTypeCreate(name="Spritstraff", value=300, logo_url="🍸"),
 ]
 
 

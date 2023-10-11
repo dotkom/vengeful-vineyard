@@ -1,33 +1,54 @@
-import { Group, GroupUser } from "../../helpers/types";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "./accordion/Accordion";
-import { textToEmoji } from "../../helpers/emojies";
-import { PunishmentList } from "./punishment/PunishmentList";
+import { Group, GroupUser, PunishmentType } from "../../helpers/types";
 import {
   QueryObserverResult,
   RefetchOptions,
   RefetchQueryFilters,
 } from "@tanstack/react-query";
 
+import { PunishmentList } from "./punishment/PunishmentList";
+import { textToEmoji } from "../../helpers/emojies";
+
 interface TableItemProps {
   user: GroupUser;
+  punishmentTypes: PunishmentType[];
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>;
 }
 
-export const TableItem = ({ user, dataRefetch }: TableItemProps) => {
+export const TableItem = ({
+  user,
+  punishmentTypes,
+  dataRefetch,
+}: TableItemProps) => {
   const totalPunishment: React.ReactNode[] = [];
+  const punishmentTypeMap = new Map<number, PunishmentType>();
+
+  punishmentTypes.forEach((type) => {
+    punishmentTypeMap.set(type.punishment_type_id, type);
+  });
+
   user.punishments.forEach((punishment) => {
     {
       Array.from({ length: punishment.amount }, (_, i) =>
         totalPunishment.push(
-          <span key={`${punishment.punishment_id}/${i}`} className="text-lg">
-            {punishment.punishment_type_id === 1 && <span>🍺</span>}
-            {punishment.punishment_type_id === 2 && <span>🍷</span>}
+          <span
+            key={`${punishment.punishment_id}/${i}`}
+            className="text-lg"
+            title={`${
+              punishmentTypeMap.get(punishment.punishment_type_id)?.name
+            } (${
+              punishmentTypeMap.get(punishment.punishment_type_id)?.value
+            }kr)`}
+          >
+            <span>
+              {punishmentTypeMap.get(punishment.punishment_type_id)?.logo_url}
+            </span>
           </span>
         )
       );
@@ -54,7 +75,11 @@ export const TableItem = ({ user, dataRefetch }: TableItemProps) => {
         </div>
       </AccordionTrigger>
       <AccordionContent>
-        <PunishmentList user={user} dataRefetch={dataRefetch} />
+        <PunishmentList
+          user={user}
+          punishmentTypes={punishmentTypes}
+          dataRefetch={dataRefetch}
+        />
       </AccordionContent>
     </AccordionItem>
   );
