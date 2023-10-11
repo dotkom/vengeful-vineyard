@@ -9,7 +9,7 @@ interface EmojiPickerProps {
 }
 
 export const EmojiPicker = ({ mutate, setSelectedEmoji }: EmojiPickerProps) => {
-  const emojis = ["👍", "👎", "😂", "❤️", "🔥", "🚀"];
+  const emojis = ["👍", "👎", "😂", "❤️", "🔥", "🚀", "😬", "😭"];
 
   return (
     <div className="absolute -bottom-1 left-0">
