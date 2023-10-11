@@ -63,7 +63,6 @@ class Groups:
             group["punishment_types"] = await self.db.punishment_types.get_all(
                 group_id, conn=conn
             )
-
             group["members"] = await self.db.group_users.get_all(
                 group_id,
                 conn=conn,

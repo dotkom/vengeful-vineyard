@@ -11,8 +11,8 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     vengeful_database: str = ":memory:"
-    postgres_host: str = "db"  # docker-compose service name
-    postgres_port: int = 5432
+    postgres_host: str = "localhost"  # docker-compose service name
+    postgres_port: int = 5433
     postgres_user: str = "postgres"
     postgres_password: str = "postgres"
     postgres_db: str = "dev"
