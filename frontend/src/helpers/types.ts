@@ -68,6 +68,7 @@ export interface GroupUser {
   user_id: number;
   ow_group_user_id: number;
   punishments: Punishment[];
+  total_paid_amount: number;
   active: boolean;
 }
 

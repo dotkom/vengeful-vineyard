@@ -42,7 +42,7 @@ class PaidPunishmentsLogs:
         conn: Optional[Pool] = None,
     ) -> int:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = "SELECT SUM(value) FROM paid_punishments_logs WHERE group_id = $1 AND user_id = $2"
+            query = "SELECT COALESCE(SUM(value), 0) FROM paid_punishments_logs WHERE group_id = $1 AND user_id = $2"
             row = await conn.fetchrow(
                 query,
                 group_id,
@@ -54,6 +54,22 @@ class PaidPunishmentsLogs:
 
             assert isinstance(row[0], int)
             return row[0]
+
+    async def get_total_paid_for_multiple(
+        self,
+        group_id: GroupId,
+        user_ids: list[UserId],
+        conn: Optional[Pool] = None,
+    ) -> dict[UserId, int]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = "SELECT user_id, COALESCE(SUM(value), 0) AS sum FROM paid_punishments_logs WHERE group_id = $1 AND user_id = ANY($2) GROUP BY user_id"
+            rows = await conn.fetch(
+                query,
+                group_id,
+                user_ids,
+            )
+
+            return {row["user_id"]: row["sum"] for row in rows}
 
     async def get_total_unpaid(
         self,

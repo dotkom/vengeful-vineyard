@@ -15,6 +15,7 @@ class BaseGroupUser(User):
     ow_group_user_id: Optional[OWGroupUserId] = None
     punishments: list[PunishmentOut] = []
     active: bool = True
+    total_paid_amount: int = 0
 
 
 class GroupUser(BaseGroupUser):
