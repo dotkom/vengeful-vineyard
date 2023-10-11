@@ -1,12 +1,14 @@
 import * as Accordion from "@radix-ui/react-accordion";
-import { TableItem } from "./TableItem";
+
 import { Group, Leaderboard, LeaderboardUser } from "../../helpers/types";
-import { SkeletonTableItem } from "./SkeletonTableItem";
 import {
   QueryObserverResult,
   RefetchOptions,
   RefetchQueryFilters,
 } from "@tanstack/react-query";
+
+import { SkeletonTableItem } from "./SkeletonTableItem";
+import { TableItem } from "./TableItem";
 
 interface TableProps {
   groupData?: Group | undefined;
@@ -35,6 +37,7 @@ export const Table = ({
             <TableItem
               key={user.user_id}
               user={user}
+              punishmentTypes={groupData.punishment_types}
               dataRefetch={dataRefetch}
             />
           ))}

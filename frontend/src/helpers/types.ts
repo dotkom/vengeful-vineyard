@@ -42,6 +42,13 @@ export interface Punishment {
   reactions: PunishmentReaction[];
 }
 
+export interface PunishmentType {
+  name: string;
+  value: number;
+  logo_url: string;
+  punishment_type_id: number;
+}
+
 export interface Group {
   name: string;
   name_short: string;
@@ -49,12 +56,7 @@ export interface Group {
   ow_group_id: number;
   image: string;
   group_id: number;
-  punishment_types: {
-    name: string;
-    value: number;
-    logo_url: string;
-    punishment_type_id: number;
-  }[];
+  punishment_types: PunishmentType[];
   members: GroupUser[];
 }
 

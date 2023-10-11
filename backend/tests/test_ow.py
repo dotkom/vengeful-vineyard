@@ -62,19 +62,19 @@ ME_GROUPS_RESPONSE = [
             {
                 "name": "\u00d8lstraff",
                 "value": 33,
-                "logo_url": "./assets/beerOutlined.svg",
+                "logo_url": "🍺",
                 "punishment_type_id": 1,
             },
             {
                 "name": "Vinstraff",
                 "value": 100,
-                "logo_url": "./assets/wineOutlined.svg",
+                "logo_url": "🍷",
                 "punishment_type_id": 2,
             },
             {
                 "name": "Spritstraff",
                 "value": 300,
-                "logo_url": "./assets/spiritOutlined.svg",
+                "logo_url": "🍸",
                 "punishment_type_id": 3,
             },
         ],
@@ -167,19 +167,19 @@ ME_GROUPS_UPDATED_RESPONSE = [
             {
                 "name": "\u00d8lstraff",
                 "value": 33,
-                "logo_url": "./assets/beerOutlined.svg",
+                "logo_url": "🍺",
                 "punishment_type_id": 1,
             },
             {
                 "name": "Vinstraff",
                 "value": 100,
-                "logo_url": "./assets/wineOutlined.svg",
+                "logo_url": "🍷",
                 "punishment_type_id": 2,
             },
             {
                 "name": "Spritstraff",
                 "value": 300,
-                "logo_url": "./assets/spiritOutlined.svg",
+                "logo_url": "🍸",
                 "punishment_type_id": 3,
             },
         ],
@@ -264,19 +264,19 @@ DEFAULT_PUNISHMENT_TYPES = [
     {
         "name": "Ølstraff",
         "value": 33,
-        "logo_url": "./assets/beerOutlined.svg",
+        "logo_url": "🍺",
         "punishment_type_id": 1,
     },
     {
         "name": "Vinstraff",
         "value": 100,
-        "logo_url": "./assets/wineOutlined.svg",
+        "logo_url": "🍷",
         "punishment_type_id": 2,
     },
     {
         "name": "Spritstraff",
         "value": 300,
-        "logo_url": "./assets/spiritOutlined.svg",
+        "logo_url": "🍸",
         "punishment_type_id": 3,
     },
 ]
@@ -284,13 +284,13 @@ DEFAULT_PUNISHMENT_TYPES = [
 NEW_PUNISHMENT_TYPE_PAYLOAD = {
     "name": "Waffles",
     "value": 125,
-    "logo_url": "./assets/beerOutlined.svg",
+    "logo_url": "🍺",
 }
 
 WAFFLES_PUNISHMENT_TYPE_RESPONSE = {
     "name": "Waffles",
     "value": 125,
-    "logo_url": "./assets/beerOutlined.svg",
+    "logo_url": "🍺",
     "punishment_type_id": 4,
 }
 
