@@ -18,9 +18,11 @@ export const GroupsView = () => {
   const { data: user } = useQuery({
     queryKey: ["groupsData"],
     queryFn: () =>
-      axios.get(ME_URL).then((res: AxiosResponse<User>) => {
-        setUser({ user_id: res.data.user_id });
-        return res.data;
+      axios.get(ME_URL).then(({data: user}: AxiosResponse<User>) => {
+        setUser({ user_id: user.user_id });
+        user.groups.sort((a, b) => a.group_id - b.group_id);
+        user.groups.forEach((group) => group.members.sort((a, b) => a.user_id - b.user_id));
+        return user;
       }),
   });
 
