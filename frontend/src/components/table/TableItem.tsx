@@ -15,7 +15,7 @@ import { textToEmoji } from "../../helpers/emojies";
 
 interface TableItemProps {
   user: GroupUser;
-  punishmentTypes: PunishmentType[];
+  punishmentTypes?: PunishmentType[];
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>;
@@ -29,9 +29,11 @@ export const TableItem = ({
   const totalPunishment: React.ReactNode[] = [];
   const punishmentTypeMap = new Map<number, PunishmentType>();
 
-  punishmentTypes.forEach((type) => {
-    punishmentTypeMap.set(type.punishment_type_id, type);
-  });
+  if (punishmentTypes !== undefined) {
+    punishmentTypes.forEach((type) => {
+      punishmentTypeMap.set(type.punishment_type_id, type);
+    });
+  }
 
   user.punishments.forEach((punishment) => {
     {
@@ -77,7 +79,7 @@ export const TableItem = ({
       <AccordionContent>
         <PunishmentList
           user={user}
-          punishmentTypes={punishmentTypes}
+          punishmentTypes={punishmentTypes ?? []}
           dataRefetch={dataRefetch}
         />
       </AccordionContent>
