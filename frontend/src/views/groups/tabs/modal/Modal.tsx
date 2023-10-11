@@ -39,7 +39,7 @@ export const Modal = forwardRef(
     const { setNotification } = useContext(NotificationContext);
 
     const { isLoading, error, data } = useQuery({
-      queryKey: ["groupLeaderboard"],
+      queryKey: ["groupLeaderboard", selectedGroup?.group_id],
       queryFn: () =>
         axios
           .get(getGroupLeaderboardUrl(selectedGroup.group_id))
