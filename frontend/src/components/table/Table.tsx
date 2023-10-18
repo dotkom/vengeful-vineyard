@@ -46,14 +46,15 @@ export const Table = ({
         <>
           {leaderboardData ? (
             <>
-              {leaderboardData.results.map((user) => (
+              {leaderboardData.results.map((user, i) => (
                 <TableItem
                   key={user.user_id}
                   punishmentTypes={[]}
                   leaderboardUser={user}
                   dataRefetch={dataRefetch}
-                />
-              ))}
+                  i={i}
+                />)
+              )}
             </>
           ) : (
             <>
