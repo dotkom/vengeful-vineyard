@@ -56,7 +56,13 @@ class Users:
                                 'amount', pwr.amount,
                                 'created_by', pwr.created_by,
                                 'created_at', pwr.created_at,
-                                'reactions', pwr.reactions
+                                'reactions', pwr.reactions,
+                                'punishment_type', (SELECT json_build_object(
+                                    'punishment_type_id', pt.punishment_type_id,
+                                    'name', pt.name,
+                                    'value', pt.value,
+                                    'logo_url', pt.logo_url
+                                ) FROM punishment_types pt WHERE pt.punishment_type_id = pwr.punishment_type_id)
                             )
                         ) FILTER (WHERE pwr.punishment_id IS NOT NULL), '[]') AS punishments,
                         COALESCE(SUM(pwr.amount * pt.value), 0) as total_value

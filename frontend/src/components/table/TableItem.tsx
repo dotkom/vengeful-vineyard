@@ -3,7 +3,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./accordion/Accordion";
-import { Group, GroupUser, PunishmentType } from "../../helpers/types";
+import {
+  Group,
+  GroupUser,
+  LeaderboardPunishment,
+  LeaderboardUser,
+  PunishmentType,
+} from "../../helpers/types";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -14,7 +20,8 @@ import { PunishmentList } from "./punishment/PunishmentList";
 import { textToEmoji } from "../../helpers/emojies";
 
 interface TableItemProps {
-  user: GroupUser;
+  groupUser?: GroupUser | undefined;
+  leaderboardUser?: LeaderboardUser | undefined;
   punishmentTypes: PunishmentType[];
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -22,10 +29,16 @@ interface TableItemProps {
 }
 
 export const TableItem = ({
-  user,
-  punishmentTypes,
+  groupUser,
+  leaderboardUser,
+  punishmentTypes = [],
   dataRefetch,
 }: TableItemProps) => {
+  const user = groupUser ?? leaderboardUser;
+  if (user === undefined) {
+    return <p>user is undefined</p>;
+  }
+
   const totalPunishment: React.ReactNode[] = [];
   const punishmentTypeMap = new Map<number, PunishmentType>();
 
@@ -33,25 +46,42 @@ export const TableItem = ({
     punishmentTypeMap.set(type.punishment_type_id, type);
   });
 
+  function isGroupUser(user: GroupUser | LeaderboardUser): user is GroupUser {
+    return (user as GroupUser).total_paid_amount !== undefined;
+  }
+
   user.punishments.forEach((punishment) => {
     {
-      Array.from({ length: punishment.amount }, (_, i) =>
+      Array.from({ length: punishment.amount }, (_, i) => {
+        let name: string;
+        let value: number;
+        let logoUrl: string;
+
+        if (isGroupUser(user)) {
+          const punishmentType = punishmentTypeMap.get(
+            punishment.punishment_type_id
+          );
+
+          name = punishmentType?.name ?? "N/A";
+          value = punishmentType?.value ?? 0;
+          logoUrl = punishmentType?.logo_url ?? "?";
+        } else {
+          const innerPunishment = punishment as LeaderboardPunishment;
+          name = innerPunishment.punishment_type.name;
+          value = innerPunishment.punishment_type.value;
+          logoUrl = innerPunishment.punishment_type.logo_url;
+        }
+
         totalPunishment.push(
           <span
             key={`${punishment.punishment_id}/${i}`}
             className="text-lg"
-            title={`${
-              punishmentTypeMap.get(punishment.punishment_type_id)?.name
-            } (${
-              punishmentTypeMap.get(punishment.punishment_type_id)?.value
-            }kr)`}
+            title={`${name} (${value}kr)`}
           >
-            <span>
-              {punishmentTypeMap.get(punishment.punishment_type_id)?.logo_url}
-            </span>
+            <span>{logoUrl}</span>
           </span>
-        )
-      );
+        );
+      });
     }
   });
 
@@ -62,7 +92,10 @@ export const TableItem = ({
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 align-middle text-4xl">
             {textToEmoji(user.first_name + user.last_name)}
           </span>
-          <p className="text-sm font-semibold leading-6 text-gray-900">
+          <p
+            className="w-48 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-semibold leading-6 text-gray-900"
+            title={`${user.first_name} ${user.last_name}`}
+          >
             {user.first_name} {user.last_name}
           </p>
         </div>
@@ -76,7 +109,8 @@ export const TableItem = ({
       </AccordionTrigger>
       <AccordionContent>
         <PunishmentList
-          user={user}
+          groupUser={groupUser}
+          leaderboardUser={leaderboardUser}
           punishmentTypes={punishmentTypes}
           dataRefetch={dataRefetch}
         />

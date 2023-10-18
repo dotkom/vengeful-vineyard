@@ -159,7 +159,7 @@ class GroupMembers:
                         JOIN group_members gm ON pr1.created_by = gm.user_id
                         WHERE gm.group_id = $1
                     ) pr ON pr.punishment_id = gp.punishment_id
-                    WHERE user_id IN (SELECT unnest($2::int[]))  -- $2 should be an array of user IDs
+                    WHERE user_id IN (SELECT unnest($2::int[])) AND group_id = $1
                     GROUP BY gp.punishment_id;"""
 
             db_punishments = await conn.fetch(query, group_id, user_ids)

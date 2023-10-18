@@ -7,6 +7,7 @@ from typing import Optional
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 from app.models.punishment import PunishmentOut
+from app.models.punishment_type import PunishmentTypeRead
 from app.types import OWUserId, UserId
 
 
@@ -33,6 +34,10 @@ class UserUpdate(CreatedUserBase):
     pass
 
 
+class LeaderboardPunishmentOut(PunishmentOut):
+    punishment_type: PunishmentTypeRead
+
+
 class LeaderboardUser(User):
-    punishments: list[PunishmentOut]
+    punishments: list[LeaderboardPunishmentOut]
     total_value: int

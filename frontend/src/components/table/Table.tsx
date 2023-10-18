@@ -20,8 +20,8 @@ interface TableProps {
 }
 
 export const Table = ({
-  groupData = undefined,
-  leaderboardData = undefined,
+  groupData,
+  leaderboardData,
   dataRefetch,
 }: TableProps) => (
   <ul role="list">
@@ -36,7 +36,7 @@ export const Table = ({
           {groupData.members.map((user) => (
             <TableItem
               key={user.user_id}
-              user={user}
+              groupUser={user}
               punishmentTypes={groupData.punishment_types}
               dataRefetch={dataRefetch}
             />
@@ -49,7 +49,8 @@ export const Table = ({
               {leaderboardData.results.map((user) => (
                 <TableItem
                   key={user.user_id}
-                  user={user}
+                  punishmentTypes={[]}
+                  leaderboardUser={user}
                   dataRefetch={dataRefetch}
                 />
               ))}
