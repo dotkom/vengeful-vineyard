@@ -2,7 +2,8 @@ import { Group, GroupUser } from "../../../../helpers/types";
 
 import { AlcoholInput } from "./AlcoholInput";
 import { PersonSelect } from "./PersonSelect";
-import { TextInput } from "./TextInput";
+import { ReasonHiddenInput } from "./ReasonHiddenInput";
+import { ReasonInput } from "./ReasonInput";
 
 interface ModalInputProps {
   newPunishment: {
@@ -34,6 +35,14 @@ export const ModalInput = ({
   const textInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({ ...newPunishment, reason: evt.currentTarget.value });
 
+  const reasonHiddenChangeHandler = (
+    evt: React.ChangeEvent<HTMLInputElement>
+  ) =>
+    setNewPunishment({
+      ...newPunishment,
+      reason_hidden: evt.currentTarget.checked,
+    });
+
   const typeInputHandler = (evt: React.ChangeEvent<HTMLSelectElement>) =>
     setNewPunishment({
       ...newPunishment,
@@ -52,10 +61,14 @@ export const ModalInput = ({
         selectedPerson={selectedPerson}
         setSelectedPerson={setSelectedPerson}
       />
-      <TextInput
+      <ReasonInput
         placeholder="Begrunnelse"
-        value={newPunishment.reason}
-        changeHandler={textInputHandler}
+        textValue={newPunishment.reason}
+        textChangeHandler={textInputHandler}
+      />
+      <ReasonHiddenInput
+        reasonHiddenValue={newPunishment.reason_hidden}
+        reasonHiddenChangeHandler={reasonHiddenChangeHandler}
       />
       <AlcoholInput
         type={newPunishment.punishment_type_id}
