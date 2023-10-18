@@ -658,6 +658,7 @@ class TestWithDB_OW:
                             "amount": 1,
                             "created_by": 1,
                             "created_at": "",
+                            "created_by_name": "BrageUpdated Updated",
                             "punishment_id": 1,
                             "punishment_type": {
                                 "logo_url": "🍺",
@@ -969,7 +970,7 @@ class TestWithDB_OW:
                                 "value": 100,
                             },
                             "created_by_name": "Anna IreneUpdated Updated",
-                            "punishment_id": 3,
+                            "punishment_id": 2,
                             "punishment_type_id": 2,
                             "reactions": [],
                             "reason": "Very good reason2",
