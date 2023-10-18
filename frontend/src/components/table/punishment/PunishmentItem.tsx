@@ -77,10 +77,10 @@ export const PunishmentItem = ({
       <div className="text-left font-light">
         <p className="m-4">
           <span className="block">
-            {!punishment.reason_hidden ? (
-              punishment.reason
+            {punishment.reason_hidden && isWallOfShame ? (
+                <span className="italic">*Årsak skjult*</span>
             ) : (
-              <span className="italic">*Årsak skjult*</span>
+              punishment.reason
             )}
           </span>
           <span className="block text-gray-500">
