@@ -20,8 +20,8 @@ interface TableProps {
 }
 
 export const Table = ({
-  groupData = undefined,
-  leaderboardData = undefined,
+  groupData,
+  leaderboardData,
   dataRefetch,
 }: TableProps) => (
   <ul role="list">

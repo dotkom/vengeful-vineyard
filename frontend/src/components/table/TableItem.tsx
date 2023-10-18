@@ -29,8 +29,8 @@ interface TableItemProps {
 }
 
 export const TableItem = ({
-  groupUser = undefined,
-  leaderboardUser = undefined,
+  groupUser,
+  leaderboardUser,
   punishmentTypes = [],
   dataRefetch,
 }: TableItemProps) => {
@@ -52,7 +52,6 @@ export const TableItem = ({
 
   user.punishments.forEach((punishment) => {
     {
-      console.log(punishment);
       Array.from({ length: punishment.amount }, (_, i) => {
         let name: string;
         let value: number;
