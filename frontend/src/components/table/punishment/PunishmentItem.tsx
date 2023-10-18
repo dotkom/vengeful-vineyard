@@ -1,4 +1,8 @@
-import { LeaderboardPunishment, Punishment, PunishmentType } from "../../../helpers/types";
+import {
+  LeaderboardPunishment,
+  Punishment,
+  PunishmentType,
+} from "../../../helpers/types";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -72,9 +76,13 @@ export const PunishmentItem = ({
     >
       <div className="text-left font-light">
         <p className="m-4">
-          <span className="block">{!punishment.reason_hidden ? punishment.reason : (
-            <span className="italic">*Årsak skjult*</span>
-          )}</span>
+          <span className="block">
+            {!punishment.reason_hidden ? (
+              punishment.reason
+            ) : (
+              <span className="italic">*Årsak skjult*</span>
+            )}
+          </span>
           <span className="block text-gray-500">
             - Gitt av {punishment.created_by}
           </span>
@@ -96,17 +104,15 @@ export const PunishmentItem = ({
       <div className="text-gray-500' absolute right-8 top-4 font-normal">
         {formattedDate}
       </div>
-      {/* {!isWallOfShame && ( */}
-        <div>
-          <EmojiPicker mutate={mutate} setSelectedEmoji={setSelectedEmoji} />
-          <ReactionsDisplay
-            mutate={mutate}
-            removeMutation={removeMutation}
-            setSelectedEmoji={setSelectedEmoji}
-            reactions={punishment.reactions}
-          />
-        </div>
-      {/* )} */}
+      <div>
+        <EmojiPicker mutate={mutate} setSelectedEmoji={setSelectedEmoji} />
+        <ReactionsDisplay
+          mutate={mutate}
+          removeMutation={removeMutation}
+          setSelectedEmoji={setSelectedEmoji}
+          reactions={punishment.reactions}
+        />
+      </div>
     </div>
   );
 };
