@@ -27,8 +27,8 @@ Under development 🚧
 ### Installation and running locally
 
 * `cd frontend`
-* `yarn`
-* `yarn dev`
+* `pnpm i`
+* `pnpm dev`
 
 
 ## Backend
