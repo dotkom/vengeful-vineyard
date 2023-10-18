@@ -1,4 +1,4 @@
-import { Punishment, PunishmentType } from "../../../helpers/types";
+import { LeaderboardPunishment, Punishment, PunishmentType } from "../../../helpers/types";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -14,7 +14,7 @@ import { getAddReactionUrl } from "../../../helpers/api";
 import { useState } from "react";
 
 interface PunishmentItemProps {
-  punishment: Punishment;
+  punishment: Punishment | LeaderboardPunishment;
   punishmentTypes: PunishmentType[];
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -57,19 +57,24 @@ export const PunishmentItem = ({
 
   const isWallOfShame = /wall-of-shame/.test(window.location.href);
 
-  const punishmentType = punishmentTypes.find(
+  let punishmentType = punishmentTypes.find(
     (type) => type.punishment_type_id === punishment.punishment_type_id
   );
 
+  if (!punishmentType) {
+    const innerPunishment = punishment as LeaderboardPunishment;
+    punishmentType = innerPunishment.punishment_type;
+  }
+
   return (
     <div
-      className={`relative flex border-b border-l-8 border-l-indigo-600 ${
-        isWallOfShame ? "pb-0" : "pb-8"
-      } md:border-l-4`}
+      className={`relative flex border-b border-l-8 border-l-indigo-600 pb-6 md:border-l-4`}
     >
       <div className="text-left font-light">
         <p className="m-4">
-          <span className="block">{punishment.reason}</span>
+          <span className="block">{!punishment.reason_hidden ? punishment.reason : (
+            <span className="italic">*Årsak skjult*</span>
+          )}</span>
           <span className="block text-gray-500">
             - Gitt av {punishment.created_by}
           </span>
@@ -91,7 +96,7 @@ export const PunishmentItem = ({
       <div className="text-gray-500' absolute right-8 top-4 font-normal">
         {formattedDate}
       </div>
-      {!isWallOfShame && (
+      {/* {!isWallOfShame && ( */}
         <div>
           <EmojiPicker mutate={mutate} setSelectedEmoji={setSelectedEmoji} />
           <ReactionsDisplay
@@ -101,7 +106,7 @@ export const PunishmentItem = ({
             reactions={punishment.reactions}
           />
         </div>
-      )}
+      {/* )} */}
     </div>
   );
 };

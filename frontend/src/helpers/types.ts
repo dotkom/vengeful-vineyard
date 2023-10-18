@@ -14,6 +14,10 @@ export interface Leaderboard {
   results: LeaderboardUser[];
 }
 
+export interface LeaderboardPunishment extends Punishment {
+  punishment_type: PunishmentType;
+}
+
 export interface LeaderboardUser {
   ow_user_id: number;
   first_name: string;
@@ -21,7 +25,7 @@ export interface LeaderboardUser {
   email: string;
   user_id: number;
   total_value: number;
-  punishments: Punishment[];
+  punishments: LeaderboardPunishment[];
 }
 
 export interface PunishmentReaction {
@@ -35,6 +39,7 @@ export interface PunishmentReaction {
 export interface Punishment {
   punishment_type_id: number;
   reason: string;
+  reason_hidden: boolean;
   amount: number;
   punishment_id: number;
   created_at: string;
