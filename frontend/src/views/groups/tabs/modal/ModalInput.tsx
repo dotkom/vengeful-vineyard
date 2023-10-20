@@ -60,7 +60,7 @@ export const ModalInput = ({
         setSelectedPerson={setSelectedPerson}
       />
       <Toggle
-        description={"Hvis du huker av her vil straffen deles på Wall of Shame"}
+        description={"Hvis du huker av her vil grunnen deles på Wall of Shame"}
         label={"Del begrunnelse"}
         value={!newPunishment.reason_hidden}
         changeHandler={reasonHiddenHandler}
