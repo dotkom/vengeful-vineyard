@@ -26,6 +26,7 @@ interface TableItemProps {
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>;
+  i?: number;
 }
 
 export const TableItem = ({
@@ -33,6 +34,7 @@ export const TableItem = ({
   leaderboardUser,
   punishmentTypes = [],
   dataRefetch,
+  i,
 }: TableItemProps) => {
   const user = groupUser ?? leaderboardUser;
   if (user === undefined) {
@@ -89,8 +91,15 @@ export const TableItem = ({
     <AccordionItem value={user.user_id}>
       <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
         <div className="flex items-center gap-x-2">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 align-middle text-4xl">
-            {textToEmoji(user.first_name + user.last_name)}
+          <span className="flex h-12 w-12 pb-1 items-center justify-center rounded-full bg-indigo-100 align-middle text-3xl text-[#4C4C51]">
+            {/* Displays the ith placement on the leaderboard if i is defined, otherwise displays an emoji */}
+            {i !== undefined
+              ? i+1 === 1 ? "🥇"
+              : i+1 === 2 ? "🥈"
+              : i+1 === 3 ? "🥉"
+              : i+1
+              : textToEmoji(user.first_name + user.last_name)
+            } 
           </span>
           <p
             className="w-48 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-semibold leading-6 text-gray-900"
