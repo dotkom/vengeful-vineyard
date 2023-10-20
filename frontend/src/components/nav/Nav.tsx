@@ -5,15 +5,16 @@ import OnlineLogo from "../../assets/online.png";
 import { AuthContextProps } from "react-oidc-context";
 import { classNames } from "../../helpers/classNames";
 import { AvatarIcon } from "@radix-ui/react-icons";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { NavLink } from "./NavLink";
 
 interface NavProps {
   auth: AuthContextProps;
 }
 
-export const Nav = ({ auth }: NavProps) => (
-  <Disclosure as="nav" className="bg-white shadow">
+export const Nav = ({ auth }: NavProps) => {
+  const navigate = useNavigate();
+  return <Disclosure as="nav" className="bg-white shadow">
     {({ open }) => (
       <>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -121,20 +122,22 @@ export const Nav = ({ auth }: NavProps) => (
 
         <Disclosure.Panel className="md:hidden">
           <div className="space-y-1 pb-3 pt-2">
-            <Disclosure.Button
-              as="a"
-              href="/"
-              className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700 sm:pl-5 sm:pr-6"
-            >
-              Hjem
-            </Disclosure.Button>
-            <Disclosure.Button
-              as="a"
-              href="/wall-of-shame"
-              className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 sm:pl-5 sm:pr-6"
-            >
-              Wall of Shame
-            </Disclosure.Button>
+            <Link to="/">
+              <Disclosure.Button
+                  as="span"
+                className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700 sm:pl-5 sm:pr-6"
+              >
+                Hjem
+              </Disclosure.Button>
+            </Link>
+            <Link to="/wall-of-shame">
+              <Disclosure.Button
+                    as="span"
+                className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 sm:pl-5 sm:pr-6"
+              >
+                Wall of Shame
+              </Disclosure.Button>
+            </Link>
           </div>
           <div className="border-t border-gray-200 pb-3 pt-4">
             <div className="flex items-center px-4 sm:px-6">
@@ -156,14 +159,14 @@ export const Nav = ({ auth }: NavProps) => (
             </div>
             <div className="mt-3 space-y-1">
               <Disclosure.Button
-                as="a"
-                href="/profil"
+                as="span"
+                onClick={() => navigate("/profil")}
                 className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6"
               >
                 Profil
               </Disclosure.Button>
               <Disclosure.Button
-                as="a"
+                as="span"
                 href="#"
                 className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6"
               >
@@ -175,4 +178,4 @@ export const Nav = ({ auth }: NavProps) => (
       </>
     )}
   </Disclosure>
-);
+}
