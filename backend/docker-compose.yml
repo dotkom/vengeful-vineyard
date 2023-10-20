@@ -9,9 +9,6 @@ services:
     ports:
       - "8000:8000"
     command: [ "poetry", "run", "uvicorn", "--reload", "--reload-dir", "app", "app.api.init_api:asgi_app", "--host", "0.0.0.0" ]
-    depends_on:
-      db:
-        condition: service_healthy
 
   db:
     image: postgres:11.3-alpine
@@ -24,12 +21,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: dev
       POSTGRES_PASSWORD: postgres
-
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "dev"]
-      interval: 1s
-      retries: 30
-      timeout: 1s
 
 volumes:
   postgres-data: null

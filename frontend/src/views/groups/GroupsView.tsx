@@ -26,13 +26,13 @@ export const GroupsView = () => {
 
   useEffect(() => {
     if (user && selectedGroupName === undefined) {
-      navigate(`/komiteer/${user.groups[0].name_short}`);
+      navigate(`/komiteer/${user.groups[0].name_short.toLowerCase()}`);
     }
   }, [user, selectedGroupName]);
 
   const selectedGroup = user?.groups.find(
-    (group) => group.name_short === selectedGroupName
-    );
+    (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
+  );
 
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["groupLeaderboard", selectedGroup?.group_id],
@@ -47,7 +47,7 @@ export const GroupsView = () => {
     <section className="mt-16">
       <Tabs
         selectedGroup={selectedGroup}
-        setSelectedGroup={group => group && navigate(`/komiteer/${group.name_short}`)}
+        setSelectedGroup={group => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />
