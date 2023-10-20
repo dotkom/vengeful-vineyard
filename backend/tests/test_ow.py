@@ -412,7 +412,8 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_update(self, client: Any) -> None:
         response = await client.get(
-            "/group/me", headers={"Authorization": SELF_USER_AUTHORIZATION}
+            "/group/me", headers={"Authorization": SELF_USER_AUTHORIZATION},
+            params={"cache": False}
         )
 
         assert response.status_code == 200
@@ -423,7 +424,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_members_update(self, client: Any) -> None:
         for c, group in enumerate(ME_UPDATED_RESPONSE):
-            response = await client.get(f"/group/{group['group_id']}")
+            response = await client.get(f"/group/{group['group_id']}", params={"cache": False})
 
             assert response.status_code == 200
 
@@ -448,6 +449,7 @@ class TestWithDB_OW:
         response = await client.get(
             "/group/me",
             headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+            params={"cache": False}
         )
 
         assert response.status_code == 200
@@ -633,7 +635,7 @@ class TestWithDB_OW:
 
     @pytest.mark.asyncio
     async def test_all_reactions_exist_on_leaderboard(self, client: Any) -> None:
-        response = await client.get(f"user/leaderboard?page_size=1&page=1")
+        response = await client.get(f"user/leaderboard?page_size=1&page=1&cache=false")
         assert response.status_code == 200
 
         data = response.json()
@@ -941,7 +943,7 @@ class TestWithDB_OW:
 
     @pytest.mark.asyncio
     async def test_leaderboard(self, client: Any) -> None:
-        response = await client.get(f"user/leaderboard?page_size=3")
+        response = await client.get(f"user/leaderboard?page_size=3&cache=false")
         assert response.status_code == 200
 
         data = response.json()
@@ -1041,7 +1043,7 @@ class TestWithDB_OW:
 
     @pytest.mark.asyncio
     async def test_leaderboard_empty_page(self, client: Any) -> None:
-        response = await client.get(f"user/leaderboard?page=1&page_size=30")
+        response = await client.get(f"user/leaderboard?page=1&page_size=30&cache=false")
         assert response.status_code == 200
         assert response.json() == {
             "next": None,

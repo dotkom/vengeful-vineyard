@@ -63,8 +63,9 @@ class OWSync:
         ow_user_id: OWUserId,
         user_id: UserId,
         wait_for_updates: bool = True,
+        cache: bool = True,
     ) -> None:
-        if self.last_user_sync.get(ow_user_id, 0) > time.time() - 60:
+        if self.last_user_sync.get(ow_user_id, 0) > time.time() - 60 and cache:
             return
         self.last_user_sync[ow_user_id] = time.time()
 
