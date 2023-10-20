@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Table } from "../../components/table";
 import { ME_URL, getGroupLeaderboardUrl } from "../../helpers/api";
 import axios, { AxiosResponse } from "axios";
-import { Group, User } from "../../helpers/types";
+import {Group, GroupUser, User} from "../../helpers/types";
 import { useContext, useEffect, useState } from "react";
 import { Tabs } from "./tabs/Tabs";
 import { UserContext } from "../../helpers/userContext";
 import { useNavigate, useParams } from "react-router-dom";
+import {sortGroupUsers, sortGroups} from "../../helpers/sorting";
 
 export const GroupsView = () => {
   const { setUser } = useContext(UserContext);
@@ -20,16 +21,9 @@ export const GroupsView = () => {
     queryFn: () =>
       axios.get(ME_URL).then((res: AxiosResponse<User>) => {
         const user = res.data;
-        user.groups.sort((a, b) => a.name_short.localeCompare(b.name_short));
-        for (const group of user.groups) {
-            group.members.sort((a, b) => {
-                if (a.first_name === b.first_name) {
-                    return a.last_name.localeCompare(b.last_name);
-                }
-                return a.first_name.localeCompare(b.first_name);
-            });
-        }
         setUser({ user_id: user.user_id });
+        user.groups = sortGroups(user.groups);
+        user.groups.forEach(group => group.members = sortGroupUsers(group.members, group.punishment_types));
         return user;
       }),
   });
@@ -49,7 +43,11 @@ export const GroupsView = () => {
     queryFn: () =>
       axios
         .get(getGroupLeaderboardUrl(selectedGroup!.group_id))
-        .then((res: AxiosResponse<Group>) => res.data),
+        .then((res: AxiosResponse<Group>) => {
+            const group = res.data;
+            group.members = sortGroupUsers(group.members, group.punishment_types);
+            return group;
+        }),
     enabled: !!user && !!selectedGroup,
   });
 
