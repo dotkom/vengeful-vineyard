@@ -38,13 +38,14 @@ class Users:
                     WITH punishments_with_reactions AS (
                         SELECT
                             gp.*,
+                            u.first_name || ' ' || u.last_name as created_by_name,
                             array_remove(array_agg(pr.*), NULL) as reactions
                         FROM group_punishments gp
                         LEFT JOIN punishment_reactions pr
                             ON pr.punishment_id = gp.punishment_id
                         LEFT JOIN users u
                             ON u.user_id = gp.created_by
-                        GROUP BY gp.punishment_id
+                        GROUP BY gp.punishment_id, created_by_name
                     )
                     SELECT u.*,
                         COALESCE(json_agg(
@@ -57,7 +58,7 @@ class Users:
                                 'reason_hidden', pwr.reason_hidden,
                                 'amount', pwr.amount,
                                 'created_by', pwr.created_by,
-                                'created_by_name', CONCAT(u.first_name, ' ', u.last_name),
+                                'created_by_name', pwr.created_by_name,
                                 'created_at', pwr.created_at,
                                 'reactions', pwr.reactions,
                                 'punishment_type', (SELECT json_build_object(

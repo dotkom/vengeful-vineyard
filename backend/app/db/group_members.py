@@ -133,7 +133,7 @@ class GroupMembers:
                         JOIN group_members gm ON pr1.created_by = gm.user_id
                         WHERE gm.group_id = $1
                     ) pr ON pr.punishment_id = gp.punishment_id
-                    LEFT JOIN users ON gp.user_id = users.user_id
+                    LEFT JOIN users ON gp.created_by = users.user_id
                     WHERE group_id = $1 AND gp.user_id = $2
                     GROUP BY gp.punishment_id, created_by_name;
                     """
@@ -160,7 +160,7 @@ class GroupMembers:
                         JOIN group_members gm ON pr1.created_by = gm.user_id
                         WHERE gm.group_id = $1
                     ) pr ON pr.punishment_id = gp.punishment_id
-                    LEFT JOIN users ON gp.user_id = users.user_id
+                    LEFT JOIN users ON gp.created_by = users.user_id
                     WHERE gp.user_id IN (SELECT unnest($2::int[])) AND group_id = $1
                     GROUP BY gp.punishment_id, created_by_name;"""
 
