@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Table } from "../../components/table";
 import { ME_URL, getGroupLeaderboardUrl } from "../../helpers/api";
 import axios, { AxiosResponse } from "axios";
-import { Group, User } from "../../helpers/types";
+import { Group, GroupUser, User } from "../../helpers/types";
 import { useContext, useEffect, useState } from "react";
 import { Tabs } from "./tabs/Tabs";
 import { UserContext } from "../../helpers/userContext";
 import { useNavigate, useParams } from "react-router-dom";
+import { sortGroupUsers, sortGroups } from "../../helpers/sorting";
 
 export const GroupsView = () => {
   const { setUser } = useContext(UserContext);
@@ -19,8 +20,17 @@ export const GroupsView = () => {
     queryKey: ["groupsData"],
     queryFn: () =>
       axios.get(ME_URL).then((res: AxiosResponse<User>) => {
-        setUser({ user_id: res.data.user_id });
-        return res.data;
+        const user = res.data;
+        setUser({ user_id: user.user_id });
+        user.groups = sortGroups(user.groups);
+        user.groups.forEach(
+          (group) =>
+            (group.members = sortGroupUsers(
+              group.members,
+              group.punishment_types
+            ))
+        );
+        return user;
       }),
   });
 
@@ -39,7 +49,11 @@ export const GroupsView = () => {
     queryFn: () =>
       axios
         .get(getGroupLeaderboardUrl(selectedGroup!.group_id))
-        .then((res: AxiosResponse<Group>) => res.data),
+        .then((res: AxiosResponse<Group>) => {
+          const group = res.data;
+          group.members = sortGroupUsers(group.members, group.punishment_types);
+          return group;
+        }),
     enabled: !!user && !!selectedGroup,
   });
 
@@ -47,7 +61,9 @@ export const GroupsView = () => {
     <section className="mt-16">
       <Tabs
         selectedGroup={selectedGroup}
-        setSelectedGroup={group => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
+        setSelectedGroup={(group) =>
+            group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)
+        }
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />

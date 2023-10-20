@@ -16,6 +16,7 @@ import {
 import { Group, GroupUser } from "../../../../helpers/types";
 import { NotificationContext } from "../../../../helpers/notificationContext";
 import { ModalInput } from "./ModalInput";
+import { sortGroupUsers } from "../../../../helpers/sorting";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -50,7 +51,12 @@ export const Modal = forwardRef(
               punishment_type_id:
                 res.data.punishment_types[0].punishment_type_id,
             }));
-            return res.data;
+            const group = res.data;
+            group.members = sortGroupUsers(
+              group.members,
+              group.punishment_types
+            );
+            return group;
           }),
     });
 
