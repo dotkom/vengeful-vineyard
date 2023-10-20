@@ -19,21 +19,8 @@ export const GroupsView = () => {
     queryKey: ["groupsData"],
     queryFn: () =>
       axios.get(ME_URL).then((res: AxiosResponse<User>) => {
-        const user = res.data;
-        user.groups.sort((a, b) => a.name_short.localeCompare(b.name_short));
-        const duplicateNames = new Map<string, number>();
-        for (const group of user.groups) {
-            if (duplicateNames.has(group.name_short)) {
-              const count = duplicateNames.get(group.name_short)!;
-              duplicateNames.set(group.name_short, count + 1);
-              group.path_name = `${group.name_short}-${count}`;
-            } else {
-                duplicateNames.set(group.name_short, 1);
-                group.path_name = group.name_short;
-            }
-        }
-        setUser({ user_id: user.user_id });
-        return user;
+        setUser({ user_id: res.data.user_id });
+        return res.data;
       }),
   });
 
