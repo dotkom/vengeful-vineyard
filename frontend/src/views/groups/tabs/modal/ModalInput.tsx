@@ -3,6 +3,7 @@ import { Group, GroupUser } from "../../../../helpers/types";
 import { AlcoholInput } from "./AlcoholInput";
 import { PersonSelect } from "./PersonSelect";
 import { TextInput } from "./TextInput";
+import { Toggle } from "./Toggle";
 
 interface ModalInputProps {
   newPunishment: {
@@ -34,6 +35,12 @@ export const ModalInput = ({
   const textInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({ ...newPunishment, reason: evt.currentTarget.value });
 
+  const reasonHiddenHandler = () =>
+    setNewPunishment({
+      ...newPunishment,
+      reason_hidden: !newPunishment.reason_hidden,
+    });
+
   const typeInputHandler = (evt: React.ChangeEvent<HTMLSelectElement>) =>
     setNewPunishment({
       ...newPunishment,
@@ -51,6 +58,12 @@ export const ModalInput = ({
         data={data}
         selectedPerson={selectedPerson}
         setSelectedPerson={setSelectedPerson}
+      />
+      <Toggle
+        description={"Hvis du huker av her vil begrunnelsen vises på Wall of Shame"}
+        label={"Del begrunnelse"}
+        value={!newPunishment.reason_hidden}
+        changeHandler={reasonHiddenHandler}
       />
       <TextInput
         placeholder="Begrunnelse"

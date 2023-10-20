@@ -33,7 +33,7 @@ export const Modal = forwardRef(
     const [newPunishment, setNewPunishment] = useState({
       punishment_type_id: 1,
       reason: "",
-      reason_hidden: false,
+      reason_hidden: true,
       amount: 1,
     });
     const { setNotification } = useContext(NotificationContext);
