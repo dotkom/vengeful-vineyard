@@ -1,6 +1,6 @@
 import {
   LeaderboardPunishment,
- Punishment,
+  Punishment,
   PunishmentType,
 } from "../../../helpers/types";
 import {
