@@ -63,10 +63,11 @@ class OWSync:
         ow_user_id: OWUserId,
         user_id: UserId,
         wait_for_updates: bool = True,
-        cache: bool = True,
+        use_cache: bool = True,
     ) -> None:
-        if self.last_user_sync.get(ow_user_id, 0) > time.time() - 60 and cache:
+        if self.last_user_sync.get(ow_user_id, 0) > time.time() - 60 and use_cache:
             return
+
         self.last_user_sync[ow_user_id] = time.time()
 
         groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)

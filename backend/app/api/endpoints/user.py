@@ -29,6 +29,7 @@ async def get_me(
     request: Request,
     include_groups: bool = Query(title="Include groups", default=True),
     wait_for_updates: bool = Query(title="Wait for updates", default=True),
+    use_cache: bool = Query(title="Use cache", default=True),
 ) -> UserWithGroups:
     app = request.app
     access_token = request.raise_if_missing_authorization()
@@ -45,6 +46,7 @@ async def get_me(
         ow_user_id,
         user_id,
         wait_for_updates=wait_for_updates,
+        use_cache=use_cache,
     )
 
     async with app.db.pool.acquire() as conn:
