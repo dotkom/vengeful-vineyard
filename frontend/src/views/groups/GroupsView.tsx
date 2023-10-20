@@ -12,26 +12,38 @@ export const GroupsView = () => {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
-  const params = useParams<{ groupId?: string }>();
-  const selectedGroupId = parseInt(params.groupId ?? "") || undefined;
+  const params = useParams<{ groupName?: string }>();
+  const selectedGroupName = params.groupName;
 
   const { data: user } = useQuery({
     queryKey: ["groupsData"],
     queryFn: () =>
       axios.get(ME_URL).then((res: AxiosResponse<User>) => {
-        setUser({ user_id: res.data.user_id });
-        return res.data;
+        const user = res.data;
+        const duplicateNames = new Map<string, number>();
+        for (const group of user.groups) {
+            if (duplicateNames.has(group.name_short)) {
+              const count = duplicateNames.get(group.name_short)!;
+              duplicateNames.set(group.name_short, count + 1);
+              group.path_name = `${group.name_short}-${count}`;
+            } else {
+                duplicateNames.set(group.name_short, 1);
+                group.path_name = group.name_short;
+            }
+        }
+        setUser({ user_id: user.user_id });
+        return user;
       }),
   });
 
   useEffect(() => {
-    if (user && selectedGroupId === undefined) {
-      navigate(`/groups/${user.groups[0].group_id}`);
+    if (user && selectedGroupName === undefined) {
+      navigate(`/grupper/${user.groups[0].path_name}`);
     }
-  }, [user, selectedGroupId]);
+  }, [user, selectedGroupName]);
 
   const selectedGroup = user?.groups.find(
-    (group) => group.group_id === selectedGroupId
+    (group) => group.path_name === selectedGroupName
   );
 
   const { isLoading, error, data, refetch } = useQuery({
@@ -47,7 +59,7 @@ export const GroupsView = () => {
     <section className="mt-16">
       <Tabs
         selectedGroup={selectedGroup}
-        setSelectedGroup={group => group && navigate(`/groups/${group.group_id}`)}
+        setSelectedGroup={group => group && navigate(`/grupper/${group.path_name}`)}
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />

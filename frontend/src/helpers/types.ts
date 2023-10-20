@@ -58,6 +58,7 @@ export interface PunishmentType {
 export interface Group {
   name: string;
   name_short: string;
+  path_name?: string; // Used for routing
   rules: string;
   ow_group_id: number;
   image: string;

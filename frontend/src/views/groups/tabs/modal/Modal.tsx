@@ -19,6 +19,7 @@ import { ModalInput } from "./ModalInput";
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  initialPerson?: GroupUser;
   selectedGroup: Group;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
