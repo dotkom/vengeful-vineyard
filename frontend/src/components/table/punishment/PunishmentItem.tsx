@@ -32,10 +32,10 @@ export const PunishmentItem = ({
 }: PunishmentItemProps) => {
   const [selectedEmoji, setSelectedEmoji] = useState("👍");
 
-  const addReactionCall = async () => {
+  const addReactionCall = async (emoji: string) => {
     const ADD_REACTION_URL = getAddReactionUrl(punishment.punishment_id);
     const res: AxiosResponse<string> = await axios.post(ADD_REACTION_URL, {
-      emoji: selectedEmoji,
+      emoji,
     });
     return res.data;
   };
