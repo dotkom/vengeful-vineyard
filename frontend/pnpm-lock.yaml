@@ -72,7 +72,7 @@ devDependencies:
     version: 18.0.9
   '@vitejs/plugin-react-swc':
     specifier: ^3.0.0
-    version: 3.0.0(vite@4.0.0)
+    version: 3.0.0(vite@4.0.5)
   autoprefixer:
     specifier: ^10.4.13
     version: 10.4.13(postcss@8.4.31)
@@ -86,8 +86,8 @@ devDependencies:
     specifier: ^4.9.3
     version: 4.9.3
   vite:
-    specifier: ^4.0.0
-    version: 4.0.0
+    specifier: ^4.0.5
+    version: 4.0.5
 
 packages:
 
@@ -771,13 +771,13 @@ packages:
   /@types/scheduler@0.16.4:
     resolution: {integrity: sha512-2L9ifAGl7wmXwP4v3pN4p2FLhD0O1qsJpvKmNin5VA8+UvNVb447UDaAEV6UdrkA+m/Xs58U1RFps44x6TFsVQ==}
 
-  /@vitejs/plugin-react-swc@3.0.0(vite@4.0.0):
+  /@vitejs/plugin-react-swc@3.0.0(vite@4.0.5):
     resolution: {integrity: sha512-vYlodz/mjYRbxMGbHzDgR8aPR+z8n7K/enWkyBGH096xrL2DIPCuTvQVRYPTXGyy6wO7OFiMxZ3r4nKQD1sH0A==}
     peerDependencies:
       vite: ^4.0.0
     dependencies:
       '@swc/core': 1.3.93
-      vite: 4.0.0
+      vite: 4.0.5
     transitivePeerDependencies:
       - '@swc/helpers'
     dev: true
@@ -1562,8 +1562,8 @@ packages:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: true
 
-  /vite@4.0.0:
-    resolution: {integrity: sha512-ynad+4kYs8Jcnn8J7SacS9vAbk7eMy0xWg6E7bAhS1s79TK+D7tVFGXVZ55S7RNLRROU1rxoKlvZ/qjaB41DGA==}
+  /vite@4.0.5:
+    resolution: {integrity: sha512-7m87RC+caiAxG+8j3jObveRLqaWA/neAdCat6JAZwMkSWqFHOvg8MYe5fAQxVBRAuKAQ1S6XDh3CBQuLNbY33w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
