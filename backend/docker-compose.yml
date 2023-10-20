@@ -5,7 +5,7 @@ services:
     build: .
     tty: true
     volumes:
-      - .:/app
+     - .:/app
     ports:
       - "8000:8000"
     command: [ "poetry", "run", "uvicorn", "--reload", "--reload-dir", "app", "app.api.init_api:asgi_app", "--host", "0.0.0.0" ]
