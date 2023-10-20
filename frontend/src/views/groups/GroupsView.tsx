@@ -20,6 +20,7 @@ export const GroupsView = () => {
     queryFn: () =>
       axios.get(ME_URL).then((res: AxiosResponse<User>) => {
         const user = res.data;
+        user.groups.sort((a, b) => a.name_short.localeCompare(b.name_short));
         const duplicateNames = new Map<string, number>();
         for (const group of user.groups) {
             if (duplicateNames.has(group.name_short)) {
