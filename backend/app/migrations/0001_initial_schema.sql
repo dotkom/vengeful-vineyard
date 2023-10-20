@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS groups (
 	group_id SERIAL PRIMARY KEY,
 	ow_group_id INTEGER UNIQUE,
 	name TEXT NOT NULL UNIQUE,
-	name_short TEXT NOT NULL UNIQUE,
+	name_short TEXT NOT NULL,
 	rules TEXT NOT NULL,
 	image TEXT NOT NULL
 );
@@ -74,3 +74,5 @@ CREATE TABLE IF NOT EXISTS punishment_reactions (
 	created_by INTEGER NOT NULL references users(user_id) ON DELETE CASCADE,
 	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS groups_short_name_idx ON groups (LOWER(name_short));
