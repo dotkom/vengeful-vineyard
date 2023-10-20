@@ -40,10 +40,10 @@ export const Modal = forwardRef(
     const { setNotification } = useContext(NotificationContext);
 
     const { isLoading, error, data } = useQuery({
-      queryKey: ["groupLeaderboard", selectedGroup?.name_short],
+      queryKey: ["groupLeaderboard", selectedGroup?.group_id],
       queryFn: () =>
         axios
-          .get(getGroupLeaderboardUrl(selectedGroup.name_short))
+          .get(getGroupLeaderboardUrl(selectedGroup.group_id))
           .then((res: AxiosResponse<Group>) => {
             setSelectedPerson(res.data.members[0]);
             setNewPunishment((prev) => ({
