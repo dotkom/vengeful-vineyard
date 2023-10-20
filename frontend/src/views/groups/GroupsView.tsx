@@ -12,8 +12,8 @@ export const GroupsView = () => {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
-  const params = useParams<{ groupId?: string }>();
-  const selectedGroupId = parseInt(params.groupId ?? "") || undefined;
+  const params = useParams<{ groupName?: string }>();
+  const selectedGroupName = params.groupName;
 
   const { data: user } = useQuery({
     queryKey: ["groupsData"],
@@ -25,13 +25,13 @@ export const GroupsView = () => {
   });
 
   useEffect(() => {
-    if (user && selectedGroupId === undefined) {
-      navigate(`/groups/${user.groups[0].group_id}`);
+    if (user && selectedGroupName === undefined) {
+      navigate(`/komiteer/${user.groups[0].name_short.toLowerCase()}`);
     }
-  }, [user, selectedGroupId]);
+  }, [user, selectedGroupName]);
 
   const selectedGroup = user?.groups.find(
-    (group) => group.group_id === selectedGroupId
+    (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
   );
 
   const { isLoading, error, data, refetch } = useQuery({
@@ -47,7 +47,7 @@ export const GroupsView = () => {
     <section className="mt-16">
       <Tabs
         selectedGroup={selectedGroup}
-        setSelectedGroup={group => group && navigate(`/groups/${group.group_id}`)}
+        setSelectedGroup={group => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />

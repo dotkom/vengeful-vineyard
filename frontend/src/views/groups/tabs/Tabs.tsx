@@ -52,7 +52,7 @@ export const Tabs = ({
                 <>
                   {groups.map((group) => (
                     <TabItem
-                      key={group.group_id}
+                      key={group.name_short}
                       group={group}
                       selectedGroup={selectedGroup}
                       onClick={() => setSelectedGroup(group)}
