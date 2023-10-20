@@ -658,6 +658,7 @@ class TestWithDB_OW:
                             "amount": 1,
                             "created_by": 1,
                             "created_at": "",
+                            "created_by_name": "BrageUpdated Updated",
                             "punishment_id": 1,
                             "punishment_type": {
                                 "logo_url": "🍺",
@@ -962,6 +963,7 @@ class TestWithDB_OW:
                             "amount": 1,
                             "created_by": 1,
                             "created_at": "",
+                            "created_by_name": "Anna IreneUpdated Updated",
                             "punishment_id": 2,
                             "punishment_type": {
                                 "logo_url": "🍷",
@@ -978,6 +980,7 @@ class TestWithDB_OW:
                             "amount": 1,
                             "created_by": 1,
                             "created_at": "",
+                            "created_by_name": "Anna IreneUpdated Updated",
                             "punishment_id": 3,
                             "punishment_type": {
                                 "logo_url": "🍷",
@@ -1004,6 +1007,7 @@ class TestWithDB_OW:
                             "amount": 1,
                             "created_by": 1,
                             "created_at": "",
+                            "created_by_name": "BrageUpdated Updated",
                             "punishment_id": 4,
                             "punishment_type": {
                                 "logo_url": "🍺",
