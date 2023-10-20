@@ -40,7 +40,8 @@ router = APIRouter(
 )
 async def get_my_groups(
     request: Request,
-    wait_for_updates: bool = True,
+    wait_for_updates: bool = Query(title="Wait for updates", default=True),
+    use_cache: bool = Query(title="Use cache", default=True),
 ) -> list[Group]:
     app = request.app
     access_token = request.raise_if_missing_authorization()
@@ -57,6 +58,7 @@ async def get_my_groups(
         ow_user_id,
         user_id,
         wait_for_updates=wait_for_updates,
+        use_cache=use_cache,
     )
 
     groups = await app.db.users.get_groups(user_id)

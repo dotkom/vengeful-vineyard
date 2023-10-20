@@ -323,7 +323,7 @@ OTHER_USER_NOT_IN_GROUP_AUTHORIZATION = f"Bearer {OTHER_USER_NOT_IN_GROUP_ACCESS
 class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_missing_authorization(self, client: Any) -> None:
-        response = await client.get("/group/me")
+        response = await client.get("/group/me?use_cache=false")
         assert response.status_code == 403 and response.json() == {
             "detail": "Not authenticated"
         }
@@ -332,7 +332,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_unauthenticated(self, client: Any, mock: Any) -> None:
         response = await client.get(
-            "/group/me", headers={"Authorization": "Bearer InvalidAuth"}
+            "/group/me?use_cache=false", headers={"Authorization": "Bearer InvalidAuth"}
         )
         assert response.status_code == 401 and response.json() == {
             "detail": "Invalid access token"
@@ -345,7 +345,8 @@ class TestWithDB_OW:
         mock: Any,
     ) -> None:
         response = await client.get(
-            "/group/me", headers={"Authorization": SELF_USER_AUTHORIZATION}
+            "/group/me?use_cache=false",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
 
         assert response.status_code == 200
@@ -360,7 +361,8 @@ class TestWithDB_OW:
         mock: Any,
     ) -> None:
         response = await client.get(
-            "/user/me", headers={"Authorization": SELF_USER_AUTHORIZATION}
+            "/user/me?use_cache=false",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
 
         assert response.status_code == 200
@@ -375,7 +377,7 @@ class TestWithDB_OW:
         mock: Any,
     ) -> None:
         response = await client.get(
-            "/user/me?include_groups=false",
+            "/user/me?include_groups=false&use_cache=false",
             headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
 
@@ -391,7 +393,8 @@ class TestWithDB_OW:
         mock: Any,
     ) -> None:
         response = await client.get(
-            "/group/me", headers={"Authorization": OTHER_USER_AUTHORIZATION}
+            "/group/me?use_cache=false",
+            headers={"Authorization": OTHER_USER_AUTHORIZATION},
         )
 
         assert response.status_code == 200
@@ -412,7 +415,8 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_my_groups_update(self, client: Any) -> None:
         response = await client.get(
-            "/group/me", headers={"Authorization": SELF_USER_AUTHORIZATION}
+            "/group/me?use_cache=false",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
 
         assert response.status_code == 200
@@ -446,7 +450,7 @@ class TestWithDB_OW:
         mock: Any,
     ) -> None:
         response = await client.get(
-            "/group/me",
+            "/group/me?use_cache=false",
             headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
         )
 
