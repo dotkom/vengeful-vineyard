@@ -51,7 +51,7 @@ export const GroupsView = () => {
         .get(getGroupLeaderboardUrl(selectedGroup!.group_id))
         .then((res: AxiosResponse<Group>) => {
           const group = res.data;
-          group.members = sortGroupUsers(group.members);
+          group.members = sortGroupUsers(group.members, group.punishment_types);
           return group;
         }),
     enabled: !!user && !!selectedGroup,
