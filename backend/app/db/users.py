@@ -42,6 +42,8 @@ class Users:
                         FROM group_punishments gp
                         LEFT JOIN punishment_reactions pr
                             ON pr.punishment_id = gp.punishment_id
+                        LEFT JOIN users u
+                            ON u.user_id = gp.created_by
                         GROUP BY gp.punishment_id
                     )
                     SELECT u.*,
@@ -55,6 +57,7 @@ class Users:
                                 'reason_hidden', pwr.reason_hidden,
                                 'amount', pwr.amount,
                                 'created_by', pwr.created_by,
+                                'created_by_name', CONCAT(u.first_name, ' ', u.last_name),
                                 'created_at', pwr.created_at,
                                 'reactions', pwr.reactions,
                                 'punishment_type', (SELECT json_build_object(

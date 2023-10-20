@@ -84,7 +84,7 @@ export const PunishmentItem = ({
             )}
           </span>
           <span className="block text-gray-500">
-            - Gitt av {punishment.created_by}
+            - Gitt av {punishment.created_by_name}
           </span>
         </p>
       </div>
