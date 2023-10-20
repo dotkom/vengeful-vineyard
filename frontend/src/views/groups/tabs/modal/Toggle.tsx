@@ -16,7 +16,7 @@ export const Toggle = ({
   <div className="flex items-center justify-between relative">
     { description ?
     <div className="group relative overflow-visible">
-      <div className="absolute top-5 z-10 items-center opacity-0 group-hover:opacity-100 transition-opacity border-gray-200 rounded-2xl bg-white border-2">
+      <div className="absolute top-5 z-5 items-center opacity-0 group-hover:opacity-100 transition-opacity border-gray-200 rounded-2xl bg-white border-2">
         <p className="text-sm text-gray-500 p-4">{description}</p>
       </div>
       <p className="text-sm font-medium text-gray-900 cursor-pointer">
