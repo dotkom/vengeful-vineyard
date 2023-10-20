@@ -1,6 +1,7 @@
 """Contains methods for syncing users from OW."""
 
 import asyncio
+import time
 from typing import TYPE_CHECKING, Any, Optional, cast
 
 from asyncpg import Pool
@@ -22,6 +23,7 @@ IGNORE_OW_GROUPS = (12,)  # "Komiteer"
 class OWSync:
     def __init__(self, app: "FastAPI"):
         self.app = app
+        self.last_user_sync: dict[OWUserId, float] = {}
 
     async def sync_for_access_token(
         self,
@@ -62,6 +64,10 @@ class OWSync:
         user_id: UserId,
         wait_for_updates: bool = True,
     ) -> None:
+        if self.last_user_sync.get(ow_user_id, 0) > time.time() - 60:
+            return
+        self.last_user_sync[ow_user_id] = time.time()
+
         groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
         filtered_groups_data = [
             g for g in groups_data["results"] if g["id"] not in IGNORE_OW_GROUPS
