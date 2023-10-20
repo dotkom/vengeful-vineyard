@@ -19,6 +19,8 @@ export const GroupsView = () => {
     queryKey: ["groupsData"],
     queryFn: () =>
       axios.get(ME_URL).then((res: AxiosResponse<User>) => {
+        const user = res.data;
+        user.groups.sort((a, b) => a.name.localeCompare(b.name));
         setUser({ user_id: res.data.user_id });
         return res.data;
       }),
