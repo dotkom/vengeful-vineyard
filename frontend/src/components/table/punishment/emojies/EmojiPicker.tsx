@@ -4,12 +4,12 @@ import { Menu, Transition } from "@headlessui/react";
 import { UseMutateFunction } from "@tanstack/react-query";
 
 interface EmojiPickerProps {
-  mutate: UseMutateFunction<string, unknown, void, unknown>;
+  mutate: UseMutateFunction<string, unknown, string, unknown>;
   setSelectedEmoji: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const EmojiPicker = ({ mutate, setSelectedEmoji }: EmojiPickerProps) => {
-  const emojis = ["👍", "👎", "😂", "❤️", "🔥", "🚀", "😬", "😭"];
+  const emojis = ["👍", "👎", "😂", "❤️", "🔥", "🚀", "😬", "😭", "💀"];
 
   return (
     <div className="absolute -bottom-1 left-0">
@@ -43,7 +43,7 @@ export const EmojiPicker = ({ mutate, setSelectedEmoji }: EmojiPickerProps) => {
                           }`}
                           onClick={() => {
                             setSelectedEmoji(emoji);
-                            mutate();
+                            mutate(emoji);
                           }}
                         >
                           {emoji}

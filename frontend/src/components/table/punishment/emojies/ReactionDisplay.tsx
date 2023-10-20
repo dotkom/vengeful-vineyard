@@ -5,7 +5,7 @@ import { UseMutateFunction } from "@tanstack/react-query";
 
 interface ReactionsDisplayProps {
   reactions: PunishmentReaction[];
-  mutate: UseMutateFunction<string, unknown, void, unknown>;
+  mutate: UseMutateFunction<string, unknown, string, unknown>;
   removeMutation: UseMutateFunction<string, unknown, void, unknown>;
   setSelectedEmoji: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -46,7 +46,7 @@ export const ReactionsDisplay = ({
               removeMutation();
             } else {
               setSelectedEmoji(emoji);
-              mutate();
+              mutate(emoji);
             }
           }}
         >
