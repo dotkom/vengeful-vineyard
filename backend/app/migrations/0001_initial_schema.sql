@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS groups (
 	group_id SERIAL PRIMARY KEY,
 	ow_group_id INTEGER UNIQUE,
 	name TEXT NOT NULL UNIQUE,
-	name_short TEXT,
+	name_short TEXT NOT NULL UNIQUE,
 	rules TEXT NOT NULL,
 	image TEXT NOT NULL
 );

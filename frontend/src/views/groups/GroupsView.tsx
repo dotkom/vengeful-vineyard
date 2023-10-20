@@ -39,13 +39,13 @@ export const GroupsView = () => {
 
   useEffect(() => {
     if (user && selectedGroupName === undefined) {
-      navigate(`/grupper/${user.groups[0].path_name}`);
+      navigate(`/komiteer/${user.groups[0].name_short}`);
     }
   }, [user, selectedGroupName]);
 
   const selectedGroup = user?.groups.find(
-    (group) => group.path_name === selectedGroupName
-  );
+    (group) => group.name_short === selectedGroupName
+    );
 
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["groupLeaderboard", selectedGroup?.group_id],
@@ -60,7 +60,11 @@ export const GroupsView = () => {
     <section className="mt-16">
       <Tabs
         selectedGroup={selectedGroup}
+<<<<<<< Updated upstream
         setSelectedGroup={group => group && navigate(`/grupper/${group.path_name}`)}
+=======
+        setSelectedGroup={group => group && navigate(`/komiteer/${group.name_short}`)}
+>>>>>>> Stashed changes
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />

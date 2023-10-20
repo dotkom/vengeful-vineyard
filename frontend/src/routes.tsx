@@ -12,7 +12,7 @@ export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route path="/" element={<Home />} />
-      <Route path="/grupper/:groupName" element={<Home />} />
+      <Route path="/komiteer/:groupName" element={<Home />} />
       <Route path="/profil" element={<Profile />} />
       <Route path="/wall-of-shame" element={<WallOfShame />} />
     </Route>
