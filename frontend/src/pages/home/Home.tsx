@@ -1,14 +1,13 @@
-import { useAuth } from "react-oidc-context";
-import { GroupsView } from "../../views/groups";
-import { DefaultHero } from "../../views/hero";
-import { useParams } from "react-router-dom";
+import { useAuth } from "react-oidc-context"
+import { GroupsView } from "../../views/groups"
+import { DefaultHero } from "../../views/hero"
 
 export const Home = () => {
-  const auth = useAuth();
+  const auth = useAuth()
 
   if (auth.isAuthenticated) {
-    return <GroupsView />;
+    return <GroupsView />
   }
 
-  return <DefaultHero auth={auth} />;
-};
+  return <DefaultHero auth={auth} />
+}

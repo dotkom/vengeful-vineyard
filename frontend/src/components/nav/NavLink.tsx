@@ -1,8 +1,8 @@
-import { NavLink as Link } from "react-router-dom";
+import { NavLink as Link } from "react-router-dom"
 
 interface NavLinkProps {
-  label: string;
-  url: string;
+  label: string
+  url: string
 }
 
 export const NavLink = ({ label, url }: NavLinkProps) => (
@@ -19,4 +19,4 @@ export const NavLink = ({ label, url }: NavLinkProps) => (
   >
     {label}
   </Link>
-);
+)

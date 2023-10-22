@@ -1,29 +1,21 @@
-import * as Accordion from "@radix-ui/react-accordion";
+import * as Accordion from "@radix-ui/react-accordion"
 
-import { Group, Leaderboard, LeaderboardUser } from "../../helpers/types";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from "@tanstack/react-query";
+import { Group, Leaderboard } from "../../helpers/types"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
 
-import { SkeletonTableItem } from "./SkeletonTableItem";
-import { TableItem } from "./TableItem";
+import { SkeletonTableItem } from "./SkeletonTableItem"
+import { TableItem } from "./TableItem"
 
 interface TableProps {
-  groupData?: Group | undefined;
-  leaderboardData?: Leaderboard | undefined;
-  isLoading: boolean;
+  groupData?: Group | undefined
+  leaderboardData?: Leaderboard | undefined
+  isLoading: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<any, unknown>>;
+  ) => Promise<QueryObserverResult<never, unknown>>
 }
 
-export const Table = ({
-  groupData,
-  leaderboardData,
-  dataRefetch,
-}: TableProps) => (
+export const Table = ({ groupData, leaderboardData, dataRefetch }: TableProps) => (
   <ul role="list">
     <Accordion.Root
       type="single"
@@ -53,8 +45,8 @@ export const Table = ({
                   leaderboardUser={user}
                   dataRefetch={dataRefetch}
                   i={i}
-                />)
-              )}
+                />
+              ))}
             </>
           ) : (
             <>
@@ -67,4 +59,4 @@ export const Table = ({
       )}
     </Accordion.Root>
   </ul>
-);
+)

@@ -6,4 +6,4 @@ export const GitHubIcon = (props: React.ComponentProps<"svg">) => (
       clipRule="evenodd"
     />
   </svg>
-);
+)

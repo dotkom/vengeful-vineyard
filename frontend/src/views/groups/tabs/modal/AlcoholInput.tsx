@@ -1,20 +1,14 @@
-import { Group } from "../../../../helpers/types";
+import { Group } from "../../../../helpers/types"
 
 interface AlcoholInputProps {
-  type: number;
-  amount: number;
-  data: Group;
-  typeInputHandler: (evt: React.ChangeEvent<HTMLSelectElement>) => void;
-  amountInputHandler: (evt: React.ChangeEvent<HTMLInputElement>) => void;
+  type: number
+  amount: number
+  data: Group
+  typeInputHandler: (evt: React.ChangeEvent<HTMLSelectElement>) => void
+  amountInputHandler: (evt: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export const AlcoholInput = ({
-  type,
-  amount,
-  data,
-  typeInputHandler,
-  amountInputHandler,
-}: AlcoholInputProps) => (
+export const AlcoholInput = ({ type, amount, data, typeInputHandler, amountInputHandler }: AlcoholInputProps) => (
   <div>
     <div className="relative rounded-md shadow-sm">
       <input
@@ -38,11 +32,7 @@ export const AlcoholInput = ({
           onChange={typeInputHandler}
         >
           {data.punishment_types.map((type) => (
-            <option
-              key={type.punishment_type_id}
-              value={type.punishment_type_id}
-              title={`Verdi: ${type.value}kr`}
-            >
+            <option key={type.punishment_type_id} value={type.punishment_type_id} title={`Verdi: ${type.value}kr`}>
               {type.name} {type.logo_url}
             </option>
           ))}
@@ -50,4 +40,4 @@ export const AlcoholInput = ({
       </div>
     </div>
   </div>
-);
+)

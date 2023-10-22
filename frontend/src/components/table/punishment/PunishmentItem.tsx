@@ -1,91 +1,72 @@
-import {
-  LeaderboardPunishment,
-  Punishment,
-  PunishmentType,
-} from "../../../helpers/types";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-  useMutation,
-} from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
+import { LeaderboardPunishment, Punishment, PunishmentType } from "../../../helpers/types"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
+import axios, { AxiosResponse } from "axios"
 
-import { EmojiPicker } from "./emojies/EmojiPicker";
-import { ReactionsDisplay } from "./emojies/ReactionDisplay";
-import dayjs from "dayjs";
-import { getAddReactionUrl } from "../../../helpers/api";
-import { useState } from "react";
+import { EmojiPicker } from "./emojies/EmojiPicker"
+import { ReactionsDisplay } from "./emojies/ReactionDisplay"
+import dayjs from "dayjs"
+import { getAddReactionUrl } from "../../../helpers/api"
+import { useState } from "react"
 
 interface PunishmentItemProps {
-  punishment: Punishment | LeaderboardPunishment;
-  punishmentTypes: PunishmentType[];
+  punishment: Punishment | LeaderboardPunishment
+  punishmentTypes: PunishmentType[]
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<any, unknown>>;
+  ) => Promise<QueryObserverResult<never>>
 }
 
-export const PunishmentItem = ({
-  punishment,
-  punishmentTypes,
-  dataRefetch,
-}: PunishmentItemProps) => {
-  const [selectedEmoji, setSelectedEmoji] = useState("👍");
+export const PunishmentItem = ({ punishment, punishmentTypes, dataRefetch }: PunishmentItemProps) => {
+  const [_, setSelectedEmoji] = useState("👍")
 
   const addReactionCall = async (emoji: string) => {
-    const ADD_REACTION_URL = getAddReactionUrl(punishment.punishment_id);
+    const ADD_REACTION_URL = getAddReactionUrl(punishment.punishment_id)
     const res: AxiosResponse<string> = await axios.post(ADD_REACTION_URL, {
       emoji,
-    });
-    return res.data;
-  };
+    })
+    return res.data
+  }
 
   const removeReactionCall = async () => {
-    const REMOVE_REACTION_URL = getAddReactionUrl(punishment.punishment_id);
-    const res: AxiosResponse<string> = await axios.delete(REMOVE_REACTION_URL);
-    return res.data;
-  };
+    const REMOVE_REACTION_URL = getAddReactionUrl(punishment.punishment_id)
+    const res: AxiosResponse<string> = await axios.delete(REMOVE_REACTION_URL)
+    return res.data
+  }
 
   const { mutate } = useMutation(addReactionCall, {
     onSuccess: () => dataRefetch(),
     onError: () => console.log("Todo: Handle error"),
-  });
+  })
 
   const { mutate: removeMutation } = useMutation(removeReactionCall, {
     onSuccess: () => dataRefetch(),
     onError: () => console.log("Todo: Handle error"),
-  });
+  })
 
-  const date = dayjs(punishment.created_at);
-  const formattedDate = date.format("DD. MMM YY");
+  const date = dayjs(punishment.created_at)
+  const formattedDate = date.format("DD. MMM YY")
 
-  const isWallOfShame = /wall-of-shame/.test(window.location.href);
+  const isWallOfShame = /wall-of-shame/.test(window.location.href)
 
-  let punishmentType = punishmentTypes.find(
-    (type) => type.punishment_type_id === punishment.punishment_type_id
-  );
+  let punishmentType = punishmentTypes.find((type) => type.punishment_type_id === punishment.punishment_type_id)
 
   if (!punishmentType) {
-    const innerPunishment = punishment as LeaderboardPunishment;
-    punishmentType = innerPunishment.punishment_type;
+    const innerPunishment = punishment as LeaderboardPunishment
+    punishmentType = innerPunishment.punishment_type
   }
 
   return (
-    <div
-      className={`relative flex border-b border-l-8 border-l-indigo-600 pb-6 md:border-l-4`}
-    >
+    <div className={`relative flex border-b border-l-8 border-l-indigo-600 pb-6 md:border-l-4`}>
       <div className="text-left font-light">
         <p className="m-4">
           <span className="block">
             {punishment.reason_hidden && isWallOfShame ? (
-                <span className="italic">*Årsak skjult*</span>
+              <span className="italic">*Årsak skjult*</span>
             ) : (
               punishment.reason
             )}
           </span>
-          <span className="block text-gray-500">
-            - Gitt av {punishment.created_by_name}
-          </span>
+          <span className="block text-gray-500">- Gitt av {punishment.created_by_name}</span>
         </p>
       </div>
       <div className="max-w-xs">
@@ -101,9 +82,7 @@ export const PunishmentItem = ({
           ))}
         </div>
       </div>
-      <div className="text-gray-500' absolute right-8 top-4 font-normal">
-        {formattedDate}
-      </div>
+      <div className="text-gray-500' absolute right-8 top-4 font-normal">{formattedDate}</div>
       <div>
         <EmojiPicker mutate={mutate} setSelectedEmoji={setSelectedEmoji} />
         <ReactionsDisplay
@@ -114,5 +93,5 @@ export const PunishmentItem = ({
         />
       </div>
     </div>
-  );
-};
+  )
+}

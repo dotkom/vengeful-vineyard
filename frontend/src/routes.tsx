@@ -1,12 +1,8 @@
-import {
-  createRoutesFromElements,
-  createBrowserRouter,
-  Route,
-} from "react-router-dom";
-import { Layout } from "./views/layout";
-import { Home } from "./pages/home";
-import { Profile } from "./pages/profile";
-import { WallOfShame } from "./pages/wallOfShame";
+import { createRoutesFromElements, createBrowserRouter, Route } from "react-router-dom"
+import { Layout } from "./views/layout"
+import { Home } from "./pages/home"
+import { Profile } from "./pages/profile"
+import { WallOfShame } from "./pages/wallOfShame"
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -17,4 +13,4 @@ export const router = createBrowserRouter(
       <Route path="/wall-of-shame" element={<WallOfShame />} />
     </Route>
   )
-);
+)
