@@ -45,3 +45,7 @@ Created with [FastAPI](https://fastapi.tiangolo.com) and PostgreSQL.
 
 Please take a look at our issues if you want to contribute to this project. Pull requests are welcome!
 
+Before contributing, make sure to install pre-commit hooks with `pre-commit install`.
+
+If you don't have `pre-commit` installed, you can install it with `pip install pre-commit` or `brew install pre-commit`
+
