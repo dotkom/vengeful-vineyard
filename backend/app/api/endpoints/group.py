@@ -249,12 +249,11 @@ async def add_user_to_group(
             group = await app.db.groups.get(group_id)
         except NotFound as exc:
             raise HTTPException(status_code=404, detail="Group not found") from exc
-        else:
-            if group.ow_group_id is not None:
-                raise HTTPException(
-                    status_code=400,
-                    detail="ow_group_user_id is required to join this group",
-                )
+        if group.ow_group_id is not None:
+            raise HTTPException(
+                status_code=400,
+                detail="ow_group_user_id is required to join this group",
+            )
 
     try:
         return await app.db.groups.insert_member(

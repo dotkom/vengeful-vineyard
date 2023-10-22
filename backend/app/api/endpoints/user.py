@@ -105,8 +105,7 @@ async def post_user(
         data = await app.db.users.insert(user)
     except DatabaseIntegrityException as exc:
         raise HTTPException(status_code=400, detail=exc.detail) from exc
-    else:
-        return {"id": data["id"]}
+    return {"id": data["id"]}
 
 
 @router.get(
