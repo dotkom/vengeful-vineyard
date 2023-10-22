@@ -8,6 +8,7 @@ import { Tabs } from "./tabs/Tabs";
 import { UserContext } from "../../helpers/userContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { sortGroupUsers, sortGroups } from "../../helpers/sorting";
+import {PunishmentsEditor} from "./PunishmentsEditor";
 
 export const GroupsView = () => {
   const { setUser } = useContext(UserContext);

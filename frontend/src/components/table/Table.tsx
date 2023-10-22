@@ -9,6 +9,7 @@ import {
 
 import { SkeletonTableItem } from "./SkeletonTableItem";
 import { TableItem } from "./TableItem";
+import {PunishmentsEditor} from "../../views/groups/PunishmentsEditor";
 
 interface TableProps {
   groupData?: Group | undefined;
@@ -65,6 +66,13 @@ export const Table = ({
           )}
         </>
       )}
+
+      <details className="p-4">
+        <summary className="cursor-pointer bg-gray-200 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-4 text-black list-item ml-10">
+            Straffetyper i {groupData?.name_short}
+        </summary>
+        <PunishmentsEditor groupData={groupData} isLoading={false} dataRefetch={dataRefetch} />
+      </details>
     </Accordion.Root>
   </ul>
 );
