@@ -477,7 +477,12 @@ class TestWithDB_OW:
             headers={"Authorization": SELF_USER_AUTHORIZATION},
         )
         assert response.status_code == 200
-        assert response.json() == {"id": 4}
+        assert response.json() == {
+            "logo_url": "🍺",
+            "name": "Waffles",
+            "punishment_type_id": 4,
+            "value": 125,
+        }
         check_response_time(response)
 
     @pytest.mark.asyncio

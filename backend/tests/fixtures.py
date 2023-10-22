@@ -47,7 +47,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 
 @pytest_asyncio.fixture(scope="class")
 async def mock() -> AsyncGenerator[aioresponses, None]:
-    with aioresponses() as m:  # type: ignore
+    with aioresponses() as m:
         # Register endpoints to mock here
 
         # TestOW.test_get_my_groups_unauthenticated()

@@ -22,7 +22,7 @@ from app.models.punishment import (
     PunishmentStreaks,
     TotalPunishmentValue,
 )
-from app.models.punishment_type import PunishmentTypeCreate
+from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.types import GroupEventId, GroupId, OWGroupUserId, PunishmentTypeId, UserId
 from app.utils.pagination import Page, Pagination
 
@@ -159,7 +159,7 @@ async def add_punishment_type_to_group(
     request: Request,
     group_id: GroupId,
     punishment_type: PunishmentTypeCreate,
-) -> dict[str, int]:
+) -> PunishmentTypeRead:
     """
     Endpoint to create a custom punishment type for a group.
     """
@@ -221,7 +221,6 @@ async def delete_punishment_type_to_group(
 
         try:
             await app.db.punishment_types.delete(
-                group_id,
                 punishment_type_id,
                 conn=conn,
             )

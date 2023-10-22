@@ -32,14 +32,14 @@ class PunishmentTypes:
         group_id: GroupId,
         punishment_type: PunishmentTypeCreate,
         conn: Optional[Pool] = None,
-    ) -> dict[str, int]:
+    ) -> PunishmentTypeRead:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """INSERT INTO punishment_types(group_id, name, value, logo_url)
                     VALUES ($1, $2, $3, $4)
-                    RETURNING punishment_type_id
+                    RETURNING *
                     """
             try:
-                punishment_type_id = await conn.fetchval(
+                punishment_type_row = await conn.fetchrow(
                     query,
                     group_id,
                     punishment_type.name,
@@ -51,19 +51,57 @@ class PunishmentTypes:
             except ForeignKeyViolationError as exc:
                 raise DatabaseIntegrityException(detail=str(exc)) from exc
 
-        return {"id": punishment_type_id}
+        return PunishmentTypeRead(**dict(punishment_type_row))
+
+    async def update(
+        self,
+        punishment_type: PunishmentTypeCreate,
+        punishment_type_id: PunishmentTypeId,
+        conn: Optional[Pool] = None,
+    ) -> PunishmentTypeRead:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """UPDATE punishment_types
+                    SET name = $1, value = $2, logo_url = $3
+                    WHERE punishment_type_id = $4
+                    RETURNING *
+                    """
+            try:
+                punishment_type_row = await conn.fetchrow(
+                    query,
+                    punishment_type.name,
+                    punishment_type.value,
+                    punishment_type.logo_url,
+                    punishment_type_id,
+                )
+            except UniqueViolationError as exc:
+                raise DatabaseIntegrityException(detail=str(exc)) from exc
+            except ForeignKeyViolationError as exc:
+                raise DatabaseIntegrityException(detail=str(exc)) from exc
+
+        return PunishmentTypeRead(**dict(punishment_type_row))
+
+    async def get(
+        self,
+        punishment_type_id: PunishmentTypeId,
+        conn: Optional[Pool] = None,
+    ) -> PunishmentTypeRead:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = "SELECT * FROM punishment_types WHERE punishment_type_id = $1"
+            punishment_type = await conn.fetchrow(query, punishment_type_id)
+
+        return PunishmentTypeRead(**dict(punishment_type))
 
     async def delete(
         self,
-        group_id: GroupId,
         punishment_type_id: PunishmentTypeId,
         conn: Optional[Pool] = None,
     ) -> None:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = "DELETE FROM punishment_types WHERE group_id = $1 AND punishment_type_id = $2 RETURNING *"
+            query = (
+                "DELETE FROM punishment_types WHERE punishment_type_id = $1 RETURNING *"
+            )
             val = await conn.fetchval(
                 query,
-                group_id,
                 punishment_type_id,
             )
 
