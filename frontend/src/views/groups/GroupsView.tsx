@@ -53,7 +53,7 @@ export const GroupsView = () => {
     <section className="mt-16">
       <Tabs
         selectedGroup={selectedGroup}
-        setSelectedGroup={(group) => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
+        setSelectedGroup={(group: Group) => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
       />
