@@ -27,7 +27,9 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
   return (
     <Fragment>
       <Transition.Root show={open} as={Fragment}>
-        <Modal setOpen={setOpen} ref={cancelButtonRef} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
+        {selectedGroup && (
+          <Modal setOpen={setOpen} ref={cancelButtonRef} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
+        )}
       </Transition.Root>
 
       <div className="mx-4 max-w-5xl md:m-auto md:px-8">

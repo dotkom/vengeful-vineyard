@@ -22,8 +22,8 @@ interface ModalInputProps {
     }>
   >
   data: Group
-  selectedPerson: GroupUser
-  setSelectedPerson: React.Dispatch<React.SetStateAction<GroupUser>>
+  selectedPerson: GroupUser | undefined
+  setSelectedPerson: React.Dispatch<React.SetStateAction<GroupUser | undefined>>
 }
 
 export const ModalInput = ({
