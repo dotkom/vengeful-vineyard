@@ -1,8 +1,8 @@
-import { AuthContextProps } from "react-oidc-context";
-import { Button } from "../../components/button";
+import { AuthContextProps } from "react-oidc-context"
+import { Button } from "../../components/button"
 
 interface DefaultHeroProps {
-  auth: AuthContextProps;
+  auth: AuthContextProps
 }
 
 export const DefaultHero = ({ auth }: DefaultHeroProps) => (
@@ -23,32 +23,19 @@ export const DefaultHero = ({ auth }: DefaultHeroProps) => (
           <path d="M.5 200V.5H200" fill="none" />
         </pattern>
       </defs>
-      <rect
-        width="100%"
-        height="100%"
-        strokeWidth={0}
-        fill="url(#0787a7c5-978c-4f66-83c7-11c213f99cb7)"
-      />
+      <rect width="100%" height="100%" strokeWidth={0} fill="url(#0787a7c5-978c-4f66-83c7-11c213f99cb7)" />
     </svg>
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
       <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-8">
-        <h1 className="mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-          Vengeful Vineyard
-        </h1>
+        <h1 className="mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">Vengeful Vineyard</h1>
         <p className="mt-6 text-lg leading-8 text-gray-600">
-          Vengeful Vineyard er en mystisk og hensynsløs vinmark kjent for å ha
-          en uforklarlig historie med hevn og ondskap. Folk sier at den eies av
-          en gammel familie med dype røtter i vinsmaking, men at den også er
-          hjemsøkt av en ubarmhjertig kraft som straffer de som våger å stjele
-          eller ødelegge avlingene. Ingenting kan forberede deg på de
-          overnaturlige konsekvensene som følger med å bryte lovene som styrer
-          denne vingården.
+          Vengeful Vineyard er en mystisk og hensynsløs vinmark kjent for å ha en uforklarlig historie med hevn og
+          ondskap. Folk sier at den eies av en gammel familie med dype røtter i vinsmaking, men at den også er hjemsøkt
+          av en ubarmhjertig kraft som straffer de som våger å stjele eller ødelegge avlingene. Ingenting kan forberede
+          deg på de overnaturlige konsekvensene som følger med å bryte lovene som styrer denne vingården.
         </p>
         <div className="mt-10 flex items-center gap-x-6">
-          <Button
-            clickHandler={() => void auth.signinRedirect()}
-            label="Logg inn"
-          />
+          <Button clickHandler={() => void auth.signinRedirect()} label="Logg inn" />
         </div>
       </div>
       <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
@@ -66,4 +53,4 @@ export const DefaultHero = ({ auth }: DefaultHeroProps) => (
       </div>
     </div>
   </div>
-);
+)

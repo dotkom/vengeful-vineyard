@@ -1,14 +1,12 @@
+import React from "react"
+
 interface TextInputProps {
-  placeholder: string;
-  value: string;
-  changeHandler: (evt: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string
+  value: string
+  changeHandler: (evt: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export const TextInput = ({
-  placeholder,
-  value,
-  changeHandler,
-}: TextInputProps) => (
+export const TextInput = ({ placeholder, value, changeHandler }: TextInputProps) => (
   <div className="mt-1">
     <input
       type="text"
@@ -20,4 +18,4 @@ export const TextInput = ({
       onChange={changeHandler}
     />
   </div>
-);
+)

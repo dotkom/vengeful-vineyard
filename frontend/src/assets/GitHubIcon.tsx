@@ -1,3 +1,5 @@
+import React from "react"
+
 export const GitHubIcon = (props: React.ComponentProps<"svg">) => (
   <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
     <path
@@ -6,4 +8,4 @@ export const GitHubIcon = (props: React.ComponentProps<"svg">) => (
       clipRule="evenodd"
     />
   </svg>
-);
+)

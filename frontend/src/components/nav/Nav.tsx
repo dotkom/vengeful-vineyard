@@ -1,15 +1,15 @@
-import { Fragment } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import OnlineLogo from "../../assets/online.png";
-import { AuthContextProps } from "react-oidc-context";
-import { classNames } from "../../helpers/classNames";
-import { AvatarIcon } from "@radix-ui/react-icons";
-import { Link } from "react-router-dom";
-import { NavLink } from "./NavLink";
+import { Fragment } from "react"
+import { Disclosure, Menu, Transition } from "@headlessui/react"
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
+import OnlineLogo from "../../assets/online.png"
+import { AuthContextProps } from "react-oidc-context"
+import { classNames } from "../../helpers/classNames"
+import { AvatarIcon } from "@radix-ui/react-icons"
+import { Link } from "react-router-dom"
+import { NavLink } from "./NavLink"
 
 interface NavProps {
-  auth: AuthContextProps;
+  auth: AuthContextProps
 }
 
 export const Nav = ({ auth }: NavProps) => (
@@ -31,18 +31,10 @@ export const Nav = ({ auth }: NavProps) => (
               </div>
               <div className="flex flex-shrink-0 items-center">
                 <Link to="/">
-                  <img
-                    className="block h-8 w-auto cursor-pointer lg:hidden"
-                    src={OnlineLogo}
-                    alt="Online Logo"
-                  />
+                  <img className="block h-8 w-auto cursor-pointer lg:hidden" src={OnlineLogo} alt="Online Logo" />
                 </Link>
                 <Link to="/">
-                  <img
-                    className="hidden h-8 w-auto cursor-pointer lg:block"
-                    src={OnlineLogo}
-                    alt="Online Logo"
-                  />
+                  <img className="hidden h-8 w-auto cursor-pointer lg:block" src={OnlineLogo} alt="Online Logo" />
                 </Link>
               </div>
               <div className="hidden md:ml-6 md:flex md:space-x-8">
@@ -148,12 +140,8 @@ export const Nav = ({ auth }: NavProps) => (
                 />
               </div>
               <div className="ml-3">
-                <div className="text-base font-medium text-gray-800">
-                  B-Rage
-                </div>
-                <div className="text-sm font-medium text-gray-500">
-                  brage@online.ntnu.no
-                </div>
+                <div className="text-base font-medium text-gray-800">B-Rage</div>
+                <div className="text-sm font-medium text-gray-500">brage@online.ntnu.no</div>
               </div>
             </div>
             <div className="mt-3 space-y-1">
@@ -178,4 +166,4 @@ export const Nav = ({ auth }: NavProps) => (
       </>
     )}
   </Disclosure>
-);
+)

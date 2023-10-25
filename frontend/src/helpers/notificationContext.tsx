@@ -1,14 +1,14 @@
-import { createContext } from "react";
+import { createContext } from "react"
 
 interface NotificationType {
-  show: boolean;
-  title: string;
-  text: string;
+  show: boolean
+  title: string
+  text: string
 }
 
 export const NotificationContext = createContext<{
-  notification: NotificationType;
-  setNotification: (notification: NotificationType) => void;
+  notification: NotificationType
+  setNotification: (notification: NotificationType) => void
 }>({
   notification: {
     show: false,
@@ -16,4 +16,4 @@ export const NotificationContext = createContext<{
     text: "",
   },
   setNotification: () => {},
-});
+})
