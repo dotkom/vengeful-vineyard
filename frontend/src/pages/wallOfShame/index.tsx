@@ -1,3 +1,3 @@
-import { WallOfShame } from "./WallOfShame";
+import { WallOfShame } from "./WallOfShame"
 
-export { WallOfShame };
+export { WallOfShame }

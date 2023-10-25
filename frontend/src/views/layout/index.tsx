@@ -1,3 +1,3 @@
-import { Layout } from "./Layout";
+import { Layout } from "./Layout"
 
-export { Layout };
+export { Layout }

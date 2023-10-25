@@ -5,4 +5,4 @@ export const SkeletonTableItem = () => (
       <span className="h-6 w-32 rounded-full bg-slate-300 text-sm font-semibold leading-6 text-gray-900" />
     </div>
   </div>
-);
+)

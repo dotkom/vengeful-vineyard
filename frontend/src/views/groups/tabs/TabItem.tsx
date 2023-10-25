@@ -1,11 +1,11 @@
-import { ComputerDesktopIcon } from "@heroicons/react/24/outline";
-import { classNames } from "../../../helpers/classNames";
-import { Group } from "../../../helpers/types";
+import { ComputerDesktopIcon } from "@heroicons/react/24/outline"
+import { classNames } from "../../../helpers/classNames"
+import { Group } from "../../../helpers/types"
 
 interface TabItemProps {
-  group: Group;
-  selectedGroup: Group | undefined;
-  onClick: () => void;
+  group: Group
+  selectedGroup: Group | undefined
+  onClick: () => void
 }
 
 export const TabItem = ({ group, selectedGroup, onClick }: TabItemProps) => (
@@ -21,13 +21,11 @@ export const TabItem = ({ group, selectedGroup, onClick }: TabItemProps) => (
   >
     <ComputerDesktopIcon
       className={classNames(
-        group.name_short === selectedGroup?.name_short
-          ? "text-gray-900"
-          : "text-gray-500 group-hover:text-gray-900",
+        group.name_short === selectedGroup?.name_short ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
         "-ml-0.5 mr-2 h-5 w-5"
       )}
       aria-hidden="true"
     />
     <span>{group.name_short}</span>
   </a>
-);
+)
