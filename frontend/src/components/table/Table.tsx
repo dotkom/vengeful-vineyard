@@ -5,6 +5,7 @@ import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanst
 
 import { SkeletonTableItem } from "./SkeletonTableItem"
 import { TableItem } from "./TableItem"
+import React from "react"
 
 interface TableProps {
   groupData?: Group | undefined
