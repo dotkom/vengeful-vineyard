@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint-staged": "lint-staged"
+    "pre-commit": "lint-staged && tsc --noEmit"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.10",

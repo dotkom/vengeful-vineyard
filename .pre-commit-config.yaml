@@ -52,6 +52,6 @@ repos:
         language: system
       - id: lint-staged
         name: lint-staged
-        entry: bash -c "cd frontend && pnpm run lint-staged"
+        entry: bash -c "cd frontend && pnpm run pre-commit"
         language: system
         always_run: true
