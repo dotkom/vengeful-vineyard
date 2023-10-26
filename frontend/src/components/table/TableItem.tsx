@@ -96,7 +96,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
   const streak = weeklyStreak(today, dateToNumber);
 
   return (
-    <AccordionItem value={user.user_id}>
+    <AccordionItem value={user.user_id.toString()}>
       <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
         <div className="flex items-center gap-x-2">
           <span className="flex h-12 w-12 pb-1 items-center justify-center rounded-full bg-indigo-100 align-middle text-3xl text-[#4C4C51]">

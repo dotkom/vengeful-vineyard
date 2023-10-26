@@ -9,7 +9,7 @@ import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanst
 
 interface TabsProps {
   selectedGroup: Group | undefined
-  setSelectedGroup: React.Dispatch<React.SetStateAction<Group | undefined>>
+  setSelectedGroup: (group: Group) => void
   groups?: Group[]
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined

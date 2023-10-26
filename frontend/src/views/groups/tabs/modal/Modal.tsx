@@ -1,4 +1,4 @@
-import React, { forwardRef, Fragment, useContext, useState } from "react"
+import React, { forwardRef, Fragment, MutableRefObject, useContext, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { SunIcon } from "@radix-ui/react-icons"
 import { getAddPunishmentUrl, getGroupLeaderboardUrl } from "../../../../helpers/api"
@@ -17,7 +17,7 @@ interface ModalProps {
   ) => Promise<QueryObserverResult<Group, unknown>>
 }
 
-export const Modal = forwardRef(({ setOpen, selectedGroup, dataRefetch }: ModalProps, ref) => {
+export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selectedGroup, dataRefetch }, ref) => {
   const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(undefined)
   const [newPunishment, setNewPunishment] = useState({
     punishment_type_id: 1,
@@ -68,7 +68,12 @@ export const Modal = forwardRef(({ setOpen, selectedGroup, dataRefetch }: ModalP
 
   if (data)
     return (
-      <Dialog as="div" className="relative z-10" initialFocus={ref} onClose={setOpen}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        initialFocus={typeof ref === "function" ? undefined : (ref as MutableRefObject<HTMLButtonElement>)}
+        onClose={() => setOpen(false)}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-100"
