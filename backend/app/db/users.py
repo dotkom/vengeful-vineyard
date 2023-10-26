@@ -85,6 +85,11 @@ class Users:
                 limit,
             )
 
+            for user in res:
+                assert isinstance(
+                    user["punishments"], list
+                ), f"Expected list, got :{type(user['punishments'])}\n{user['punishments'].__repr__()}"
+
             users = [LeaderboardUser(**r) for r in res]
 
             if not force_include_reasons:
