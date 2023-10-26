@@ -1,10 +1,11 @@
-import { Table } from "../../components/table"
-import { useGroupLeaderboard, useMyGroups } from "../../helpers/api"
-import { Group } from "../../helpers/types"
 import { useContext, useEffect } from "react"
+import { useGroupLeaderboard, useMyGroups } from "../../helpers/api"
+import { useNavigate, useParams } from "react-router-dom"
+
+import { Group } from "../../helpers/types"
+import { Table } from "../../components/table"
 import { Tabs } from "./tabs/Tabs"
 import { UserContext } from "../../helpers/userContext"
-import { useNavigate, useParams } from "react-router-dom"
 
 export const GroupsView = () => {
   const { setUserContext } = useContext(UserContext)

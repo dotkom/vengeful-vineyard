@@ -1,28 +1,25 @@
-import React, { forwardRef, Fragment, MutableRefObject, useContext, useEffect, useState } from "react"
+import React, { forwardRef, Fragment, MutableRefObject, useContext, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { SunIcon } from "@radix-ui/react-icons"
-import { addPunishment, useGroupLeaderboard } from "../../../../helpers/api"
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
-import { Group, GroupUser, PunishmentCreate } from "../../../../helpers/types"
+import { getAddPunishmentUrl, getGroupLeaderboardUrl } from "../../../../helpers/api"
+import axios, { AxiosResponse } from "axios"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
+import { Group, GroupUser } from "../../../../helpers/types"
 import { NotificationContext } from "../../../../helpers/notificationContext"
 import { ModalInput } from "./ModalInput"
+import { sortGroupUsers } from "../../../../helpers/sorting"
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  isLoading: boolean
-  includePrimaryButton?: boolean
-  primaryButtonLabel?: string
-  includeCancelButton?: boolean
-  cancelButtonLabel?: string
-  title?: string
-  children?: React.ReactNode
-  primaryButtonAction?: () => void
-  cancelButtonAction?: () => void
+  selectedGroup: Group
+  dataRefetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Group, unknown>>
 }
 
 export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selectedGroup, dataRefetch }, ref) => {
   const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(undefined)
-  const [newPunishment, setNewPunishment] = useState<PunishmentCreate>({
+  const [newPunishment, setNewPunishment] = useState({
     punishment_type_id: 1,
     reason: "",
     reason_hidden: true,
@@ -30,27 +27,34 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
   })
   const { setNotification } = useContext(NotificationContext)
 
-  const { data: group } = useGroupLeaderboard(selectedGroup.group_id)
-
-  useEffect(() => {
-    if (group === undefined) return
-    setSelectedPerson(group.members[0])
-    setNewPunishment((prev) => ({
-      ...prev,
-      punishment_type_id: group.punishment_types[0].punishment_type_id,
-    }))
-  }, [group])
+  const { data } = useQuery({
+    queryKey: ["groupLeaderboard", selectedGroup?.group_id],
+    queryFn: () =>
+      axios.get(getGroupLeaderboardUrl(selectedGroup.group_id)).then((res: AxiosResponse<Group>) => {
+        setSelectedPerson(res.data.members[0])
+        setNewPunishment((prev) => ({
+          ...prev,
+          punishment_type_id: res.data.punishment_types[0].punishment_type_id,
+        }))
+        const group = res.data
+        group.members = sortGroupUsers(group.members, group.punishment_types)
+        return group
+      }),
+  })
 
   const createPunishmentCall = async () => {
     if (selectedPerson) {
-      return await addPunishment(selectedGroup.group_id, selectedPerson.user_id, newPunishment)
+      const ADD_PUNISHMENT_URL = getAddPunishmentUrl(selectedGroup.group_id, selectedPerson.user_id)
+      const res: AxiosResponse<string> = await axios.post(ADD_PUNISHMENT_URL, [newPunishment])
+      return res.data
     } else {
       console.log("......")
     }
+  }
 
   const { mutate } = useMutation(createPunishmentCall, {
     onSuccess: () => {
-      dataRefetch().then()
+      dataRefetch()
       setNotification({
         show: true,
         title: "Straff registrert!",
@@ -62,7 +66,7 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
     },
   })
 
-  if (group)
+  if (data)
     return (
       <Dialog
         as="div"
@@ -108,7 +112,7 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
                         <ModalInput
                           newPunishment={newPunishment}
                           setNewPunishment={setNewPunishment}
-                          data={group}
+                          data={data}
                           selectedPerson={selectedPerson}
                           setSelectedPerson={setSelectedPerson}
                         />
@@ -117,37 +121,24 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
                   </div>
                 </div>
                 <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  {includePrimaryButton && (
-                    <button
-                      type="button"
-                      className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
-                      onClick={() => {
-                        setOpen(false)
-
-                        if (primaryButtonAction) {
-                          primaryButtonAction()
-                        }
-                      }}
-                    >
-                      {primaryButtonLabel}
-                    </button>
-                  )}
-                  {includeCancelButton && (
-                    <button
-                      type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                      onClick={() => {
-                        setOpen(false)
-
-                        if (cancelButtonAction) {
-                          cancelButtonAction()
-                        }
-                      }}
-                      ref={ref}
-                    >
-                      {cancelButtonLabel}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                    onClick={() => {
+                      mutate()
+                      setOpen(false)
+                    }}
+                  >
+                    Gi straff
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    onClick={() => setOpen(false)}
+                    ref={ref}
+                  >
+                    Avbryt
+                  </button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
@@ -155,5 +146,6 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
         </div>
       </Dialog>
     )
-  }
-)
+
+  return <h1>loading</h1>
+})

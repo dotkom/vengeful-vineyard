@@ -1,11 +1,12 @@
 import { PlusIcon } from "@heroicons/react/24/outline"
 import { Modal } from "./modal/Modal"
-import React, { Fragment, useEffect, useRef, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { Transition } from "@headlessui/react"
 import { Group } from "../../../helpers/types"
 import { TabItem } from "./TabItem"
 import { SkeletonTabItem } from "./SkeletonTabItem"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
+import { IconButton } from "../../../components/button"
 
 interface TabsProps {
   selectedGroup: Group | undefined
@@ -46,15 +47,13 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
                       onClick={() => setSelectedGroup(group)}
                     />
                   ))}
-                  <div className="w-full">
-                    <button
-                      type="button"
-                      className="relative float-right inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      onClick={() => setOpen(true)}
-                    >
+                  <div className="w-full flex flex-row gap-x-2 mb-1 justify-end">
+                    <IconButton label="Ny straff" onClick={() => setOpen(true)}>
                       <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                      Ny straff
-                    </button>
+                    </IconButton>
+                    <IconButton label="Registrer">
+                      <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+                    </IconButton>
                   </div>
                 </>
               ) : (
