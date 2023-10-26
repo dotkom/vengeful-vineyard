@@ -1,21 +1,22 @@
 import * as Accordion from "@radix-ui/react-accordion"
 
-import { Group, Leaderboard } from "../../helpers/types"
+import { Group, LeaderboardUser } from "../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
 
 import { SkeletonTableItem } from "./SkeletonTableItem"
 import { TableItem } from "./TableItem"
+import React from "react"
 
 interface TableProps {
   groupData?: Group | undefined
-  leaderboardData?: Leaderboard | undefined
+  leaderboardUsers?: LeaderboardUser[] | undefined
   isLoading: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
 }
 
-export const Table = ({ groupData, leaderboardData, dataRefetch }: TableProps) => (
+export const Table = ({ groupData, leaderboardUsers, dataRefetch }: TableProps) => (
   <ul role="list">
     <Accordion.Root
       type="single"
@@ -36,9 +37,9 @@ export const Table = ({ groupData, leaderboardData, dataRefetch }: TableProps) =
         </>
       ) : (
         <>
-          {leaderboardData ? (
+          {leaderboardUsers ? (
             <>
-              {leaderboardData.results.map((user, i) => (
+              {leaderboardUsers.map((user, i) => (
                 <TableItem
                   key={user.user_id}
                   punishmentTypes={[]}
