@@ -1271,8 +1271,8 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  /crypto-js@4.1.1:
-    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
+  /crypto-js@4.2.0:
+    resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
     dev: false
 
   /cssesc@3.0.0:
@@ -2053,7 +2053,7 @@ packages:
     resolution: {integrity: sha512-g/W+DsUVeHZ8A7xUSTeK4bI6BNs9ROtMiiOOo+0M6IiTHxueJ757GD8e/8nPBL+k/o6bkfM5mWg4cZcSI8Iosw==}
     engines: {node: '>=12.13.0'}
     dependencies:
-      crypto-js: 4.1.1
+      crypto-js: 4.2.0
       jwt-decode: 3.1.2
     dev: false
 
