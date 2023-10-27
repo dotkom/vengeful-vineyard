@@ -54,6 +54,17 @@ class Database:
         self.group_users = GroupUsers(self)
         self.group_events = GroupEvents(self)
 
+    async def get_migration_lock_version(self, conn: Optional[Pool]) -> int:
+        await conn.execute('CREATE TABLE IF NOT EXISTS __migration_version_lock (id INT PRIMARY KEY, version INT DEFAULT 0)')
+        has_version = await conn.fetchval('SELECT COUNT(*) AS count FROM __migration_version_lock')
+        if int(has_version) == 0:
+            await conn.execute('INSERT INTO __migration_version_lock VALUES (0, 0)')
+        current_version = await conn.fetchval('SELECT version FROM __migration_version_lock WHERE id = 0 LIMIT 1')
+        return int(current_version)
+
+    async def set_migration_lock_version(self, conn: Optional[Pool], version: int):
+        await conn.execute('UPDATE __migration_version_lock SET version = $1 WHERE id = 0', version)
+
     @property
     def pool(self) -> Pool:
         """A little hacky but mypy won't shut up about pool being None."""
@@ -93,15 +104,6 @@ class Database:
     async def close(self) -> None:
         await self.pool.close()
 
-    async def _set_database_version(
-        self,
-        version: int,
-        conn: Optional[Pool] = None,
-    ) -> None:
-        async with MaybeAcquire(conn, self.pool) as conn:
-            query = f"set mg.version to {version}; alter database {self._db_name} set mg.version from current;"
-            await conn.execute(query)
-
     async def load_db_migrations(self, conn: Optional[Pool] = None) -> None:
         """
         Loads the database schema and applies new migrations.
@@ -116,13 +118,7 @@ class Database:
         )
 
         async with MaybeAcquire(conn, self.pool) as conn:
-            query = "SELECT current_setting('mg.version') as version"
-            try:
-                schema_version = await conn.fetchval(query)
-            except UndefinedObjectError:
-                schema_version = 0
-            else:
-                schema_version = int(schema_version)
+            schema_version = await self.get_migration_lock_version(conn)
 
             logger.debug("Schema version: %d", schema_version)
 
@@ -135,4 +131,4 @@ class Database:
             logger.info("Applying migration: %s", file_.name)
 
             await conn.execute(sql_commands)
-            await self._set_database_version(file_version)
+            await self.set_migration_lock_version(conn, file_version)

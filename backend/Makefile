@@ -55,19 +55,34 @@ clean:
 docs:
 	poetry run pdoc3 --html --force .
 
+docker-build:
+	docker build -f lambda.Dockerfile --platform linux/amd64 -t vengeful-vineyard:latest .
+
+docker-push-dev:
+	docker tag vengeful-vineyard:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
+
+docker-login:
+	aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
+
+lambda-update-dev:
+	aws lambda update-function-code --function-name vengeful-vineyard-dev --image-uri 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
+
 help:
 	@echo "Makefile commands:"
-	@echo "help:    Show this help."
+	@echo "help:         Show this help."
 	@echo ""
-	@echo "prod:    Run production server (vengeful_vineyard.db)"
-	@echo "dev:     Run development server (dev.db)"
+	@echo "prod:         Run production server (vengeful_vineyard.db)"
+	@echo "dev:          Run development server (dev.db)"
 	@echo ""
-	@echo "docs:    Create documentation"
-	@echo "test:    Run tests"
-	@echo "testv:   Run tests (verbose)"
-	@echo "testvv:  Run tests (very verbose)"
-	@echo "pylint:  Python linter to check for common mistakes"
-	@echo "mypy:    Typecheck Python code"
-	@echo "hooks:   Run all commit hooks"
+	@echo "docs:         Create documentation"
+	@echo "test:         Run tests"
+	@echo "testv:        Run tests (verbose)"
+	@echo "testvv:       Run tests (very verbose)"
+	@echo "pylint:       Python linter to check for common mistakes"
+	@echo "mypy:         Typecheck Python code"
+	@echo "hooks:        Run all commit hooks"
+	@echo "docker-build: Build docker image for AWS Lambda
+	@echo "docker-login: Log in to Amazon ECR
+	@echo "docker-push-: Push the docker image to the specified environment (dev,stg,prd)
 	@echo ""
 	@echo "clean:   Clean up Python environment"
