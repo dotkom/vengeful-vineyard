@@ -1,4 +1,4 @@
-import { Group } from "../../../../helpers/types"
+import { Group } from "../../helpers/types"
 import React from "react"
 
 interface AlcoholInputProps {

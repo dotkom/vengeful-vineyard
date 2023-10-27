@@ -1,12 +1,12 @@
-import { PlusIcon } from "@heroicons/react/24/outline"
-import { Modal } from "./modal/Modal"
-import { Fragment, useEffect, useRef, useState } from "react"
-import { Transition } from "@headlessui/react"
+import { PlusIcon, CurrencyDollarIcon } from "@heroicons/react/24/outline"
+import { Fragment, useEffect, useState } from "react"
 import { Group } from "../../../helpers/types"
 import { TabItem } from "./TabItem"
 import { SkeletonTabItem } from "./SkeletonTabItem"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
 import { IconButton } from "../../../components/button"
+import { GivePunishmentModal } from "./modal/GivePunishmentModal"
+import { RegisterPaymentModal } from "./modal/RegisterPaymentModal"
 
 interface TabsProps {
   selectedGroup: Group | undefined
@@ -18,8 +18,8 @@ interface TabsProps {
 }
 
 export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: TabsProps) => {
-  const [open, setOpen] = useState(false)
-  const cancelButtonRef = useRef(null)
+  const [givePunishmentOpen, setGivePunishmentOpen] = useState(false)
+  const [registerPaymentOpen, setRegisterPaymentOpen] = useState(false)
 
   useEffect(() => {
     if (selectedGroup === undefined && groups) setSelectedGroup(groups[0])
@@ -27,11 +27,23 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
 
   return (
     <Fragment>
-      <Transition.Root show={open} as={Fragment}>
-        {selectedGroup && (
-          <Modal setOpen={setOpen} ref={cancelButtonRef} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
-        )}
-      </Transition.Root>
+      {givePunishmentOpen && selectedGroup && (
+        <GivePunishmentModal
+          open={givePunishmentOpen}
+          setOpen={setGivePunishmentOpen}
+          selectedGroup={selectedGroup}
+          dataRefetch={dataRefetch}
+        />
+      )}
+
+      {registerPaymentOpen && selectedGroup && (
+        <RegisterPaymentModal
+          open={registerPaymentOpen}
+          setOpen={setRegisterPaymentOpen}
+          selectedGroup={selectedGroup}
+          dataRefetch={dataRefetch}
+        />
+      )}
 
       <div className="mx-4 max-w-5xl md:m-auto md:px-8">
         <div className="sm:block">
@@ -48,11 +60,11 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
                     />
                   ))}
                   <div className="w-full flex flex-row gap-x-2 mb-1 justify-end">
-                    <IconButton label="Ny straff" onClick={() => setOpen(true)}>
+                    <IconButton label="Ny straff" onClick={() => setGivePunishmentOpen(true)}>
                       <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                     </IconButton>
-                    <IconButton label="Registrer">
-                      <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+                    <IconButton label="Registrer betaling" onClick={() => setRegisterPaymentOpen(true)}>
+                      <CurrencyDollarIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                     </IconButton>
                   </div>
                 </>

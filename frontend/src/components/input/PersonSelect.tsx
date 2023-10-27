@@ -1,9 +1,9 @@
 import React, { Fragment } from "react"
 import { Listbox, Transition } from "@headlessui/react"
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid"
-import { classNames } from "../../../../helpers/classNames"
-import { Group, GroupUser } from "../../../../helpers/types"
-import { textToEmoji } from "../../../../helpers/emojies"
+import { classNames } from "../../helpers/classNames"
+import { Group, GroupUser } from "../../helpers/types"
+import { textToEmoji } from "../../helpers/emojies"
 
 interface PersonSelectProps {
   data: Group

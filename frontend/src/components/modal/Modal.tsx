@@ -1,75 +1,38 @@
-import React, { forwardRef, Fragment, MutableRefObject, useContext, useEffect, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
+import React, { Fragment, forwardRef } from "react"
+
 import { SunIcon } from "@radix-ui/react-icons"
-import { addPunishment, useGroupLeaderboard } from "../../../../helpers/api"
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
-import { Group, GroupUser, PunishmentCreate } from "../../../../helpers/types"
-import { NotificationContext } from "../../../../helpers/notificationContext"
-import { ModalInput } from "./ModalInput"
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  isLoading: boolean
   includePrimaryButton?: boolean
+  isLoading?: boolean
   primaryButtonLabel?: string
   includeCancelButton?: boolean
   cancelButtonLabel?: string
   title?: string
   children?: React.ReactNode
-  primaryButtonAction?: () => void
+  primaryButtonAction?: () => boolean
   cancelButtonAction?: () => void
 }
 
-export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selectedGroup, dataRefetch }, ref) => {
-  const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(undefined)
-  const [newPunishment, setNewPunishment] = useState<PunishmentCreate>({
-    punishment_type_id: 1,
-    reason: "",
-    reason_hidden: true,
-    amount: 1,
-  })
-  const { setNotification } = useContext(NotificationContext)
-
-  const { data: group } = useGroupLeaderboard(selectedGroup.group_id)
-
-  useEffect(() => {
-    if (group === undefined) return
-    setSelectedPerson(group.members[0])
-    setNewPunishment((prev) => ({
-      ...prev,
-      punishment_type_id: group.punishment_types[0].punishment_type_id,
-    }))
-  }, [group])
-
-  const createPunishmentCall = async () => {
-    if (selectedPerson) {
-      return await addPunishment(selectedGroup.group_id, selectedPerson.user_id, newPunishment)
-    } else {
-      console.log("......")
-    }
-
-  const { mutate } = useMutation(createPunishmentCall, {
-    onSuccess: () => {
-      dataRefetch().then()
-      setNotification({
-        show: true,
-        title: "Straff registrert!",
-        text: `Du ga en straff til ${selectedPerson?.first_name}`,
-      })
+export const Modal = forwardRef<HTMLDivElement, ModalProps>(
+  (
+    {
+      setOpen,
+      title,
+      children,
+      includePrimaryButton = true,
+      primaryButtonLabel = "Gjør",
+      includeCancelButton = true,
+      cancelButtonLabel = "Cancel",
+      primaryButtonAction,
+      cancelButtonAction,
     },
-    onError: () => {
-      console.log("Todo: Handle error")
-    },
-  })
-
-  if (group)
+    ref
+  ) => {
     return (
-      <Dialog
-        as="div"
-        className="relative z-10"
-        initialFocus={typeof ref === "function" ? undefined : (ref as MutableRefObject<HTMLButtonElement>)}
-        onClose={() => setOpen(false)}
-      >
+      <Dialog as="div" className="relative z-10" onClose={() => setOpen(false)} ref={ref}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-100"
@@ -100,19 +63,12 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
                       <SunIcon className="h-6 w-6 text-blue-600" aria-hidden="true" />
                     </div>
                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
-                        Gi straff
-                      </Dialog.Title>
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-500">Her kan du lage en ny vinstraff</p>
-                        <ModalInput
-                          newPunishment={newPunishment}
-                          setNewPunishment={setNewPunishment}
-                          data={group}
-                          selectedPerson={selectedPerson}
-                          setSelectedPerson={setSelectedPerson}
-                        />
-                      </div>
+                      {title && (
+                        <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                          {title}
+                        </Dialog.Title>
+                      )}
+                      {children}
                     </div>
                   </div>
                 </div>
@@ -122,10 +78,13 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
                       type="button"
                       className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                       onClick={() => {
-                        setOpen(false)
-
+                        let result: boolean | undefined = true
                         if (primaryButtonAction) {
-                          primaryButtonAction()
+                          result = primaryButtonAction()
+                        }
+
+                        if (result) {
+                          setOpen(false)
                         }
                       }}
                     >
@@ -143,7 +102,6 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
                           cancelButtonAction()
                         }
                       }}
-                      ref={ref}
                     >
                       {cancelButtonLabel}
                     </button>
