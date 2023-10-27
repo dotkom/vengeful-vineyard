@@ -56,7 +56,13 @@ docs:
 	poetry run pdoc3 --html --force .
 
 docker-build:
-	docker build -f lambda.Dockerfile --platform linux/amd64 -t vengeful-vineyard-backend:latest .
+	docker build -f lambda.Dockerfile --platform linux/amd64 -t vengeful-vineyard:latest .
+
+docker-push-dev:
+	docker tag vengeful-vineyard:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
+
+docker-login:
+	aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
 
 help:
 	@echo "Makefile commands:"
@@ -73,5 +79,7 @@ help:
 	@echo "mypy:         Typecheck Python code"
 	@echo "hooks:        Run all commit hooks"
 	@echo "docker-build: Build docker image for AWS Lambda
+	@echo "docker-login: Log in to Amazon ECR
+	@echo "docker-push-: Push the docker image to the specified environment (dev,stg,prd)
 	@echo ""
 	@echo "clean:   Clean up Python environment"
