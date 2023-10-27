@@ -55,19 +55,23 @@ clean:
 docs:
 	poetry run pdoc3 --html --force .
 
+docker-build:
+	docker build -f lambda.Dockerfile --platform linux/amd64 -t vengeful-vineyard-backend:latest .
+
 help:
 	@echo "Makefile commands:"
-	@echo "help:    Show this help."
+	@echo "help:         Show this help."
 	@echo ""
-	@echo "prod:    Run production server (vengeful_vineyard.db)"
-	@echo "dev:     Run development server (dev.db)"
+	@echo "prod:         Run production server (vengeful_vineyard.db)"
+	@echo "dev:          Run development server (dev.db)"
 	@echo ""
-	@echo "docs:    Create documentation"
-	@echo "test:    Run tests"
-	@echo "testv:   Run tests (verbose)"
-	@echo "testvv:  Run tests (very verbose)"
-	@echo "pylint:  Python linter to check for common mistakes"
-	@echo "mypy:    Typecheck Python code"
-	@echo "hooks:   Run all commit hooks"
+	@echo "docs:         Create documentation"
+	@echo "test:         Run tests"
+	@echo "testv:        Run tests (verbose)"
+	@echo "testvv:       Run tests (very verbose)"
+	@echo "pylint:       Python linter to check for common mistakes"
+	@echo "mypy:         Typecheck Python code"
+	@echo "hooks:        Run all commit hooks"
+	@echo "docker-build: Build docker image for AWS Lambda
 	@echo ""
 	@echo "clean:   Clean up Python environment"

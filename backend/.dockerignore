@@ -1,0 +1,9 @@
+.gitignore
+docker-compose.*.yml
+mypy.ini
+pylintrc
+
+Dockerfile
+Makefile
+
+tests
