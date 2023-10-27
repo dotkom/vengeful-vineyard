@@ -64,6 +64,9 @@ docker-push-dev:
 docker-login:
 	aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
 
+lambda-update-dev:
+	aws lambda update-function-code --function-name vengeful-vineyard-dev --image-uri 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
+
 help:
 	@echo "Makefile commands:"
 	@echo "help:         Show this help."
