@@ -14,15 +14,15 @@ const queryClient = new QueryClient()
 
 const configuration: AuthProviderProps = {
   client_id: "219919",
-  redirect_uri: "http://localhost:3000",
+  redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
   scope: "openid profile onlineweb4",
   authority: "https://old.online.ntnu.no/openid",
   metadataUrl: "https://old.online.ntnu.no/openid/.well-known/openid-configuration",
-  silent_redirect_uri: "http://localhost:3000",
+  silent_redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
   filterProtocolClaims: true,
   loadUserInfo: true,
   revokeTokensOnSignout: true,
-  post_logout_redirect_uri: "http://localhost:3000",
+  post_logout_redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
   onSigninCallback: onSigninCallback,
   userStore: new WebStorageStateStore({ store: window.localStorage }),
 }
