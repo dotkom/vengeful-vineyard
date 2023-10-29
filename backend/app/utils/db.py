@@ -23,9 +23,6 @@ class MaybeAcquire:
         if self._connection is None:
             self._cleanup = True
             self._connection = c = await self.pool.acquire()
-            await c.set_type_codec(
-                "json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
-            )
             return c
         return self._connection
 
