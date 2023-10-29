@@ -58,6 +58,59 @@ class OWSync:
         )
         return user.user_id, ow_user_id
 
+    async def sync_all_groups(self) -> None:
+        groups_data = await self.app.http.get_ow_groups()
+        filtered_groups_data = [
+            g for g in groups_data["results"] if g["id"] not in IGNORE_OW_GROUPS
+        ]
+
+        for g in filtered_groups_data:
+            await self.sync_group(g)
+
+    async def sync_group(self, group_data: dict[str, Any]) -> None:
+        print(f"Synchronizing group {group_data['name_short']} ({group_data['id']})")
+        group_users = await self.app.http.get_ow_group_users(group_data["id"])
+
+        image_data = group_data["image"]
+        group_create = GroupCreate(
+            ow_group_id=group_data["id"],
+            name=group_data["name_long"],
+            name_short=group_data["name_short"],
+            rules="No rules",
+            image=image_data["sm"]
+            if image_data
+            else "NoImage",  # TODO?: Maybe change to something default??
+        )
+
+        async with self.app.db.pool.acquire() as conn:
+            group_res = await self.app.db.groups.insert_or_update(
+                group_create,
+                conn=conn,
+            )
+            group_id = group_res["id"]
+
+            action = group_res["action"]
+            if action == "CREATE":
+                await self.add_users_to_group(
+                    group_id,
+                    group_users,
+                    conn=conn,
+                )
+
+            elif action == "UPDATE":
+                await self.handle_group_update(
+                    group_id=group_id,
+                    group_users=group_users,
+                    member_ids=group_data["members"],
+                    conn=conn,
+                )
+
+                await self.update_multiple(
+                    group_id=group_id,
+                    group_users=group_users,
+                    conn=conn,
+                )
+
     async def sync_for_user(
         self,
         ow_user_id: OWUserId,

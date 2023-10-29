@@ -138,6 +138,12 @@ class HTTPClient:
             data = await response.json()
             return data["results"]
 
+    async def get_ow_groups(self) -> Any:
+        async with self._session.get(
+            f"{BASE_OLD_ONLINE}/api/v1/group/online-groups",
+        ) as response:
+            return await response.json()
+
     async def get_ow_groups_by_user_id(self, user_id: int) -> Any:
         params = {
             "members__user": user_id,

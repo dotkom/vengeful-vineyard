@@ -75,6 +75,7 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
 
         await database.async_init(**db_settings)
         await http.async_init()
+        await app.ow_sync.sync_all_groups()
 
     @app.on_event("shutdown")
     async def shutdown_handler() -> None:
