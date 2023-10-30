@@ -29,7 +29,7 @@ async def get_me(
     request: Request,
     include_groups: bool = Query(title="Include groups", default=True),
     wait_for_updates: bool = Query(title="Wait for updates", default=True),
-    use_cache: bool = Query(title="Use cache", default=True),
+    optimistic: bool = Query(title="Optimistic", default=False),
 ) -> UserWithGroups:
     app = request.app
     access_token = request.raise_if_missing_authorization()
@@ -42,12 +42,12 @@ async def get_me(
     except NotFound as exc:
         raise HTTPException(status_code=401, detail="Invalid access token") from exc
 
-    await app.ow_sync.sync_for_user(
-        ow_user_id,
-        user_id,
-        wait_for_updates=wait_for_updates,
-        use_cache=use_cache,
-    )
+    if not optimistic:
+        await app.ow_sync.sync_for_user(
+            ow_user_id,
+            user_id,
+            wait_for_updates=wait_for_updates,
+        )
 
     async with app.db.pool.acquire() as conn:
         groups = []

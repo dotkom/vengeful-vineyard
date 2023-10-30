@@ -4,7 +4,7 @@ export const getGroupLeaderboardUrl = (groupId: number) => BASE_URL + `/group/${
 
 export const LEADERBOARD_URL = BASE_URL + "/user/leaderboard"
 
-export const ME_URL = BASE_URL + "/user/me"
+export const getMeUrl = (optimistic: boolean) => BASE_URL + `/user/me?optimistic=${optimistic}`
 
 export const GROUPS_URL = BASE_URL + "/group/me"
 
