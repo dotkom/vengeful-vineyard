@@ -82,9 +82,11 @@ class Database:
         await conn.set_type_codec(
             "json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
         )
+        """
         await conn.set_type_codec(
-            "uuid", encoder=str, decoder=str, schema="pg_catalog"
+            "uuid", encoder=str, decoder=uuid.UUID, schema="pg_catalog"
         )
+        """
 
     async def async_init(self, **db_settings: str) -> None:
         for _ in range(10):  # Try for 10*0.5 seconds
