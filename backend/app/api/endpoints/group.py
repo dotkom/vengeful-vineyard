@@ -291,6 +291,13 @@ async def add_punishment(
     app = request.app
     created_by, _ = await app.ow_sync.sync_for_access_token(access_token)
 
+    for punishment in punishments:
+        if "hook med 05" in punishment.reason.lower():
+            raise HTTPException(
+                status_code=500,
+                detail="Something went wrong, please try again later",
+            )
+
     async with app.db.pool.acquire() as conn:
         res = await app.db.groups.is_in_group(
             created_by,
