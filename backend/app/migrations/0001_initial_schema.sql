@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS group_events (
 );
 
 CREATE TABLE IF NOT EXISTS punishment_reactions (
-    reaction_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    punishment_reaction_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
 	punishment_id uuid NOT NULL references group_punishments(punishment_id) ON DELETE CASCADE,
 	emoji TEXT NOT NULL,
 	created_by uuid NOT NULL references users(user_id) ON DELETE CASCADE,
