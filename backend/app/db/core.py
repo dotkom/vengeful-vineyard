@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from pathlib import Path
 from typing import Optional
@@ -75,6 +76,12 @@ class Database:
     def pool(self, value: Pool) -> None:
         self._pool = value
 
+    @staticmethod
+    async def set_connection_codecs(conn) -> None:
+        await conn.set_type_codec(
+            "json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
+        )
+
     async def async_init(self, **db_settings: str) -> None:
         for _ in range(10):  # Try for 10*0.5 seconds
             try:
@@ -87,6 +94,7 @@ class Database:
                     user=db_settings.get("user", settings.postgres_user),
                     password=db_settings.get("password", settings.postgres_password),
                     database=self._db_name,
+                    init=Database.set_connection_codecs,
                 )
             except (ConnectionError, CannotConnectNowError):
                 logger.info(
