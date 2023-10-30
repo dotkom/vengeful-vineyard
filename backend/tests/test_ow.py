@@ -8,9 +8,18 @@ import pytest
 from tests.fixtures import client, mock
 from tests.response_time import check_response_time
 
+
+class AnyUUID:
+    def __eq__(self, other):
+        return isinstance(other, str) and len(other) == 36
+
+    def __repr__(self):
+        return "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+
+
 GROUPS_ME_RESPONSE = [
     {
-        "group_id": 1,
+        "group_id": AnyUUID(),
         "ow_group_id": 4,
         "name": "Drifts- og Utviklingskomiteen",
         "name_short": "Dotkom",
@@ -23,7 +32,7 @@ GROUPS_ME_RESPONSE = [
 
 USERS_ME_RESPONSE = {
     "ow_user_id": 2581,
-    "user_id": 1,
+    "user_id": AnyUUID(),
     "first_name": "Brage",
     "last_name": "",
     "email": "email1@email.com",
@@ -35,7 +44,7 @@ USERS_ME_RESPONSE_EMPTY_GROUPS["groups"] = []
 
 ME_UPDATED_RESPONSE = [
     {
-        "group_id": 1,
+        "group_id": AnyUUID(),
         "ow_group_id": 4,
         "name": "Drifts- og Utviklingskomiteen",
         "name_short": "DotkomUpdated",
@@ -54,28 +63,26 @@ ME_GROUPS_RESPONSE = [
         "name_short": "Dotkom",
         "rules": "No rules",
         "ow_group_id": 4,
-        "members": [],
-        "punishment_types": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
-        "group_id": 1,
+        "group_id": AnyUUID(),
         "punishment_types": [
             {
                 "name": "\u00d8lstraff",
                 "value": 33,
                 "logo_url": "🍺",
-                "punishment_type_id": 1,
+                "punishment_type_id": AnyUUID(),
             },
             {
                 "name": "Vinstraff",
                 "value": 100,
                 "logo_url": "🍷",
-                "punishment_type_id": 2,
+                "punishment_type_id": AnyUUID(),
             },
             {
                 "name": "Spritstraff",
                 "value": 300,
                 "logo_url": "🍸",
-                "punishment_type_id": 3,
+                "punishment_type_id": AnyUUID(),
             },
         ],
         "members": [
@@ -85,7 +92,7 @@ ME_GROUPS_RESPONSE = [
                 "last_name": "",
                 "ow_group_user_id": 2224,
                 "email": "email1@email.com",
-                "user_id": 1,
+                "user_id": AnyUUID(),
                 "active": True,
                 "punishments": [],
                 "total_paid_amount": 0,
@@ -96,7 +103,7 @@ ME_GROUPS_RESPONSE = [
                 "last_name": "",
                 "ow_group_user_id": 656,
                 "email": "email2@email.com",
-                "user_id": 2,
+                "user_id": AnyUUID(),
                 "active": True,
                 "punishments": [],
                 "total_paid_amount": 0,
@@ -107,7 +114,7 @@ ME_GROUPS_RESPONSE = [
                 "last_name": "",
                 "ow_group_user_id": 658,
                 "email": "email3@email.com",
-                "user_id": 3,
+                "user_id": AnyUUID(),
                 "active": True,
                 "punishments": [],
                 "total_paid_amount": 0,
@@ -118,7 +125,7 @@ ME_GROUPS_RESPONSE = [
                 "last_name": "",
                 "ow_group_user_id": 1552,
                 "email": "email4@email.com",
-                "user_id": 4,
+                "user_id": AnyUUID(),
                 "active": True,
                 "punishments": [],
                 "total_paid_amount": 0,
@@ -129,7 +136,7 @@ ME_GROUPS_RESPONSE = [
                 "last_name": "",
                 "ow_group_user_id": 2227,
                 "email": "email5@email.com",
-                "user_id": 5,
+                "user_id": AnyUUID(),
                 "active": True,
                 "punishments": [],
                 "total_paid_amount": 0,
@@ -140,7 +147,7 @@ ME_GROUPS_RESPONSE = [
                 "last_name": "",
                 "ow_group_user_id": 1052,
                 "email": "email6@email.com",
-                "user_id": 6,
+                "user_id": AnyUUID(),
                 "active": True,
                 "punishments": [],
                 "total_paid_amount": 0,
@@ -151,7 +158,7 @@ ME_GROUPS_RESPONSE = [
                 "last_name": "",
                 "ow_group_user_id": 1551,
                 "email": "email7@email.com",
-                "user_id": 7,
+                "user_id": AnyUUID(),
                 "active": True,
                 "punishments": [],
                 "total_paid_amount": 0,
