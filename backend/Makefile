@@ -67,6 +67,8 @@ docker-login:
 lambda-update-dev:
 	aws lambda update-function-code --function-name vengeful-vineyard-dev --image-uri 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
 
+deploy: docker-build docker-login docker-push-dev lambda-update-dev
+
 help:
 	@echo "Makefile commands:"
 	@echo "help:         Show this help."
