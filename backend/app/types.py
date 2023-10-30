@@ -6,15 +6,7 @@ Some newtype definitions for extra type safety
 from typing import TypedDict
 
 
-class UserId(int):
-    pass
-
-
 class OWUserId(int):
-    pass
-
-
-class GroupId(int):
     pass
 
 
@@ -22,23 +14,31 @@ class OWGroupUserId(int):
     pass
 
 
-class PunishmentId(int):
+class UserId(str):
     pass
 
 
-class PunishmentTypeId(int):
+class GroupId(str):
     pass
 
 
-class PaidPunishmentLogId(int):
+class PunishmentId(str):
     pass
 
 
-class GroupEventId(int):
+class PunishmentTypeId(str):
     pass
 
 
-class PunishmentReactionId(int):
+class PaidPunishmentLogId(str):
+    pass
+
+
+class GroupEventId(str):
+    pass
+
+
+class PunishmentReactionId(str):
     pass
 
 
