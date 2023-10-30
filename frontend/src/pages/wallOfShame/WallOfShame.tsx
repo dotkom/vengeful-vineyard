@@ -13,6 +13,7 @@ export const WallOfShame = () => {
     ({ pageParam = LEADERBOARD_URL }) => getLeaderboard(pageParam),
     {
       getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
+      staleTime: 1000 * 60,
     }
   )
 
