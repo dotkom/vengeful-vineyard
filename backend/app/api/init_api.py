@@ -6,6 +6,7 @@ Sets up the API (FastAPI)
 """
 
 import logging
+import time
 from timeit import default_timer as timer
 from typing import Any
 
@@ -86,6 +87,20 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
             await app.http.close()
 
 
+class TimerLogger:
+    def __init__(self):
+        self.start_time = time.time()
+
+    def log(self, message):
+        print(f"[{(time.time() - self.start_time) * 1000:.0f}ms] {message}")
+
+
+def init_logger(app: FastAPI) -> None:
+    logger = TimerLogger()
+    logger.log("hei FUCK YOU")
+    app.set_logger(logger)
+
+
 def init_api(**db_settings: str) -> FastAPI:
     oauth = {
         "clientId": "219919",
@@ -94,14 +109,20 @@ def init_api(**db_settings: str) -> FastAPI:
         "scopes": "openid profile onlineweb4",
     }
 
+    print("Initializing API")
     app = FastAPI(
         swagger_ui_init_oauth=oauth,
         swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect",
     )
     app.router.route_class = APIRoute
+    init_logger(app)
+    app.logger.log("Setting up middleware")
     init_middlewares(app)
+    app.logger.log("Setting up routes")
     init_routes(app)
+    app.logger.log("Setting up events")
     init_events(app, **db_settings)
+    app.logger.log("Setting up logging")
     return app
 
 

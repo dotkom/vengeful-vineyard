@@ -1,6 +1,7 @@
 """API related functions and classes."""
 
 import json
+import logging
 from typing import Any, Callable, Coroutine, Optional
 
 from fastapi import FastAPI as OriginalFastAPI
@@ -36,6 +37,7 @@ class FastAPI(OriginalFastAPI):
     http: HTTPClient
     app_state: State
     ow_sync: OWSync
+    logger: Any
 
     def set_db(self, db: Database) -> None:
         self.db = db
@@ -48,6 +50,9 @@ class FastAPI(OriginalFastAPI):
 
     def set_ow_sync(self, ow_sync: OWSync) -> None:
         self.ow_sync = ow_sync
+
+    def set_logger(self, logger):
+        self.logger = logger
 
 
 class Request(OriginalRequest):

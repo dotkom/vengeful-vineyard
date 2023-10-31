@@ -56,15 +56,23 @@ class Database:
         self.group_events = GroupEvents(self)
 
     async def get_migration_lock_version(self, conn: Optional[Pool]) -> int:
-        await conn.execute('CREATE TABLE IF NOT EXISTS __migration_version_lock (id INT PRIMARY KEY, version INT DEFAULT 0)')
-        has_version = await conn.fetchval('SELECT COUNT(*) AS count FROM __migration_version_lock')
+        await conn.execute(
+            "CREATE TABLE IF NOT EXISTS __migration_version_lock (id INT PRIMARY KEY, version INT DEFAULT 0)"
+        )
+        has_version = await conn.fetchval(
+            "SELECT COUNT(*) AS count FROM __migration_version_lock"
+        )
         if int(has_version) == 0:
-            await conn.execute('INSERT INTO __migration_version_lock VALUES (0, 0)')
-        current_version = await conn.fetchval('SELECT version FROM __migration_version_lock WHERE id = 0 LIMIT 1')
+            await conn.execute("INSERT INTO __migration_version_lock VALUES (0, 0)")
+        current_version = await conn.fetchval(
+            "SELECT version FROM __migration_version_lock WHERE id = 0 LIMIT 1"
+        )
         return int(current_version)
 
     async def set_migration_lock_version(self, conn: Optional[Pool], version: int):
-        await conn.execute('UPDATE __migration_version_lock SET version = $1 WHERE id = 0', version)
+        await conn.execute(
+            "UPDATE __migration_version_lock SET version = $1 WHERE id = 0", version
+        )
 
     @property
     def pool(self) -> Pool:

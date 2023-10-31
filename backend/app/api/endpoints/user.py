@@ -31,31 +31,42 @@ async def get_me(
     wait_for_updates: bool = Query(title="Wait for updates", default=True),
     optimistic: bool = Query(title="Optimistic", default=False),
 ) -> UserWithGroups:
-    app = request.app
+    app, logger = request.app, request.app.logger
     access_token = request.raise_if_missing_authorization()
 
     if access_token is None:
         raise HTTPException(status_code=401, detail="Invalid access token")
 
+    logger.log("Getting user id")
     try:
         user_id, ow_user_id = await app.ow_sync.sync_for_access_token(access_token)
+        logger.log(f"Got user id {user_id} and ow user id {ow_user_id}")
     except NotFound as exc:
         raise HTTPException(status_code=401, detail="Invalid access token") from exc
 
     if not optimistic:
+        logger.log(f"Syncing for user {user_id}")
         await app.ow_sync.sync_for_user(
             ow_user_id,
             user_id,
             wait_for_updates=wait_for_updates,
         )
+        logger.log("Synced for user")
 
+    logger.log(f"Getting user {user_id}")
     async with app.db.pool.acquire() as conn:
+        logger.log("Acquired connection")
         groups = []
         if include_groups:
+            logger.log("Getting groups")
             groups = await app.db.users.get_groups(user_id, conn=conn)
+            logger.log(f"Got groups {groups}")
 
+        logger.log("Getting user")
         user = await app.db.users.get(user_id=user_id, conn=conn)
+        logger.log(f"Got user {user}")
 
+        logger.log("Returning user with groups")
         return UserWithGroups(
             groups=groups,
             **dict(user),

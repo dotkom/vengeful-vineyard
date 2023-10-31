@@ -43,7 +43,7 @@ async def get_my_groups(
     wait_for_updates: bool = Query(title="Wait for updates", default=True),
     optimistic: bool = Query(title="Optimistic", default=False),
 ) -> list[Group]:
-    app = request.app
+    app, logger = request.app, request.app.logger
     access_token = request.raise_if_missing_authorization()
 
     if access_token is None:
