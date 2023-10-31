@@ -1,333 +1,325 @@
 # flake8: noqa
 
 import copy
+import uuid
 from typing import Any
+from uuid import UUID
 
 import pytest
 
 from tests.fixtures import client, mock
 from tests.response_time import check_response_time
-
-
-class AnyUUID:
-    def __eq__(self, other):
-        return isinstance(other, str) and len(other) == 36
-
-    def __repr__(self):
-        return "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-
-
-GROUPS_ME_RESPONSE = [
-    {
-        "group_id": AnyUUID(),
-        "ow_group_id": 4,
-        "name": "Drifts- og Utviklingskomiteen",
-        "name_short": "Dotkom",
-        "rules": "No rules",
-        "members": [],
-        "punishment_types": [],
-        "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
-    }
-]
-
-USERS_ME_RESPONSE = {
-    "ow_user_id": 2581,
-    "user_id": AnyUUID(),
-    "first_name": "Brage",
-    "last_name": "",
-    "email": "email1@email.com",
-    "groups": GROUPS_ME_RESPONSE,
-}
-
-USERS_ME_RESPONSE_EMPTY_GROUPS = copy.copy(USERS_ME_RESPONSE)
-USERS_ME_RESPONSE_EMPTY_GROUPS["groups"] = []
-
-ME_UPDATED_RESPONSE = [
-    {
-        "group_id": AnyUUID(),
-        "ow_group_id": 4,
-        "name": "Drifts- og Utviklingskomiteen",
-        "name_short": "DotkomUpdated",
-        "rules": "No rules",
-        "members": [],
-        "punishment_types": [],
-        "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
-    }
-]
-
-ME_NEW_USER_RESPONSE: list[dict[str, Any]] = []
-
-ME_GROUPS_RESPONSE = [
-    {
-        "name": "Drifts- og Utviklingskomiteen",
-        "name_short": "Dotkom",
-        "rules": "No rules",
-        "ow_group_id": 4,
-        "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
-        "group_id": AnyUUID(),
-        "punishment_types": [
-            {
-                "name": "\u00d8lstraff",
-                "value": 33,
-                "logo_url": "🍺",
-                "punishment_type_id": AnyUUID(),
-            },
-            {
-                "name": "Vinstraff",
-                "value": 100,
-                "logo_url": "🍷",
-                "punishment_type_id": AnyUUID(),
-            },
-            {
-                "name": "Spritstraff",
-                "value": 300,
-                "logo_url": "🍸",
-                "punishment_type_id": AnyUUID(),
-            },
-        ],
-        "members": [
-            {
-                "ow_user_id": 2581,
-                "first_name": "Brage",
-                "last_name": "",
-                "ow_group_user_id": 2224,
-                "email": "email1@email.com",
-                "user_id": AnyUUID(),
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 1381,
-                "first_name": "Amund",
-                "last_name": "",
-                "ow_group_user_id": 656,
-                "email": "email2@email.com",
-                "user_id": AnyUUID(),
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 1383,
-                "first_name": "Anh-Kha Nguyen",
-                "last_name": "",
-                "ow_group_user_id": 658,
-                "email": "email3@email.com",
-                "user_id": AnyUUID(),
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 2027,
-                "first_name": "Anna Irene",
-                "last_name": "",
-                "ow_group_user_id": 1552,
-                "email": "email4@email.com",
-                "user_id": AnyUUID(),
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 2219,
-                "first_name": "Billy Steen",
-                "last_name": "",
-                "ow_group_user_id": 2227,
-                "email": "email5@email.com",
-                "user_id": AnyUUID(),
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 1705,
-                "first_name": "B\u00f8rge",
-                "last_name": "",
-                "ow_group_user_id": 1052,
-                "email": "email6@email.com",
-                "user_id": AnyUUID(),
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 1395,
-                "first_name": "Carl",
-                "last_name": "",
-                "ow_group_user_id": 1551,
-                "email": "email7@email.com",
-                "user_id": AnyUUID(),
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-        ],
-    }
-]
-
-ME_GROUPS_UPDATED_RESPONSE = [
-    {
-        "name": "Drifts- og Utviklingskomiteen",
-        "name_short": "DotkomUpdated",
-        "rules": "No rules",
-        "ow_group_id": 4,
-        "members": [],
-        "punishment_types": [],
-        "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
-        "group_id": 1,
-        "punishment_types": [
-            {
-                "name": "\u00d8lstraff",
-                "value": 33,
-                "logo_url": "🍺",
-                "punishment_type_id": 1,
-            },
-            {
-                "name": "Vinstraff",
-                "value": 100,
-                "logo_url": "🍷",
-                "punishment_type_id": 2,
-            },
-            {
-                "name": "Spritstraff",
-                "value": 300,
-                "logo_url": "🍸",
-                "punishment_type_id": 3,
-            },
-        ],
-        "members": [
-            {
-                "ow_user_id": 2581,
-                "first_name": "BrageUpdated",
-                "last_name": "Updated",
-                "ow_group_user_id": 2224,
-                "email": "email1@email.com",
-                "user_id": 1,
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 1381,
-                "first_name": "AmundUpdated",
-                "last_name": "Updated",
-                "ow_group_user_id": 656,
-                "email": "email2@email.com",
-                "user_id": 2,
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 1383,
-                "first_name": "Anh-Kha NguyenUpdated",
-                "last_name": "Updated",
-                "ow_group_user_id": 658,
-                "email": "email3@email.com",
-                "user_id": 3,
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 2027,
-                "first_name": "Anna IreneUpdated",
-                "last_name": "Updated",
-                "ow_group_user_id": 1552,
-                "email": "email4@email.com",
-                "user_id": 4,
-                "active": False,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {
-                "ow_user_id": 2219,
-                "first_name": "Billy SteenUpdated",
-                "last_name": "Updated",
-                "ow_group_user_id": 2227,
-                "email": "email5@email.com",
-                "user_id": 5,
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            # Removed user here
-            {
-                "ow_user_id": 1395,
-                "first_name": "CarlUpdated",
-                "last_name": "Updated",
-                "ow_group_user_id": 1551,
-                "email": "email7@email.com",
-                "user_id": 7,
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-            {  # Added user here
-                "ow_user_id": 1998,
-                "first_name": "FelixOriginal",
-                "last_name": "Original",
-                "ow_group_user_id": 1399,
-                "email": "email8@email.com",
-                "user_id": 8,
-                "active": True,
-                "punishments": [],
-                "total_paid_amount": 0,
-            },
-        ],
-    }
-]
-
-
-DEFAULT_PUNISHMENT_TYPES = [
-    {
-        "name": "Ølstraff",
-        "value": 33,
-        "logo_url": "🍺",
-        "punishment_type_id": 1,
-    },
-    {
-        "name": "Vinstraff",
-        "value": 100,
-        "logo_url": "🍷",
-        "punishment_type_id": 2,
-    },
-    {
-        "name": "Spritstraff",
-        "value": 300,
-        "logo_url": "🍸",
-        "punishment_type_id": 3,
-    },
-]
-
-NEW_PUNISHMENT_TYPE_PAYLOAD = {
-    "name": "Waffles",
-    "value": 125,
-    "logo_url": "🍺",
-}
-
-WAFFLES_PUNISHMENT_TYPE_RESPONSE = {
-    "name": "Waffles",
-    "value": 125,
-    "logo_url": "🍺",
-    "punishment_type_id": 4,
-}
-
-
-SELF_USER_ID = 1
-OTHER_USER_ID = 4
-OTHER_USER_NOT_IN_GROUP_ID = 10
-SELF_USER_ACCESS_TOKEN = str(SELF_USER_ID)
-OTHER_USER_ACCESS_TOKEN = str(OTHER_USER_ID)
-OTHER_USER_NOT_IN_GROUP_ACCESS_TOKEN = str(OTHER_USER_NOT_IN_GROUP_ID)
-SELF_USER_AUTHORIZATION = f"Bearer {SELF_USER_ACCESS_TOKEN}"
-OTHER_USER_AUTHORIZATION = f"Bearer {OTHER_USER_ACCESS_TOKEN}"
-OTHER_USER_NOT_IN_GROUP_AUTHORIZATION = f"Bearer {OTHER_USER_NOT_IN_GROUP_ACCESS_TOKEN}"
+from tests.test_utils import AnyUUID
 
 
 class TestWithDB_OW:
+    @classmethod
+    def setup_class(cls):
+        cls.groups_me_response = [
+            {
+                "group_id": AnyUUID(),
+                "ow_group_id": 4,
+                "name": "Drifts- og Utviklingskomiteen",
+                "name_short": "Dotkom",
+                "rules": "No rules",
+                "members": [],
+                "punishment_types": [],
+                "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+            }
+        ]
+
+        cls.users_me_response = {
+            "ow_user_id": 2581,
+            "user_id": AnyUUID(),
+            "first_name": "Brage",
+            "last_name": "",
+            "email": "email1@email.com",
+            "groups": cls.groups_me_response,
+        }
+
+        cls.users_me_response_empty_groups = copy.copy(cls.users_me_response)
+        cls.users_me_response_empty_groups["groups"] = []
+
+        cls.me_updated_response = [
+            {
+                "group_id": AnyUUID(),
+                "ow_group_id": 4,
+                "name": "Drifts- og Utviklingskomiteen",
+                "name_short": "DotkomUpdated",
+                "rules": "No rules",
+                "members": [],
+                "punishment_types": [],
+                "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+            }
+        ]
+
+        cls.me_new_user_response: list[dict[str, Any]] = []
+
+        cls.me_groups_response = [
+            {
+                "name": "Drifts- og Utviklingskomiteen",
+                "name_short": "Dotkom",
+                "rules": "No rules",
+                "ow_group_id": 4,
+                "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "group_id": AnyUUID(),
+                "punishment_types": [
+                    {
+                        "name": "\u00d8lstraff",
+                        "value": 33,
+                        "logo_url": "🍺",
+                        "punishment_type_id": AnyUUID(),
+                    },
+                    {
+                        "name": "Vinstraff",
+                        "value": 100,
+                        "logo_url": "🍷",
+                        "punishment_type_id": AnyUUID(),
+                    },
+                    {
+                        "name": "Spritstraff",
+                        "value": 300,
+                        "logo_url": "🍸",
+                        "punishment_type_id": AnyUUID(),
+                    },
+                ],
+                "members": [
+                    {
+                        "ow_user_id": 2581,
+                        "first_name": "Brage",
+                        "last_name": "",
+                        "ow_group_user_id": 2224,
+                        "email": "email1@email.com",
+                        "user_id": AnyUUID(),
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 1381,
+                        "first_name": "Amund",
+                        "last_name": "",
+                        "ow_group_user_id": 656,
+                        "email": "email2@email.com",
+                        "user_id": AnyUUID(),
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 1383,
+                        "first_name": "Anh-Kha Nguyen",
+                        "last_name": "",
+                        "ow_group_user_id": 658,
+                        "email": "email3@email.com",
+                        "user_id": AnyUUID(),
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 2027,
+                        "first_name": "Anna Irene",
+                        "last_name": "",
+                        "ow_group_user_id": 1552,
+                        "email": "email4@email.com",
+                        "user_id": AnyUUID(),
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 2219,
+                        "first_name": "Billy Steen",
+                        "last_name": "",
+                        "ow_group_user_id": 2227,
+                        "email": "email5@email.com",
+                        "user_id": AnyUUID(),
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 1705,
+                        "first_name": "B\u00f8rge",
+                        "last_name": "",
+                        "ow_group_user_id": 1052,
+                        "email": "email6@email.com",
+                        "user_id": AnyUUID(),
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 1395,
+                        "first_name": "Carl",
+                        "last_name": "",
+                        "ow_group_user_id": 1551,
+                        "email": "email7@email.com",
+                        "user_id": AnyUUID(),
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                ],
+            }
+        ]
+
+        cls.me_groups_updated_response = [
+            {
+                "name": "Drifts- og Utviklingskomiteen",
+                "name_short": "DotkomUpdated",
+                "rules": "No rules",
+                "ow_group_id": 4,
+                "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+                "group_id": 1,
+                "punishment_types": [
+                    {
+                        "name": "\u00d8lstraff",
+                        "value": 33,
+                        "logo_url": "🍺",
+                        "punishment_type_id": 1,
+                    },
+                    {
+                        "name": "Vinstraff",
+                        "value": 100,
+                        "logo_url": "🍷",
+                        "punishment_type_id": 2,
+                    },
+                    {
+                        "name": "Spritstraff",
+                        "value": 300,
+                        "logo_url": "🍸",
+                        "punishment_type_id": 3,
+                    },
+                ],
+                "members": [
+                    {
+                        "ow_user_id": 2581,
+                        "first_name": "BrageUpdated",
+                        "last_name": "Updated",
+                        "ow_group_user_id": 2224,
+                        "email": "email1@email.com",
+                        "user_id": 1,
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 1381,
+                        "first_name": "AmundUpdated",
+                        "last_name": "Updated",
+                        "ow_group_user_id": 656,
+                        "email": "email2@email.com",
+                        "user_id": 2,
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 1383,
+                        "first_name": "Anh-Kha NguyenUpdated",
+                        "last_name": "Updated",
+                        "ow_group_user_id": 658,
+                        "email": "email3@email.com",
+                        "user_id": 3,
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 2027,
+                        "first_name": "Anna IreneUpdated",
+                        "last_name": "Updated",
+                        "ow_group_user_id": 1552,
+                        "email": "email4@email.com",
+                        "user_id": 4,
+                        "active": False,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {
+                        "ow_user_id": 2219,
+                        "first_name": "Billy SteenUpdated",
+                        "last_name": "Updated",
+                        "ow_group_user_id": 2227,
+                        "email": "email5@email.com",
+                        "user_id": 5,
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    # Removed user here
+                    {
+                        "ow_user_id": 1395,
+                        "first_name": "CarlUpdated",
+                        "last_name": "Updated",
+                        "ow_group_user_id": 1551,
+                        "email": "email7@email.com",
+                        "user_id": 7,
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                    {  # Added user here
+                        "ow_user_id": 1998,
+                        "first_name": "FelixOriginal",
+                        "last_name": "Original",
+                        "ow_group_user_id": 1399,
+                        "email": "email8@email.com",
+                        "user_id": 8,
+                        "active": True,
+                        "punishments": [],
+                        "total_paid_amount": 0,
+                    },
+                ],
+            }
+        ]
+
+        cls.default_punishment_types = [
+            {
+                "name": "Ølstraff",
+                "value": 33,
+                "logo_url": "🍺",
+                "punishment_type_id": AnyUUID(),
+            },
+            {
+                "name": "Vinstraff",
+                "value": 100,
+                "logo_url": "🍷",
+                "punishment_type_id": AnyUUID(),
+            },
+            {
+                "name": "Spritstraff",
+                "value": 300,
+                "logo_url": "🍸",
+                "punishment_type_id": AnyUUID(),
+            },
+        ]
+
+        cls.new_punishment_type_payload = {
+            "name": "Waffles",
+            "value": 125,
+            "logo_url": "🍺",
+        }
+
+        cls.waffles_punishment_type_response = {
+            "name": "Waffles",
+            "value": 125,
+            "logo_url": "🍺",
+            "punishment_type_id": 4,
+        }
+
+        cls.self_user_id = str(uuid.uuid4())
+        cls.other_user_id = str(uuid.uuid4())
+        cls.other_user_not_in_group_id = 10
+        cls.self_user_access_token = str(cls.self_user_id)
+        cls.other_user_access_token = str(cls.other_user_id)
+        cls.other_user_not_in_group_access_token = str(cls.other_user_not_in_group_id)
+        cls.self_user_authorization = f"Bearer {cls.self_user_access_token}"
+        cls.other_user_authorization = f"Bearer {cls.other_user_access_token}"
+        cls.other_user_not_in_group_authorization = f"Bearer {cls.other_user_not_in_group_access_token}"
+
     @pytest.mark.asyncio
     async def test_get_my_groups_missing_authorization(self, client: Any) -> None:
         response = await client.get("/group/me")
@@ -353,11 +345,13 @@ class TestWithDB_OW:
     ) -> None:
         response = await client.get(
             "/group/me",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_access_token},
         )
 
         assert response.status_code == 200
-        assert response.json() == GROUPS_ME_RESPONSE
+        data = response.json()
+        assert data == self.groups_me_response
+        self.groups_me_response = data
 
         check_response_time(response)
 
@@ -369,11 +363,13 @@ class TestWithDB_OW:
     ) -> None:
         response = await client.get(
             "/user/me",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
 
         assert response.status_code == 200
-        assert response.json() == USERS_ME_RESPONSE
+        data = response.json()
+        assert data == self.users_me_response
+        self.users_me_response = data
 
         check_response_time(response)
 
@@ -385,11 +381,13 @@ class TestWithDB_OW:
     ) -> None:
         response = await client.get(
             "/user/me?include_groups=false",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
 
         assert response.status_code == 200
-        assert response.json() == USERS_ME_RESPONSE_EMPTY_GROUPS
+        data = response.json()
+        assert data == self.users_me_response_empty_groups
+        self.users_me_response_empty_groups = data
 
         check_response_time(response)
 
@@ -401,21 +399,25 @@ class TestWithDB_OW:
     ) -> None:
         response = await client.get(
             "/group/me",
-            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+            headers={"Authorization": self.other_user_authorization},
         )
 
         assert response.status_code == 200
-        assert response.json() == GROUPS_ME_RESPONSE
+        data = response.json()
+        assert data == self.groups_me_response
+        self.groups_me_response = data
 
         check_response_time(response)
 
     @pytest.mark.asyncio
     async def test_get_my_groups_members(self, client: Any) -> None:
-        for c, group in enumerate(GROUPS_ME_RESPONSE):
+        for c, group in enumerate(self.groups_me_response):
             response = await client.get(f"/group/{group['group_id']}")
 
             assert response.status_code == 200
-            assert response.json() == ME_GROUPS_RESPONSE[c]
+            data = response.json()
+            assert data == self.me_groups_response[c]
+            self.me_groups_response[c] = data
 
             check_response_time(response)
 
@@ -423,17 +425,19 @@ class TestWithDB_OW:
     async def test_get_my_groups_update(self, client: Any) -> None:
         response = await client.get(
             "/group/me",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
 
         assert response.status_code == 200
-        assert response.json() == ME_UPDATED_RESPONSE
+        data = response.json()
+        assert data == self.me_updated_response
+        self.me_updated_response = data
 
         check_response_time(response)
 
     @pytest.mark.asyncio
     async def test_get_my_groups_members_update(self, client: Any) -> None:
-        for c, group in enumerate(ME_UPDATED_RESPONSE):
+        for c, group in enumerate(self.me_updated_response):
             response = await client.get(f"/group/{group['group_id']}")
 
             assert response.status_code == 200
@@ -442,11 +446,12 @@ class TestWithDB_OW:
             response_data["members"] = sorted(
                 response_data["members"], key=lambda x: x["ow_user_id"]  # type: ignore
             )
-            set_response = ME_GROUPS_UPDATED_RESPONSE
+            set_response = self.me_updated_response
             set_response[c]["members"] = sorted(
                 set_response[c]["members"], key=lambda x: x["ow_user_id"]  # type: ignore
             )
             assert response_data == set_response[c]
+            self.me_groups_response[c] = response_data
 
             check_response_time(response)
 
@@ -458,11 +463,13 @@ class TestWithDB_OW:
     ) -> None:
         response = await client.get(
             "/group/me",
-            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+            headers={"Authorization": self.other_user_not_in_group_authorization},
         )
 
         assert response.status_code == 200
-        assert response.json() == ME_NEW_USER_RESPONSE
+        data = response.json()
+        assert data == self.me_new_user_response
+        self.me_new_user_response = data
 
         check_response_time(response)
 
@@ -470,8 +477,8 @@ class TestWithDB_OW:
     async def test_create_punishment_type_forbidden(self, client: Any) -> None:
         response = await client.post(
             "/group/1/punishmentType",
-            json=NEW_PUNISHMENT_TYPE_PAYLOAD,
-            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+            json=self.new_punishment_type_payload,
+            headers={"Authorization": self.other_user_not_in_group_authorization},
         )
         assert response.status_code == 403
         check_response_time(response)
@@ -480,20 +487,22 @@ class TestWithDB_OW:
     async def test_create_punsihment_type(self, client: Any) -> None:
         response = await client.post(
             "/group/1/punishmentType",
-            json=NEW_PUNISHMENT_TYPE_PAYLOAD,
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            json=self.new_punishment_type_payload,
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
-        assert response.json() == {"id": 4}
+        assert response.json() == {"id": AnyUUID()}
         check_response_time(response)
 
     @pytest.mark.asyncio
     async def test_get_group_with_punishment_type(self, client: Any) -> None:
         response = await client.get(f"/group/1")
         assert response.status_code == 200
-        assert response.json()["punishment_types"] == DEFAULT_PUNISHMENT_TYPES + [
-            WAFFLES_PUNISHMENT_TYPE_RESPONSE
+        data = response.json()
+        assert data["punishment_types"] == self.default_punishment_types + [
+            self.waffles_punishment_type_response
         ]
+        self.group_with_punishment_type_response = data
 
         check_response_time(response)
 
@@ -501,7 +510,7 @@ class TestWithDB_OW:
     async def test_delete_punishment_type_user_not_in_group(self, client: Any) -> None:
         response = await client.delete(
             "/group/1/punishmentType/4",
-            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+            headers={"Authorization": self.other_user_not_in_group_authorization},
         )
         assert response.status_code == 403
         check_response_time(response)
@@ -510,7 +519,7 @@ class TestWithDB_OW:
     async def test_delete_punishment_type(self, client: Any) -> None:
         response = await client.delete(
             "/group/1/punishmentType/4",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -518,7 +527,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_create_punishment_on_self_user(self, client: Any) -> None:
         response = await client.post(
-            f"/group/1/user/{SELF_USER_ID}/punishment",
+            f"/group/1/user/{self.self_user_id}/punishment",
             json=[
                 {
                     "punishment_type_id": 1,
@@ -527,7 +536,7 @@ class TestWithDB_OW:
                     "amount": 1,
                 }
             ],
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         assert response.json()["ids"] == [1]
@@ -536,7 +545,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_create_punishment_on_other_user(self, client: Any) -> None:
         response = await client.post(
-            f"/group/1/user/{OTHER_USER_ID}/punishment",
+            f"/group/1/user/{self.other_user_id}/punishment",
             json=[
                 {
                     "punishment_type_id": 2,
@@ -545,7 +554,7 @@ class TestWithDB_OW:
                     "amount": 1,
                 }
             ],
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         assert response.json()["ids"] == [2]
@@ -556,7 +565,7 @@ class TestWithDB_OW:
         self, client: Any
     ) -> None:
         response = await client.post(
-            f"/group/1/user/{OTHER_USER_ID}/punishment",
+            f"/group/1/user/{self.other_user_id}/punishment",
             json=[
                 {
                     "punishment_type_id": 2,
@@ -565,10 +574,10 @@ class TestWithDB_OW:
                     "amount": 1,
                 }
             ],
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
-        assert response.json()["ids"] == [3]
+        assert response.json()["ids"] == [AnyUUID()]
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -577,7 +586,7 @@ class TestWithDB_OW:
         client: Any,
     ) -> None:
         response = await client.post(
-            f"/group/1/user/{OTHER_USER_NOT_IN_GROUP_ID}/punishment",
+            f"/group/1/user/{self.other_user_not_in_group_id}/punishment",
             json=[
                 {
                     "punishment_type_id": 2,
@@ -586,7 +595,7 @@ class TestWithDB_OW:
                     "amount": 1,
                 }
             ],
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 400
         check_response_time(response)
@@ -600,7 +609,7 @@ class TestWithDB_OW:
             json={
                 "emoji": "g",
             },
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 400
         check_response_time(response)
@@ -612,7 +621,7 @@ class TestWithDB_OW:
             json={
                 "emoji": "👍",
             },
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -626,7 +635,7 @@ class TestWithDB_OW:
             json={
                 "emoji": "👍",
             },
-            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+            headers={"Authorization": self.other_user_not_in_group_authorization},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -634,7 +643,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_punishment_reaction_exists(self, client: Any) -> None:
         response = await client.get(
-            f"/group/1/user/{SELF_USER_ID}",
+            f"/group/1/user/{self.self_user_id}",
         )
         assert response.status_code == 200
 
@@ -714,7 +723,7 @@ class TestWithDB_OW:
             json={
                 "emoji": "🧡",
             },
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -722,7 +731,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_punishment_reaction_was_replaced(self, client: Any) -> None:
         response = await client.get(
-            f"/group/1/user/{SELF_USER_ID}",
+            f"/group/1/user/{self.self_user_id}",
         )
         assert response.status_code == 200
         assert len(response.json()["punishments"][0]["reactions"]) == 1
@@ -733,7 +742,7 @@ class TestWithDB_OW:
     async def test_delete_reaction_from_wrong_user(self, client: Any) -> None:
         response = await client.delete(
             f"/punishment/1/reaction",
-            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+            headers={"Authorization": self.other_user_authorization},
         )
         assert response.status_code == 404
         check_response_time(response)
@@ -742,7 +751,7 @@ class TestWithDB_OW:
     async def test_delete_reaction_from_self_user(self, client: Any) -> None:
         response = await client.delete(
             f"/punishment/1/reaction",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -751,7 +760,7 @@ class TestWithDB_OW:
     async def test_add_paid_log_entry(self, client: Any) -> None:
         response = await client.post(
             "group/1/user/1/punishments/paid",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
             json={"value": 4},
         )
         assert response.status_code == 200
@@ -761,7 +770,7 @@ class TestWithDB_OW:
     async def test_add_paid_log_entry_from_other_user(self, client: Any) -> None:
         response = await client.post(
             "group/1/user/1/punishments/paid",
-            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+            headers={"Authorization": self.other_user_authorization},
             json={"value": 9},
         )
         assert response.status_code == 200
@@ -771,7 +780,7 @@ class TestWithDB_OW:
     async def test_get_paid_logs(self, client: Any) -> None:
         response = await client.get(
             "group/1/user/1/punishments/paid",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
 
@@ -802,7 +811,7 @@ class TestWithDB_OW:
     async def test_get_group_total_paid_for_user(self, client: Any) -> None:
         response = await client.get(
             "/group/1/user/1/punishments/paid/totalPaid",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         assert response.json() == 13
@@ -812,7 +821,7 @@ class TestWithDB_OW:
     async def test_get_group_total_unpaid_for_user(self, client: Any) -> None:
         response = await client.get(
             "/group/1/user/1/punishments/paid/totalUnpaid",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         assert response.json() == 20  # 33 - 13
@@ -822,7 +831,7 @@ class TestWithDB_OW:
     async def test_get_group_total_punishment_value(self, client: Any) -> None:
         response = await client.get(
             "/group/1/totalPunishmentValue",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         assert response.json() == {
@@ -834,7 +843,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_total_paid_amount_on_group_user(self, client: Any) -> None:
         response = await client.get(
-            f"/group/1/user/{SELF_USER_ID}",
+            f"/group/1/user/{self.self_user_id}",
         )
         assert response.status_code == 200
 
@@ -850,7 +859,7 @@ class TestWithDB_OW:
 
         data = response.json()
         for user in data:
-            if user["user_id"] == SELF_USER_ID:
+            if user["user_id"] == self.self_user_id:
                 assert user["total_paid_amount"] == 13
             else:
                 assert user["total_paid_amount"] == 0
@@ -861,7 +870,7 @@ class TestWithDB_OW:
     async def test_delete_own_punishment_created_by_other(self, client: Any) -> None:
         response = await client.delete(
             "/punishment/2",
-            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+            headers={"Authorization": self.other_user_authorization},
         )
         assert response.status_code == 403
         check_response_time(response)
@@ -870,7 +879,7 @@ class TestWithDB_OW:
     async def test_delete_own_punishment_created_by_self(self, client: Any) -> None:
         response = await client.delete(
             "/punishment/1",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -882,14 +891,14 @@ class TestWithDB_OW:
     ) -> None:
         response = await client.delete(
             "/punishment/1",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 404
         check_response_time(response)
 
     @pytest.mark.asyncio
     async def test_check_punishments_exists(self, client: Any) -> None:
-        response = await client.get(f"/group/1/user/{OTHER_USER_ID}")
+        response = await client.get(f"/group/1/user/{self.other_user_id}")
         punishments = response.json()["punishments"]
         assert len(punishments) == 2
 
@@ -927,7 +936,7 @@ class TestWithDB_OW:
     @pytest.mark.asyncio
     async def test_get_group_user_punishment_streaks(self, client: Any) -> None:
         response = await client.post(
-            f"/group/1/user/{SELF_USER_ID}/punishment",
+            f"/group/1/user/{self.self_user_id}/punishment",
             json=[
                 {
                     "punishment_type_id": 1,
@@ -936,7 +945,7 @@ class TestWithDB_OW:
                     "amount": 1,
                 }
             ],
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
 
@@ -1072,7 +1081,7 @@ class TestWithDB_OW:
                 "start_time": "2021-01-01T00:00:00.000Z",
                 "end_time": "2021-02-01T00:00:00",
             },
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         check_response_time(response)
@@ -1087,7 +1096,7 @@ class TestWithDB_OW:
                 "start_time": "2021-02-01T00:00:00.000Z",
                 "end_time": "2021-01-01T00:00:00",
             },
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 400
         check_response_time(response)
@@ -1102,7 +1111,7 @@ class TestWithDB_OW:
                 "start_time": "2021-01-01T10:00:00.000Z",
                 "end_time": "2021-02-01T00:00:00",
             },
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 400
         assert response.json() == {
@@ -1114,7 +1123,7 @@ class TestWithDB_OW:
     async def test_get_group_events(self, client: Any) -> None:
         response = await client.get(
             "/group/1/events?page0&page_size=30",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
 
@@ -1152,7 +1161,7 @@ class TestWithDB_OW:
     async def test_forbidden_get_group_events(self, client: Any) -> None:
         response = await client.get(
             f"group/1/events?page0&page_size=30",
-            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
+            headers={"Authorization": self.other_user_not_in_group_authorization},
         )
         assert response.status_code == 403
         check_response_time(response)
@@ -1161,7 +1170,7 @@ class TestWithDB_OW:
     async def test_group_events_empty_page(self, client: Any) -> None:
         response = await client.get(
             f"group/1/events?page=1&page_size=30",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
+            headers={"Authorization": self.self_user_authorization},
         )
         assert response.status_code == 200
         assert response.json() == {

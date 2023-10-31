@@ -34,3 +34,20 @@ class TestUtils:
     ) -> None:
         parsed = parse_naive_datetime(dtinput)
         assert parsed == expected
+
+
+class AnyUUID:
+    instance = None
+
+    def __eq__(self, other):
+        return isinstance(other, str) and len(other) == 36
+
+    def __repr__(self):
+        return "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+
+    def __new__(cls, *args, **kwargs):
+        if cls.instance is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance
+
+
