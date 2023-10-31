@@ -1,11 +1,10 @@
 import { LeaderboardPunishment, Punishment, PunishmentType } from "../../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
-import axios, { AxiosResponse } from "axios"
 
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 import dayjs from "dayjs"
-import { getAddReactionUrl } from "../../../helpers/api"
+import { addReaction, removeReaction } from "../../../helpers/api"
 import { useState } from "react"
 
 interface PunishmentItemProps {
@@ -13,25 +12,14 @@ interface PunishmentItemProps {
   punishmentTypes: PunishmentType[]
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<any, unknown>>
+  ) => Promise<QueryObserverResult<any>>
 }
 
 export const PunishmentItem = ({ punishment, punishmentTypes, dataRefetch }: PunishmentItemProps) => {
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
 
-  const addReactionCall = async (emoji: string) => {
-    const ADD_REACTION_URL = getAddReactionUrl(punishment.punishment_id)
-    const res: AxiosResponse<string> = await axios.post(ADD_REACTION_URL, {
-      emoji,
-    })
-    return res.data
-  }
-
-  const removeReactionCall = async () => {
-    const REMOVE_REACTION_URL = getAddReactionUrl(punishment.punishment_id)
-    const res: AxiosResponse<string> = await axios.delete(REMOVE_REACTION_URL)
-    return res.data
-  }
+  const addReactionCall = async (emoji: string) => addReaction(punishment.punishment_id, emoji)
+  const removeReactionCall = async () => removeReaction(punishment.punishment_id)
 
   const { mutate } = useMutation(addReactionCall, {
     onSuccess: () => dataRefetch(),

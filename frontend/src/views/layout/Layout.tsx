@@ -57,7 +57,7 @@ export const Layout = () => {
 
   return (
     <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50">
-      <UserContext.Provider value={{ user, setUser }}>
+      <UserContext.Provider value={{ user, setUserContext: setUser }}>
         <NotificationContext.Provider value={{ notification, setNotification }}>
           <Nav auth={auth} />
           <div className="mb-auto">
