@@ -65,7 +65,10 @@ class OWSync:
     ) -> None:
         groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
         filtered_groups_data = [
-            g for g in groups_data["results"] if g["id"] not in IGNORE_OW_GROUPS
+            g
+            for g in groups_data["results"]
+            if g["id"] not in IGNORE_OW_GROUPS
+            and g["group_type"] in ("committee", "node_committee")
         ]
 
         tasks = [
