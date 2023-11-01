@@ -73,7 +73,7 @@ class Punishments:
     ) -> dict[str, list[int]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """SELECT 1 FROM punishment_types
-                WHERE group_id = $1 AND punishment_type_id = ANY($2::int[])
+                WHERE group_id = $1 AND punishment_type_id = ANY($2::uuid[])
                 """
             res = await conn.fetch(
                 query,
