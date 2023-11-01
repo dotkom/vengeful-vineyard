@@ -20,7 +20,7 @@ interface ModalProps {
 export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selectedGroup, dataRefetch }, ref) => {
   const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(undefined)
   const [newPunishment, setNewPunishment] = useState({
-    punishment_type_id: 1,
+    punishment_type_id: "",
     reason: "",
     reason_hidden: true,
     amount: 1,

@@ -8,14 +8,14 @@ import React from "react"
 
 interface ModalInputProps {
   newPunishment: {
-    punishment_type_id: number
+    punishment_type_id: string
     reason: string
     reason_hidden: boolean
     amount: number
   }
   setNewPunishment: React.Dispatch<
     React.SetStateAction<{
-      punishment_type_id: number
+      punishment_type_id: string
       reason: string
       reason_hidden: boolean
       amount: number
@@ -45,7 +45,7 @@ export const ModalInput = ({
   const typeInputHandler = (evt: React.ChangeEvent<HTMLSelectElement>) =>
     setNewPunishment({
       ...newPunishment,
-      punishment_type_id: Number(evt.currentTarget.value),
+      punishment_type_id: evt.currentTarget.value,
     })
   const amountInputHandler = (evt: React.ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({

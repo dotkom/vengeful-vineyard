@@ -24,7 +24,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
   }
 
   const totalPunishment: React.ReactNode[] = []
-  const punishmentTypeMap = new Map<number, PunishmentType>()
+  const punishmentTypeMap = new Map<string, PunishmentType>()
 
   punishmentTypes.forEach((type) => {
     punishmentTypeMap.set(type.punishment_type_id, type)
@@ -64,36 +64,38 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
   })
 
   function weeklyStreak(date: number, listDates: number[]) {
-    let streak = [date];
+    let streak = [date]
     for (let i = 1; i <= listDates.length; i++) {
       for (let j = 0; j < listDates.length; j++) {
-        const compareDate = streak[i - 1];
-        const prewDate = listDates[0];
+        const compareDate = streak[i - 1]
+        const prewDate = listDates[0]
         if (compareDate <= 604800000 + prewDate && prewDate <= compareDate) {
-          streak[i] = prewDate;
-          listDates.shift();
+          streak[i] = prewDate
+          listDates.shift()
         } else {
           if (prewDate! <= compareDate) {
-            break;
+            break
           }
         }
       }
       if (streak[i] === undefined) {
-        break;
+        break
       }
     }
-    return streak.length - 1;
+    return streak.length - 1
   }
 
   // Punishment dates to number from most recent to oldest
-  const dateToNumber = user.punishments.map((punishment) => {
-    const date = punishment.created_at.slice(0, 10);
-    const [year, month, day] = date.split("-").map(Number);
-    return new Date(year, month - 1, day).getTime();
-  }).reverse();
+  const dateToNumber = user.punishments
+    .map((punishment) => {
+      const date = punishment.created_at.slice(0, 10)
+      const [year, month, day] = date.split("-").map(Number)
+      return new Date(year, month - 1, day).getTime()
+    })
+    .reverse()
 
-  const today = new Date().getTime();
-  const streak = weeklyStreak(today, dateToNumber);
+  const today = new Date().getTime()
+  const streak = weeklyStreak(today, dateToNumber)
 
   return (
     <AccordionItem value={user.user_id.toString()}>

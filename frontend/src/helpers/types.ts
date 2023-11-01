@@ -1,6 +1,6 @@
 export interface User {
   ow_user_id: number
-  user_id: number
+  user_id: string
   first_name: string
   last_name: string
   email: string
@@ -23,27 +23,27 @@ export interface LeaderboardUser {
   first_name: string
   last_name: string
   email: string
-  user_id: number
+  user_id: string
   total_value: number
   punishments: LeaderboardPunishment[]
 }
 
 export interface PunishmentReaction {
-  punishment_reaction_id: number
-  punishment_id: number
-  created_by: number
+  punishment_reaction_id: string
+  punishment_id: string
+  created_by: string
   created_at: string
   emoji: string
 }
 
 export interface Punishment {
-  punishment_type_id: number
+  punishment_type_id: string
   reason: string
   reason_hidden: boolean
   amount: number
-  punishment_id: number
+  punishment_id: string
   created_at: string
-  created_by: number
+  created_by: string
   created_by_name: string
   reactions: PunishmentReaction[]
 }
@@ -52,7 +52,7 @@ export interface PunishmentType {
   name: string
   value: number
   logo_url: string
-  punishment_type_id: number
+  punishment_type_id: string
 }
 
 export interface Group {
@@ -61,7 +61,7 @@ export interface Group {
   rules: string
   ow_group_id: number
   image: string
-  group_id: number
+  group_id: string
   punishment_types: PunishmentType[]
   members: GroupUser[]
 }
@@ -71,7 +71,7 @@ export interface GroupUser {
   first_name: string
   last_name: string
   email: string
-  user_id: number
+  user_id: string
   ow_group_user_id: number
   punishments: Punishment[]
   total_paid_amount: number

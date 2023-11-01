@@ -2,7 +2,7 @@ import { Group } from "../../../../helpers/types"
 import React from "react"
 
 interface AlcoholInputProps {
-  type: number
+  type: string
   amount: number
   data: Group
   typeInputHandler: (evt: React.ChangeEvent<HTMLSelectElement>) => void
