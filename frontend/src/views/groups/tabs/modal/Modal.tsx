@@ -1,13 +1,11 @@
-import React, { forwardRef, Fragment, MutableRefObject, useContext, useState } from "react"
+import React, { forwardRef, Fragment, MutableRefObject, useContext, useEffect, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { SunIcon } from "@radix-ui/react-icons"
-import { getAddPunishmentUrl, getGroupLeaderboardUrl } from "../../../../helpers/api"
-import axios, { AxiosResponse } from "axios"
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
-import { Group, GroupUser } from "../../../../helpers/types"
+import { addPunishment, useGroupLeaderboard } from "../../../../helpers/api"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
+import { Group, GroupUser, PunishmentCreate } from "../../../../helpers/types"
 import { NotificationContext } from "../../../../helpers/notificationContext"
 import { ModalInput } from "./ModalInput"
-import { sortGroupUsers } from "../../../../helpers/sorting"
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -19,7 +17,7 @@ interface ModalProps {
 
 export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selectedGroup, dataRefetch }, ref) => {
   const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(undefined)
-  const [newPunishment, setNewPunishment] = useState({
+  const [newPunishment, setNewPunishment] = useState<PunishmentCreate>({
     punishment_type_id: 1,
     reason: "",
     reason_hidden: true,
@@ -27,26 +25,20 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
   })
   const { setNotification } = useContext(NotificationContext)
 
-  const { data } = useQuery({
-    queryKey: ["groupLeaderboard", selectedGroup?.group_id],
-    queryFn: () =>
-      axios.get(getGroupLeaderboardUrl(selectedGroup.group_id)).then((res: AxiosResponse<Group>) => {
-        setSelectedPerson(res.data.members[0])
-        setNewPunishment((prev) => ({
-          ...prev,
-          punishment_type_id: res.data.punishment_types[0].punishment_type_id,
-        }))
-        const group = res.data
-        group.members = sortGroupUsers(group.members, group.punishment_types)
-        return group
-      }),
-  })
+  const { data: group } = useGroupLeaderboard(selectedGroup.group_id)
+
+  useEffect(() => {
+    if (group === undefined) return
+    setSelectedPerson(group.members[0])
+    setNewPunishment((prev) => ({
+      ...prev,
+      punishment_type_id: group.punishment_types[0].punishment_type_id,
+    }))
+  }, [group])
 
   const createPunishmentCall = async () => {
     if (selectedPerson) {
-      const ADD_PUNISHMENT_URL = getAddPunishmentUrl(selectedGroup.group_id, selectedPerson.user_id)
-      const res: AxiosResponse<string> = await axios.post(ADD_PUNISHMENT_URL, [newPunishment])
-      return res.data
+      return await addPunishment(selectedGroup.group_id, selectedPerson.user_id, newPunishment)
     } else {
       console.log("......")
     }
@@ -54,7 +46,7 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
 
   const { mutate } = useMutation(createPunishmentCall, {
     onSuccess: () => {
-      dataRefetch()
+      dataRefetch().then()
       setNotification({
         show: true,
         title: "Straff registrert!",
@@ -66,7 +58,7 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
     },
   })
 
-  if (data)
+  if (group)
     return (
       <Dialog
         as="div"
@@ -112,7 +104,7 @@ export const Modal = forwardRef<HTMLButtonElement, ModalProps>(({ setOpen, selec
                         <ModalInput
                           newPunishment={newPunishment}
                           setNewPunishment={setNewPunishment}
-                          data={data}
+                          data={group}
                           selectedPerson={selectedPerson}
                           setSelectedPerson={setSelectedPerson}
                         />

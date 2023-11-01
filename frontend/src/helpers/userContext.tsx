@@ -6,10 +6,10 @@ interface UserType {
 
 export const UserContext = createContext<{
   user: UserType
-  setUser: (user: UserType) => void
+  setUserContext: (user: UserType) => void
 }>({
   user: {
     user_id: 0,
   },
-  setUser: () => {},
+  setUserContext: () => {},
 })

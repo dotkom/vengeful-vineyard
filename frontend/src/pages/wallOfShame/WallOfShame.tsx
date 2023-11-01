@@ -1,21 +1,9 @@
-import { useInfiniteQuery } from "@tanstack/react-query"
 import { Table } from "../../components/table"
-import axios, { AxiosResponse } from "axios"
-import { LEADERBOARD_URL } from "../../helpers/api"
-import { Leaderboard } from "../../helpers/types"
+import { useLeaderboard } from "../../helpers/api"
 import { useEffect } from "react"
 
 export const WallOfShame = () => {
-  const getLeaderboard = (url: string) => axios.get(url).then((res: AxiosResponse<Leaderboard>) => res.data)
-
-  const { isLoading, isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(
-    ["leaderboard"],
-    ({ pageParam = LEADERBOARD_URL }) => getLeaderboard(pageParam),
-    {
-      getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
-      staleTime: 1000 * 60,
-    }
-  )
+  const { isLoading, isFetching, data, refetch, fetchNextPage } = useLeaderboard()
 
   const handleScroll = () => {
     if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight) {

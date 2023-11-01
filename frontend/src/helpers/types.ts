@@ -36,6 +36,13 @@ export interface PunishmentReaction {
   emoji: string
 }
 
+export interface PunishmentCreate {
+  punishment_type_id: number
+  reason: string
+  reason_hidden: boolean
+  amount: number
+}
+
 export interface Punishment {
   punishment_type_id: number
   reason: string
