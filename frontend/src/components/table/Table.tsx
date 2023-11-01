@@ -60,7 +60,7 @@ export const Table = ({
 
   return (
     <ul role="list">
-      <SearchBar setSearchTerm={setSearchTerm} />
+      {filteredData && <SearchBar setSearchTerm={setSearchTerm} />}
       <Accordion.Root
         type="single"
         defaultValue="item-1"
