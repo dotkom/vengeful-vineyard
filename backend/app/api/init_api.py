@@ -6,6 +6,7 @@ Sets up the API (FastAPI)
 """
 
 import logging
+import sys
 import time
 from timeit import default_timer as timer
 from typing import Any
@@ -74,8 +75,10 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
         app.set_app_state(State())
         app.set_ow_sync(OWSync(app))
 
-        await database.async_init(**db_settings)
+        await database.async_init(**db_settings, logger=app.logger)
         await http.async_init()
+
+        app.logger.info("Application started")
 
     @app.on_event("shutdown")
     async def shutdown_handler() -> None:
@@ -87,17 +90,30 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
             await app.http.close()
 
 
-class TimerLogger:
+class TimeSinceCreationFilter(logging.Filter):
     def __init__(self):
         self.start_time = time.time()
 
-    def log(self, message):
-        print(f"[{(time.time() - self.start_time) * 1000:.0f}ms] {message}")
+    def filter(self, record):
+        elapsed_time = time.time() - self.start_time
+        record.elapsed_ms = int(elapsed_time * 1000)  # Convert to milliseconds
+        return True
 
 
 def init_logger(app: FastAPI) -> None:
-    logger = TimerLogger()
-    logger.log("hei FUCK YOU")
+    logger: logging.Logger = logging.getLogger("app")
+    logger.setLevel(logging.DEBUG)
+    logger.propagate = False
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter('[%(elapsed_ms)ims] %(message)s')
+    ch.addFilter(TimeSinceCreationFilter())
+    ch.setFormatter(formatter)
+
+    logger.addHandler(ch)
+
     app.set_logger(logger)
 
 
@@ -116,13 +132,13 @@ def init_api(**db_settings: str) -> FastAPI:
     )
     app.router.route_class = APIRoute
     init_logger(app)
-    app.logger.log("Setting up middleware")
+    app.logger.info("Setting up middleware")
     init_middlewares(app)
-    app.logger.log("Setting up routes")
+    app.logger.info("Setting up routes")
     init_routes(app)
-    app.logger.log("Setting up events")
+    app.logger.info("Setting up events")
     init_events(app, **db_settings)
-    app.logger.log("Setting up logging")
+    app.logger.info("Setting up logging")
     return app
 
 

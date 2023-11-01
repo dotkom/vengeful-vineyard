@@ -20,8 +20,6 @@ from .punishment_types import PunishmentTypes
 from .punishments import Punishments
 from .users import Users
 
-logger = logging.getLogger(__name__)
-
 
 def read_sql_file(filepath: Path) -> str:
     """Reads an SQL file and ignores comments"""
@@ -90,7 +88,7 @@ class Database:
             "json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
         )
 
-    async def async_init(self, **db_settings: str) -> None:
+    async def async_init(self, logger: logging.Logger, **db_settings: str) -> None:
         for _ in range(10):  # Try for 10*0.5 seconds
             try:
                 logger.info("Connecting to postgres database.")
@@ -104,6 +102,7 @@ class Database:
                     database=self._db_name,
                     init=Database.set_connection_codecs,
                 )
+                logger.info("Connected to postgres database.")
             except (ConnectionError, CannotConnectNowError):
                 logger.info(
                     "Connection to postgres database could not be established. Retrying in 0.5s"
@@ -120,7 +119,7 @@ class Database:
     async def close(self) -> None:
         await self.pool.close()
 
-    async def load_db_migrations(self, conn: Optional[Pool] = None) -> None:
+    async def load_db_migrations(self, conn: Optional[Pool] = None, logger: Optional[logging.Logger] = None) -> None:
         """
         Loads the database schema and applies new migrations.
         """
@@ -136,15 +135,18 @@ class Database:
         async with MaybeAcquire(conn, self.pool) as conn:
             schema_version = await self.get_migration_lock_version(conn)
 
-            logger.debug("Schema version: %d", schema_version)
+            if logger is not None:
+                logger.debug("Schema version: %d", schema_version)
 
             file_version = get_version_from_name(file_.name)
             if file_version <= schema_version:
-                logger.debug("Skipping migration: %s", file_.name)
+                if logger is not None:
+                    logger.debug("Skipping migration: %s", file_.name)
                 return
 
             sql_commands = read_sql_file(file_)
-            logger.info("Applying migration: %s", file_.name)
+            if logger is not None:
+                logger.info("Applying migration: %s", file_.name)
 
             await conn.execute(sql_commands)
             await self.set_migration_lock_version(conn, file_version)
