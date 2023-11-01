@@ -30,7 +30,7 @@ export const ReactionsDisplay = ({ reactions, mutate, removeMutation, setSelecte
         <div
           key={emoji}
           className={`flex cursor-pointer items-center justify-center rounded-full border-[1px] px-2 ${
-            emoji === userReactionEmoji ? "border-blue-400 bg-blue-100" : "border-blue-400 bg-blue-50"
+            emoji === userReactionEmoji ? "border-blue-500 bg-blue-100" : "border-gray-400 bg-gray-50"
           }`}
           onClick={() => {
             if (emoji === userReactionEmoji) {
