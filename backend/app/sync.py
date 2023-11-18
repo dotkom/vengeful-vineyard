@@ -23,7 +23,6 @@ IGNORE_OW_GROUPS = (12,)  # "Komiteer"
 class OWSync:
     def __init__(self, app: "FastAPI"):
         self.app = app
-        self.last_user_sync: dict[OWUserId, float] = {}
 
     async def sync_for_access_token(
         self,
@@ -63,16 +62,13 @@ class OWSync:
         ow_user_id: OWUserId,
         user_id: UserId,
         wait_for_updates: bool = True,
-        use_cache: bool = True,
     ) -> None:
-        if self.last_user_sync.get(ow_user_id, 0) > time.time() - 60 and use_cache:
-            return
-
-        self.last_user_sync[ow_user_id] = time.time()
-
         groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
         filtered_groups_data = [
-            g for g in groups_data["results"] if g["id"] not in IGNORE_OW_GROUPS
+            g
+            for g in groups_data["results"]
+            if g["id"] not in IGNORE_OW_GROUPS
+            and g["group_type"] in ("committee", "node_committee")
         ]
 
         tasks = [

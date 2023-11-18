@@ -41,7 +41,7 @@ router = APIRouter(
 async def get_my_groups(
     request: Request,
     wait_for_updates: bool = Query(title="Wait for updates", default=True),
-    use_cache: bool = Query(title="Use cache", default=True),
+    optimistic: bool = Query(title="Optimistic", default=False),
 ) -> list[Group]:
     app = request.app
     access_token = request.raise_if_missing_authorization()
@@ -54,12 +54,12 @@ async def get_my_groups(
     except NotFound as exc:
         raise HTTPException(status_code=401, detail="Invalid access token") from exc
 
-    await app.ow_sync.sync_for_user(
-        ow_user_id,
-        user_id,
-        wait_for_updates=wait_for_updates,
-        use_cache=use_cache,
-    )
+    if not optimistic:
+        await app.ow_sync.sync_for_user(
+            ow_user_id,
+            user_id,
+            wait_for_updates=wait_for_updates,
+        )
 
     groups = await app.db.users.get_groups(user_id)
     return groups

@@ -1,33 +1,26 @@
-import { AiFillInfoCircle } from "react-icons/ai";
+import { AiFillInfoCircle } from "react-icons/ai"
 
 interface ToggleProps {
-  description?: string;
-  label: string;
-  value: boolean;
-  changeHandler: () => void;
+  description?: string
+  label: string
+  value: boolean
+  changeHandler: () => void
 }
 
-export const Toggle = ({
-  description,
-  label,
-  value,
-  changeHandler,
-}: ToggleProps) => (
+export const Toggle = ({ description, label, value, changeHandler }: ToggleProps) => (
   <div className="flex items-center justify-between relative">
-    { description ?
-    <div className="group relative overflow-visible">
-      <div className="absolute z-10 top-5 items-center hidden group-hover:block transition-opacity border-gray-200 rounded-2xl bg-white border-2">
-        <p className="text-sm text-gray-500 p-4">{description}</p>
+    {description ? (
+      <div className="group relative overflow-visible">
+        <div className="absolute z-10 top-5 items-center hidden group-hover:block transition-opacity border-gray-200 rounded-2xl bg-white border-2">
+          <p className="text-sm text-gray-500 p-4">{description}</p>
+        </div>
+        <p className="text-sm font-medium text-gray-900 cursor-pointer">
+          {label} <AiFillInfoCircle className="text-gray-400 inline" />
+        </p>
       </div>
-      <p className="text-sm font-medium text-gray-900 cursor-pointer">
-        {label} <AiFillInfoCircle className="text-gray-400 inline" />
-      </p>
-    </div>
-      :
-    <p className="text-sm font-medium text-gray-900 cursor-pointer">
-      {label}
-    </p>
-    }
+    ) : (
+      <p className="text-sm font-medium text-gray-900 cursor-pointer">{label}</p>
+    )}
     <button
       type="button"
       aria-pressed="false"
@@ -46,5 +39,4 @@ export const Toggle = ({
       />
     </button>
   </div>
-);
-
+)

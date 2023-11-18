@@ -1,23 +1,23 @@
-import React from "react";
-import * as Accordion from "@radix-ui/react-accordion";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { classNames } from "../../../helpers/classNames";
+import React from "react"
+import * as Accordion from "@radix-ui/react-accordion"
+import { ChevronDownIcon } from "@radix-ui/react-icons"
+import { classNames } from "../../../helpers/classNames"
 
-export const AccordionItem = React.forwardRef(
+export const AccordionItem = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Accordion.Item>>(
   ({ children, className, ...props }, forwardedRef) => (
-    <Accordion.Item {...props} ref={forwardedRef}>
+    <Accordion.Item {...props} ref={forwardedRef} className={className}>
       {children}
     </Accordion.Item>
   )
-);
+)
 
-export const AccordionTrigger = React.forwardRef(
+export const AccordionTrigger = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Accordion.Trigger>>(
   ({ children, className, ...props }, forwardedRef) => (
     <Accordion.Header className="flex">
       <Accordion.Trigger
         className={classNames(
           "hover:bg-mauve2 group flex flex-1 cursor-default items-center justify-between bg-white px-5 text-[15px] leading-none outline-none",
-          className
+          className ?? ""
         )}
         {...props}
         ref={forwardedRef}
@@ -30,14 +30,14 @@ export const AccordionTrigger = React.forwardRef(
       </Accordion.Trigger>
     </Accordion.Header>
   )
-);
+)
 
-export const AccordionContent = React.forwardRef(
+export const AccordionContent = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Accordion.Content>>(
   ({ children, className, ...props }, forwardedRef) => (
     <Accordion.Content
       className={classNames(
         "data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden text-[15px]",
-        className
+        className ?? ""
       )}
       {...props}
       ref={forwardedRef}
@@ -45,5 +45,4 @@ export const AccordionContent = React.forwardRef(
       <div className="">{children}</div>
     </Accordion.Content>
   )
-);
-
+)

@@ -1,20 +1,16 @@
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from "@tanstack/react-query";
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
 
-import { Fragment } from "react";
-import { PunishmentItem } from "./PunishmentItem";
-import { GroupUser, PunishmentType, LeaderboardUser } from "../../../helpers/types";
+import { Fragment } from "react"
+import { PunishmentItem } from "./PunishmentItem"
+import { GroupUser, PunishmentType, LeaderboardUser } from "../../../helpers/types"
 
 interface PunishmentListProps {
-  groupUser?: GroupUser | undefined;
-  leaderboardUser?: LeaderboardUser | undefined;
-  punishmentTypes: PunishmentType[];
+  groupUser?: GroupUser | undefined
+  leaderboardUser?: LeaderboardUser | undefined
+  punishmentTypes: PunishmentType[]
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<any, unknown>>;
+  ) => Promise<QueryObserverResult<any, unknown>>
 }
 
 export const PunishmentList = ({
@@ -23,9 +19,9 @@ export const PunishmentList = ({
   punishmentTypes,
   dataRefetch,
 }: PunishmentListProps) => {
-  const user = groupUser ?? leaderboardUser;
+  const user = groupUser ?? leaderboardUser
   if (user === undefined) {
-    return <p>user is undefined</p>;
+    return <p>user is undefined</p>
   }
 
   if (user.punishments.length === 0) {
@@ -33,7 +29,7 @@ export const PunishmentList = ({
       <Fragment>
         <p className="p-4">Ingen straffer</p>
       </Fragment>
-    );
+    )
   }
 
   return (
@@ -47,5 +43,5 @@ export const PunishmentList = ({
         />
       ))}
     </Fragment>
-  );
-};
+  )
+}

@@ -50,3 +50,8 @@ repos:
         types: [python]
         pass_filenames: false
         language: system
+      - id: lint-staged
+        name: lint-staged
+        entry: bash -c "cd frontend && pnpm run pre-commit"
+        language: system
+        always_run: true

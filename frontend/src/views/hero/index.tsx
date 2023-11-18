@@ -1,3 +1,3 @@
-import { DefaultHero } from "./DefaultHero";
+import { DefaultHero } from "./DefaultHero"
 
-export { DefaultHero };
+export { DefaultHero }

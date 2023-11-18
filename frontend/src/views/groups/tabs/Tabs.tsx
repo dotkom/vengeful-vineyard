@@ -1,25 +1,21 @@
-import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { Modal } from "./modal/Modal";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { Transition } from "@headlessui/react";
-import { Group } from "../../../helpers/types";
-import { TabItem } from "./TabItem";
-import { SkeletonTabItem } from "./SkeletonTabItem";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from "@tanstack/react-query";
+import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline"
+import { Modal } from "./modal/Modal"
+import React, { Fragment, useEffect, useRef, useState } from "react"
+import { Transition } from "@headlessui/react"
+import { Group } from "../../../helpers/types"
+import { TabItem } from "./TabItem"
+import { SkeletonTabItem } from "./SkeletonTabItem"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
 
 interface TabsProps {
-  selectedGroup: Group | undefined;
-  setSelectedGroup: React.Dispatch<React.SetStateAction<Group | undefined>>;
-  groups?: Group[];
+  selectedGroup: Group | undefined
+  setSelectedGroup: (group: Group) => void
+  groups?: Group[]
+  setShowSearchBar: React.Dispatch<React.SetStateAction<boolean>>
+  showSearchBar: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<Group, unknown>>;
-  setShowSearchBar: React.Dispatch<React.SetStateAction<boolean>>;
-  showSearchBar: boolean;
+  ) => Promise<QueryObserverResult<Group, unknown>>
 }
 
 export const Tabs = ({
@@ -30,22 +26,19 @@ export const Tabs = ({
   setShowSearchBar,
   showSearchBar,
 }: TabsProps) => {
-  const [open, setOpen] = useState(false);
-  const cancelButtonRef = useRef(null);
+  const [open, setOpen] = useState(false)
+  const cancelButtonRef = useRef(null)
 
   useEffect(() => {
-    if (selectedGroup === undefined && groups) setSelectedGroup(groups[0]);
-  }, [groups]);
+    if (selectedGroup === undefined && groups) setSelectedGroup(groups[0])
+  }, [groups])
 
   return (
     <Fragment>
       <Transition.Root show={open} as={Fragment}>
-        <Modal
-          setOpen={setOpen}
-          ref={cancelButtonRef}
-          selectedGroup={selectedGroup}
-          dataRefetch={dataRefetch}
-        />
+        {selectedGroup && (
+          <Modal setOpen={setOpen} ref={cancelButtonRef} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
+        )}
       </Transition.Root>
 
       <div className="mx-4 max-w-5xl md:m-auto md:px-8">
@@ -69,20 +62,14 @@ export const Tabs = ({
                       className="relative float-right inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       onClick={() => setOpen(true)}
                     >
-                      <PlusIcon
-                        className="-ml-0.5 h-5 w-5"
-                        aria-hidden="true"
-                      />
+                      <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                       Ny straff
                     </button>
                     <button
                       className="relative float-right mr-2 inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       onClick={() => setShowSearchBar(!showSearchBar)}
                     >
-                      <MagnifyingGlassIcon
-                        className="-ml-0.5 h-5 w-5"
-                        aria-hidden="true"
-                      />
+                      <MagnifyingGlassIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                     </button>
                   </div>
                 </>
@@ -94,5 +81,5 @@ export const Tabs = ({
         </div>
       </div>
     </Fragment>
-  );
-};
+  )
+}

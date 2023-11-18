@@ -1,13 +1,13 @@
-import { useAuth } from "react-oidc-context";
-import { DefaultHero } from "../../views/hero";
-import { AuthenticatedProfile } from "./AuthenticatedProfile";
+import { useAuth } from "react-oidc-context"
+import { DefaultHero } from "../../views/hero"
+import { AuthenticatedProfile } from "./AuthenticatedProfile"
 
 export const Profile = () => {
-  const auth = useAuth();
+  const auth = useAuth()
 
   if (auth.isAuthenticated) {
-    return <AuthenticatedProfile />;
+    return <AuthenticatedProfile />
   }
 
-  return <DefaultHero auth={auth} />;
-};
+  return <DefaultHero auth={auth} />
+}
