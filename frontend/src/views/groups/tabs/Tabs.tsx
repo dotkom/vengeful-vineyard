@@ -1,4 +1,4 @@
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Modal } from "./modal/Modal";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
@@ -18,6 +18,8 @@ interface TabsProps {
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<Group, unknown>>;
+  setShowSearchBar: React.Dispatch<React.SetStateAction<boolean>>;
+  showSearchBar: boolean;
 }
 
 export const Tabs = ({
@@ -25,6 +27,8 @@ export const Tabs = ({
   setSelectedGroup,
   groups,
   dataRefetch,
+  setShowSearchBar,
+  showSearchBar,
 }: TabsProps) => {
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
@@ -58,6 +62,7 @@ export const Tabs = ({
                       onClick={() => setSelectedGroup(group)}
                     />
                   ))}
+
                   <div className="w-full">
                     <button
                       type="button"
@@ -69,6 +74,15 @@ export const Tabs = ({
                         aria-hidden="true"
                       />
                       Ny straff
+                    </button>
+                    <button
+                      className="relative float-right mr-2 inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      onClick={() => setShowSearchBar(!showSearchBar)}
+                    >
+                      <MagnifyingGlassIcon
+                        className="-ml-0.5 h-5 w-5"
+                        aria-hidden="true"
+                      />
                     </button>
                   </div>
                 </>

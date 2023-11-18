@@ -12,6 +12,7 @@ import { sortGroupUsers, sortGroups } from "../../helpers/sorting";
 export const GroupsView = () => {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const [showSearchBar, setShowSearchBar] = useState(false);
 
   const params = useParams<{ groupName?: string }>();
   const selectedGroupName = params.groupName;
@@ -41,7 +42,8 @@ export const GroupsView = () => {
   }, [user, selectedGroupName]);
 
   const selectedGroup = user?.groups.find(
-    (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
+    (group) =>
+      group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
   );
 
   const { isLoading, error, data, refetch } = useQuery({
@@ -62,12 +64,19 @@ export const GroupsView = () => {
       <Tabs
         selectedGroup={selectedGroup}
         setSelectedGroup={(group) =>
-            group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)
+          group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)
         }
         groups={user ? user.groups : undefined}
         dataRefetch={refetch}
+        setShowSearchBar={setShowSearchBar}
+        showSearchBar={showSearchBar}
       />
-      <Table groupData={data} isLoading={isLoading} dataRefetch={refetch} />
+      <Table
+        groupData={data}
+        isLoading={isLoading}
+        dataRefetch={refetch}
+        showSearchBar={showSearchBar}
+      />
     </section>
   );
 };

@@ -15,6 +15,7 @@ interface TableProps {
   groupData?: Group | undefined;
   leaderboardData?: Leaderboard | undefined;
   isLoading: boolean;
+  showSearchBar: boolean;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>;
@@ -39,6 +40,7 @@ export const Table = ({
   groupData,
   leaderboardData,
   dataRefetch,
+  showSearchBar,
 }: TableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState(groupData);
@@ -47,10 +49,12 @@ export const Table = ({
     if (groupData && searchTerm !== "") {
       setFilteredData({
         ...groupData,
-        members: groupData.members.filter(
-          (user) =>
-            user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
+        members: groupData.members.filter((user) =>
+          (
+            user.first_name.toLowerCase() +
+            " " +
+            user.last_name.toLowerCase()
+          ).includes(searchTerm.toLowerCase())
         ),
       });
     } else {
@@ -60,7 +64,9 @@ export const Table = ({
 
   return (
     <ul role="list">
-      {filteredData && <SearchBar setSearchTerm={setSearchTerm} />}
+      {filteredData && showSearchBar && (
+        <SearchBar setSearchTerm={setSearchTerm} />
+      )}
       <Accordion.Root
         type="single"
         defaultValue="item-1"
