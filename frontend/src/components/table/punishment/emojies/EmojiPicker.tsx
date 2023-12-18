@@ -29,7 +29,7 @@ export const EmojiPicker = ({ mutate, setSelectedEmoji }: EmojiPickerProps) => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items static className="absolute bottom-2 rounded border-[1px]  bg-white text-2xl shadow-md">
+            <Menu.Items static className="absolute bottom-9 rounded border-[1px]  bg-white text-2xl shadow-md">
               <div className="flex">
                 {emojis.map((emoji, index) => (
                   <Menu.Item key={index}>

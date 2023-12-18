@@ -1,8 +1,8 @@
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useContext, useRef, useState } from "react"
 import { Group, GroupUser } from "../../../../helpers/types"
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
-import { getAddPunishmentUrl, getGroupLeaderboardUrl } from "../../../../helpers/api"
+import { getAddPunishmentUrl, useGroupLeaderboard } from "../../../../helpers/api"
 
 import { AlcoholInput } from "../../../../components/input/AlcoholInput"
 import { Modal } from "../../../../components/modal/Modal"
@@ -11,7 +11,6 @@ import { PersonSelect } from "../../../../components/input/PersonSelect"
 import { TextInput } from "../../../../components/input/TextInput"
 import { Toggle } from "../../../../components/input/Toggle"
 import { Transition } from "@headlessui/react"
-import { sortGroupUsers } from "../../../../helpers/sorting"
 import { useGivePunishmentModal } from "../../../../helpers/givePunishmentModalContext"
 
 interface GivePunishmentModalProps {
@@ -35,22 +34,7 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
   })
   const { setNotification } = useContext(NotificationContext)
 
-  const { data } = useQuery({
-    queryKey: ["groupLeaderboard", selectedGroup?.group_id],
-    queryFn: () =>
-      axios.get(getGroupLeaderboardUrl(selectedGroup.group_id)).then((res: AxiosResponse<Group>) => {
-        if (!selectedPerson) {
-          setSelectedPerson(res.data.members[0])
-        }
-        setNewPunishment((prev) => ({
-          ...prev,
-          punishment_type_id: res.data.punishment_types[0].punishment_type_id,
-        }))
-        const group = res.data
-        group.members = sortGroupUsers(group.members, group.punishment_types)
-        return group
-      }),
-  })
+  const { data } = useGroupLeaderboard(selectedGroup.group_id)
 
   const createPunishmentCall = async () => {
     if (selectedPerson) {

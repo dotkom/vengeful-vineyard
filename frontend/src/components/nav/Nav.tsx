@@ -1,12 +1,13 @@
-import { Fragment } from "react"
-import { Disclosure, Menu, Transition } from "@headlessui/react"
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
-import OnlineLogo from "../../assets/online.png"
+import { Disclosure, Menu, Transition } from "@headlessui/react"
+
 import { AuthContextProps } from "react-oidc-context"
-import { classNames } from "../../helpers/classNames"
 import { AvatarIcon } from "@radix-ui/react-icons"
+import { Fragment } from "react"
 import { Link } from "react-router-dom"
 import { NavLink } from "./NavLink"
+import OnlineLogo from "../../assets/online.png"
+import { classNames } from "../../helpers/classNames"
 
 interface NavProps {
   auth: AuthContextProps
