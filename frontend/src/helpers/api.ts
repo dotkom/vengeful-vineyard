@@ -1,7 +1,8 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
-import axios, { AxiosResponse } from "axios"
 import { Group, Leaderboard, PunishmentCreate, User } from "./types"
-import { sortGroups, sortGroupUsers } from "./sorting"
+import axios, { AxiosResponse } from "axios"
+import { sortGroupUsers, sortGroups } from "./sorting"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
+
 import { useOptimisticQuery } from "./optimisticQuery"
 
 export const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
@@ -16,6 +17,13 @@ export const ADD_PUNISHMENT = BASE_URL + "/group/1/user/1/punishment"
 
 export const getAddPunishmentUrl = (groupId: number, userId: number) =>
   BASE_URL + `/group/${groupId}/user/${userId}/punishment`
+
+export const getPostPunishmentsPaidUrl = (groupId: number) => BASE_URL + `/group/${groupId}/punishments/paid`
+
+export const getPostPunishmentsUnpaidUrl = (groupId: number) => BASE_URL + `/group/${groupId}/punishments/unpaid`
+
+export const getPostAllPunishmentsPaidForUserUrl = (groupId: number, userId: number) =>
+  BASE_URL + `/group/${groupId}/user/${userId}/punishments/paid/all`
 
 export const getAddReactionUrl = (punishmentId: number) => BASE_URL + `/punishment/${punishmentId}/reaction`
 

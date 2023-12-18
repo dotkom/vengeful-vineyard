@@ -90,7 +90,10 @@ class Punishments:
                                                      reason_hidden,
                                                      amount,
                                                      created_by,
-                                                     created_at)
+                                                     created_at,
+                                                     paid,
+                                                     paid_at,
+                                                     marked_paid_by)
                     (SELECT
                         p.group_id,
                         p.user_id,
@@ -99,7 +102,10 @@ class Punishments:
                         p.reason_hidden,
                         p.amount,
                         p.created_by,
-                        p.created_at
+                        p.created_at,
+                        p.paid,
+                        p.paid_at,
+                        p.marked_paid_by
                     FROM
                         unnest($1::group_punishments[]) as p
                     )
@@ -118,6 +124,9 @@ class Punishments:
                         p.amount,
                         created_by,
                         datetime.datetime.utcnow(),
+                        False,
+                        None,
+                        None,
                     )
                     for p in punishments
                 ],
@@ -134,4 +143,72 @@ class Punishments:
             res = await conn.fetchval(query, punishment_id)
 
             if res is None:
+                raise NotFound
+
+    async def mark_multiple_as_paid(
+        self,
+        group_id: GroupId,
+        punishment_ids: list[PunishmentId],
+        marked_paid_by: UserId,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            async with conn.transaction():
+                query = """UPDATE group_punishments
+                        SET paid = true, paid_at = $1, marked_paid_by = $2
+                        WHERE group_id = $3 AND punishment_id = ANY($4::int[])
+                        RETURNING *"""
+                res = await conn.fetch(
+                    query,
+                    datetime.datetime.utcnow(),
+                    marked_paid_by,
+                    group_id,
+                    punishment_ids,
+                )
+
+                if len(res) != len(punishment_ids):
+                    raise NotFound
+
+    async def mark_multiple_as_unpaid(
+        self,
+        group_id: GroupId,
+        punishment_ids: list[PunishmentId],
+        conn: Optional[Pool] = None,
+    ) -> None:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            async with conn.transaction():
+                query = """UPDATE group_punishments
+                        SET paid = false, paid_at = null, marked_paid_by = null
+                        WHERE group_id = $1 AND punishment_id = ANY($2::int[])
+                        RETURNING *"""
+                res = await conn.fetch(
+                    query,
+                    group_id,
+                    punishment_ids,
+                )
+
+                if len(res) != len(punishment_ids):
+                    raise NotFound
+
+    async def mark_all_punishments_as_paid_for_user(
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        marked_paid_by: UserId,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """UPDATE group_punishments
+                    SET paid = true, paid_at = $1, marked_paid_by = $2
+                    WHERE group_id = $3 AND user_id = $4 AND paid = false
+                    RETURNING *"""
+            res = await conn.fetch(
+                query,
+                datetime.datetime.utcnow(),
+                marked_paid_by,
+                group_id,
+                user_id,
+            )
+
+            if len(res) == 0:
                 raise NotFound

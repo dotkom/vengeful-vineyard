@@ -1,7 +1,6 @@
 """Contains methods for syncing users from OW."""
 
 import asyncio
-import time
 from typing import TYPE_CHECKING, Any, Optional, cast
 
 from asyncpg import Pool

@@ -1,7 +1,8 @@
 import { createContext } from "react"
 
-interface NotificationType {
+export interface NotificationType {
   show: boolean
+  type: "success" | "error"
   title: string
   text: string
 }
@@ -12,6 +13,7 @@ export const NotificationContext = createContext<{
 }>({
   notification: {
     show: false,
+    type: "success",
     title: "",
     text: "",
   },

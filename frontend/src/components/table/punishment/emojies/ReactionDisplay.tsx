@@ -1,7 +1,8 @@
 import React, { useContext } from "react"
+
 import { PunishmentReaction } from "../../../../helpers/types"
-import { UserContext } from "../../../../helpers/userContext"
 import { UseMutateFunction } from "@tanstack/react-query"
+import { UserContext } from "../../../../helpers/userContext"
 
 interface ReactionsDisplayProps {
   reactions: PunishmentReaction[]
@@ -25,7 +26,7 @@ export const ReactionsDisplay = ({ reactions, mutate, removeMutation, setSelecte
   const userReactionEmoji = reactions.find((r) => r.created_by === user.user_id)?.emoji
 
   return (
-    <div className="absolute bottom-[10px] left-12 flex space-x-2">
+    <div className="flex space-x-2">
       {Object.entries(emojiCounts).map(([emoji, count]) => (
         <div
           key={emoji}

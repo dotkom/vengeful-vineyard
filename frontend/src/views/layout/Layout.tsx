@@ -1,20 +1,22 @@
-import { useAuth } from "react-oidc-context"
+import { NotificationContext, NotificationType } from "../../helpers/notificationContext"
+
 import { Footer } from "../../components/footer"
 import { Nav } from "../../components/nav"
-import axios from "axios"
+import { Notification } from "../../components/notification"
 import { Outlet } from "react-router-dom"
 import { Spinner } from "../../components/spinner"
-import { Notification } from "../../components/notification"
-import { useState } from "react"
-import { NotificationContext } from "../../helpers/notificationContext"
 import { UserContext } from "../../helpers/userContext"
+import axios from "axios"
+import { useAuth } from "react-oidc-context"
+import { useState } from "react"
 
 export const Layout = () => {
   const auth = useAuth()
-  const [notification, setNotification] = useState({
+  const [notification, setNotification] = useState<NotificationType>({
     show: false,
     title: "",
     text: "",
+    type: "success",
   })
   const [user, setUser] = useState({
     user_id: 0,
@@ -45,6 +47,7 @@ export const Layout = () => {
         <Nav auth={auth} />
         <div className="flex items-center justify-center">
           <h1>Ai ai ai ai ai!!!</h1>
+          <pre>{auth.error.message}</pre>
         </div>
         <Footer />
       </main>

@@ -1,11 +1,13 @@
-import { PlusIcon } from "@heroicons/react/24/outline"
-import { Modal } from "./modal/Modal"
-import React, { Fragment, useEffect, useRef, useState } from "react"
-import { Transition } from "@headlessui/react"
-import { Group } from "../../../helpers/types"
-import { TabItem } from "./TabItem"
-import { SkeletonTabItem } from "./SkeletonTabItem"
+import { Fragment, useEffect } from "react"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
+
+import { GivePunishmentModal } from "./modal/GivePunishmentModal"
+import { Group } from "../../../helpers/types"
+import { IconButton } from "../../../components/button"
+import { PlusIcon } from "@heroicons/react/24/outline"
+import { SkeletonTabItem } from "./SkeletonTabItem"
+import { TabItem } from "./TabItem"
+import { useGivePunishmentModal } from "../../../helpers/givePunishmentModalContext"
 
 interface TabsProps {
   selectedGroup: Group | undefined
@@ -17,8 +19,7 @@ interface TabsProps {
 }
 
 export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: TabsProps) => {
-  const [open, setOpen] = useState(false)
-  const cancelButtonRef = useRef(null)
+  const { open, setOpen } = useGivePunishmentModal()
 
   useEffect(() => {
     if (selectedGroup === undefined && groups) setSelectedGroup(groups[0])
@@ -26,13 +27,11 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
 
   return (
     <Fragment>
-      <Transition.Root show={open} as={Fragment}>
-        {selectedGroup && (
-          <Modal setOpen={setOpen} ref={cancelButtonRef} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
-        )}
-      </Transition.Root>
+      {open && selectedGroup && (
+        <GivePunishmentModal open={open} setOpen={setOpen} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
+      )}
 
-      <div className="mx-4 max-w-5xl md:m-auto md:px-8">
+      <div className="mx-4 max-w-5xl md:m-auto pl-8 pr-4">
         <div className="sm:block">
           <div>
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
@@ -46,15 +45,10 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
                       onClick={() => setSelectedGroup(group)}
                     />
                   ))}
-                  <div className="w-full">
-                    <button
-                      type="button"
-                      className="relative float-right inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      onClick={() => setOpen(true)}
-                    >
+                  <div className="w-full flex flex-row gap-x-2 mb-1 justify-end">
+                    <IconButton label="Ny straff" onClick={() => setOpen(true)}>
                       <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                      Ny straff
-                    </button>
+                    </IconButton>
                   </div>
                 </>
               ) : (

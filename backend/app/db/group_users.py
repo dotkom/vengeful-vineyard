@@ -24,7 +24,7 @@ class GroupUsers:
         conn: Optional[Pool] = None,
     ) -> GroupUser:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT m.active, m.ow_group_user_id, users.*
+            query = """SELECT m.active, m.ow_group_user_id, m.group_id, users.*
                     FROM users
                     INNER JOIN group_members as m
                     ON users.user_id = m.user_id
@@ -43,13 +43,6 @@ class GroupUsers:
             user["punishments"] = []
             if punishments:
                 user["punishments"] = await self.db.group_members.get_raw_punishments(
-                    group_id,
-                    user_id,
-                    conn=conn,
-                )
-                user[
-                    "total_paid_amount"
-                ] = await self.db.paid_punishments_logs.get_total_paid(
                     group_id,
                     user_id,
                     conn=conn,
@@ -91,22 +84,14 @@ class GroupUsers:
                         conn=conn,
                     )
                 )
-                db_paid_amounts = (
-                    await self.db.paid_punishments_logs.get_total_paid_for_multiple(
-                        group_id,
-                        user_ids,
-                        conn=conn,
-                    )
-                )
             else:
                 db_punishments = {}
-                db_paid_amounts = {}
 
             users = []
             for db_user in db_users:
                 user = dict(db_user)
                 user["punishments"] = db_punishments.get(user["user_id"], [])
-                user["total_paid_amount"] = db_paid_amounts.get(user["user_id"], 0)
+                user["group_id"] = group_id
                 users.append(GroupUser(**user))
 
             return users

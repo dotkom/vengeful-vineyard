@@ -15,6 +15,7 @@ export interface Leaderboard {
 }
 
 export interface LeaderboardPunishment extends Punishment {
+  group_id: null
   punishment_type: PunishmentType
 }
 
@@ -45,6 +46,7 @@ export interface PunishmentCreate {
 
 export interface Punishment {
   punishment_type_id: number
+  group_id: number | null // null if the punishment is for wall of shame
   reason: string
   reason_hidden: boolean
   amount: number
@@ -52,6 +54,9 @@ export interface Punishment {
   created_at: string
   created_by: number
   created_by_name: string
+  paid: boolean
+  paid_at: string
+  marked_paid_by: number
   reactions: PunishmentReaction[]
 }
 
@@ -79,9 +84,9 @@ export interface GroupUser {
   last_name: string
   email: string
   user_id: number
+  group_id: number
   ow_group_user_id: number
   punishments: Punishment[]
-  total_paid_amount: number
   active: boolean
 }
 

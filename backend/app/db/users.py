@@ -51,7 +51,6 @@ class Users:
                         COALESCE(json_agg(
                             json_build_object(
                                 'punishment_id', pwr.punishment_id,
-                                'group_id', pwr.group_id,
                                 'user_id', pwr.user_id,
                                 'punishment_type_id', pwr.punishment_type_id,
                                 'reason', pwr.reason,
@@ -60,6 +59,10 @@ class Users:
                                 'created_by', pwr.created_by,
                                 'created_by_name', pwr.created_by_name,
                                 'created_at', pwr.created_at,
+                                'group_id', pwr.group_id,
+                                'paid', pwr.paid,
+                                'paid_at', pwr.paid_at,
+                                'marked_paid_by', pwr.marked_paid_by,
                                 'reactions', pwr.reactions,
                                 'punishment_type', (SELECT json_build_object(
                                     'punishment_type_id', pt.punishment_type_id,
