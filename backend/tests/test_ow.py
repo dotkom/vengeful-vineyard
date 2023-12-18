@@ -83,6 +83,7 @@ ME_GROUPS_RESPONSE = [
                 "ow_user_id": 2581,
                 "first_name": "Brage",
                 "last_name": "",
+                "group_id": 1,
                 "ow_group_user_id": 2224,
                 "email": "email1@email.com",
                 "user_id": 1,
@@ -93,6 +94,7 @@ ME_GROUPS_RESPONSE = [
                 "ow_user_id": 1381,
                 "first_name": "Amund",
                 "last_name": "",
+                "group_id": 1,
                 "ow_group_user_id": 656,
                 "email": "email2@email.com",
                 "user_id": 2,
@@ -103,6 +105,7 @@ ME_GROUPS_RESPONSE = [
                 "ow_user_id": 1383,
                 "first_name": "Anh-Kha Nguyen",
                 "last_name": "",
+                "group_id": 1,
                 "ow_group_user_id": 658,
                 "email": "email3@email.com",
                 "user_id": 3,
@@ -113,6 +116,7 @@ ME_GROUPS_RESPONSE = [
                 "ow_user_id": 2027,
                 "first_name": "Anna Irene",
                 "last_name": "",
+                "group_id": 1,
                 "ow_group_user_id": 1552,
                 "email": "email4@email.com",
                 "user_id": 4,
@@ -123,6 +127,7 @@ ME_GROUPS_RESPONSE = [
                 "ow_user_id": 2219,
                 "first_name": "Billy Steen",
                 "last_name": "",
+                "group_id": 1,
                 "ow_group_user_id": 2227,
                 "email": "email5@email.com",
                 "user_id": 5,
@@ -133,6 +138,7 @@ ME_GROUPS_RESPONSE = [
                 "ow_user_id": 1705,
                 "first_name": "B\u00f8rge",
                 "last_name": "",
+                "group_id": 1,
                 "ow_group_user_id": 1052,
                 "email": "email6@email.com",
                 "user_id": 6,
@@ -143,6 +149,7 @@ ME_GROUPS_RESPONSE = [
                 "ow_user_id": 1395,
                 "first_name": "Carl",
                 "last_name": "",
+                "group_id": 1,
                 "ow_group_user_id": 1551,
                 "email": "email7@email.com",
                 "user_id": 7,
@@ -188,6 +195,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "ow_user_id": 2581,
                 "first_name": "BrageUpdated",
                 "last_name": "Updated",
+                "group_id": 1,
                 "ow_group_user_id": 2224,
                 "email": "email1@email.com",
                 "user_id": 1,
@@ -198,6 +206,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "ow_user_id": 1381,
                 "first_name": "AmundUpdated",
                 "last_name": "Updated",
+                "group_id": 1,
                 "ow_group_user_id": 656,
                 "email": "email2@email.com",
                 "user_id": 2,
@@ -208,6 +217,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "ow_user_id": 1383,
                 "first_name": "Anh-Kha NguyenUpdated",
                 "last_name": "Updated",
+                "group_id": 1,
                 "ow_group_user_id": 658,
                 "email": "email3@email.com",
                 "user_id": 3,
@@ -218,6 +228,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "ow_user_id": 2027,
                 "first_name": "Anna IreneUpdated",
                 "last_name": "Updated",
+                "group_id": 1,
                 "ow_group_user_id": 1552,
                 "email": "email4@email.com",
                 "user_id": 4,
@@ -228,6 +239,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "ow_user_id": 2219,
                 "first_name": "Billy SteenUpdated",
                 "last_name": "Updated",
+                "group_id": 1,
                 "ow_group_user_id": 2227,
                 "email": "email5@email.com",
                 "user_id": 5,
@@ -239,6 +251,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "ow_user_id": 1395,
                 "first_name": "CarlUpdated",
                 "last_name": "Updated",
+                "group_id": 1,
                 "ow_group_user_id": 1551,
                 "email": "email7@email.com",
                 "user_id": 7,
@@ -249,6 +262,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "ow_user_id": 1998,
                 "first_name": "FelixOriginal",
                 "last_name": "Original",
+                "group_id": 1,
                 "ow_group_user_id": 1399,
                 "email": "email8@email.com",
                 "user_id": 8,
@@ -780,6 +794,18 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
+    async def test_mark_punishment_as_unpaid_from_other_user(self, client: Any) -> None:
+        response = await client.post(
+            f"/group/1/punishments/unpaid",
+            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+            json=[
+                1,  # punishment_id
+            ],
+        )
+        assert response.status_code == 200
+        check_response_time(response)
+
+    @pytest.mark.asyncio
     async def test_delete_own_punishment_created_by_other(self, client: Any) -> None:
         response = await client.delete(
             "/punishment/2",
@@ -1104,4 +1130,37 @@ class TestWithDB_OW:
             "results": [],
             "total": 1,
         }
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_mark_all_punishments_as_paid(self, client: Any) -> None:
+        response = await client.post(
+            "/group/1/user/1/punishments/paid/all",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_assert_all_punishments_are_paid(self, client: Any) -> None:
+        response = await client.get(
+            "/group/1/user/1",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 200
+
+        for punishment in response.json()["punishments"]:
+            assert punishment["paid"] == True
+
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_mark_all_punishments_as_paid_not_works_when_no_unpaid(
+        self, client: Any
+    ) -> None:
+        response = await client.post(
+            "/group/1/user/1/punishments/paid/all",
+            headers={"Authorization": SELF_USER_AUTHORIZATION},
+        )
+        assert response.status_code == 404
         check_response_time(response)

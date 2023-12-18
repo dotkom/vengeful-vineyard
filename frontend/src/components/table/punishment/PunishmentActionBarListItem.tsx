@@ -12,7 +12,7 @@ export const PunishmentActionBarListItem: FC<PunishmentActionBarListItemProps> =
   return (
     <Menu.Item
       as="div"
-      className="h-12 w-48 flex flex-row gap-x-2 items-center px-4 hover:bg-slate-100 cursor-pointer"
+      className="py-4 w-72 flex flex-row gap-x-2 items-center px-4 hover:bg-slate-100 cursor-pointer"
       onClick={onClick}
     >
       {icon}

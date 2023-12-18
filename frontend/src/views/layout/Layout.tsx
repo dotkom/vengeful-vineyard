@@ -47,6 +47,7 @@ export const Layout = () => {
         <Nav auth={auth} />
         <div className="flex items-center justify-center">
           <h1>Ai ai ai ai ai!!!</h1>
+          <pre>{auth.error.message}</pre>
         </div>
         <Footer />
       </main>

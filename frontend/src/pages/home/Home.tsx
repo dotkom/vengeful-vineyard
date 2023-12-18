@@ -1,10 +1,10 @@
-import { useAuth } from "react-oidc-context"
-import { GroupsView } from "../../views/groups"
 import { DefaultHero } from "../../views/hero"
-import { useEffect } from "react"
-import { useQueryClient } from "@tanstack/react-query"
+import { GroupsView } from "../../views/groups"
 import { LEADERBOARD_URL } from "../../helpers/api"
 import { Leaderboard } from "../../helpers/types"
+import { useAuth } from "react-oidc-context"
+import { useEffect } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 
 export const Home = () => {
   const auth = useAuth()
@@ -17,7 +17,7 @@ export const Home = () => {
         ({ pageParam = LEADERBOARD_URL }) => fetch(pageParam).then((res) => res.json()),
         {
           getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
-          staleTime: 1000 * 60,
+          staleTime: 1000 * 60 * 5,
         }
       )
       .then()

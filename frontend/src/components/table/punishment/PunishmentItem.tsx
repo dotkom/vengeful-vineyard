@@ -1,6 +1,11 @@
 import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
-import { addReaction, getPostPunishmentsPaidUrl, removeReaction } from "../../../helpers/api"
+import {
+  addReaction,
+  getPostPunishmentsPaidUrl,
+  getPostPunishmentsUnpaidUrl,
+  removeReaction,
+} from "../../../helpers/api"
 import axios, { AxiosResponse } from "axios"
 import { useContext, useState } from "react"
 
@@ -9,7 +14,6 @@ import { EmojiPicker } from "./emojies/EmojiPicker"
 import { NotificationContext } from "../../../helpers/notificationContext"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 import dayjs from "dayjs"
-import { useTogglePunishments } from "../../../helpers/togglePunishmentsContext"
 
 interface PunishmentItemProps {
   user: LeaderboardUser | GroupUser
@@ -29,13 +33,6 @@ export const PunishmentItem = ({
 }: PunishmentItemProps) => {
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
   const { setNotification } = useContext(NotificationContext)
-
-  let isToggled = false
-
-  if (isGroupContext) {
-    const { isToggled: newIsToggled } = useTogglePunishments()
-    isToggled = newIsToggled
-  }
 
   let punishmentType = punishmentTypes.find((type) => type.punishment_type_id === punishment.punishment_type_id)
 
@@ -63,14 +60,42 @@ export const PunishmentItem = ({
     return res.data
   }
 
+  const markPunishmentAsUnpaidCall = async () => {
+    if (!punishmentType) {
+      throw new Error("Punishment type is undefined")
+    }
+
+    if (punishment.group_id === null) {
+      // this should never happen
+      return
+    }
+
+    const POST_PUNISHMENTS_PAID_URL = getPostPunishmentsUnpaidUrl(punishment.group_id)
+    const res: AxiosResponse<string> = await axios.post(POST_PUNISHMENTS_PAID_URL, [punishment.punishment_id])
+
+    return res.data
+  }
+
   const { mutate: mutateAddReaction } = useMutation(addReactionCall, {
     onSuccess: () => dataRefetch(),
-    onError: () => console.log("Todo: Handle error"),
+    onError: () =>
+      setNotification({
+        show: true,
+        type: "error",
+        title: "Noe gikk galt",
+        text: "Kunne ikke legge til reaction",
+      }),
   })
 
   const { mutate: mutateRemoveReaction } = useMutation(removeReactionCall, {
     onSuccess: () => dataRefetch(),
-    onError: () => console.log("Todo: Handle error"),
+    onError: () =>
+      setNotification({
+        show: true,
+        type: "error",
+        title: "Noe gikk galt",
+        text: "Kunne ikke fjerne reaction",
+      }),
   })
 
   const { mutate: markPunishmentAsPaid } = useMutation(markPunishmentAsPaidCall, {
@@ -81,6 +106,26 @@ export const PunishmentItem = ({
         type: "success",
         title: "Betaling registrert",
         text: `Straff registrert betalt`,
+      })
+    },
+    onError: () => {
+      setNotification({
+        show: true,
+        type: "error",
+        title: "Noe gikk galt",
+        text: "Kunne ikke registrere betaling",
+      })
+    },
+  })
+
+  const { mutate: markPunishmentAsUnpaid } = useMutation(markPunishmentAsUnpaidCall, {
+    onSuccess: () => {
+      dataRefetch()
+      setNotification({
+        show: true,
+        type: "success",
+        title: "Betaling registrert",
+        text: `Straff registrert ubetalt`,
       })
     },
     onError: () => {
@@ -148,11 +193,20 @@ export const PunishmentItem = ({
           {/* {isGroupContext && paidAmount && (
             <span>{paidAmount}/{punishmentType.value}kr</span>
           )} */}
-          {isGroupContext && !isToggled && (
+          {isGroupContext && !punishment.paid && (
             <BorderedButton
               label="Marker som betalt"
               onClick={() => {
                 markPunishmentAsPaid()
+              }}
+            />
+          )}
+
+          {isGroupContext && punishment.paid && (
+            <BorderedButton
+              label="Marker som ubetalt"
+              onClick={() => {
+                markPunishmentAsUnpaid()
               }}
             />
           )}

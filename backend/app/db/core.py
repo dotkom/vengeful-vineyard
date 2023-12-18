@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from asyncpg import Pool, create_pool
-from asyncpg.exceptions import CannotConnectNowError, UndefinedObjectError
+from asyncpg.exceptions import CannotConnectNowError
 
 from app.config import settings
 from app.utils.db import MaybeAcquire
@@ -54,15 +54,27 @@ class Database:
         self.group_events = GroupEvents(self)
 
     async def get_migration_lock_version(self, conn: Optional[Pool]) -> int:
-        await conn.execute('CREATE TABLE IF NOT EXISTS __migration_version_lock (id INT PRIMARY KEY, version INT DEFAULT 0)')
-        has_version = await conn.fetchval('SELECT COUNT(*) AS count FROM __migration_version_lock')
+        assert conn is not None
+        await conn.execute(
+            "CREATE TABLE IF NOT EXISTS __migration_version_lock (id INT PRIMARY KEY, version INT DEFAULT 0)"
+        )
+        has_version = await conn.fetchval(
+            "SELECT COUNT(*) AS count FROM __migration_version_lock"
+        )
         if int(has_version) == 0:
-            await conn.execute('INSERT INTO __migration_version_lock VALUES (0, 0)')
-        current_version = await conn.fetchval('SELECT version FROM __migration_version_lock WHERE id = 0 LIMIT 1')
+            await conn.execute("INSERT INTO __migration_version_lock VALUES (0, 0)")
+        current_version = await conn.fetchval(
+            "SELECT version FROM __migration_version_lock WHERE id = 0 LIMIT 1"
+        )
         return int(current_version)
 
-    async def set_migration_lock_version(self, conn: Optional[Pool], version: int):
-        await conn.execute('UPDATE __migration_version_lock SET version = $1 WHERE id = 0', version)
+    async def set_migration_lock_version(
+        self, conn: Optional[Pool], version: int
+    ) -> None:
+        assert conn is not None
+        await conn.execute(
+            "UPDATE __migration_version_lock SET version = $1 WHERE id = 0", version
+        )
 
     @property
     def pool(self) -> Pool:
@@ -75,7 +87,8 @@ class Database:
         self._pool = value
 
     @staticmethod
-    async def set_connection_codecs(conn) -> None:
+    async def set_connection_codecs(conn: Optional[Pool]) -> None:
+        assert conn is not None
         await conn.set_type_codec(
             "json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
         )

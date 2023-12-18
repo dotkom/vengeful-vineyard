@@ -149,7 +149,7 @@ class Punishments:
         self,
         group_id: GroupId,
         punishment_ids: list[PunishmentId],
-        marked_marked_paid_by: UserId,
+        marked_paid_by: UserId,
         conn: Optional[Pool] = None,
     ) -> None:
         async with MaybeAcquire(conn, self.db.pool) as conn:
@@ -161,7 +161,7 @@ class Punishments:
                 res = await conn.fetch(
                     query,
                     datetime.datetime.utcnow(),
-                    marked_marked_paid_by,
+                    marked_paid_by,
                     group_id,
                     punishment_ids,
                 )
@@ -189,3 +189,26 @@ class Punishments:
 
                 if len(res) != len(punishment_ids):
                     raise NotFound
+
+    async def mark_all_punishments_as_paid_for_user(
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        marked_paid_by: UserId,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """UPDATE group_punishments
+                    SET paid = true, paid_at = $1, marked_paid_by = $2
+                    WHERE group_id = $3 AND user_id = $4 AND paid = false
+                    RETURNING *"""
+            res = await conn.fetch(
+                query,
+                datetime.datetime.utcnow(),
+                marked_paid_by,
+                group_id,
+                user_id,
+            )
+
+            if len(res) == 0:
+                raise NotFound

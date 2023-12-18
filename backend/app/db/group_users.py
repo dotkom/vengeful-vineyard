@@ -24,7 +24,7 @@ class GroupUsers:
         conn: Optional[Pool] = None,
     ) -> GroupUser:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT m.active, m.ow_group_user_id, users.*
+            query = """SELECT m.active, m.ow_group_user_id, m.group_id, users.*
                     FROM users
                     INNER JOIN group_members as m
                     ON users.user_id = m.user_id
@@ -91,6 +91,7 @@ class GroupUsers:
             for db_user in db_users:
                 user = dict(db_user)
                 user["punishments"] = db_punishments.get(user["user_id"], [])
+                user["group_id"] = group_id
                 users.append(GroupUser(**user))
 
             return users

@@ -38,7 +38,7 @@ export const PunishmentList = ({
   if (isGroupContext) {
     const { isToggled: newIsToggled } = useTogglePunishments()
     isToggled = newIsToggled
-    punishments = !isToggled ? unpaidPunishments : paidPunishments
+    punishments = !isToggled ? unpaidPunishments : [...unpaidPunishments, ...paidPunishments]
   } else {
     punishments = [...unpaidPunishments, ...paidPunishments]
   }

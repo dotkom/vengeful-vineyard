@@ -1,10 +1,14 @@
-import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
+import { Dispatch, Fragment, ReactNode, SetStateAction, useContext } from "react"
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { GroupUser, LeaderboardUser } from "../../../helpers/types"
 import { Menu, Switch, Transition } from "@headlessui/react"
+import axios, { AxiosResponse } from "axios"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
+import { NotificationContext } from "../../../helpers/notificationContext"
 import { PunishmentActionBarListItem } from "./PunishmentActionBarListItem"
 import { classNames } from "../../../helpers/classNames"
+import { getPostAllPunishmentsPaidForUserUrl } from "../../../helpers/api"
 import { useGivePunishmentModal } from "../../../helpers/givePunishmentModalContext"
 import { useTogglePunishments } from "../../../helpers/togglePunishmentsContext"
 
@@ -26,6 +30,9 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
   let isToggled: boolean | undefined
   let setIsToggled: Dispatch<SetStateAction<boolean>> | undefined
 
+  const { setNotification } = useContext(NotificationContext)
+  const queryClient = useQueryClient()
+
   if (isGroupContext) {
     const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
     setOpen = newSetOpen
@@ -36,14 +43,51 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
     setIsToggled = newSetIsToggled
   }
 
+  const markAllPunishmentsAsPaidCall = async () => {
+    const groupUser = user as GroupUser
+
+    const POST_ALL_PUNISHMENTS_PAID_URL = getPostAllPunishmentsPaidForUserUrl(groupUser.group_id, user.user_id)
+    const res: AxiosResponse<string> = await axios.post(POST_ALL_PUNISHMENTS_PAID_URL)
+
+    return res.data
+  }
+
+  const { mutate: mutateMarkAllPunishmentsAsPaid } = useMutation(markAllPunishmentsAsPaidCall, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["groupLeaderboard"] })
+      setNotification({
+        // staleTIME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        show: true,
+        type: "success",
+        title: "Betalinger registert",
+        text: `Alle straffer registrert som betalte`,
+      })
+    },
+    onError: () => {
+      setNotification({
+        show: true,
+        type: "error",
+        title: "Noe gikk galt",
+        text: "Kunne ikke registrere betalingene",
+      })
+    },
+  })
+
   const listItems: ActionBarItem[] = []
   if (isGroupContext) {
     listItems.push({
-      label: "Give punishment",
+      label: "Gi straff",
       icon: <PlusIcon className="h-5 w-5" />,
       onClick: () => {
         setOpen(true)
         setPreferredSelectedPerson(user as GroupUser)
+      },
+    })
+    listItems.push({
+      label: "Marker alle straffer som betalte",
+      icon: <PlusIcon className="h-5 w-5" />,
+      onClick: () => {
+        mutateMarkAllPunishmentsAsPaid()
       },
     })
   }
@@ -71,9 +115,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
               } inline-block h-4 w-4 transform rounded-full bg-white transition`}
             />
           </Switch>
-          <span className="text-sm text-slate-600">
-            {isToggled ? "Viser betalte straffer" : "Viser ubetalte straffer"}
-          </span>
+          <span className="text-sm text-slate-600">Vis betalte straffer</span>
         </div>
       ) : (
         <span></span>
@@ -96,7 +138,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none !overflow-visible">
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none !overflow-visible">
               {listItems.map((item, i) => (
                 <PunishmentActionBarListItem key={i} label={item.label} icon={item.icon} onClick={item.onClick} />
               ))}

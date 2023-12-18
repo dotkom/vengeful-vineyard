@@ -84,6 +84,7 @@ export interface GroupUser {
   last_name: string
   email: string
   user_id: number
+  group_id: number
   ow_group_user_id: number
   punishments: Punishment[]
   active: boolean

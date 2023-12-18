@@ -416,6 +416,60 @@ async def post_mark_punishments_as_unpaid(
             ) from exc
 
 
+@router.post(
+    "/{group_id}/user/{user_id}/punishments/paid/all",
+    dependencies=[Depends(oidc)],
+)
+async def post_mark_all_punishments_as_paid_for_user(
+    request: Request,
+    group_id: GroupId,
+    user_id: UserId,
+) -> None:
+    """
+    Endpoint to mark all punishments as paid for a given user.
+    """
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        res = await app.db.groups.is_in_group(
+            requester_user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=403,
+                detail="You must be a member of the group to perform this action",
+            )
+
+        res = await app.db.groups.is_in_group(
+            user_id,
+            group_id,
+            conn=conn,
+        )
+        if not res:
+            raise HTTPException(
+                status_code=400,
+                detail="The user is not a member of the group",
+            )
+
+        try:
+            await app.db.punishments.mark_all_punishments_as_paid_for_user(
+                group_id,
+                user_id,
+                requester_user_id,
+                conn=conn,
+            )
+        except NotFound as exc:
+            raise HTTPException(
+                status_code=404,
+                detail="No unpaid punishments found",
+            ) from exc
+
+
 @router.get(
     "/{group_id}/events",
     dependencies=[Depends(oidc)],
