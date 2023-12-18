@@ -1,12 +1,13 @@
-import { PlusIcon, CurrencyDollarIcon } from "@heroicons/react/24/outline"
-import { Fragment, useEffect, useState } from "react"
-import { Group } from "../../../helpers/types"
-import { TabItem } from "./TabItem"
-import { SkeletonTabItem } from "./SkeletonTabItem"
+import { Fragment, useEffect } from "react"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
-import { IconButton } from "../../../components/button"
+
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
-import { RegisterPaymentModal } from "./modal/RegisterPaymentModal"
+import { Group } from "../../../helpers/types"
+import { IconButton } from "../../../components/button"
+import { PlusIcon } from "@heroicons/react/24/outline"
+import { SkeletonTabItem } from "./SkeletonTabItem"
+import { TabItem } from "./TabItem"
+import { useGivePunishmentModal } from "../../../helpers/givePunishmentModalContext"
 
 interface TabsProps {
   selectedGroup: Group | undefined
@@ -18,8 +19,7 @@ interface TabsProps {
 }
 
 export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: TabsProps) => {
-  const [givePunishmentOpen, setGivePunishmentOpen] = useState(false)
-  const [registerPaymentOpen, setRegisterPaymentOpen] = useState(false)
+  const { open, setOpen } = useGivePunishmentModal()
 
   useEffect(() => {
     if (selectedGroup === undefined && groups) setSelectedGroup(groups[0])
@@ -27,25 +27,11 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
 
   return (
     <Fragment>
-      {givePunishmentOpen && selectedGroup && (
-        <GivePunishmentModal
-          open={givePunishmentOpen}
-          setOpen={setGivePunishmentOpen}
-          selectedGroup={selectedGroup}
-          dataRefetch={dataRefetch}
-        />
+      {open && selectedGroup && (
+        <GivePunishmentModal open={open} setOpen={setOpen} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
       )}
 
-      {registerPaymentOpen && selectedGroup && (
-        <RegisterPaymentModal
-          open={registerPaymentOpen}
-          setOpen={setRegisterPaymentOpen}
-          selectedGroup={selectedGroup}
-          dataRefetch={dataRefetch}
-        />
-      )}
-
-      <div className="mx-4 max-w-5xl md:m-auto md:px-8">
+      <div className="mx-4 max-w-5xl md:m-auto pl-8 pr-4">
         <div className="sm:block">
           <div>
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
@@ -60,11 +46,8 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
                     />
                   ))}
                   <div className="w-full flex flex-row gap-x-2 mb-1 justify-end">
-                    <IconButton label="Ny straff" onClick={() => setGivePunishmentOpen(true)}>
+                    <IconButton label="Ny straff" onClick={() => setOpen(true)}>
                       <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                    </IconButton>
-                    <IconButton label="Registrer betaling" onClick={() => setRegisterPaymentOpen(true)}>
-                      <CurrencyDollarIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                     </IconButton>
                   </div>
                 </>

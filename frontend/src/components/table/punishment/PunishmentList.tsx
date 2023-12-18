@@ -1,12 +1,16 @@
+import { GroupUser, LeaderboardUser, Punishment, PunishmentType } from "../../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
 
 import { Fragment } from "react"
+import { PunishmentActionBar } from "./PunishmentActionBar"
 import { PunishmentItem } from "./PunishmentItem"
-import { GroupUser, PunishmentType, LeaderboardUser } from "../../../helpers/types"
+import { useTogglePunishments } from "../../../helpers/togglePunishmentsContext"
 
 interface PunishmentListProps {
   groupUser?: GroupUser | undefined
   leaderboardUser?: LeaderboardUser | undefined
+  unpaidPunishments: Punishment[]
+  paidPunishments: Punishment[]
   punishmentTypes: PunishmentType[]
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -16,6 +20,8 @@ interface PunishmentListProps {
 export const PunishmentList = ({
   groupUser = undefined,
   leaderboardUser = undefined,
+  unpaidPunishments,
+  paidPunishments,
   punishmentTypes,
   dataRefetch,
 }: PunishmentListProps) => {
@@ -24,20 +30,37 @@ export const PunishmentList = ({
     return <p>user is undefined</p>
   }
 
-  if (user.punishments.length === 0) {
+  const isGroupContext = groupUser !== undefined
+
+  let isToggled = false
+  let punishments: Punishment[]
+
+  if (isGroupContext) {
+    const { isToggled: newIsToggled } = useTogglePunishments()
+    isToggled = newIsToggled
+    punishments = !isToggled ? unpaidPunishments : paidPunishments
+  } else {
+    punishments = [...unpaidPunishments, ...paidPunishments]
+  }
+
+  if (punishments.length === 0) {
     return (
       <Fragment>
-        <p className="p-4">Ingen straffer</p>
+        <PunishmentActionBar label="Ingen straffer" isGroupContext={isGroupContext} user={user} />
       </Fragment>
     )
   }
 
   return (
     <Fragment>
-      {user.punishments.map((punishment) => (
+      <PunishmentActionBar isGroupContext={isGroupContext} user={user} />
+
+      {punishments.map((punishment) => (
         <PunishmentItem
+          user={user}
           punishment={punishment}
           punishmentTypes={punishmentTypes}
+          isGroupContext={isGroupContext}
           key={punishment.punishment_id}
           dataRefetch={dataRefetch}
         />

@@ -15,7 +15,7 @@ const queryClient = new QueryClient()
 const configuration: AuthProviderProps = {
   client_id: "219919",
   redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
-  scope: "openid profile onlineweb4",
+  scope: "openid email profile onlineweb4",
   authority: "https://old.online.ntnu.no/openid",
   metadataUrl: "https://old.online.ntnu.no/openid/.well-known/openid-configuration",
   silent_redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",

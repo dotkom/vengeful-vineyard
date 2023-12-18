@@ -1,11 +1,10 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from "./accordion/Accordion"
-import { GroupUser, LeaderboardPunishment, LeaderboardUser, PunishmentType } from "../../helpers/types"
+import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
+import React, { ReactNode } from "react"
 
 import { PunishmentList } from "./punishment/PunishmentList"
 import { textToEmoji } from "../../helpers/emojies"
-
-import React from "react"
 
 interface TableItemProps {
   groupUser?: GroupUser | undefined
@@ -23,77 +22,84 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
     return <p>user is undefined</p>
   }
 
-  const totalPunishment: React.ReactNode[] = []
+  const isGroupContext = groupUser !== undefined
+
+  const totalPunishment: ReactNode[] = []
   const punishmentTypeMap = new Map<number, PunishmentType>()
 
   punishmentTypes.forEach((type) => {
     punishmentTypeMap.set(type.punishment_type_id, type)
   })
 
-  function isGroupUser(user: GroupUser | LeaderboardUser): user is GroupUser {
-    return (user as GroupUser).total_paid_amount !== undefined
+  const unpaidPunishments: Punishment[] = []
+  const paidPunishments: Punishment[] = []
+
+  for (let i = user.punishments.length - 1; i >= 0; i--) {
+    const punishment = user.punishments[i]
+
+    if (punishment.paid) {
+      paidPunishments.push(punishment)
+    } else {
+      unpaidPunishments.push(punishment)
+    }
+
+    let name: string
+    let value: number
+    let logoUrl: string
+
+    if (isGroupContext) {
+      const punishmentType = punishmentTypeMap.get(punishment.punishment_type_id)
+
+      name = punishmentType?.name ?? "N/A"
+      value = punishmentType?.value ?? 0
+      logoUrl = punishmentType?.logo_url ?? "?"
+    } else {
+      const innerPunishment = punishment as LeaderboardPunishment
+      name = innerPunishment.punishment_type.name
+      value = innerPunishment.punishment_type.value
+      logoUrl = innerPunishment.punishment_type.logo_url
+    }
+
+    totalPunishment.push(
+      <span key={`${punishment.punishment_id}/${i}`} className="text-lg" title={`${name} (${value}kr)`}>
+        <span>{logoUrl}</span>
+      </span>
+    )
   }
 
-  user.punishments.forEach((punishment) => {
-    {
-      Array.from({ length: punishment.amount }, (_, i) => {
-        let name: string
-        let value: number
-        let logoUrl: string
-
-        if (isGroupUser(user)) {
-          const punishmentType = punishmentTypeMap.get(punishment.punishment_type_id)
-
-          name = punishmentType?.name ?? "N/A"
-          value = punishmentType?.value ?? 0
-          logoUrl = punishmentType?.logo_url ?? "?"
-        } else {
-          const innerPunishment = punishment as LeaderboardPunishment
-          name = innerPunishment.punishment_type.name
-          value = innerPunishment.punishment_type.value
-          logoUrl = innerPunishment.punishment_type.logo_url
-        }
-
-        totalPunishment.push(
-          <span key={`${punishment.punishment_id}/${i}`} className="text-lg" title={`${name} (${value}kr)`}>
-            <span>{logoUrl}</span>
-          </span>
-        )
-      })
-    }
-  })
-
   function weeklyStreak(date: number, listDates: number[]) {
-    let streak = [date];
+    let streak = [date]
     for (let i = 1; i <= listDates.length; i++) {
       for (let j = 0; j < listDates.length; j++) {
-        const compareDate = streak[i - 1];
-        const prewDate = listDates[0];
+        const compareDate = streak[i - 1]
+        const prewDate = listDates[0]
         if (compareDate <= 604800000 + prewDate && prewDate <= compareDate) {
-          streak[i] = prewDate;
-          listDates.shift();
+          streak[i] = prewDate
+          listDates.shift()
         } else {
           if (prewDate! <= compareDate) {
-            break;
+            break
           }
         }
       }
       if (streak[i] === undefined) {
-        break;
+        break
       }
     }
-    return streak.length - 1;
+    return streak.length - 1
   }
 
   // Punishment dates to number from most recent to oldest
-  const dateToNumber = user.punishments.map((punishment) => {
-    const date = punishment.created_at.slice(0, 10);
-    const [year, month, day] = date.split("-").map(Number);
-    return new Date(year, month - 1, day).getTime();
-  }).reverse();
+  const dateToNumber = user.punishments
+    .map((punishment) => {
+      const date = punishment.created_at.slice(0, 10)
+      const [year, month, day] = date.split("-").map(Number)
+      return new Date(year, month - 1, day).getTime()
+    })
+    .reverse()
 
-  const today = new Date().getTime();
-  const streak = weeklyStreak(today, dateToNumber);
+  const today = new Date().getTime()
+  const streak = weeklyStreak(today, dateToNumber)
 
   return (
     <AccordionItem value={user.user_id.toString()}>
@@ -134,10 +140,12 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
           </div>
         )}
       </AccordionTrigger>
-      <AccordionContent>
+      <AccordionContent className="overflow-visible">
         <PunishmentList
           groupUser={groupUser}
           leaderboardUser={leaderboardUser}
+          unpaidPunishments={unpaidPunishments}
+          paidPunishments={paidPunishments}
           punishmentTypes={punishmentTypes}
           dataRefetch={dataRefetch}
         />

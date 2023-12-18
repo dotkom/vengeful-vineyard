@@ -1,13 +1,18 @@
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
-import { Dispatch, FC, Fragment, SetStateAction, useContext, useRef, useState } from "react"
+import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useContext, useRef, useState } from "react"
 import { Group, GroupUser } from "../../../../helpers/types"
-import { NotificationContext } from "../../../../helpers/notificationContext"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { getAddPunishmentUrl, getGroupLeaderboardUrl } from "../../../../helpers/api"
-import { sortGroupUsers } from "../../../../helpers/sorting"
+
+import { AlcoholInput } from "../../../../components/input/AlcoholInput"
 import { Modal } from "../../../../components/modal/Modal"
-import { GivePunishmentModalInput } from "./GivePunishmentModalInput"
+import { NotificationContext } from "../../../../helpers/notificationContext"
+import { PersonSelect } from "../../../../components/input/PersonSelect"
+import { TextInput } from "../../../../components/input/TextInput"
+import { Toggle } from "../../../../components/input/Toggle"
 import { Transition } from "@headlessui/react"
+import { sortGroupUsers } from "../../../../helpers/sorting"
+import { useGivePunishmentModal } from "../../../../helpers/givePunishmentModalContext"
 
 interface GivePunishmentModalProps {
   open: boolean
@@ -20,7 +25,8 @@ interface GivePunishmentModalProps {
 
 export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpen, selectedGroup, dataRefetch }) => {
   const ref = useRef(null)
-  const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(undefined)
+  const { preferredSelectedPerson } = useGivePunishmentModal()
+  const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(preferredSelectedPerson)
   const [newPunishment, setNewPunishment] = useState({
     punishment_type_id: 1,
     reason: "",
@@ -33,7 +39,9 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
     queryKey: ["groupLeaderboard", selectedGroup?.group_id],
     queryFn: () =>
       axios.get(getGroupLeaderboardUrl(selectedGroup.group_id)).then((res: AxiosResponse<Group>) => {
-        setSelectedPerson(res.data.members[0])
+        if (!selectedPerson) {
+          setSelectedPerson(res.data.members[0])
+        }
         setNewPunishment((prev) => ({
           ...prev,
           punishment_type_id: res.data.punishment_types[0].punishment_type_id,
@@ -59,14 +67,45 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
       dataRefetch()
       setNotification({
         show: true,
+        type: "success",
         title: "Straff registrert!",
         text: `Du ga en straff til ${selectedPerson?.first_name}`,
       })
     },
     onError: () => {
-      console.log("Todo: Handle error")
+      setNotification({
+        show: true,
+        type: "error",
+        title: "Noe gikk galt",
+        text: "Kunne ikke registrere straff",
+      })
     },
   })
+
+  const textInputHandler = (evt: ChangeEvent<HTMLInputElement>) =>
+    setNewPunishment({ ...newPunishment, reason: evt.currentTarget.value })
+
+  const reasonHiddenHandler = () =>
+    setNewPunishment({
+      ...newPunishment,
+      reason_hidden: !newPunishment.reason_hidden,
+    })
+
+  const typeInputHandler = (evt: ChangeEvent<HTMLSelectElement>) =>
+    setNewPunishment({
+      ...newPunishment,
+      punishment_type_id: Number(evt.currentTarget.value),
+    })
+  const amountInputHandler = (evt: ChangeEvent<HTMLInputElement>) =>
+    setNewPunishment({
+      ...newPunishment,
+      amount: Number(evt.currentTarget.value),
+    })
+
+  const handlePrimaryActionClick = (): boolean => {
+    mutate()
+    return true
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -75,16 +114,32 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
         title="Gi straff"
         setOpen={setOpen}
         primaryButtonLabel="Gi straff"
-        primaryButtonAction={() => mutate()}
+        primaryButtonAction={handlePrimaryActionClick}
       >
         <p className="text-sm text-gray-500">Her kan du lage en ny vinstraff</p>
-        <GivePunishmentModalInput
-          newPunishment={newPunishment}
-          setNewPunishment={setNewPunishment}
-          data={data}
-          selectedPerson={selectedPerson}
-          setSelectedPerson={setSelectedPerson}
-        />
+        <div className="mb-4 flex flex-col gap-2 font-normal">
+          {data ? (
+            <>
+              <PersonSelect data={data} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} />
+              <Toggle
+                description={"Hvis du huker av her vil begrunnelsen vises på Wall of Shame"}
+                label={"Del begrunnelse"}
+                value={!newPunishment.reason_hidden}
+                changeHandler={reasonHiddenHandler}
+              />
+              <TextInput placeholder="Begrunnelse" value={newPunishment.reason} changeHandler={textInputHandler} />
+              <AlcoholInput
+                type={newPunishment.punishment_type_id}
+                amount={newPunishment.amount}
+                data={data}
+                typeInputHandler={typeInputHandler}
+                amountInputHandler={amountInputHandler}
+              />
+            </>
+          ) : (
+            <p>Loading...</p>
+          )}
+        </div>
       </Modal>
     </Transition.Root>
   )

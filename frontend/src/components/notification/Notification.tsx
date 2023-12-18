@@ -1,8 +1,9 @@
 import { Fragment, useContext } from "react"
-import { Transition } from "@headlessui/react"
+
 import { CheckCircleIcon } from "@heroicons/react/24/outline"
-import { XMarkIcon } from "@heroicons/react/20/solid"
 import { NotificationContext } from "../../helpers/notificationContext"
+import { Transition } from "@headlessui/react"
+import { XMarkIcon } from "@heroicons/react/20/solid"
 
 export const Notification = () => {
   const { notification, setNotification } = useContext(NotificationContext)
@@ -28,7 +29,11 @@ export const Notification = () => {
               <div className="p-4">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
-                    <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                    {notification.type === "success" ? (
+                      <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                    ) : (
+                      <XMarkIcon className="h-6 w-6 text-red-400" aria-hidden="true" />
+                    )}
                   </div>
                   <div className="ml-3 w-0 flex-1 pt-0.5">
                     <p className="text-sm font-medium text-gray-900">{notification.title}</p>

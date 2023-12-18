@@ -1,6 +1,6 @@
 import { Table } from "../../components/table"
-import { useLeaderboard } from "../../helpers/api"
 import { useEffect } from "react"
+import { useLeaderboard } from "../../helpers/api"
 
 export const WallOfShame = () => {
   const { isLoading, isFetching, data, refetch, fetchNextPage } = useLeaderboard()

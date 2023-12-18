@@ -2,9 +2,11 @@ import { useContext, useEffect } from "react"
 import { useGroupLeaderboard, useMyGroups } from "../../helpers/api"
 import { useNavigate, useParams } from "react-router-dom"
 
+import { GivePunishmentModalProvider } from "../../helpers/givePunishmentModalContext"
 import { Group } from "../../helpers/types"
 import { Table } from "../../components/table"
 import { Tabs } from "./tabs/Tabs"
+import { TogglePunishmentsProvider } from "../../helpers/togglePunishmentsContext"
 import { UserContext } from "../../helpers/userContext"
 
 export const GroupsView = () => {
@@ -30,14 +32,18 @@ export const GroupsView = () => {
   const { isLoading, data, refetch } = useGroupLeaderboard(selectedGroup?.group_id)
 
   return (
-    <section className="mt-16">
-      <Tabs
-        selectedGroup={selectedGroup}
-        setSelectedGroup={(group: Group) => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
-        groups={user ? user.groups : undefined}
-        dataRefetch={refetch}
-      />
-      <Table groupData={data} isLoading={isLoading} dataRefetch={refetch} />
-    </section>
+    <GivePunishmentModalProvider>
+      <TogglePunishmentsProvider>
+        <section className="mt-16">
+          <Tabs
+            selectedGroup={selectedGroup}
+            setSelectedGroup={(group: Group) => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
+            groups={user ? user.groups : undefined}
+            dataRefetch={refetch}
+          />
+          <Table groupData={data} isLoading={isLoading} dataRefetch={refetch} />
+        </section>
+      </TogglePunishmentsProvider>
+    </GivePunishmentModalProvider>
   )
 }
