@@ -88,7 +88,6 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 1,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1381,
@@ -99,7 +98,6 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 2,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1383,
@@ -110,7 +108,6 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 3,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2027,
@@ -121,7 +118,6 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 4,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2219,
@@ -132,7 +128,6 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 5,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1705,
@@ -143,7 +138,6 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 6,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1395,
@@ -154,7 +148,6 @@ ME_GROUPS_RESPONSE = [
                 "user_id": 7,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
         ],
     }
@@ -200,7 +193,6 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 1,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1381,
@@ -211,7 +203,6 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 2,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 1383,
@@ -222,7 +213,6 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 3,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2027,
@@ -233,7 +223,6 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 4,
                 "active": False,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {
                 "ow_user_id": 2219,
@@ -244,7 +233,6 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 5,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             # Removed user here
             {
@@ -256,7 +244,6 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 7,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
             {  # Added user here
                 "ow_user_id": 1998,
@@ -267,7 +254,6 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": 8,
                 "active": True,
                 "punishments": [],
-                "total_paid_amount": 0,
             },
         ],
     }
@@ -663,6 +649,10 @@ class TestWithDB_OW:
                             "created_by": 1,
                             "created_at": "",
                             "created_by_name": "BrageUpdated Updated",
+                            "group_id": 1,
+                            "paid": False,
+                            "paid_at": None,
+                            "marked_paid_by": None,
                             "punishment_id": 1,
                             "punishment_type": {
                                 "logo_url": "🍺",
@@ -741,74 +731,39 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
-    async def test_add_paid_log_entry(self, client: Any) -> None:
+    async def test_mark_punishment_as_paid(self, client: Any) -> None:
         response = await client.post(
-            "group/1/user/1/punishments/paid",
+            f"/group/1/punishments/paid",
             headers={"Authorization": SELF_USER_AUTHORIZATION},
-            json={"value": 4},
+            json=[
+                1,  # punishment_id
+            ],
         )
         assert response.status_code == 200
-        assert response.json() == None
-
-    @pytest.mark.asyncio
-    async def test_add_paid_log_entry_from_other_user(self, client: Any) -> None:
-        response = await client.post(
-            "group/1/user/1/punishments/paid",
-            headers={"Authorization": OTHER_USER_AUTHORIZATION},
-            json={"value": 9},
-        )
-        assert response.status_code == 200
-        assert response.json() == None
-
-    @pytest.mark.asyncio
-    async def test_get_paid_logs(self, client: Any) -> None:
-        response = await client.get(
-            "group/1/user/1/punishments/paid",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
-        )
-        assert response.status_code == 200
-
-        data = response.json()
-        for log in data:
-            log["created_at"] = ""
-
-        assert data == [
-            {
-                "value": 4,
-                "user_id": 1,
-                "group_id": 1,
-                "paid_punishment_log_id": 1,
-                "created_at": "",
-                "created_by": 1,
-            },
-            {
-                "value": 9,
-                "user_id": 1,
-                "group_id": 1,
-                "paid_punishment_log_id": 2,
-                "created_at": "",
-                "created_by": 4,
-            },
-        ]
-
-    @pytest.mark.asyncio
-    async def test_get_group_total_paid_for_user(self, client: Any) -> None:
-        response = await client.get(
-            "/group/1/user/1/punishments/paid/totalPaid",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
-        )
-        assert response.status_code == 200
-        assert response.json() == 13
         check_response_time(response)
 
     @pytest.mark.asyncio
-    async def test_get_group_total_unpaid_for_user(self, client: Any) -> None:
-        response = await client.get(
-            "/group/1/user/1/punishments/paid/totalUnpaid",
+    async def test_mark_punishment_as_unpaid(self, client: Any) -> None:
+        response = await client.post(
+            f"/group/1/punishments/unpaid",
             headers={"Authorization": SELF_USER_AUTHORIZATION},
+            json=[
+                1,  # punishment_id
+            ],
         )
         assert response.status_code == 200
-        assert response.json() == 20  # 33 - 13
+        check_response_time(response)
+
+    @pytest.mark.asyncio
+    async def test_mark_punishment_as_paid_from_other_user(self, client: Any) -> None:
+        response = await client.post(
+            f"/group/1/punishments/paid",
+            headers={"Authorization": OTHER_USER_AUTHORIZATION},
+            json=[
+                1,  # punishment_id
+            ],
+        )
+        assert response.status_code == 200
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -820,34 +775,8 @@ class TestWithDB_OW:
         assert response.status_code == 200
         assert response.json() == {
             "total_value": 233,
-            "total_paid_value": 13,  # 4 + 9
+            "total_paid_value": 33,
         }
-        check_response_time(response)
-
-    @pytest.mark.asyncio
-    async def test_total_paid_amount_on_group_user(self, client: Any) -> None:
-        response = await client.get(
-            f"/group/1/user/{SELF_USER_ID}",
-        )
-        assert response.status_code == 200
-
-        assert response.json()["total_paid_amount"] == 13
-        check_response_time(response)
-
-    @pytest.mark.asyncio
-    async def test_total_paid_amount_on_group_users(self, client: Any) -> None:
-        response = await client.get(
-            f"/group/1/users",
-        )
-        assert response.status_code == 200
-
-        data = response.json()
-        for user in data:
-            if user["user_id"] == SELF_USER_ID:
-                assert user["total_paid_amount"] == 13
-            else:
-                assert user["total_paid_amount"] == 0
-
         check_response_time(response)
 
     @pytest.mark.asyncio
@@ -968,6 +897,10 @@ class TestWithDB_OW:
                             "created_by": 1,
                             "created_at": "",
                             "created_by_name": "BrageUpdated Updated",
+                            "group_id": 1,
+                            "paid": False,
+                            "paid_at": None,
+                            "marked_paid_by": None,
                             "punishment_id": 2,
                             "punishment_type": {
                                 "logo_url": "🍷",
@@ -985,6 +918,10 @@ class TestWithDB_OW:
                             "created_by": 1,
                             "created_at": "",
                             "created_by_name": "BrageUpdated Updated",
+                            "group_id": 1,
+                            "paid": False,
+                            "paid_at": None,
+                            "marked_paid_by": None,
                             "punishment_id": 3,
                             "punishment_type": {
                                 "logo_url": "🍷",
@@ -1012,6 +949,10 @@ class TestWithDB_OW:
                             "created_by": 1,
                             "created_at": "",
                             "created_by_name": "BrageUpdated Updated",
+                            "group_id": 1,
+                            "paid": False,
+                            "paid_at": None,
+                            "marked_paid_by": None,
                             "punishment_id": 4,
                             "punishment_type": {
                                 "logo_url": "🍺",

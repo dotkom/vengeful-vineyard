@@ -3,6 +3,7 @@ Models for punishment data structures
 """
 
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -23,12 +24,16 @@ class PunishmentCreate(PunishmentBase):
 
 class PunishmentOut(PunishmentCreate):
     punishment_id: PunishmentId
+    group_id: Optional[
+        GroupId
+    ]  # Optional because we dont want this information on wall of shame
     created_at: datetime
     created_by: UserId
     created_by_name: str
+    paid: bool
+    paid_at: Optional[datetime]
+    marked_paid_by: Optional[UserId]
     reactions: list[PunishmentReactionRead] = []
-    # verified_at: Optional[datetime]
-    # verified_by: Optional[UserId]
 
 
 class PunishmentRead(PunishmentOut):

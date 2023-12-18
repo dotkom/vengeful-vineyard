@@ -77,8 +77,9 @@ class Groups:
     ) -> TotalPunishmentValue:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
-            SELECT COALESCE(SUM(gp.amount * pt.value), 0) AS total_value,
-                   (SELECT COALESCE(SUM(value), 0) FROM paid_punishments_logs WHERE group_id = gp.group_id) AS total_paid_value
+            SELECT
+                COALESCE(SUM(gp.amount * pt.value), 0) AS total_value,
+                COALESCE(SUM(CASE WHEN gp.paid THEN gp.amount * pt.value ELSE 0 END), 0) AS total_paid_value
                 FROM group_punishments AS gp
             LEFT JOIN punishment_types AS pt
                 ON gp.punishment_type_id = pt.punishment_type_id

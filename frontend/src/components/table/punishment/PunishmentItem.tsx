@@ -52,6 +52,11 @@ export const PunishmentItem = ({
       throw new Error("Punishment type is undefined")
     }
 
+    if (punishment.group_id === null) {
+      // this should never happen
+      return
+    }
+
     const POST_PUNISHMENTS_PAID_URL = getPostPunishmentsPaidUrl(punishment.group_id)
     const res: AxiosResponse<string> = await axios.post(POST_PUNISHMENTS_PAID_URL, [punishment.punishment_id])
 

@@ -41,19 +41,11 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	reason TEXT NOT NULL,
 	reason_hidden BOOLEAN DEFAULT false,
 	amount INTEGER NOT NULL,
-	-- verified_by INTEGER references users(user_id),
 	created_by INTEGER references users(user_id) ON DELETE CASCADE,
-	-- verified_at TIMESTAMP WITHOUT TIME ZONE,
-	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS paid_punishments_logs (
-	paid_punishment_log_id SERIAL PRIMARY KEY,
-	group_id INTEGER NOT NULL references groups(group_id) ON DELETE CASCADE,
-	user_id INTEGER NOT NULL references users(user_id) ON DELETE CASCADE,
-	value INTEGER NOT NULL,
-	created_by INTEGER references users(user_id) ON DELETE CASCADE,
-	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
+	paid BOOLEAN DEFAULT false,
+	paid_at TIMESTAMP WITHOUT TIME ZONE,
+	marked_paid_by INTEGER references users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS group_events (
