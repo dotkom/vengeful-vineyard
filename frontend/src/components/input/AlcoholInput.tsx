@@ -2,7 +2,7 @@ import { Group } from "../../helpers/types"
 import React from "react"
 
 interface AlcoholInputProps {
-  type: number
+  type: string
   amount: number
   data: Group
   typeInputHandler: (evt: React.ChangeEvent<HTMLSelectElement>) => void
@@ -32,9 +32,9 @@ export const AlcoholInput = ({ type, amount, data, typeInputHandler, amountInput
           value={type}
           onChange={typeInputHandler}
         >
-          {data.punishment_types.map((type) => (
-            <option key={type.punishment_type_id} value={type.punishment_type_id} title={`Verdi: ${type.value}kr`}>
-              {type.name} {type.logo_url}
+          {data.punishment_types.map((ptype) => (
+            <option key={ptype.punishment_type_id} value={ptype.punishment_type_id} title={`Verdi: ${ptype.value}kr`}>
+              {ptype.name} {ptype.logo_url}
             </option>
           ))}
         </select>

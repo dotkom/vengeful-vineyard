@@ -96,7 +96,7 @@ async def get_users(request: Request) -> dict[str, list[Any]]:
 async def post_user(
     request: Request,
     user: UserCreate,
-) -> dict[str, Optional[int]]:
+) -> dict[str, Optional[UserId]]:
     """
     Endpoint to create a user.
     """

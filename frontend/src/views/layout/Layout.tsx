@@ -19,7 +19,7 @@ export const Layout = () => {
     type: "success",
   })
   const [user, setUser] = useState({
-    user_id: 0,
+    user_id: "",
   })
 
   switch (auth.activeNavigator) {

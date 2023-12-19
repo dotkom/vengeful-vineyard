@@ -27,14 +27,21 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
   const { preferredSelectedPerson } = useGivePunishmentModal()
   const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(preferredSelectedPerson)
   const [newPunishment, setNewPunishment] = useState({
-    punishment_type_id: 1,
+    punishment_type_id: "",
     reason: "",
     reason_hidden: true,
     amount: 1,
   })
   const { setNotification } = useContext(NotificationContext)
 
-  const { data } = useGroupLeaderboard(selectedGroup.group_id)
+  const onGroupLeaderboardFetched = (group: Group) => {
+    setNewPunishment({
+      ...newPunishment,
+      punishment_type_id: group.punishment_types[0].punishment_type_id,
+    })
+  }
+
+  const { data } = useGroupLeaderboard(selectedGroup.group_id, onGroupLeaderboardFetched)
 
   const createPunishmentCall = async () => {
     if (selectedPerson) {
@@ -78,7 +85,7 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
   const typeInputHandler = (evt: ChangeEvent<HTMLSelectElement>) =>
     setNewPunishment({
       ...newPunishment,
-      punishment_type_id: Number(evt.currentTarget.value),
+      punishment_type_id: evt.currentTarget.value,
     })
   const amountInputHandler = (evt: ChangeEvent<HTMLInputElement>) =>
     setNewPunishment({

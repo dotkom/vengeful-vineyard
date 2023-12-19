@@ -108,7 +108,7 @@ class OWSync:
                 last_name=last_name,
                 email=email,
             )
-            res = await self.app.db.users.insert_or_update(user_create, conn=conn)
+            res = await self.app.db.users.upsert(user_create, conn=conn)
             return res["id"]
 
     async def add_user_to_group(
@@ -124,7 +124,7 @@ class OWSync:
             email=user_data["user"]["email"],
         )
 
-        res = await self.app.db.users.insert_or_update(user_create, conn=conn)
+        res = await self.app.db.users.upsert(user_create, conn=conn)
         user_id = res["id"]
 
         try:
@@ -154,7 +154,7 @@ class OWSync:
                 email=user_data["user"]["email"],
             )
 
-        res = await self.app.db.users.insert_or_update_multiple(
+        res = await self.app.db.users.upsert_multiple(
             list(user_creates.values()), conn=conn
         )
 

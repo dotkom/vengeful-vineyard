@@ -142,7 +142,7 @@ async def get_group(request: Request, group_id: GroupId) -> Group:
 async def post_group(
     request: Request,
     group: GroupCreate,
-) -> dict[str, Optional[int]]:
+) -> dict[str, Optional[GroupId]]:
     """
     Endpoint to create a new group.
     """
@@ -285,7 +285,7 @@ async def add_punishment(
     group_id: GroupId,
     user_id: UserId,
     punishments: list[PunishmentCreate],
-) -> dict[str, list[int]]:
+) -> dict[str, list[PunishmentId]]:
     """
     Endpoint to add a punishment to a user in the context of a specific group.
     """

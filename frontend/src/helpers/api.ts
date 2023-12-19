@@ -15,25 +15,30 @@ export const GROUPS_URL = BASE_URL + "/group/me"
 
 export const ADD_PUNISHMENT = BASE_URL + "/group/1/user/1/punishment"
 
-export const getAddPunishmentUrl = (groupId: number, userId: number) =>
+export const getAddPunishmentUrl = (groupId: string, userId: string) =>
   BASE_URL + `/group/${groupId}/user/${userId}/punishment`
 
-export const getPostPunishmentsPaidUrl = (groupId: number) => BASE_URL + `/group/${groupId}/punishments/paid`
+export const getPostPunishmentsPaidUrl = (groupId: string) => BASE_URL + `/group/${groupId}/punishments/paid`
 
-export const getPostPunishmentsUnpaidUrl = (groupId: number) => BASE_URL + `/group/${groupId}/punishments/unpaid`
+export const getPostPunishmentsUnpaidUrl = (groupId: string) => BASE_URL + `/group/${groupId}/punishments/unpaid`
 
-export const getPostAllPunishmentsPaidForUserUrl = (groupId: number, userId: number) =>
+export const getPostAllPunishmentsPaidForUserUrl = (groupId: string, userId: string) =>
   BASE_URL + `/group/${groupId}/user/${userId}/punishments/paid/all`
 
-export const getAddReactionUrl = (punishmentId: number) => BASE_URL + `/punishment/${punishmentId}/reaction`
+export const getAddReactionUrl = (punishmentId: string) => BASE_URL + `/punishment/${punishmentId}/reaction`
 
-export const useGroupLeaderboard = (groupId?: number) =>
+export const useGroupLeaderboard = (groupId?: string, cb?: (group: Group) => void) =>
   useQuery({
     queryKey: ["groupLeaderboard", groupId ?? 0],
     queryFn: () =>
       axios.get(BASE_URL + `/group/${groupId}`).then((res: AxiosResponse<Group>) => {
         const group = res.data
         group.members = sortGroupUsers(group.members, group.punishment_types)
+
+        if (cb) {
+          cb(group)
+        }
+
         return group
       }),
     enabled: groupId !== undefined,
@@ -49,17 +54,17 @@ export const useMyGroups = () =>
     })
   )
 
-export const addPunishment = (groupId: number, userId: number, punishment: PunishmentCreate) => {
+export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {
   return addManyPunishments(groupId, userId, [punishment])
 }
 
-export const addManyPunishments = async (groupId: number, userId: number, punishments: PunishmentCreate[]) =>
+export const addManyPunishments = async (groupId: string, userId: string, punishments: PunishmentCreate[]) =>
   (await axios.post(getAddPunishmentUrl(groupId, userId), punishments)).data
 
-export const addReaction = async (punishmentId: number, emoji: string) =>
+export const addReaction = async (punishmentId: string, emoji: string) =>
   (await axios.post(getAddReactionUrl(punishmentId), { emoji })).data
 
-export const removeReaction = async (punishmentId: number) => (await axios.delete(getAddReactionUrl(punishmentId))).data
+export const removeReaction = async (punishmentId: string) => (await axios.delete(getAddReactionUrl(punishmentId))).data
 
 const getLeaderboard = ({ pageParam = LEADERBOARD_URL }) =>
   axios.get(pageParam).then((res: AxiosResponse<Leaderboard>) => res.data)

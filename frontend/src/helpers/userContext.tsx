@@ -1,7 +1,7 @@
 import { createContext } from "react"
 
 interface UserType {
-  user_id: number
+  user_id: string
 }
 
 export const UserContext = createContext<{
@@ -9,7 +9,7 @@ export const UserContext = createContext<{
   setUserContext: (user: UserType) => void
 }>({
   user: {
-    user_id: 0,
+    user_id: "",
   },
   setUserContext: () => {},
 })
