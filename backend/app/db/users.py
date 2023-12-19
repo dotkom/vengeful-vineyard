@@ -79,7 +79,7 @@ class Users:
                     LEFT JOIN punishment_types pt
                         ON pt.punishment_type_id = pwr.punishment_type_id
                     GROUP BY u.user_id
-                    ORDER BY total_value DESC
+                    ORDER BY total_value DESC, u.first_name ASC
                     OFFSET $1
                     LIMIT $2"""
             res = await conn.fetch(
@@ -127,6 +127,30 @@ class Users:
                 raise NotFound
 
             return User(**db_user)
+
+    async def upsert(
+        self,
+        user: UserCreate,
+        conn: Optional[Pool] = None,
+    ) -> InsertOrUpdateUser:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """INSERT INTO users(ow_user_id, first_name, last_name, email)
+                    VALUES ($1, $2, $3, $4)
+                    ON CONFLICT (ow_user_id)
+                    DO UPDATE SET first_name = $2, last_name = $3, email = $4
+                    RETURNING user_id"""
+            try:
+                user_id = await conn.fetchval(
+                    query,
+                    user.ow_user_id,
+                    user.first_name,
+                    user.last_name,
+                    user.email,
+                )
+            except UniqueViolationError as exc:
+                raise DatabaseIntegrityException(detail=str(exc)) from exc
+
+        return {"id": user_id, "action": "CREATE"}
 
     async def insert(
         self,
@@ -244,6 +268,32 @@ class Users:
                 return await self.update_by_ow_user_id(user, conn=conn)
 
             return {"id": db_user.user_id, "action": "NO_CHANGE"}
+
+    async def upsert_multiple(
+        self,
+        users: list[UserCreate],
+        conn: Optional[Pool] = None,
+    ) -> dict[OWUserId, UserId]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """INSERT INTO users(ow_user_id, first_name, last_name, email)
+                    (SELECT
+                        u.ow_user_id, u.first_name, u.last_name, u.email
+                    FROM
+                        unnest($1::users[]) as u
+                    )
+                    ON CONFLICT (ow_user_id)
+                    DO UPDATE SET first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name, email = EXCLUDED.email
+                    RETURNING user_id, ow_user_id
+                    """
+
+            res = await conn.fetch(
+                query,
+                [
+                    (None, x.ow_user_id, x.first_name, x.last_name, x.email)
+                    for x in users
+                ],
+            )
+            return {x["ow_user_id"]: x["user_id"] for x in res}
 
     async def insert_multiple(
         self,

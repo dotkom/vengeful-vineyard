@@ -4,17 +4,10 @@ Some newtype definitions for extra type safety
 
 
 from typing import TypedDict
-
-
-class UserId(int):
-    pass
+from uuid import UUID
 
 
 class OWUserId(int):
-    pass
-
-
-class GroupId(int):
     pass
 
 
@@ -22,23 +15,31 @@ class OWGroupUserId(int):
     pass
 
 
-class PunishmentId(int):
+class UserId(UUID):
     pass
 
 
-class PunishmentTypeId(int):
+class GroupId(UUID):
     pass
 
 
-class PaidPunishmentLogId(int):
+class PunishmentId(UUID):
     pass
 
 
-class GroupEventId(int):
+class PunishmentTypeId(UUID):
     pass
 
 
-class PunishmentReactionId(int):
+class PaidPunishmentLogId(UUID):
+    pass
+
+
+class GroupEventId(UUID):
+    pass
+
+
+class PunishmentReactionId(UUID):
     pass
 
 

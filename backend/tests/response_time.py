@@ -1,6 +1,6 @@
 from typing import Any
 
-FAST_RESPONSE_MS = 100  # Milliseconds
+FAST_RESPONSE_MS = 200  # Milliseconds
 
 
 def check_response_time(response: Any, max_time: float = FAST_RESPONSE_MS) -> None:

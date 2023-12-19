@@ -70,10 +70,10 @@ class Punishments:
         created_by: UserId,
         punishments: list[PunishmentCreate],
         conn: Optional[Pool] = None,
-    ) -> dict[str, list[int]]:
+    ) -> dict[str, list[PunishmentId]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """SELECT 1 FROM punishment_types
-                WHERE group_id = $1 AND punishment_type_id = ANY($2::int[])
+                WHERE group_id = $1 AND punishment_type_id = ANY($2)
                 """
             res = await conn.fetch(
                 query,
@@ -156,7 +156,7 @@ class Punishments:
             async with conn.transaction():
                 query = """UPDATE group_punishments
                         SET paid = true, paid_at = $1, marked_paid_by = $2
-                        WHERE group_id = $3 AND punishment_id = ANY($4::int[])
+                        WHERE group_id = $3 AND punishment_id = ANY($4::uuid[])
                         RETURNING *"""
                 res = await conn.fetch(
                     query,
@@ -179,7 +179,7 @@ class Punishments:
             async with conn.transaction():
                 query = """UPDATE group_punishments
                         SET paid = false, paid_at = null, marked_paid_by = null
-                        WHERE group_id = $1 AND punishment_id = ANY($2::int[])
+                        WHERE group_id = $1 AND punishment_id = ANY($2::uuid[])
                         RETURNING *"""
                 res = await conn.fetch(
                     query,

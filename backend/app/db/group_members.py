@@ -84,7 +84,7 @@ class GroupMembers:
     ) -> list[UserId]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """DELETE FROM group_members
-                    WHERE group_id = $1 AND user_id = ANY($2::bigint[])
+                    WHERE group_id = $1 AND user_id = ANY($2::uuid[])
                     RETURNING user_id;
                     """
             res = await conn.fetch(
@@ -161,7 +161,7 @@ class GroupMembers:
                         WHERE gm.group_id = $1
                     ) pr ON pr.punishment_id = gp.punishment_id
                     LEFT JOIN users ON gp.created_by = users.user_id
-                    WHERE gp.user_id IN (SELECT unnest($2::int[])) AND group_id = $1
+                    WHERE gp.user_id IN (SELECT unnest($2::uuid[])) AND group_id = $1
                     GROUP BY gp.punishment_id, created_by_name;"""
 
             db_punishments = await conn.fetch(query, group_id, user_ids)

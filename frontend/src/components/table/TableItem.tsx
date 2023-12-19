@@ -25,7 +25,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
   const isGroupContext = groupUser !== undefined
 
   const totalPunishment: ReactNode[] = []
-  const punishmentTypeMap = new Map<number, PunishmentType>()
+  const punishmentTypeMap = new Map<string, PunishmentType>()
 
   punishmentTypes.forEach((type) => {
     punishmentTypeMap.set(type.punishment_type_id, type)
