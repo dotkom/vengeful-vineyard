@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react"
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  label: string
+  label?: string
   color?: "BLUE" | "RED" | "GREEN" | "YELLOW"
   children?: ReactNode
 }
@@ -31,7 +31,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         {...rest}
       >
         {children}
-        {label}
+        {label && label}
       </button>
     )
   }

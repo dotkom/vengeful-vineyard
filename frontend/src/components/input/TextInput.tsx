@@ -8,7 +8,7 @@ interface TextInputProps {
 }
 
 export const TextInput = ({ placeholder, value, error, changeHandler }: TextInputProps) => (
-  <div className="mt-1">
+  <div>
     <input
       type="text"
       name="text"

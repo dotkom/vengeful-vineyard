@@ -3,7 +3,6 @@ import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanst
 
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { Group } from "../../../helpers/types"
-import { IconButton } from "../../../components/button"
 import { PlusIcon } from "@heroicons/react/24/outline"
 import { SkeletonTabItem } from "./SkeletonTabItem"
 import { TabItem } from "./TabItem"
@@ -31,10 +30,10 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
         <GivePunishmentModal open={open} setOpen={setOpen} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
       )}
 
-      <div className="mx-4 max-w-5xl md:m-auto pl-8 pr-4">
-        <div className="sm:block">
-          <div>
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+      <div className="mx-4 md:pl-8 md:pr-4">
+        <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row gap-x-6 items-center">
+            <nav className="flex space-x-4 md:space-x-8 items-center" aria-label="Tabs">
               {groups !== undefined ? (
                 <>
                   {groups.map((group) => (
@@ -45,16 +44,19 @@ export const Tabs = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: T
                       onClick={() => setSelectedGroup(group)}
                     />
                   ))}
-                  <div className="w-full flex flex-row gap-x-2 mb-1 justify-end">
+                  {/* <div className="w-full flex flex-row gap-x-2 mb-1 justify-end">
                     <IconButton label="Ny straff" onClick={() => setOpen(true)}>
                       <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                     </IconButton>
-                  </div>
+                  </div> */}
                 </>
               ) : (
                 <SkeletonTabItem />
               )}
             </nav>
+            <button className="h-full flex flex-row mb-2 opacity-60 hover:opacity-90">
+              <PlusIcon className="h-[1.4rem] w-[1.4rem]" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </div>
