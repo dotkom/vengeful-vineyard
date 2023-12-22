@@ -18,6 +18,7 @@ from app.db.core import Database
 from app.http import HTTPClient
 from app.state import State
 from app.sync import OWSync
+from app.utils.permissions import PermissionManager
 
 __all__ = (
     "FastAPI",
@@ -36,6 +37,7 @@ class FastAPI(OriginalFastAPI):
     http: HTTPClient
     app_state: State
     ow_sync: OWSync
+    permission_manager: PermissionManager
 
     def set_db(self, db: Database) -> None:
         self.db = db
@@ -49,9 +51,14 @@ class FastAPI(OriginalFastAPI):
     def set_ow_sync(self, ow_sync: OWSync) -> None:
         self.ow_sync = ow_sync
 
+    def set_permission_manager(self, permission_manager: PermissionManager) -> None:
+        self.permission_manager = permission_manager
+
 
 class Request(OriginalRequest):
-    app: FastAPI
+    @property
+    def app(self) -> FastAPI:
+        return super().app  # type: ignore
 
     @property
     def access_token(self) -> Optional[str]:

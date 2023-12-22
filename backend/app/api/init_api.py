@@ -13,11 +13,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from app.api.endpoints import group, punishment, user
-from app.config import settings
+from app.config import PERMISSIONS, settings
 from app.db.core import Database
 from app.http import HTTPClient
 from app.state import State
 from app.sync import OWSync
+from app.utils.permissions import PermissionManager
 
 from . import APIRoute, FastAPI, Request
 
@@ -73,6 +74,10 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
         app.set_app_state(State())
         app.set_ow_sync(OWSync(app))
 
+        permission_manager = PermissionManager.from_raw_permissions(PERMISSIONS)
+        permission_manager.inject_app(app)
+        app.set_permission_manager(permission_manager)
+
         await database.async_init(**db_settings)
         await http.async_init()
 
@@ -91,7 +96,7 @@ def init_api(**db_settings: str) -> FastAPI:
         "clientId": "219919",
         "appName": "Vengeful Vineyard Docs",
         "usePkceWithAuthorizationCodeGrant": True,
-        "scopes": "openid profile onlineweb4",
+        "scopes": "openid email profile onlineweb4",
     }
 
     app = FastAPI(

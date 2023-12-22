@@ -5,7 +5,7 @@ the table 'group_members' and 'users'.
 
 from typing import Optional
 
-from app.types import GroupId, OWGroupUserId
+from app.types import GroupId, OWGroupUserId, PermissionPrivilege
 
 from .punishment import PunishmentOut
 from .user import User
@@ -16,6 +16,7 @@ class BaseGroupUser(User):
     punishments: list[PunishmentOut] = []
     active: bool = True
     group_id: GroupId
+    permissions: list[PermissionPrivilege] = []
 
 
 class GroupUser(BaseGroupUser):

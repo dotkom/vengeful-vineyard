@@ -2,14 +2,12 @@
 User endpoints
 """
 
-from typing import Any, Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api import APIRoute, Request, oidc
-from app.exceptions import DatabaseIntegrityException, NotFound
+from app.exceptions import NotFound
 from app.models.group import Group, UserWithGroups
-from app.models.user import LeaderboardUser, User, UserCreate
+from app.models.user import LeaderboardUser, User
 from app.types import UserId
 from app.utils.pagination import Page, Pagination
 
@@ -84,29 +82,29 @@ async def get_leadeboard(
 
 
 # @router.get("")  # Disabled
-async def get_users(request: Request) -> dict[str, list[Any]]:
-    """
-    Endpoint to get all users on the system.
-    """
-    app = request.app
-    return await app.db.users.get_all_raw()
+# async def get_users(request: Request) -> dict[str, list[Any]]:
+#     """
+#     Endpoint to get all users on the system.
+#     """
+#     app = request.app
+#     return await app.db.users.get_all_raw()
 
 
 # @router.post("")  # Disabled
-async def post_user(
-    request: Request,
-    user: UserCreate,
-) -> dict[str, Optional[UserId]]:
-    """
-    Endpoint to create a user.
-    """
-    app = request.app
-    try:
-        data = await app.db.users.insert(user)
-    except DatabaseIntegrityException as exc:
-        raise HTTPException(status_code=400, detail=exc.detail) from exc
-    else:
-        return {"id": data["id"]}
+# async def post_user(
+#     request: Request,
+#     user: UserCreate,
+# ) -> dict[str, Optional[UserId]]:
+#     """
+#     Endpoint to create a user.
+#     """
+#     app = request.app
+#     try:
+#         data = await app.db.users.insert(user)
+#     except DatabaseIntegrityException as exc:
+#         raise HTTPException(status_code=400, detail=exc.detail) from exc
+#     else:
+#         return {"id": data["id"]}
 
 
 @router.get(

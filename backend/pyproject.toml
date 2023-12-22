@@ -21,6 +21,7 @@ pyyaml = ">=6.0.1"
 emoji = "^2.8.0"
 types-emoji = "^2.1.0.3"
 mangum = "^0.17.0"
+networkx = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"

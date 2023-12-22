@@ -69,4 +69,14 @@ CREATE TABLE IF NOT EXISTS punishment_reactions (
 	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS group_member_permissions (
+	group_id uuid NOT NULL references groups(group_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	user_id uuid NOT NULL references users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	privilege varchar(255) NOT NULL,
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
+	updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
+	created_by uuid references users(user_id) ON DELETE SET null ON UPDATE CASCADE,
+	PRIMARY KEY (group_id, user_id, privilege)
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS groups_short_name_idx ON groups (LOWER(name_short));

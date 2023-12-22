@@ -82,11 +82,14 @@ async def get_group_user(
     """
     app = request.app
     try:
-        return await app.db.group_users.get(group_id, user_id)
+        ret = await app.db.group_users.get(group_id, user_id)
     except NotFound as exc:
         raise HTTPException(
             status_code=404, detail="User not found or not in group"
         ) from exc
+
+    assert isinstance(ret, GroupUser)
+    return ret
 
 
 @router.get(
@@ -252,12 +255,12 @@ async def add_user_to_group(
             group = await app.db.groups.get(group_id)
         except NotFound as exc:
             raise HTTPException(status_code=404, detail="Group not found") from exc
-        else:
-            if group.ow_group_id is not None:
-                raise HTTPException(
-                    status_code=400,
-                    detail="ow_group_user_id is required to join this group",
-                )
+
+        if group.ow_group_id is not None:
+            raise HTTPException(
+                status_code=400,
+                detail="ow_group_user_id is required to join this group",
+            )
 
     try:
         return await app.db.groups.insert_member(
@@ -295,6 +298,13 @@ async def add_punishment(
     created_by, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
+        await app.permission_manager.raise_if_missing_permission(
+            group_id,
+            created_by,
+            "group.add_punishment",
+            conn=conn,
+        )
+
         res = await app.db.groups.is_in_group(
             created_by,
             group_id,

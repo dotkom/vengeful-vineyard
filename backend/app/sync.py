@@ -1,15 +1,16 @@
 """Contains methods for syncing users from OW."""
 
 import asyncio
+from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Optional, cast
 
 from asyncpg import Pool
 
 from .exceptions import DatabaseIntegrityException, NotFound
 from .models.group import GroupCreate
-from .models.group_member import GroupMemberCreate, GroupMemberUpdate
+from .models.group_member import GroupMember, GroupMemberCreate, GroupMemberUpdate
 from .models.user import UserCreate, UserUpdate
-from .types import GroupId, OWUserId, UserId
+from .types import GroupId, OWUserId, PermissionPrivilege, UserId
 from .utils.db import MaybeAcquire
 
 if TYPE_CHECKING:
@@ -17,6 +18,21 @@ if TYPE_CHECKING:
 
 
 IGNORE_OW_GROUPS = (12,)  # "Komiteer"
+
+
+OW_GROUP_ROLES = {
+    1063: "leader",
+    1064: "deputy_leader",
+    1065: "treasurer",
+    1069: "chief_editor",
+    1079: "board_member",
+}
+
+
+OW_GROUP_ROLES_TO_PERMISSIONS: dict[int, tuple[str, ...]] = {
+    1063: ("group.owner",),
+    1064: ("group.admin",),
+}
 
 
 class OWSync:
@@ -144,7 +160,7 @@ class OWSync:
         group_id: GroupId,
         users_data: list[dict[str, Any]],
         conn: Optional[Pool] = None,
-    ) -> None:
+    ) -> list[GroupMember]:
         user_creates = {}
         for user_data in users_data:
             user_creates[user_data["user"]["id"]] = UserCreate(
@@ -169,7 +185,39 @@ class OWSync:
                 )
             )
 
-        await self.app.db.groups.insert_members(group_member_creates, conn=conn)
+        return await self.app.db.groups.insert_members(group_member_creates, conn=conn)
+
+    def map_roles(self, roles: list[int]) -> list[PermissionPrivilege]:
+        _roles = []
+        for role in roles:
+            mapped = OW_GROUP_ROLES_TO_PERMISSIONS.get(role)
+            if mapped is not None:
+                for p in mapped:
+                    _roles.append(PermissionPrivilege(p))
+
+        return _roles
+
+    async def handle_initial_group_permissions(
+        self,
+        group_id: GroupId,
+        members: list[GroupMember],
+        group_users: list[dict[str, Any]],
+        conn: Optional[Pool] = None,
+    ) -> None:
+        ids_map = {m.ow_group_user_id: m.user_id for m in members}
+        privileges = []
+        for u in group_users:
+            user_id = ids_map.get(u["id"])
+            if user_id is not None:
+                for role in self.map_roles(u["roles"]):
+                    privileges.append((user_id, role))
+
+        if privileges:
+            await self.app.db.permissions.insert_permissions_for_multiple_users(
+                group_id,
+                privileges,
+                conn=conn,
+            )
 
     async def handle_group_update(
         self,
@@ -178,18 +226,22 @@ class OWSync:
         member_ids: list[int],
         conn: Optional[Pool] = None,
     ) -> None:
-        group_members = await self.app.db.group_members.get_all_raw(group_id)
-        ids = [m["ow_group_user_id"] for m in group_members]
-
-        to_add = [u for u in group_users if u["id"] not in ids]
-        to_remove = [
-            m["user_id"]
-            for m in group_members
-            if m["ow_group_user_id"] not in member_ids
-        ]
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
+            group_members = await self.app.db.group_members.get_all_raw(
+                group_id, conn=conn
+            )
+            id_map = {m["ow_group_user_id"]: m["user_id"] for m in group_members}
+
+            to_add = [u for u in group_users if u["id"] not in id_map]
+            to_remove = [
+                m["user_id"]
+                for m in group_members
+                if m["ow_group_user_id"] not in member_ids
+            ]
+
+            added_members = []
             if to_add:
-                await self.add_users_to_group(
+                added_members = await self.add_users_to_group(
                     group_id,
                     to_add,
                     conn=conn,
@@ -199,6 +251,54 @@ class OWSync:
                 await self.app.db.group_members.delete_multiple(
                     group_id,
                     to_remove,
+                    conn=conn,
+                )
+
+            updated_id_map = {k: v for k, v in id_map.items() if v not in to_remove}
+            updated_id_map.update(
+                {m.ow_group_user_id: m.user_id for m in added_members}
+            )
+
+            privileges = {
+                updated_id_map[u["id"]]: self.map_roles(u["roles"])
+                for u in group_users
+                if u["id"] in updated_id_map
+            }
+
+            db_permissions = (
+                await self.app.db.permissions.get_auto_managed_permissions_for_group(
+                    group_id,
+                    conn=conn,
+                )
+            )
+
+            db_permissions_map = defaultdict(list)
+            for role in db_permissions:
+                db_permissions_map[role.user_id].append(role.privilege)
+
+            privileges_to_add = []
+            for user_id, _privileges in privileges.items():
+                for privilege in _privileges:
+                    if privilege not in db_permissions_map[user_id]:
+                        privileges_to_add.append((user_id, privilege))
+
+            privileges_to_remove = []
+            for user_id, _privileges in db_permissions_map.items():
+                for privilege in _privileges:
+                    if privilege not in privileges.get(user_id, []):
+                        privileges_to_remove.append((user_id, privilege))
+
+            if privileges_to_add:
+                await self.app.db.permissions.insert_permissions_for_multiple_users(
+                    group_id,
+                    privileges_to_add,
+                    conn=conn,
+                )
+
+            if privileges_to_remove:
+                await self.app.db.permissions.remove_permissions_for_multiple_users(
+                    group_id,
+                    privileges_to_remove,
                     conn=conn,
                 )
 
@@ -237,9 +337,15 @@ class OWSync:
 
             action = group_res["action"]
             if action == "CREATE":
-                await self.add_users_to_group(
+                members = await self.add_users_to_group(
                     group_id,
                     [u for u in group_users if u["user"]["id"] != ow_group_user_id],
+                    conn=conn,
+                )
+                await self.handle_initial_group_permissions(
+                    group_id,
+                    members,
+                    group_users,
                     conn=conn,
                 )
 
