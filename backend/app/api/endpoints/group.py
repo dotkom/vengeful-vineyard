@@ -18,7 +18,7 @@ from app.models.punishment import (
     PunishmentStreaks,
     TotalPunishmentValue,
 )
-from app.models.punishment_type import PunishmentTypeCreate
+from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.types import (
     GroupEventId,
     GroupId,
@@ -165,7 +165,7 @@ async def add_punishment_type_to_group(
     request: Request,
     group_id: GroupId,
     punishment_type: PunishmentTypeCreate,
-) -> dict[str, int]:
+) -> PunishmentTypeRead:
     """
     Endpoint to create a custom punishment type for a group.
     """
