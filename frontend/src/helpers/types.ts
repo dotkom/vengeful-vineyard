@@ -4,6 +4,9 @@ export interface User {
   first_name: string
   last_name: string
   email: string
+}
+
+export interface MeUser extends User {
   groups: Group[]
 }
 
@@ -19,12 +22,7 @@ export interface LeaderboardPunishment extends Punishment {
   punishment_type: PunishmentType
 }
 
-export interface LeaderboardUser {
-  ow_user_id: number
-  first_name: string
-  last_name: string
-  email: string
-  user_id: string
+export interface LeaderboardUser extends User {
   total_value: number
   punishments: LeaderboardPunishment[]
 }
@@ -78,12 +76,7 @@ export interface Group {
   members: GroupUser[]
 }
 
-export interface GroupUser {
-  ow_user_id: number
-  first_name: string
-  last_name: string
-  email: string
-  user_id: string
+export interface GroupUser extends User {
   group_id: string
   ow_group_user_id: number
   punishments: Punishment[]

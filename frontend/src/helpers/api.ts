@@ -1,4 +1,4 @@
-import { Group, Leaderboard, PunishmentCreate, User } from "./types"
+import { Group, Leaderboard, MeUser, PunishmentCreate } from "./types"
 import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
@@ -33,7 +33,7 @@ export const useGroupLeaderboard = (groupId?: string, cb?: (group: Group) => voi
     queryFn: () =>
       axios.get(BASE_URL + `/group/${groupId}`).then((res: AxiosResponse<Group>) => {
         const group = res.data
-        group.members = sortGroupUsers(group.members, group.punishment_types)
+        // group.members = sortGroupUsers(group.members, group.punishment_types)
 
         if (cb) {
           cb(group)
@@ -45,8 +45,8 @@ export const useGroupLeaderboard = (groupId?: string, cb?: (group: Group) => voi
   })
 
 export const useMyGroups = () =>
-  useOptimisticQuery<User>(["groupsData"], (_, optimistic: boolean) =>
-    axios.get(getMeUrl(optimistic)).then((res: AxiosResponse<User>) => {
+  useOptimisticQuery<MeUser>(["groupsData"], (_, optimistic: boolean) =>
+    axios.get(getMeUrl(optimistic)).then((res: AxiosResponse<MeUser>) => {
       const user = res.data
       user.groups = sortGroups(user.groups)
       user.groups.forEach((group) => (group.members = sortGroupUsers(group.members, group.punishment_types)))

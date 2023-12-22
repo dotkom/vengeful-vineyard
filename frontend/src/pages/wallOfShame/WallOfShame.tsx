@@ -20,7 +20,7 @@ export const WallOfShame = () => {
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)
 
   return (
-    <section className="mt-16">
+    <section className="mt-16 max-w-5xl w-[90%] mx-auto">
       <h1 className="mb-4 text-center text-xl font-medium">Wall of shame</h1>
       <Table leaderboardUsers={leaderboardUsers} isLoading={isLoading} dataRefetch={refetch} />
     </section>

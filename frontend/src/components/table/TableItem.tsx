@@ -1,9 +1,9 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from "./accordion/Accordion"
 import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
-import React, { ReactNode } from "react"
 
 import { PunishmentList } from "./punishment/PunishmentList"
+import { ReactNode } from "react"
 import { textToEmoji } from "../../helpers/emojies"
 
 interface TableItemProps {
@@ -37,6 +37,10 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
   for (let i = user.punishments.length - 1; i >= 0; i--) {
     const punishment = user.punishments[i]
 
+    if (isGroupContext && !punishmentTypes.some((type) => type.punishment_type_id === punishment.punishment_type_id)) {
+      continue
+    }
+
     if (punishment.paid) {
       paidPunishments.push(punishment)
     } else {
@@ -60,11 +64,15 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
       logoUrl = innerPunishment.punishment_type.logo_url
     }
 
-    totalPunishment.push(
-      <span key={`${punishment.punishment_id}/${i}`} className="text-lg" title={`${name} (${value}kr)`}>
-        <span>{logoUrl}</span>
-      </span>
-    )
+    if (!punishment.paid) {
+      for (let j = 0; j < punishment.amount; j++) {
+        totalPunishment.push(
+          <span key={`${punishment.punishment_id}/${i}/${j}`} className="text-lg" title={`${name} (${value}kr)`}>
+            <span>{logoUrl}</span>
+          </span>
+        )
+      }
+    }
   }
 
   function weeklyStreak(date: number, listDates: number[]) {
@@ -103,9 +111,9 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
 
   return (
     <AccordionItem value={user.user_id.toString()}>
-      <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
+      <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 hover:bg-gray-50">
         <div className="flex items-center gap-x-2">
-          <span className="flex h-12 w-12 pb-1 items-center justify-center rounded-full bg-indigo-100 align-middle text-3xl text-[#4C4C51]">
+          <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 text-lg md:text-3xl text-[#4C4C51]">
             {/* Displays the ith placement on the leaderboard if i is defined, otherwise displays an emoji */}
             {i !== undefined
               ? i + 1 === 1
@@ -118,7 +126,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
               : textToEmoji(user.first_name + user.last_name)}
           </span>
           <p
-            className="w-48 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-semibold leading-6 text-gray-900"
+            className="w-48 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900"
             title={`${user.first_name} ${user.last_name}`}
           >
             {user.first_name} {user.last_name}
