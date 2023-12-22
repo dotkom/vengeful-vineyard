@@ -66,36 +66,6 @@ class GroupUsers:
 
         return [dict(row) for row in db_users]
 
-    async def get_alla(
-        self,
-        group_id: GroupId,
-        punishments: bool = True,
-        conn: Optional[Pool] = None,
-    ) -> list[GroupUser]:
-        async with MaybeAcquire(conn, self.db.pool) as conn:
-            db_users = await self.db.group_users.get_all_raw(group_id, conn=conn)
-
-            if punishments:
-                user_ids = [db_user["user_id"] for db_user in db_users]
-                db_punishments = (
-                    await self.db.group_members.get_raw_punishments_for_multiple(
-                        group_id,
-                        user_ids,
-                        conn=conn,
-                    )
-                )
-            else:
-                db_punishments = {}
-
-            users = []
-            for db_user in db_users:
-                user = dict(db_user)
-                user["punishments"] = db_punishments.get(user["user_id"], [])
-                user["group_id"] = group_id
-                users.append(GroupUser(**user))
-
-            return users
-
     async def get_all(
         self,
         group_id: GroupId,
