@@ -72,18 +72,8 @@ class PermissionManager:
         user_id: UserId,
         privilege: Iterable[PermissionPrivilege],
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> bool:
-        if ow_group_is_always_allowed:
-            try:
-                group = await self.app.db.groups.get(group_id, conn=conn)
-            except NotFound:
-                pass
-            else:
-                if group.ow_group_id is not None:
-                    return True
-
         user_permissions = await self.app.db.permissions.get_permission_privileges(
             group_id,
             user_id,
@@ -101,14 +91,12 @@ class PermissionManager:
         user_id: UserId,
         privilege: PermissionPrivilege,
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> bool:
         return await self.has_permissions(
             group_id,
             user_id,
             (privilege,),
-            ow_group_is_always_allowed=ow_group_is_always_allowed,
             conn=conn,
         )
 
@@ -118,14 +106,12 @@ class PermissionManager:
         user_id: UserId,
         privilege: Iterable[PermissionPrivilege],
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> None:
         if not await self.has_permissions(
             group_id,
             user_id,
             privilege,
-            ow_group_is_always_allowed=ow_group_is_always_allowed,
             conn=conn,
         ):
             raise HTTPException(
@@ -139,13 +125,11 @@ class PermissionManager:
         user_id: UserId,
         privilege: PermissionPrivilege,
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> None:
         await self.raise_if_missing_permissions(
             group_id,
             user_id,
             (privilege,),
-            ow_group_is_always_allowed=ow_group_is_always_allowed,
             conn=conn,
         )
