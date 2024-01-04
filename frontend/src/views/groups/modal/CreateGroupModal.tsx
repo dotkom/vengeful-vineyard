@@ -7,10 +7,10 @@ import axios from "axios"
 import { VengefulApiError, getPostGroupUrl } from "../../../helpers/api"
 import { useErrorControl } from "../../../helpers/form"
 import { useMutation } from "@tanstack/react-query"
-import { useMyGroupsRefetch } from "../../../helpers/context/useMyGroupsRefetchContext"
+import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { useSelectedGroup } from "../../../helpers/context/selectedGroupContext"
 import { z } from "zod"
+import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 
 interface CreateGroupModalProps {
   open: boolean
@@ -28,7 +28,7 @@ export const CreateGroupModal: FC<CreateGroupModalProps> = ({ open, setOpen }) =
   const ref = useRef(null)
   const { setNotification } = useNotification()
   const { myGroupsRefetch } = useMyGroupsRefetch()
-  const { setSelectedGroup } = useSelectedGroup()
+  const { setPreferredGroupShortName } = useGroupNavigation()
 
   const [createGroupData, setCreateGroupData] = useState<GroupCreateType>({
     name: "",
@@ -58,14 +58,8 @@ export const CreateGroupModal: FC<CreateGroupModalProps> = ({ open, setOpen }) =
   const { mutate: createGroupMutate } = useMutation(async () => await axios.post(getPostGroupUrl(), createGroupData), {
     onSuccess: () => {
       if (myGroupsRefetch) {
-        ;(async () => {
-          const groupName = createGroupData.name
-          const data = await myGroupsRefetch()
-          const group = data?.data?.groups.find((group) => group.name === groupName)
-          if (group) {
-            setSelectedGroup(group)
-          }
-        })()
+        setPreferredGroupShortName(createGroupData.name_short)
+        myGroupsRefetch()
       }
       setCreateGroupData({
         name: "",

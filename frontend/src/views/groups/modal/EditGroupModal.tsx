@@ -20,10 +20,11 @@ import { Modal } from "../../../components/modal"
 import { Spinner } from "../../../components/spinner"
 import { Tabs } from "../../../components/tabs/Tabs"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { useSelectedGroup } from "../../../helpers/context/selectedGroupContext"
 import { useErrorControl } from "../../../helpers/form"
 import { PunishmentType } from "../../../helpers/types"
 import { areObjectsEqual } from "../../../helpers/utils"
+import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
+import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
 
 interface EditGroupModalProps {
   open: boolean
@@ -63,7 +64,8 @@ const baseEditPunishmentTypeData = {
 }
 
 export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
-  const { selectedGroup } = useSelectedGroup()
+  const { selectedGroup, setPreferredGroupShortName } = useGroupNavigation()
+  const { myGroupsRefetch } = useMyGroupsRefetch()
   const { setNotification } = useNotification()
   const queryClient = useQueryClient()
   const ref = useRef(null)
@@ -187,7 +189,9 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
 
   const { mutate: editGroupMutate } = useMutation(() => axios.patch(getPutGroupUrl(selectedGroupId), editGroupData), {
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroupId] })
+      setPreferredGroupShortName(editGroupData.name_short)
+      // queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroupId] })
+      if (myGroupsRefetch) myGroupsRefetch()
       setNotification({
         type: "success",
         title: "Suksess",

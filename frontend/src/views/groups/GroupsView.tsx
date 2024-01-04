@@ -17,8 +17,7 @@ import { useCreateGroupModal } from "../../helpers/context/modal/createGroupModa
 import { useEditGroupMembersModal } from "../../helpers/context/modal/editGroupMembersModalContext"
 import { useEditGroupModal } from "../../helpers/context/modal/editGroupModalContext"
 import { useRequestToJoinGroupModal } from "../../helpers/context/modal/requestToJoinGroupModalContext"
-import { useSelectedGroup } from "../../helpers/context/selectedGroupContext"
-import { useMyGroupsRefetch } from "../../helpers/context/useMyGroupsRefetchContext"
+import { useMyGroupsRefetch } from "../../helpers/context/myGroupsRefetchContext"
 import { Group } from "../../helpers/types"
 import { DefaultHero } from "../hero"
 import { AdministerGroupJoinRequestsModal } from "./modal/AdministerGroupJoinRequestsModal"
@@ -28,10 +27,11 @@ import { EditGroupModal } from "./modal/EditGroupModal"
 import { RequestToJoinGroupModal } from "./modal/RequestToJoinGroupModal"
 import { GroupsSidebar } from "./sidebar/GroupsSidebar"
 import { TabNav } from "./tabnav/TabNav"
+import { useGroupNavigation } from "../../helpers/context/groupNavigationContext"
 
 export const GroupsView = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
-  const { setSelectedGroup } = useSelectedGroup()
+  const { setSelectedGroup } = useGroupNavigation()
   const { open: createGroupModalOpen, setOpen: setCreateGroupModalOpen } = useCreateGroupModal()
   const { open: requestToJoinGroupModalOpen, setOpen: setRequestToJoinGroupModalOpen } = useRequestToJoinGroupModal()
   const { open: editGroupModalOpen, setOpen: setEditGroupModalOpen } = useEditGroupModal()
@@ -40,6 +40,7 @@ export const GroupsView = () => {
     useAdministerGroupJoinRequestsModal()
   const navigate = useNavigate()
   const { setMyGroupsRefetch } = useMyGroupsRefetch()
+  const { preferredGroupShortName, setPreferredGroupShortName } = useGroupNavigation()
   const auth = useAuth()
 
   const params = useParams<{ groupName?: string }>()
@@ -60,8 +61,24 @@ export const GroupsView = () => {
   useEffect(() => {
     if (user) setCurrentUser({ user_id: user.user_id })
 
-    if (user && selectedGroupName === undefined && user.groups.length > 0) {
-      navigate(`/komiteer/${user.groups[0].name_short.toLowerCase()}`)
+    if (user && (selectedGroupName === undefined || preferredGroupShortName !== undefined) && user.groups.length > 0) {
+      let targetGroup: Group | undefined = undefined
+
+      if (preferredGroupShortName) {
+        const preferredGroup = user.groups.find(
+          (group) => group.name_short.toLowerCase() === preferredGroupShortName.toLowerCase()
+        )
+        if (preferredGroup) {
+          targetGroup = preferredGroup
+          setPreferredGroupShortName(undefined)
+        }
+      }
+
+      if (!targetGroup) {
+        targetGroup = user.groups[0]
+      }
+
+      navigate(`/komiteer/${targetGroup.name_short.toLowerCase()}`)
     }
   }, [user, selectedGroupName])
 

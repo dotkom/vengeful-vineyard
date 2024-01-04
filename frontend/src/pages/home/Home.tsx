@@ -7,12 +7,12 @@ import { EditGroupModalProvider } from "../../helpers/context/modal/editGroupMod
 import { GivePunishmentModalProvider } from "../../helpers/context/modal/givePunishmentModalContext"
 import { GroupsView } from "../../views/groups"
 import { InputConfirmModal } from "../../components/modal/InputConfirmModal"
-import { MyGroupsRefetchProvider } from "../../helpers/context/useMyGroupsRefetchContext"
+import { MyGroupsRefetchProvider } from "../../helpers/context/myGroupsRefetchContext"
 import { RequestToJoinGroupModalProvider } from "../../helpers/context/modal/requestToJoinGroupModalContext"
-import { SelectedGroupProvider } from "../../helpers/context/selectedGroupContext"
 import { TogglePunishmentsProvider } from "../../helpers/context/togglePunishmentsContext"
 import { useAuth } from "react-oidc-context"
 import { useConfirmModal } from "../../helpers/context/modal/confirmModalContext"
+import { GroupNavigationProvider } from "../../helpers/context/groupNavigationContext"
 
 export const Home = () => {
   const auth = useAuth()
@@ -27,7 +27,7 @@ export const Home = () => {
       )}
       {auth.isAuthenticated ? (
         <MyGroupsRefetchProvider>
-          <SelectedGroupProvider>
+          <GroupNavigationProvider>
             <GivePunishmentModalProvider>
               <TogglePunishmentsProvider>
                 <CreateGroupModalProvider>
@@ -43,7 +43,7 @@ export const Home = () => {
                 </CreateGroupModalProvider>
               </TogglePunishmentsProvider>
             </GivePunishmentModalProvider>
-          </SelectedGroupProvider>
+          </GroupNavigationProvider>
         </MyGroupsRefetchProvider>
       ) : (
         <DefaultHero auth={auth} />

@@ -12,7 +12,7 @@ import { Transition } from "@headlessui/react"
 import axios from "axios"
 import { Modal } from "../../../components/modal"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { useSelectedGroup } from "../../../helpers/context/selectedGroupContext"
+import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 
 interface AdministerGroupJoinRequestsModalProps {
   open: boolean
@@ -22,7 +22,7 @@ interface AdministerGroupJoinRequestsModalProps {
 export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsModalProps> = ({ open, setOpen }) => {
   const ref = useRef(null)
   const { setNotification } = useNotification()
-  const { selectedGroup } = useSelectedGroup()
+  const { selectedGroup } = useGroupNavigation()
   const queryClient = useQueryClient()
 
   const { data: group } = useGroupLeaderboard(selectedGroup?.group_id)

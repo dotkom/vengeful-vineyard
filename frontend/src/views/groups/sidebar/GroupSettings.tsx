@@ -18,9 +18,9 @@ import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 import { useEditGroupMembersModal } from "../../../helpers/context/modal/editGroupMembersModalContext"
 import { useEditGroupModal } from "../../../helpers/context/modal/editGroupModalContext"
 import { useMutation } from "@tanstack/react-query"
-import { useMyGroupsRefetch } from "../../../helpers/context/useMyGroupsRefetchContext"
+import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { useSelectedGroup } from "../../../helpers/context/selectedGroupContext"
+import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 
 interface GroupSettingsProps {
   groupData: Group | undefined
@@ -31,8 +31,8 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   const { setOpen: setEditGroupMembersModalOpen } = useEditGroupMembersModal()
   const { currentUser } = useCurrentUser()
   const { setNotification } = useNotification()
-  const { setSelectedGroup } = useSelectedGroup()
   const { myGroupsRefetch } = useMyGroupsRefetch()
+  const { setPreferredGroupShortName } = useGroupNavigation()
   const {
     setOpen: setConfirmModalOpen,
     setType: setConfirmModalType,
@@ -49,7 +49,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     async () => await axios.delete(getDeleteGroupMemberUrl(groupData.group_id, currentUser.user_id)),
     {
       onSuccess: () => {
-        setSelectedGroup(undefined)
+        setPreferredGroupShortName("")
         if (myGroupsRefetch) myGroupsRefetch()
         setNotification({
           type: "success",
@@ -70,7 +70,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     async () => await axios.delete(getDeleteGroupUrl(groupData.group_id)),
     {
       onSuccess: () => {
-        setSelectedGroup(undefined)
+        setPreferredGroupShortName("")
         if (myGroupsRefetch) myGroupsRefetch()
         setNotification({
           type: "success",

@@ -20,7 +20,7 @@ import axios from "axios"
 import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
 import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { useSelectedGroup } from "../../../helpers/context/selectedGroupContext"
+import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 
 interface EditGroupMembersModalProps {
   open: boolean
@@ -34,7 +34,7 @@ const rolesOptions: ListboxOption<string>[] = PERMISSION_GROUPS.map((group) => (
 }))
 
 export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, setOpen }) => {
-  const { selectedGroup } = useSelectedGroup()
+  const { selectedGroup } = useGroupNavigation()
   const { currentUser } = useCurrentUser()
   const { setNotification } = useNotification()
   const ref = useRef(null)
