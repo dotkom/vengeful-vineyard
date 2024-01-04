@@ -55,7 +55,7 @@ export const PunishmentList = ({
     <Fragment>
       <PunishmentActionBar isGroupContext={isGroupContext} user={user} />
 
-      <ul className="border-t divide-y divide-gray-100">
+      <ul className="border-t flex flex-col gap-y-px bg-gray-100">
         {punishments.map((punishment) => (
           <PunishmentItem
             user={user}

@@ -19,6 +19,7 @@ import { isAtLeastAsValuableRole } from "../../../helpers/permissions"
 import { Button } from "../../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
+import { classNames } from "../../../helpers/classNames"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -162,9 +163,10 @@ export const PunishmentItem = ({
 
   return (
     <div
-      className={`flex flex-col justify-between border-l-4 md:border-l-[6px] px-4 pt-4 pb-4 min-h-[7rem] ${
-        !punishment.paid ? "border-l-indigo-600" : "border-l-slate-400"
-      }`}
+      className={classNames(
+        "flex flex-col justify-between border-l-4 md:border-l-[6px] px-4 pt-4 pb-4 min-h-[7rem] bg-white",
+        !punishment.paid ? "border-l-indigo-600" : "border-l-indigo-400"
+      )}
     >
       <div className="flex flex-row justify-between gap-x-2">
         <div className="text-left font-light">
