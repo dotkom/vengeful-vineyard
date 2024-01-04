@@ -221,7 +221,9 @@ class TestWithDB_OW:
             client.app, str(NEW_PUNISHMENT_TYPE_PAYLOAD["name"]), PUNISHMENT_TYPE_4_ID
         )
 
-        assert suppress_defaults(response.json()) == suppress_defaults({"id": ""})
+        assert suppress_defaults(response.json()) == suppress_defaults(
+            {**NEW_PUNISHMENT_TYPE_PAYLOAD, "punishment_type_id": PUNISHMENT_TYPE_4_ID}
+        )
 
     @pytest.mark.asyncio
     async def test_get_group_with_punishment_type(self, client: Any) -> None:

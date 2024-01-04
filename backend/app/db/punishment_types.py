@@ -1,9 +1,8 @@
 from typing import TYPE_CHECKING, Optional
 
 from asyncpg import Pool
-from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 
-from app.exceptions import DatabaseIntegrityException, PunishmentTypeNotExists
+from app.exceptions import PunishmentTypeNotExists
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.types import GroupId, PunishmentTypeId
 from app.utils.db import MaybeAcquire
@@ -32,26 +31,41 @@ class PunishmentTypes:
         group_id: GroupId,
         punishment_type: PunishmentTypeCreate,
         conn: Optional[Pool] = None,
-    ) -> dict[str, int]:
+    ) -> PunishmentTypeRead:
+        res = await self.insert_multiple(group_id, [punishment_type], conn=conn)
+        return res[0]
+
+    async def insert_multiple(
+        self,
+        group_id: GroupId,
+        punishment_types: list[PunishmentTypeCreate],
+        conn: Optional[Pool] = None,
+    ) -> list[PunishmentTypeRead]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """INSERT INTO punishment_types(group_id, name, value, logo_url)
-                    VALUES ($1, $2, $3, $4)
-                    RETURNING punishment_type_id
+                    (SELECT
+                        m.group_id, m.name, m.value, m.logo_url
+                    FROM
+                        unnest($1::punishment_types[]) as m
+                    )
+                    RETURNING *
                     """
-            try:
-                punishment_type_id = await conn.fetchval(
-                    query,
-                    group_id,
-                    punishment_type.name,
-                    punishment_type.value,
-                    punishment_type.logo_url,
-                )
-            except UniqueViolationError as exc:
-                raise DatabaseIntegrityException(detail=str(exc)) from exc
-            except ForeignKeyViolationError as exc:
-                raise DatabaseIntegrityException(detail=str(exc)) from exc
 
-        return {"id": punishment_type_id}
+            punishment_types = await conn.fetch(
+                query,
+                [
+                    (
+                        None,
+                        group_id,
+                        x.name,
+                        x.value,
+                        x.logo_url,
+                    )
+                    for x in punishment_types
+                ],
+            )
+
+        return [PunishmentTypeRead(**dict(x)) for x in punishment_types]
 
     async def delete(
         self,

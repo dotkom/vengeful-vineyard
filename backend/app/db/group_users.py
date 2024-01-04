@@ -24,31 +24,14 @@ class GroupUsers:
         conn: Optional[Pool] = None,
     ) -> GroupUser:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT m.active, m.ow_group_user_id, m.group_id, users.*
-                    FROM users
-                    INNER JOIN group_members as m
-                    ON users.user_id = m.user_id
-                    WHERE users.user_id = $1 AND m.group_id = $2
-                    """
-            db_user = await conn.fetchrow(
-                query,
-                user_id,
-                group_id,
+            db_users = await self.get_all(
+                group_id, [user_id], punishments=punishments, conn=conn
             )
 
-            if db_user is None:
-                raise NotFound
+            if not db_users:
+                raise NotFound("Group user not found")
 
-            user = dict(db_user)
-            user["punishments"] = []
-            if punishments:
-                user["punishments"] = await self.db.group_members.get_raw_punishments(
-                    group_id,
-                    user_id,
-                    conn=conn,
-                )
-
-            return GroupUser(**user)
+            return db_users[0]
 
     async def get_all_raw(
         self,
@@ -69,19 +52,29 @@ class GroupUsers:
     async def get_all(
         self,
         group_id: GroupId,
+        users: Optional[list[UserId]] = None,
         punishments: bool = True,
         conn: Optional[Pool] = None,
     ) -> list[GroupUser]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """
+            if users:
+                extra = "AND u.user_id = ANY($3)"
+                args = [group_id, punishments, users]
+            else:
+                extra = ""
+                args = [group_id, punishments]
+
+            query = f"""
                 WITH punishments_with_reactions AS (
                     SELECT
                         gp.*,
                         u.first_name || ' ' || u.last_name as created_by_name,
                         array_remove(array_agg(pr.*), NULL) as reactions
                     FROM group_punishments gp
+                    LEFT JOIN group_members gm
+                        ON gm.group_id = gp.group_id
                     LEFT JOIN punishment_reactions pr
-                        ON pr.punishment_id = gp.punishment_id
+                        ON pr.punishment_id = gp.punishment_id AND pr.created_by = gm.user_id
                     LEFT JOIN users u
                         ON u.user_id = gp.created_by
                     GROUP BY gp.punishment_id, created_by_name
@@ -113,11 +106,11 @@ class GroupUsers:
                     ON gm.user_id = pwr.user_id AND gm.group_id = pwr.group_id AND true = $2
                 LEFT JOIN group_member_permissions gmp
                     ON gm.user_id = gmp.user_id AND gm.group_id = gmp.group_id
-                WHERE gm.group_id = $1
+                WHERE gm.group_id = $1 {extra}
                 GROUP BY gm.active, gm.ow_group_user_id, u.user_id
                 """
 
-            db_group_users = await conn.fetch(query, group_id, punishments)
+            db_group_users = await conn.fetch(query, *args)
             return [
                 GroupUser(**db_group_user, group_id=group_id)
                 for db_group_user in db_group_users

@@ -53,16 +53,23 @@ class Groups:
         conn: Optional[Pool] = None,
     ) -> Group:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = "SELECT * FROM groups WHERE groups.group_id = $1"
+            query = """
+                SELECT
+                    g.*,
+                    COALESCE(json_agg(pt.*) FILTER (WHERE pt.punishment_type_id IS NOT NULL), '[]') AS punishment_types
+                FROM groups g
+                LEFT JOIN punishment_types pt
+                    ON g.group_id = pt.group_id
+                WHERE g.group_id = $1
+                GROUP BY g.group_id
+                """
+
             db_group = await conn.fetchrow(query, group_id)
 
             if db_group is None:
                 raise NotFound
 
             group = dict(db_group)
-            group["punishment_types"] = await self.db.punishment_types.get_all(
-                group_id, conn=conn
-            )
             group["members"] = await self.db.group_users.get_all(
                 group_id,
                 conn=conn,
@@ -112,8 +119,11 @@ class Groups:
                 raise DatabaseIntegrityException(detail=str(exc)) from exc
 
             gid = cast(GroupId, group_id)
-            for punishment_type in DEFAULT_PUSHISHMENT_TYPES:
-                await self.db.punishment_types.insert(gid, punishment_type, conn=conn)
+            await self.db.punishment_types.insert_multiple(
+                gid, DEFAULT_PUSHISHMENT_TYPES, conn=conn
+            )
+            # for punishment_type in DEFAULT_PUSHISHMENT_TYPES:
+            #     await self.db.punishment_types.insert(gid, punishment_type, conn=conn)
 
         return {"id": gid, "action": "CREATE"}
 

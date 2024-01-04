@@ -84,17 +84,11 @@ class PermissionManager:
                 if group.ow_group_id is not None:
                     return True
 
-        (
-            user_permissions,
-            is_ow_group,
-        ) = await self.app.db.permissions.get_permission_privileges(
+        user_permissions = await self.app.db.permissions.get_permission_privileges(
             group_id,
             user_id,
             conn=conn,
         )
-
-        if ow_group_is_always_allowed and is_ow_group:
-            return True
 
         return all(
             self.internal_has_permission(permission, user_permissions)
