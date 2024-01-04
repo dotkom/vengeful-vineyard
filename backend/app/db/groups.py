@@ -6,7 +6,7 @@ from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group, GroupCreate
-from app.models.group_member import GroupMemberCreate
+from app.models.group_member import GroupMember, GroupMemberCreate
 from app.models.punishment import TotalPunishmentValue
 from app.models.punishment_type import PunishmentTypeCreate
 from app.types import GroupId, InsertOrUpdateGroup, OWUserId, UserId
@@ -183,7 +183,7 @@ class Groups:
         self,
         members: list[GroupMemberCreate],
         conn: Optional[Pool] = None,
-    ) -> list[dict[str, Union[GroupId, UserId]]]:
+    ) -> list[GroupMember]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_at)
                     (SELECT
@@ -191,7 +191,7 @@ class Groups:
                     FROM
                         unnest($1::group_members[]) as m
                     )
-                    RETURNING group_id, user_id
+                    RETURNING *
                     """
 
             res = await conn.fetch(
@@ -207,4 +207,4 @@ class Groups:
                     for x in members
                 ],
             )
-            return [dict(r) for r in res]
+            return [GroupMember(**row) for row in res]

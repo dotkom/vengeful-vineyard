@@ -43,6 +43,10 @@ class PunishmentReactionId(UUID):
     pass
 
 
+class PermissionPrivilege(str):
+    pass
+
+
 class InsertOrUpdateUser(TypedDict):
     id: UserId
     action: str

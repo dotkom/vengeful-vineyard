@@ -133,6 +133,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 1383,
@@ -144,6 +145,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 2219,
@@ -155,6 +157,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": ["group.admin"],
             },
             {
                 "ow_user_id": 1705,
@@ -166,6 +169,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 1395,
@@ -177,6 +181,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 2581,
@@ -188,6 +193,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": ["group.owner"],
             },
             {
                 "ow_user_id": 2027,
@@ -199,6 +205,7 @@ ME_GROUPS_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
         ],
     }
@@ -245,6 +252,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 1381,
@@ -256,6 +264,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 1383,
@@ -267,6 +276,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 2027,
@@ -278,6 +288,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": "",
                 "active": False,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 2219,
@@ -289,6 +300,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
             {
                 "ow_user_id": 2581,
@@ -300,6 +312,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": ["group.owner"],
             },
             # Removed user here
             {
@@ -312,6 +325,7 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "user_id": "",
                 "active": True,
                 "punishments": [],
+                "permissions": [],
             },
         ],
     }
@@ -410,7 +424,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 
 @pytest_asyncio.fixture(scope="class")
 async def mock() -> AsyncGenerator[aioresponses, None]:
-    with aioresponses() as m:  # type: ignore
+    with aioresponses() as m:
         # Register endpoints to mock here
 
         # TestOW.test_get_my_groups_unauthenticated()

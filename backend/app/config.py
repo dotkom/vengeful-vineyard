@@ -8,6 +8,23 @@ from pathlib import Path
 
 from pydantic import BaseSettings
 
+ROLES = (
+    ("Group Owner", "group.owner"),
+    ("Group Admin", "group.admin"),
+    ("Group Moderator", "group.moderator"),
+)
+
+PERMISSIONS = (
+    # Roles
+    ("group.owner",),
+    ("group.admin", ("group.owner",)),
+    ("group.moderator", ("group.admin",)),
+    # Permissions
+    ("group.members.manage", ("group.admin",)),
+    ("group.punishments.add", ("group.moderator",)),
+    ("group.punishments.remove", ("group.moderator",)),
+)
+
 
 class Settings(BaseSettings):
     vengeful_database: str = ":memory:"

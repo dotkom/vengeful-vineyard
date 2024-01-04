@@ -81,6 +81,7 @@ export interface GroupUser extends User {
   ow_group_user_id: number
   punishments: Punishment[]
   active: boolean
+  permissions: string[]
 }
 
 export interface PunishmentStreaks {

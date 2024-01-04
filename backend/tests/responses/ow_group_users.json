@@ -51,7 +51,7 @@
             "username": "billysb"
         },
         "added": "2022-09-07T20:03:53.514264+02:00",
-        "roles": [],
+        "roles": [1064],
         "is_on_leave": false,
         "is_retired": false
     },
@@ -79,7 +79,7 @@
             "username": "bragebau"
         },
         "added": "2022-09-07T20:03:24.432403+02:00",
-        "roles": [],
+        "roles": [1063],
         "is_on_leave": false,
         "is_retired": false
     },
@@ -93,7 +93,7 @@
             "username": "carlofholy"
         },
         "added": "2020-08-31T19:51:04.777707+02:00",
-        "roles": [],
+        "roles": [1065],
         "is_on_leave": false,
         "is_retired": false
     }

@@ -140,8 +140,12 @@ class TestWithDB_OW:
         assert response.status_code == 200
         check_response_time(response)
 
-        assert suppress_defaults(response.json()) == suppress_defaults(
-            ME_GROUPS_RESPONSE[0]
+        def sort(x: Any) -> Any:
+            x["members"].sort(key=lambda x: x["ow_user_id"])
+            return x
+
+        assert sort(suppress_defaults(response.json())) == sort(
+            suppress_defaults(ME_GROUPS_RESPONSE[0])
         )
 
     @pytest.mark.asyncio
@@ -165,17 +169,12 @@ class TestWithDB_OW:
         assert response.status_code == 200
         check_response_time(response)
 
-        # response_data = response.json()
-        # response_data["members"] = sorted(
-        #     response_data["members"], key=lambda x: x["ow_user_id"]  # type: ignore
-        # )
-        # set_response = ME_GROUPS_UPDATED_RESPONSE
-        # set_response[c]["members"] = sorted(
-        #     set_response[c]["members"], key=lambda x: x["ow_user_id"]  # type: ignore
-        # )
-        # assert response_data == set_response[c]
-        assert suppress_defaults(response.json()) == suppress_defaults(
-            ME_GROUPS_UPDATED_RESPONSE[0]
+        def sort(x: Any) -> Any:
+            x["members"].sort(key=lambda x: x["ow_user_id"])
+            return x
+
+        assert sort(suppress_defaults(response.json())) == sort(
+            suppress_defaults(ME_GROUPS_UPDATED_RESPONSE[0])
         )
 
     @pytest.mark.asyncio
@@ -642,7 +641,14 @@ class TestWithDB_OW:
         assert response.status_code == 200
         check_response_time(response)
 
-        punishments = response.json()[3]["punishments"]
+        punishments = []
+        for group_user in response.json():
+            if group_user["user_id"] == OTHER_USER_ID:
+                punishments = group_user["punishments"]
+                break
+        else:
+            assert False
+
         assert len(punishments) == 2
         not_hidden_count = len([x for x in punishments if not x["reason_hidden"]])
         hidden_count = len([x for x in punishments if x["reason_hidden"]])
