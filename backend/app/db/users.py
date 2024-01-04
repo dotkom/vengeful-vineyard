@@ -26,6 +26,23 @@ class Users:
             assert isinstance(res, int)
             return res
 
+    async def get_leaderboard_count(
+        self,
+        conn: Optional[Pool] = None,
+    ) -> int:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            res = await conn.fetchval(
+                """SELECT COUNT(DISTINCT users.user_id)
+                FROM users
+                INNER JOIN group_members ON group_members.user_id = users.user_id
+                INNER JOIN groups ON groups.group_id = group_members.group_id
+                INNER JOIN group_punishments ON group_punishments.user_id = users.user_id
+                WHERE groups.ow_group_id IS NOT NULL;
+                """,
+            )
+            assert isinstance(res, int)
+            return res
+
     async def get_leaderboard(
         self,
         offset: int,
@@ -45,6 +62,9 @@ class Users:
                             ON pr.punishment_id = gp.punishment_id
                         LEFT JOIN users u
                             ON u.user_id = gp.created_by
+                        LEFT JOIN groups g
+                            ON g.group_id = gp.group_id
+                        WHERE g.ow_group_id IS NOT NULL
                         GROUP BY gp.punishment_id, created_by_name
                     )
                     SELECT u.*,
@@ -68,7 +88,10 @@ class Users:
                                     'punishment_type_id', pt.punishment_type_id,
                                     'name', pt.name,
                                     'value', pt.value,
-                                    'logo_url', pt.logo_url
+                                    'emoji', pt.emoji,
+                                    'created_at', pt.created_at,
+                                    'created_by', pt.created_by,
+                                    'updated_at', pt.updated_at
                                 ) FROM punishment_types pt WHERE pt.punishment_type_id = pwr.punishment_type_id)
                             )
                         ) FILTER (WHERE pwr.punishment_id IS NOT NULL), '[]') AS punishments,
@@ -78,6 +101,8 @@ class Users:
                         ON pwr.user_id = u.user_id
                     LEFT JOIN punishment_types pt
                         ON pt.punishment_type_id = pwr.punishment_type_id
+                    INNER JOIN groups g
+                        ON g.group_id = pwr.group_id AND g.ow_group_id IS NOT NULL
                     GROUP BY u.user_id
                     ORDER BY total_value DESC, u.first_name ASC
                     OFFSET $1

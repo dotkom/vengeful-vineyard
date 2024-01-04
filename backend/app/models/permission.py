@@ -24,3 +24,7 @@ class GroupMemberPermissionCreate(GroupMemberPermissionBase):
 class GroupMemberPermissionRead(GroupMemberPermissionBase):
     created_at: datetime
     updated_at: datetime
+
+
+class GroupMemberPermissionPatch(BaseModel):
+    privilege: PermissionPrivilege

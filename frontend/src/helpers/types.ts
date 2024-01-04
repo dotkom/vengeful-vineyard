@@ -61,19 +61,23 @@ export interface Punishment {
 export interface PunishmentType {
   name: string
   value: number
-  logo_url: string
+  emoji: string
   punishment_type_id: string
 }
 
-export interface Group {
+export interface GroupBase {
   name: string
   name_short: string
   rules: string
-  ow_group_id: number
   image: string
+  ow_group_id: number
   group_id: string
+}
+
+export interface Group extends GroupBase {
   punishment_types: PunishmentType[]
   members: GroupUser[]
+  join_requests: User[]
 }
 
 export interface GroupUser extends User {

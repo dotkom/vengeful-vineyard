@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Optional, Union
 from asyncpg import Pool
 
 from app.exceptions import NotFound
-from app.models.group_member import GroupMemberUpdate
+from app.models.group_member import GroupMember, GroupMemberUpdate
 from app.models.punishment import PunishmentStreaks
 from app.types import GroupId, UserId
 from app.utils.db import MaybeAcquire
@@ -52,6 +52,18 @@ class GroupMembers:
         )
         return PunishmentStreaks(**streaks)
 
+    async def get_all(
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool] = None,
+    ) -> list[GroupMember]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """SELECT * FROM group_members
+                    WHERE group_id = $1"""
+            res = await conn.fetch(query, group_id)
+
+        return [GroupMember(**dict(row)) for row in res]
+
     async def get_all_raw(
         self,
         group_id: GroupId,
@@ -96,6 +108,7 @@ class GroupMembers:
 
     async def update_multiple(
         self,
+        group_id: GroupId,
         members: list[GroupMemberUpdate],
         conn: Optional[Pool] = None,
     ) -> list[dict[str, Union[GroupId, UserId]]]:
@@ -112,7 +125,7 @@ class GroupMembers:
             res = await conn.fetch(
                 query,
                 [
-                    (x.group_id, x.user_id, x.ow_group_user_id, x.active, None)
+                    (group_id, x.user_id, x.ow_group_user_id, x.active, None)
                     for x in members
                 ],
             )

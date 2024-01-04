@@ -8,20 +8,23 @@ import { classNames } from "../../helpers/classNames"
 export interface ListboxOption<T = unknown> {
   value: T
   label: string
+  disabled?: boolean
 }
 
 interface ListboxProps<T = unknown> {
+  label?: string
   value: T
   onChange?: Dispatch<SetStateAction<T>>
   options: ListboxOption<T>[]
 }
 
-export const Listbox = <T,>({ value, onChange, options }: ListboxProps<T>) => {
+export const Listbox = <T,>({ label, value, onChange, options }: ListboxProps<T>) => {
   return (
     <HeadlessUiListbox value={value} onChange={onChange}>
       {({ open }) => (
         <>
-          <div className="relative">
+          <div className="relative flex flex-col gap-y-1">
+            {label && <span className="font-bold text-sm ml-1 text-gray-700">{label}</span>}
             <HeadlessUiListbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
               <span className="block truncate">{options.find((option) => option.value === value)?.label}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -36,14 +39,20 @@ export const Listbox = <T,>({ value, onChange, options }: ListboxProps<T>) => {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <HeadlessUiListbox.Options className="absolute z-20 mt-2 max-h-56 w-full overflow-auto rounded-md bg-white text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <HeadlessUiListbox.Options
+                className={classNames(
+                  "absolute z-20 max-h-56 w-full overflow-auto rounded-md bg-white text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm",
+                  label ? "mt-16" : "mt-10"
+                )}
+              >
                 {options.map((option) => (
                   <HeadlessUiListbox.Option
                     key={String(option.value)}
                     value={option.value}
-                    className={({ active }) =>
+                    disabled={option.disabled ?? false}
+                    className={({ active, disabled }) =>
                       classNames(
-                        active ? "bg-gray-900/5" : "text-gray-900",
+                        disabled ? "text-gray-500" : active ? "bg-gray-900/5" : "text-gray-900",
                         "relative cursor-default select-none py-2 pr-9"
                       )
                     }

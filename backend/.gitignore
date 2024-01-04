@@ -97,3 +97,5 @@ html
 htmlcov
 
 postgres-data
+.mypy_cache
+.pytest_cache

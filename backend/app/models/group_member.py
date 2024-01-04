@@ -12,13 +12,13 @@ from app.types import GroupId, OWGroupUserId, UserId
 
 
 class BaseGroupMember(BaseModel):
-    group_id: GroupId
     user_id: UserId
     ow_group_user_id: Optional[OWGroupUserId] = None
     active: bool = True
 
 
 class GroupMember(BaseGroupMember):
+    group_id: GroupId
     added_at: datetime.datetime
 
 

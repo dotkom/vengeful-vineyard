@@ -1,8 +1,7 @@
-import React, { useContext } from "react"
-
 import { PunishmentReaction } from "../../../../helpers/types"
+import React from "react"
 import { UseMutateFunction } from "@tanstack/react-query"
-import { UserContext } from "../../../../helpers/userContext"
+import { useCurrentUser } from "../../../../helpers/context/currentUserContext"
 
 interface ReactionsDisplayProps {
   reactions: PunishmentReaction[]
@@ -16,14 +15,14 @@ interface EmojiCounts {
 }
 
 export const ReactionsDisplay = ({ reactions, mutate, removeMutation, setSelectedEmoji }: ReactionsDisplayProps) => {
-  const { user } = useContext(UserContext)
+  const { currentUser } = useCurrentUser()
 
   const emojiCounts = reactions.reduce((acc: EmojiCounts, reaction) => {
     acc[reaction.emoji] = (acc[reaction.emoji] || 0) + 1
     return acc
   }, {})
 
-  const userReactionEmoji = reactions.find((r) => r.created_by === user.user_id)?.emoji
+  const userReactionEmoji = reactions.find((r) => r.created_by === currentUser.user_id)?.emoji
 
   return (
     <div className="flex space-x-2">

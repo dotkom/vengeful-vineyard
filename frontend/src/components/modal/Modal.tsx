@@ -1,7 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react"
-import React, { Fragment, forwardRef } from "react"
+import { ExclamationCircleIcon, SunIcon } from "@heroicons/react/24/outline"
+import React, { ForwardRefExoticComponent, Fragment, SVGProps, forwardRef } from "react"
 
-import { SunIcon } from "@radix-ui/react-icons"
+import { Button } from "../button"
+import ReactMarkdown from "react-markdown"
+import { classNames } from "../../helpers/classNames"
 
 interface ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -9,11 +12,21 @@ interface ModalProps {
   isLoading?: boolean
   primaryButtonLabel?: string
   includeCancelButton?: boolean
+  primaryButtonDisabled?: boolean
   cancelButtonLabel?: string
   title?: string
+  description?: string
+  type?: "REGULAR" | "ERROR" | "WARNING"
+  icon?: ForwardRefExoticComponent<
+    SVGProps<SVGSVGElement> & {
+      title?: string | undefined
+      titleId?: string | undefined
+    }
+  >
   children?: React.ReactNode
   primaryButtonAction?: () => boolean
   cancelButtonAction?: () => void
+  onClose?: () => void
 }
 
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(
@@ -21,18 +34,53 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     {
       setOpen,
       title,
+      description,
       children,
+      type = "REGULAR",
+      icon,
       includePrimaryButton = true,
-      primaryButtonLabel = "Gjør",
+      primaryButtonLabel = "Gjennomfør",
+      primaryButtonDisabled = false,
       includeCancelButton = true,
-      cancelButtonLabel = "Cancel",
+      cancelButtonLabel = "Lukk",
       primaryButtonAction,
       cancelButtonAction,
+      onClose,
     },
     ref
   ) => {
+    let Icon
+    let iconColorClass
+
+    switch (type) {
+      case "ERROR":
+        Icon = ExclamationCircleIcon
+        iconColorClass = "text-red-600 bg-red-100"
+        break
+      case "WARNING":
+        Icon = ExclamationCircleIcon
+        iconColorClass = "text-yellow-600 bg-yellow-100"
+        break
+      default:
+        Icon = SunIcon
+        iconColorClass = "text-blue-600 bg-blue-100"
+        break
+    }
+
+    if (icon) {
+      Icon = icon
+    }
+
     return (
-      <Dialog as="div" className="relative z-10" onClose={() => setOpen(false)} ref={ref}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={() => {
+          if (onClose) onClose()
+          setOpen(false)
+        }}
+        ref={ref}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-100"
@@ -46,7 +94,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-100"
@@ -56,27 +104,48 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                  <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                      <SunIcon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+              <Dialog.Panel className="relative transform bg-gray-50 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div className="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div className="flex items-start gap-x-2">
+                    <div
+                      className={classNames(
+                        "mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10",
+                        iconColorClass
+                      )}
+                    >
+                      <Icon className="h-6 w-6" aria-hidden="true" />
                     </div>
-                    <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <div className={`${description ? "" : "mt-3"} sm:ml-2 sm:mt-0 sm:text-left`}>
                       {title && (
                         <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
                           {title}
                         </Dialog.Title>
                       )}
-                      {children}
+                      {description && <ReactMarkdown className="text-sm text-gray-500">{description}</ReactMarkdown>}
                     </div>
                   </div>
+                  {children}
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <div className="w-full flex flex-row gap-x-1 items-center justify-end px-4 pb-4">
+                  {includeCancelButton && (
+                    <Button
+                      label={cancelButtonLabel}
+                      variant="OUTLINE"
+                      className="min-w-[4rem] flex justify-center items-center"
+                      onClick={() => {
+                        setOpen(false)
+
+                        if (cancelButtonAction) {
+                          cancelButtonAction()
+                        }
+                      }}
+                    />
+                  )}
                   {includePrimaryButton && (
-                    <button
-                      type="button"
-                      className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                    <Button
+                      label={primaryButtonLabel}
+                      disabled={primaryButtonDisabled}
+                      className="min-w-[4rem] flex justify-center items-center"
                       onClick={() => {
                         let result: boolean | undefined = true
                         if (primaryButtonAction) {
@@ -87,24 +156,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                           setOpen(false)
                         }
                       }}
-                    >
-                      {primaryButtonLabel}
-                    </button>
-                  )}
-                  {includeCancelButton && (
-                    <button
-                      type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                      onClick={() => {
-                        setOpen(false)
-
-                        if (cancelButtonAction) {
-                          cancelButtonAction()
-                        }
-                      }}
-                    >
-                      {cancelButtonLabel}
-                    </button>
+                    />
                   )}
                 </div>
               </Dialog.Panel>

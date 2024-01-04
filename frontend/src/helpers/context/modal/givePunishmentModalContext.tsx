@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState } from "react"
 
-import { GroupUser } from "./types"
+import { GroupUser } from "../../types"
 
 interface GivePunishmentModalContextProps {
   open: boolean

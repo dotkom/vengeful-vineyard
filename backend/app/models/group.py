@@ -16,19 +16,37 @@ from app.types import GroupId
 class GroupBase(BaseModel):
     name: str
     name_short: str
-    rules: str
-    ow_group_id: Optional[int]
-    image: str
 
 
-class Group(GroupBase):
-    group_id: GroupId
-    punishment_types: list[PunishmentTypeRead] = []
-    members: list[GroupUser] = []
+class GroupCreateMinified(GroupBase):
+    pass
 
 
 class GroupCreate(GroupBase):
-    pass
+    rules: str = ""
+    ow_group_id: Optional[int] = None
+    image: str = ""
+
+    @classmethod
+    def from_minified(cls, group: GroupCreateMinified) -> "GroupCreate":
+        return cls(
+            name=group.name,
+            name_short=group.name_short,
+            rules="",
+            ow_group_id=None,
+            image="",
+        )
+
+
+class GroupSearchResult(GroupCreateMinified):
+    group_id: GroupId
+
+
+class Group(GroupCreate):
+    group_id: GroupId
+    punishment_types: list[PunishmentTypeRead] = []
+    members: list[GroupUser] = []
+    join_requests: list[User] = []
 
 
 class UserWithGroups(User):

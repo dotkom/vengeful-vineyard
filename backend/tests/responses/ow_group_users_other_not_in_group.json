@@ -1,0 +1,16 @@
+[
+    {
+        "id": 6969,
+        "user": {
+            "id": 6666,
+            "first_name": "Felix",
+            "last_name": "",
+            "email": "email6666@email.com",
+            "username": "gerødbau"
+        },
+        "added": "2019-07-27T10:03:33.649888+02:00",
+        "roles": [1063],
+        "is_on_leave": false,
+        "is_retired": false
+    }
+]

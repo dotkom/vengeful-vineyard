@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from app.api.endpoints import group, punishment, user
-from app.config import PERMISSIONS, settings
+from app.config import OW_GROUP_PERMISSIONS, PERMISSIONS, settings
 from app.db.core import Database
 from app.http import HTTPClient
 from app.state import State
@@ -77,6 +77,12 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
         permission_manager = PermissionManager.from_raw_permissions(PERMISSIONS)
         permission_manager.inject_app(app)
         app.set_permission_manager(permission_manager)
+
+        ow_permission_manager = PermissionManager.from_raw_permissions(
+            OW_GROUP_PERMISSIONS
+        )
+        ow_permission_manager.inject_app(app)
+        app.set_ow_permission_manager(ow_permission_manager)
 
         await database.async_init(**db_settings)
         await http.async_init()

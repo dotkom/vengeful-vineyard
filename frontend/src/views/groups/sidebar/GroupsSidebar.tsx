@@ -4,6 +4,7 @@ import { MultipleToggle, ToggleOption } from "../../../components/toggle/Multipl
 
 import { CheckBadgeIcon } from "@heroicons/react/20/solid"
 import { Group } from "../../../helpers/types"
+import { GroupJoinRequestsContainer } from "./GroupJoinRequestsContainer"
 import { GroupSettings } from "./GroupSettings"
 import { Listbox } from "../../../components/listbox/Listbox"
 import { SidebarSection } from "./SidebarSection"
@@ -59,10 +60,13 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
                 </span>
               )}
             </h1>
-            <GroupSettings />
+            <div className="flex flex-row gap-x-3">
+              <GroupJoinRequestsContainer groupData={groupData} />
+              <GroupSettings groupData={groupData} />
+            </div>
           </>
         ) : (
-          <div className="bg-slate-300 rounded-xl pulse w-24 h-6"></div>
+          <div className="bg-slate-300 rounded-xl animate-pulse w-24 h-6"></div>
         )}
       </div>
 
@@ -71,7 +75,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
       <SidebarSection title="Søk">
         <TextInput
           placeholder="Søk etter en bruker"
-          changeHandler={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
           value={searchTerm}
         />
       </SidebarSection>

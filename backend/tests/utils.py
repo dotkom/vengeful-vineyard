@@ -37,9 +37,17 @@ def suppress_defaults(dictionary: DictOrList) -> Optional[DictOrList]:
             "created_by",
             "marked_paid_by",
             "event_id",
+            "created_at",
+            "updated_at",
         ),
     )
 
 
 def suppress_compare(input1: DictOrList, input2: DictOrList) -> None:
     assert suppress_defaults(input1) == suppress_defaults(input2)
+
+
+def find(lst: list[Any], func: Any) -> Any:
+    for item in lst:
+        if func(item):
+            return item

@@ -4,6 +4,7 @@ from asyncpg import Pool
 from pydantic.generics import GenericModel
 
 from app.api import Request
+from app.utils.db import MaybeAcquire
 
 T = TypeVar("T")
 
@@ -54,14 +55,14 @@ class Pagination(Generic[T]):
         replaced = self._url.replace_query_params(**query_params)
         return str(replaced)
 
-    async def paginate(self) -> Page[T]:
+    async def paginate(self, conn: Optional[Pool] = None) -> Page[T]:
         page = self._page
         page_size = self._page_size
 
         offset = page * page_size
         limit = page_size
 
-        async with self._request.app.db.pool.acquire() as conn:
+        async with MaybeAcquire(conn, self._request.app.db.pool) as conn:
             total = await self._total_coro(conn=conn)
             results = await self._results_coro(offset, limit, conn=conn)
 

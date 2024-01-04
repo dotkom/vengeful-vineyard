@@ -14,51 +14,14 @@ from app.models.punishment_reaction import (
 from app.types import PunishmentId
 
 router = APIRouter(
-    prefix="/punishment",
-    tags=["Punishment"],
+    prefix="/punishments",
+    tags=["Punishments"],
     route_class=APIRoute,
 )
 
 
-@router.delete(
-    "/{punishment_id}",
-    tags=["Punishment"],
-    dependencies=[Depends(oidc)],
-)
-async def delete_punishment(
-    request: Request,
-    punishment_id: PunishmentId,
-) -> None:
-    """
-    Endpoint to delete a punishment.
-    """
-    access_token = request.raise_if_missing_authorization()
-
-    app = request.app
-    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
-
-    async with app.db.pool.acquire() as conn:
-        try:
-            punishment = await app.db.punishments.get(punishment_id, conn=conn)
-        except NotFound as exc:
-            raise HTTPException(status_code=404, detail="Punishment not found") from exc
-
-        if punishment.user_id == user_id:
-            # Can't delete your own punishment if you didn't create it
-            if punishment.created_by != user_id:
-                raise HTTPException(
-                    status_code=403,
-                    detail="You cannot delete this punishment",
-                )
-
-        await app.db.punishments.delete(
-            punishment_id,
-            conn=conn,
-        )
-
-
 @router.post(
-    "/{punishment_id}/reaction",
+    "/{punishment_id}/reactions",
     tags=["Punishment"],
     dependencies=[Depends(oidc)],
 )
@@ -76,12 +39,14 @@ async def post_punishment_reaction(
         try:
             await app.db.punishments.get(punishment_id, conn=conn)
         except NotFound as exc:
-            raise HTTPException(status_code=404, detail="Punishment not found") from exc
+            raise HTTPException(
+                status_code=404, detail="Straffen ble ikke funnet"
+            ) from exc
 
         if not is_emoji(punishment_reaction.emoji):
             raise HTTPException(
                 status_code=400,
-                detail="Emoji is invalid.",
+                detail="Emojien er ugyldig",
             )
 
         try:
@@ -109,7 +74,7 @@ async def post_punishment_reaction(
 
 
 @router.delete(
-    "/{punishment_id}/reaction",
+    "/{punishment_id}/reactions",
     tags=["Punishment"],
     dependencies=[Depends(oidc)],
 )
@@ -129,7 +94,9 @@ async def delete_punishment_reaction(
         try:
             punishment = await app.db.punishments.get(punishment_id, conn=conn)
         except NotFound as exc:
-            raise HTTPException(status_code=404, detail="Punishment not found") from exc
+            raise HTTPException(
+                status_code=404, detail="Straffen ble ikke funnet"
+            ) from exc
 
         try:
             punishment_reaction = (
@@ -139,14 +106,14 @@ async def delete_punishment_reaction(
             )
         except NotFound as exc:
             raise HTTPException(
-                status_code=404, detail="Punishment reaction not found"
+                status_code=404, detail="Reaksjonen ble ikke funnet"
             ) from exc
 
         # Shouldn't ever get here anyways if above checks pass
         if punishment_reaction.created_by != user_id:
             raise HTTPException(
                 status_code=403,
-                detail="You cannot delete this punishment reaction",
+                detail="Du kan ikke slette andres reaksjoner",
             )
 
         await app.db.punishment_reactions.delete(

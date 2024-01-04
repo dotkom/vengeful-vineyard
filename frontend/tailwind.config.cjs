@@ -1,5 +1,5 @@
-const { mauve, violet } = require("@radix-ui/colors");
-const brand = {};
+const { mauve, violet } = require("@radix-ui/colors")
+const brand = {}
 
 const slate = {
   1: "#151718",
@@ -14,7 +14,7 @@ const slate = {
   10: "#787f85",
   11: "#9ba1a6",
   12: "#ecedee",
-};
+}
 
 const blue = {
   1: "#0f1720",
@@ -29,7 +29,7 @@ const blue = {
   10: "#369eff",
   11: "#52a9ff",
   12: "#eaf6ff",
-};
+}
 
 const amber = {
   1: "#1f1300",
@@ -44,7 +44,7 @@ const amber = {
   10: "#ffcb47",
   11: "#f1a10d",
   12: "#fef3dd",
-};
+}
 
 const green = {
   1: "#0d1912",
@@ -59,7 +59,7 @@ const green = {
   10: "#3cb179",
   11: "#4cc38a",
   12: "#e5fbeb",
-};
+}
 
 const red = {
   1: "#1d1412",
@@ -74,7 +74,7 @@ const red = {
   10: "#ec5e41",
   11: "#f16a50",
   12: "#feefec",
-};
+}
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -87,12 +87,12 @@ module.exports = {
       },
       keyframes: {
         slideDown: {
-          from: { height: 0 },
-          to: { height: "var(--radix-accordion-content-height)" },
+          from: { height: 0, overflow: "hidden" },
+          to: { height: "var(--radix-accordion-content-height)", overflow: "visible" },
         },
         slideUp: {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
+          from: { height: "var(--radix-accordion-content-height)", overflow: "visible" },
+          to: { height: 0, overflow: "hidden" },
         },
       },
       animation: {
@@ -102,4 +102,4 @@ module.exports = {
     },
   },
   plugins: [require("@tailwindcss/forms")],
-};
+}

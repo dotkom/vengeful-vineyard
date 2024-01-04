@@ -11,6 +11,7 @@ from app.config import settings
 from app.utils.db import MaybeAcquire
 
 from .group_events import GroupEvents
+from .group_join_requests import GroupJoinRequests
 from .group_members import GroupMembers
 from .group_users import GroupUsers
 from .groups import Groups
@@ -54,6 +55,7 @@ class Database:
         self.group_members = GroupMembers(self)
         self.group_users = GroupUsers(self)
         self.group_events = GroupEvents(self)
+        self.group_join_requests = GroupJoinRequests(self)
 
     async def get_migration_lock_version(self, conn: Optional[Pool]) -> int:
         assert conn is not None

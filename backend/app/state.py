@@ -17,7 +17,10 @@ class State:
         self.ow_user_ids_to_access_tokens[user_id] = access_token
 
         if to_remove is not None:
-            del self.access_tokens_to_ow_user_ids[to_remove]
+            try:
+                del self.access_tokens_to_ow_user_ids[to_remove]
+            except KeyError:
+                pass
 
     def get_ow_user_id_by_access_token(self, access_token: str) -> Optional[OWUserId]:
         return self.access_tokens_to_ow_user_ids.get(access_token)

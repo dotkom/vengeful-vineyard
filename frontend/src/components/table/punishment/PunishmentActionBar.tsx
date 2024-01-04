@@ -1,16 +1,18 @@
-import { Dispatch, Fragment, ReactNode, SetStateAction, useContext } from "react"
+import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { GroupUser, LeaderboardUser } from "../../../helpers/types"
 import { Menu, Switch, Transition } from "@headlessui/react"
 import axios, { AxiosResponse } from "axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { NotificationContext } from "../../../helpers/notificationContext"
 import { PunishmentActionBarListItem } from "./PunishmentActionBarListItem"
 import { classNames } from "../../../helpers/classNames"
-import { getPostAllPunishmentsPaidForUserUrl } from "../../../helpers/api"
-import { useGivePunishmentModal } from "../../../helpers/givePunishmentModalContext"
-import { useTogglePunishments } from "../../../helpers/togglePunishmentsContext"
+import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, useGroupLeaderboard } from "../../../helpers/api"
+import { useGivePunishmentModal } from "../../../helpers/context/modal/givePunishmentModalContext"
+import { useNotification } from "../../../helpers/context/notificationContext"
+import { useTogglePunishments } from "../../../helpers/context/togglePunishmentsContext"
+import { isAtLeastAsValuableRole } from "../../../helpers/permissions"
+import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 
 interface PunishmentActionBarProps {
   user: LeaderboardUser | GroupUser
@@ -30,8 +32,13 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
   let isToggled: boolean | undefined
   let setIsToggled: Dispatch<SetStateAction<boolean>> | undefined
 
-  const { setNotification } = useContext(NotificationContext)
+  const { setNotification } = useNotification()
   const queryClient = useQueryClient()
+  const { currentUser } = useCurrentUser()
+
+  const { data: groupData } = useGroupLeaderboard((user as GroupUser).group_id, undefined, {
+    enabled: isGroupContext,
+  })
 
   if (isGroupContext) {
     const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
@@ -56,51 +63,61 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["groupLeaderboard"] })
       setNotification({
-        // staleTIME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         show: true,
         type: "success",
         title: "Betalinger registert",
         text: `Alle straffer registrert som betalte`,
       })
     },
-    onError: () => {
+    onError: (e: VengefulApiError) => {
       setNotification({
-        show: true,
         type: "error",
-        title: "Noe gikk galt",
-        text: "Kunne ikke registrere betalingene",
+        title: "Kunne ikke registrere betalingene",
+        text: e.response.data.detail,
       })
     },
   })
 
   const listItems: ActionBarItem[] = []
   if (isGroupContext) {
-    listItems.push({
-      label: "Gi straff",
-      icon: <PlusIcon className="h-5 w-5" />,
-      onClick: () => {
-        setOpen(true)
-        setPreferredSelectedPerson(user as GroupUser)
-      },
-    })
-    listItems.push({
-      label: "Marker alle straffer som betalte",
-      icon: <PlusIcon className="h-5 w-5" />,
-      onClick: () => {
-        mutateMarkAllPunishmentsAsPaid()
-      },
-    })
+    const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)
+    if (currentGroupUser) {
+      const isOwGroup = currentGroupUser.ow_group_user_id !== null
+      const role = currentGroupUser.permissions.at(0) ?? ""
+      const isAtLeastModerator = isAtLeastAsValuableRole("group.moderator", role)
+
+      if (isOwGroup || isAtLeastModerator) {
+        listItems.push({
+          label: "Gi straff",
+          icon: <PlusIcon className="h-5 w-5" />,
+          onClick: () => {
+            setOpen(true)
+            setPreferredSelectedPerson(user as GroupUser)
+          },
+        })
+      }
+
+      if (isAtLeastModerator) {
+        listItems.push({
+          label: "Marker alle straffer som betalte",
+          icon: <PlusIcon className="h-5 w-5" />,
+          onClick: () => {
+            mutateMarkAllPunishmentsAsPaid()
+          },
+        })
+      }
+    }
   }
 
   return (
     <div
       className={classNames(
-        `w-full h-16 border-y flex flex-row items-center px-4 justify-between`,
+        `w-full h-16 border-t flex flex-row items-center px-4 justify-between`,
         !isGroupContext && !label && listItems.length === 0 ? "hidden" : ""
       )}
     >
       {isGroupContext && setIsToggled ? (
-        <div className="flex flex-row gap-x-2 items-end">
+        <div className="flex flex-row gap-x-2 items-center">
           <Switch
             checked={isToggled}
             onChange={setIsToggled}
@@ -115,7 +132,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
               } inline-block h-4 w-4 transform rounded-full bg-white transition`}
             />
           </Switch>
-          <span className="text-sm text-slate-600">Vis betalte straffer</span>
+          <span className="text-xs md:text-sm text-slate-600">Vis betalte straffer</span>
         </div>
       ) : (
         <span></span>

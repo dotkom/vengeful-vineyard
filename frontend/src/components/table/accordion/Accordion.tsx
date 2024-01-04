@@ -24,7 +24,7 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, React.Compon
       >
         {children}
         <ChevronDownIcon
-          className="text-violet10 ease-[cubic-bezier(0.87,_0,_0.13,_1)] transition-transform duration-300 group-data-[state=open]:rotate-180"
+          className="text-violet10 ease-[cubic-bezier(0.87,_0,_0.13,_1)] transition-transform duration-300 group-data-[state=open]:rotate-180 shrink-0"
           aria-hidden
         />
       </Accordion.Trigger>
@@ -36,7 +36,7 @@ export const AccordionContent = React.forwardRef<HTMLDivElement, React.Component
   ({ children, className, ...props }, forwardedRef) => (
     <Accordion.Content
       className={classNames(
-        "data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden text-[15px]",
+        "data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp text-[15px]",
         className ?? ""
       )}
       {...props}
