@@ -23,7 +23,7 @@ export const AlcoholInput = ({
   const randomId = Math.random().toString(36).substring(7)
 
   return (
-    <div>
+    <div className="-mt-0.5">
       {label && (
         <label htmlFor={randomId} className="font-bold text-sm ml-1 text-gray-700">
           {label}

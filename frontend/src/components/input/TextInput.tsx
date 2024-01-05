@@ -6,10 +6,11 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   value: string
   error?: string
   isLoading?: boolean
+  children?: React.ReactNode
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ label, value, error, disabled, isLoading = false, ...rest }, ref) => {
+  ({ label, value, error, disabled, isLoading = false, children, ...rest }, ref) => {
     const randomId = Math.random().toString(36).substring(7)
 
     return (
@@ -33,6 +34,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             value={value}
             {...rest}
           />
+          {children}
           {isLoading && (
             <div className="absolute right-2 top-0 h-full flex items-center">
               <svg

@@ -20,6 +20,15 @@ export function sortGroups(groups: Group[]) {
   })
 }
 
+export function sortGroupUsersByName(users: GroupUser[]) {
+  return users.sort((a, b) => {
+    if (a.first_name === b.first_name) {
+      return a.last_name.localeCompare(b.last_name)
+    }
+    return a.first_name.localeCompare(b.first_name)
+  })
+}
+
 export function getSortGroupUsersFunc(
   punishmentMap: Map<string, PunishmentType>,
   sortAlternative?: GroupMembersSortAlternative

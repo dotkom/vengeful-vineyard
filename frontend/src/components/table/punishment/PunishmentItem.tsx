@@ -152,7 +152,7 @@ export const PunishmentItem = ({
 
   const date = dayjs.utc(punishment.created_at).tz("Europe/Oslo")
 
-  const formattedDate = date.format("DD. MMM YY")
+  const formattedDate = date.format("DD. MMM HH:mm")
   const formattedLongerDate = date.format("DD. MMM YYYY HH:mm")
 
   const isWallOfShame = !isGroupContext

@@ -28,10 +28,13 @@ import { RequestToJoinGroupModal } from "./modal/RequestToJoinGroupModal"
 import { GroupsSidebar } from "./sidebar/GroupsSidebar"
 import { TabNav } from "./tabnav/TabNav"
 import { useGroupNavigation } from "../../helpers/context/groupNavigationContext"
+import { GivePunishmentModal } from "./modal/GivePunishmentModal"
+import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
 
 export const GroupsView = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
   const { setSelectedGroup } = useGroupNavigation()
+  const { open: givePunishmentModalOpen, setOpen: setGivePunishmentModalOpen } = useGivePunishmentModal()
   const { open: createGroupModalOpen, setOpen: setCreateGroupModalOpen } = useCreateGroupModal()
   const { open: requestToJoinGroupModalOpen, setOpen: setRequestToJoinGroupModalOpen } = useRequestToJoinGroupModal()
   const { open: editGroupModalOpen, setOpen: setEditGroupModalOpen } = useEditGroupModal()
@@ -117,6 +120,7 @@ export const GroupsView = () => {
 
   return (
     <>
+      <GivePunishmentModal open={givePunishmentModalOpen} setOpen={setGivePunishmentModalOpen} />
       <CreateGroupModal open={createGroupModalOpen} setOpen={setCreateGroupModalOpen} />
       <RequestToJoinGroupModal open={requestToJoinGroupModalOpen} setOpen={setRequestToJoinGroupModalOpen} />
       <EditGroupModal open={editGroupModalOpen} setOpen={setEditGroupModalOpen} />
@@ -152,7 +156,6 @@ export const GroupsView = () => {
                 selectedGroup={selectedGroup}
                 setSelectedGroup={(group: Group) => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
                 groups={user ? user.groups : undefined}
-                dataRefetch={refetch}
               />
               <Popover className="relative mb-1 mr-2 block md:hidden">
                 {({ open }) => (

@@ -1,27 +1,21 @@
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQueryClient } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 
-import { AdditionalGroupNavItem } from "./AdditionalGroupNavItem"
-import { GivePunishmentModal } from "../modal/GivePunishmentModal"
+import axios from "axios"
+import { useEffect } from "react"
+import { getGroupUrl } from "../../../helpers/api"
+import { classNames } from "../../../helpers/classNames"
 import { Group } from "../../../helpers/types"
+import { AdditionalGroupNavItem } from "./AdditionalGroupNavItem"
 import { SkeletonTabNavItem } from "./SkeletonTabNavItem"
 import { TabNavItem } from "./TabNavItem"
-import { classNames } from "../../../helpers/classNames"
-import { useEffect } from "react"
-import { useGivePunishmentModal } from "../../../helpers/context/modal/givePunishmentModalContext"
-import axios from "axios"
-import { getGroupUrl } from "../../../helpers/api"
 
 interface TabNavProps {
   selectedGroup: Group | undefined
   setSelectedGroup: (group: Group) => void
   groups?: Group[]
-  dataRefetch: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<Group, unknown>>
 }
 
-export const TabNav = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }: TabNavProps) => {
-  const { open, setOpen } = useGivePunishmentModal()
+export const TabNav = ({ selectedGroup, setSelectedGroup, groups }: TabNavProps) => {
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -42,10 +36,6 @@ export const TabNav = ({ selectedGroup, setSelectedGroup, groups, dataRefetch }:
 
   return (
     <>
-      {open && selectedGroup && (
-        <GivePunishmentModal open={open} setOpen={setOpen} selectedGroup={selectedGroup} dataRefetch={dataRefetch} />
-      )}
-
       <div className="mx-auto w-[86%] md:w-[90%]">
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex flex-row gap-x-6 items-center w-full">

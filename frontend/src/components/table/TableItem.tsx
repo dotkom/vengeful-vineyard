@@ -166,7 +166,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
               : textToEmoji(user.first_name + user.last_name)}
             {RoleIcon && (
               <div className="absolute -top-2 -right-0.5">
-                <RoleIcon className="h-5 w-5 text-gray-700" title={roleName} />
+                <RoleIcon className="h-4 w-4 md:h-5 md:w-5 text-gray-700" title={roleName} />
               </div>
             )}
           </span>

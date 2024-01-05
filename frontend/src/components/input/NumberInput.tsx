@@ -11,7 +11,7 @@ export const NumberInput = ({ label, value, suffix, error, ...props }: NumberInp
   const randomId = Math.random().toString(36).substring(7)
 
   return (
-    <div className="">
+    <div>
       <div className="relative flex flex-col gap-y-1">
         {label && (
           <label htmlFor={randomId} className="font-bold text-sm ml-1 text-gray-700">
