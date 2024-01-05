@@ -34,7 +34,8 @@ export const Layout = () => {
   if (auth.error) {
     if (
       auth.error.message === "No matching state found in storage" ||
-      auth.error.message.startsWith("The provided authorization grant or refresh token is invalid, expired")
+      auth.error.message.startsWith("The provided authorization grant or refresh token is invalid, expired") ||
+      auth.error.message === "invalid_grant"
     ) {
       auth.signinRedirect()
     }
@@ -42,9 +43,9 @@ export const Layout = () => {
     return (
       <main className="flex h-screen flex-col justify-between bg-gray-50">
         <Nav auth={auth} />
-        <div className="flex items-center justify-center">
-          <h1>Ai ai ai ai ai!!!</h1>
-          <pre>{auth.error.message}</pre>
+        <div className="flex flex-col items-center justify-center mt-16">
+          <h1>Ai ai ai ai ai!!! En feil oppsto.</h1>
+          <p>Melding: {auth.error.message}</p>
         </div>
         <Footer />
       </main>
