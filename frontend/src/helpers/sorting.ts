@@ -23,9 +23,6 @@ export function sortGroups(groups: Group[]) {
 export function sortGroupUsersByName(users: GroupUser[]) {
   return users.sort((a, b) => {
     if (a.first_name === b.first_name) {
-      if (a.last_name === b.last_name) {
-        return a.permissions.length - b.permissions.length
-      }
       return a.last_name.localeCompare(b.last_name)
     }
     return a.first_name.localeCompare(b.first_name)
@@ -64,7 +61,6 @@ export function getSortGroupUsersFunc(
       return b_value - a_value
     }
 
-    console.log(a.permissions);
     if (a.permissions.length !== b.permissions.length) {
       return b.permissions.length - a.permissions.length;
     }
