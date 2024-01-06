@@ -1,18 +1,26 @@
-import { Fragment, useContext } from "react"
+import { FC, Fragment } from "react"
 
 import { CheckCircleIcon } from "@heroicons/react/24/outline"
-import { NotificationContext } from "../../helpers/notificationContext"
 import { Transition } from "@headlessui/react"
 import { XMarkIcon } from "@heroicons/react/20/solid"
+import { classNames } from "../../helpers/classNames"
+import { useNotification } from "../../helpers/context/notificationContext"
 
-export const Notification = () => {
-  const { notification, setNotification } = useContext(NotificationContext)
+interface NotificationProps {
+  position?: "fixed" | "sticky"
+}
+
+export const Notification: FC<NotificationProps> = ({ position = "fixed" }) => {
+  const { notification, setNotification } = useNotification()
 
   return (
     <>
       <div
         aria-live="assertive"
-        className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
+        className={classNames(
+          "pointer-events-none inset-0 z-30 flex items-end px-4 py-6 sm:items-start sm:p-6",
+          position === "sticky" ? "sticky top-16 -mb-32 h-32 -translate-y-12" : "fixed"
+        )}
       >
         <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
           <Transition

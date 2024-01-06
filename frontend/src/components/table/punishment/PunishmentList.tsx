@@ -4,7 +4,7 @@ import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanst
 import { Fragment } from "react"
 import { PunishmentActionBar } from "./PunishmentActionBar"
 import { PunishmentItem } from "./PunishmentItem"
-import { useTogglePunishments } from "../../../helpers/togglePunishmentsContext"
+import { useTogglePunishments } from "../../../helpers/context/togglePunishmentsContext"
 
 interface PunishmentListProps {
   groupUser?: GroupUser | undefined
@@ -55,16 +55,18 @@ export const PunishmentList = ({
     <Fragment>
       <PunishmentActionBar isGroupContext={isGroupContext} user={user} />
 
-      {punishments.map((punishment) => (
-        <PunishmentItem
-          user={user}
-          punishment={punishment}
-          punishmentTypes={punishmentTypes}
-          isGroupContext={isGroupContext}
-          key={punishment.punishment_id}
-          dataRefetch={dataRefetch}
-        />
-      ))}
+      <ul className="border-t flex flex-col gap-y-px bg-gray-100">
+        {punishments.map((punishment) => (
+          <PunishmentItem
+            user={user}
+            punishment={punishment}
+            punishmentTypes={punishmentTypes}
+            isGroupContext={isGroupContext}
+            key={punishment.punishment_id}
+            dataRefetch={dataRefetch}
+          />
+        ))}
+      </ul>
     </Fragment>
   )
 }

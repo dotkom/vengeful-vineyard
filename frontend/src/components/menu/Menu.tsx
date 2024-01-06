@@ -26,7 +26,7 @@ export const Menu: FC<MenuProps> = ({ icon, items }) => {
       >
         <HeadlessUiMenu.Items className="absolute right-0 z-10 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none !overflow-visible">
           {items.map((item, i) => (
-            <MenuItem key={i} label={item.label} icon={item.icon} onClick={item.onClick} />
+            <MenuItem key={i} {...item} />
           ))}
         </HeadlessUiMenu.Items>
       </Transition>

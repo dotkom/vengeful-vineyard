@@ -1,49 +1,102 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
+import { LEADERBOARD_URL, useMyGroups } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
 import { Fragment } from "react"
-import { Link } from "react-router-dom"
+import { Leaderboard } from "../../helpers/types"
+import { Link, useLocation } from "react-router-dom"
 import { NavLink } from "./NavLink"
 import OnlineLogo from "../../assets/online.png"
+import axios from "axios"
 import { classNames } from "../../helpers/classNames"
+import { useQueryClient } from "@tanstack/react-query"
+
+interface NavItem {
+  label: string
+  url: string
+  isActivePredicate: (item: NavItem, currentPathname: string) => boolean
+  shouldShowPredicate?: (item: NavItem, currentPathname: string) => boolean
+  prefetch?: () => void
+}
 
 interface NavProps {
   auth: AuthContextProps
 }
 
-export const Nav = ({ auth }: NavProps) => (
-  <Disclosure as="nav" className="bg-white shadow">
-    {({ open }) => (
-      <>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 justify-between">
-            <div className="flex">
-              <div className="-ml-2 mr-2 flex items-center md:hidden">
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                  <span className="sr-only">Open main menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
+export const Nav = ({ auth }: NavProps) => {
+  const queryClient = useQueryClient()
+  const location = useLocation()
+
+  const { data: groups } = useMyGroups({
+    enabled: auth.isAuthenticated,
+  })
+  const isInAnyOWGroup = groups?.groups.some((group) => group.ow_group_id !== null) ?? false
+
+  const prefetchWallOfShame = () => {
+    queryClient.prefetchInfiniteQuery(
+      ["leaderboard"],
+      ({ pageParam = LEADERBOARD_URL }) => axios.get(pageParam).then((res) => res.data),
+      {
+        getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
+        staleTime: 1000 * 60 * 5,
+      }
+    )
+  }
+
+  const items: NavItem[] = [
+    {
+      label: "Hjem",
+      url: "/",
+      isActivePredicate: (_, currentLocation) => currentLocation.toLowerCase().startsWith("/komiteer/"),
+    },
+    {
+      label: "Wall of Shame",
+      url: "/wall-of-shame",
+      isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
+      shouldShowPredicate: () => isInAnyOWGroup,
+      prefetch: prefetchWallOfShame,
+    },
+  ]
+
+  return (
+    <Disclosure as="nav" className="bg-white shadow">
+      {({ open }) => (
+        <>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-row h-16 justify-between">
+              <div className="flex flex-row justify-between md:justify-start w-full">
+                <div className="-ml-2 mr-2 flex items-center md:hidden">
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    )}
+                  </Disclosure.Button>
+                </div>
+                <div className="flex flex-shrink-0 items-center">
+                  <Link to="/">
+                    <img className="h-8 w-auto cursor-pointer" src={OnlineLogo} alt="Online Logo" />
+                  </Link>
+                </div>
+                <div className="hidden md:ml-6 md:flex md:space-x-8">
+                  {items
+                    .filter((item) => !item.shouldShowPredicate || item.shouldShowPredicate(item, location.pathname))
+                    .map((item) => (
+                      <NavLink
+                        key={item.url}
+                        label={item.label}
+                        url={item.url}
+                        onMouseEnter={item.prefetch}
+                        onFocus={item.prefetch}
+                        isActive={item.isActivePredicate(item, location.pathname)}
+                      />
+                    ))}
+                </div>
               </div>
-              <div className="flex flex-shrink-0 items-center">
-                <Link to="/">
-                  <img className="block h-8 w-auto cursor-pointer lg:hidden" src={OnlineLogo} alt="Online Logo" />
-                </Link>
-                <Link to="/">
-                  <img className="hidden h-8 w-auto cursor-pointer lg:block" src={OnlineLogo} alt="Online Logo" />
-                </Link>
-              </div>
-              <div className="hidden md:ml-6 md:flex md:space-x-8">
-                <NavLink label="Hjem" url="/" />
-                <NavLink label="Wall of Shame" url="/wall-of-shame" />
-              </div>
-            </div>
-            <div className="flex items-center">
               <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
                 <Menu as="div" className="relative ml-3">
                   <div>
@@ -62,21 +115,6 @@ export const Nav = ({ auth }: NavProps) => (
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {/*
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            to="/profil"
-                            className={classNames(
-                              active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
-                            )}
-                          >
-                            Profil
-                          </Link>
-                        )}
-                      </Menu.Item>
-                      */}
                       <Menu.Item>
                         {({ active }) => (
                           <Fragment>
@@ -110,61 +148,40 @@ export const Nav = ({ auth }: NavProps) => (
               </div>
             </div>
           </div>
-        </div>
 
-        <Disclosure.Panel className="md:hidden">
-          <div className="space-y-1 pb-3 pt-2">
-            <Link to="/">
-              <Disclosure.Button
-                as="span"
-                className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700 sm:pl-5 sm:pr-6"
-              >
-                Hjem
-              </Disclosure.Button>
-            </Link>
-            <Link to="/wall-of-shame">
-              <Disclosure.Button
-                as="span"
-                className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 sm:pl-5 sm:pr-6"
-              >
-                Wall of Shame
-              </Disclosure.Button>
-            </Link>
-          </div>
-          <div className="border-t border-gray-200 pb-3 pt-4">
-            <div className="flex items-center px-4 sm:px-6">
-              <div className="flex-shrink-0">
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src="https://media.licdn.com/dms/image/D4E03AQGhozXJkpG0JA/profile-displayphoto-shrink_800_800/0/1664545360034?e=2147483647&v=beta&t=AERDN5WsH6qFhpnUjD7dovDOtsOYJ7mQ0g0aXijSFQw"
-                  alt=""
-                />
-              </div>
-              <div className="ml-3">
-                <div className="text-base font-medium text-gray-800">B-Rage</div>
-                <div className="text-sm font-medium text-gray-500">brage@online.ntnu.no</div>
-              </div>
+          <Disclosure.Panel className="md:hidden">
+            <div className="space-y-1 pt-2">
+              {items
+                .filter((item) => !item.shouldShowPredicate || item.shouldShowPredicate(item, location.pathname))
+                .map((item) => (
+                  <Link key={item.url} to={item.url}>
+                    <Disclosure.Button
+                      as="span"
+                      className={classNames(
+                        "block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 sm:pl-5 sm:pr-6",
+                        item.isActivePredicate(item, location.pathname) ? "border-indigo-500 text-indigo-700" : ""
+                      )}
+                    >
+                      {item.label}
+                    </Disclosure.Button>
+                  </Link>
+                ))}
             </div>
-            <div className="mt-3 space-y-1">
-              <Link to="/profil">
+            <div className="border-t border-gray-200">
+              <div className="space-y-1">
                 <Disclosure.Button
-                  as="span"
+                  as="a"
+                  href="#"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6"
+                  onClick={() => (auth.isAuthenticated ? auth.removeUser() : auth.signinRedirect())}
                 >
-                  Profil
+                  {auth.isAuthenticated ? "Logg ut" : "Logg inn"}
                 </Disclosure.Button>
-              </Link>
-              <Disclosure.Button
-                as="a"
-                href="#"
-                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6"
-              >
-                Logg ut
-              </Disclosure.Button>
+              </div>
             </div>
-          </div>
-        </Disclosure.Panel>
-      </>
-    )}
-  </Disclosure>
-)
+          </Disclosure.Panel>
+        </>
+      )}
+    </Disclosure>
+  )
+}

@@ -2,11 +2,7 @@ module.exports = {
   env: {
     browser: true,
   },
-  extends: [
-    "prettier",
-    "eslint:recommended",
-    "plugin:prettier/recommended",
-  ],
+  extends: ["prettier", "eslint:recommended", "plugin:prettier/recommended"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     sourceType: "module",
@@ -17,4 +13,8 @@ module.exports = {
     "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
   },
   ignorePatterns: ["**/dist/**/*", "**/node_modules/**/*"],
+  globals: {
+    JSX: true,
+    React: true,
+  },
 }

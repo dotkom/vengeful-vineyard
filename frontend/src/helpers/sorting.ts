@@ -5,7 +5,28 @@ export const groupMembersSortAlternatives = ["total_punishments", "total_value"]
 export type GroupMembersSortAlternative = (typeof groupMembersSortAlternatives)[number]
 
 export function sortGroups(groups: Group[]) {
-  return groups.sort((a, b) => a.name_short.localeCompare(b.name_short))
+  return groups.sort((a, b) => {
+    const aIsOwGroup = a.ow_group_id !== null
+    const bIsOwGroup = b.ow_group_id !== null
+
+    if (aIsOwGroup && !bIsOwGroup) {
+      return -1
+    }
+    if (!aIsOwGroup && bIsOwGroup) {
+      return 1
+    }
+
+    return a.name_short.localeCompare(b.name_short)
+  })
+}
+
+export function sortGroupUsersByName(users: GroupUser[]) {
+  return users.sort((a, b) => {
+    if (a.first_name === b.first_name) {
+      return a.last_name.localeCompare(b.last_name)
+    }
+    return a.first_name.localeCompare(b.first_name)
+  })
 }
 
 export function getSortGroupUsersFunc(

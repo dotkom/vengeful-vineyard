@@ -4,13 +4,16 @@ import networkx as nx
 from asyncpg import Pool
 from fastapi import HTTPException
 
-from app.exceptions import NotFound
 from app.types import GroupId, PermissionPrivilege, UserId
 
 if TYPE_CHECKING:
     from app.api import FastAPI
 
 StringAndOptionalIterable = Union[Sequence[str], tuple[str, Iterable[str]]]
+
+# don't mind these values
+NEVER = "88c35694-a18c-40ff-bdf7-3ec6e1c07cdf"
+ALWAYS = "71595420-8ebc-4cc9-8c48-20b1a9fc2e0b"
 
 
 class PermissionManager:
@@ -59,7 +62,9 @@ class PermissionManager:
         self, permission: str, user_permissions: Union[str, Iterable[str]]
     ) -> bool:
         if isinstance(user_permissions, str):
-            user_permissions = (user_permissions,)
+            user_permissions = (user_permissions, ALWAYS)
+        else:
+            user_permissions = (*user_permissions, ALWAYS)
 
         return any(
             self.permission_has_descendant(permission, user_permission)
@@ -72,18 +77,8 @@ class PermissionManager:
         user_id: UserId,
         privilege: Iterable[PermissionPrivilege],
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> bool:
-        if ow_group_is_always_allowed:
-            try:
-                group = await self.app.db.groups.get(group_id, conn=conn)
-            except NotFound:
-                pass
-            else:
-                if group.ow_group_id is not None:
-                    return True
-
         user_permissions = await self.app.db.permissions.get_permission_privileges(
             group_id,
             user_id,
@@ -101,14 +96,12 @@ class PermissionManager:
         user_id: UserId,
         privilege: PermissionPrivilege,
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> bool:
         return await self.has_permissions(
             group_id,
             user_id,
             (privilege,),
-            ow_group_is_always_allowed=ow_group_is_always_allowed,
             conn=conn,
         )
 
@@ -118,14 +111,12 @@ class PermissionManager:
         user_id: UserId,
         privilege: Iterable[PermissionPrivilege],
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> None:
         if not await self.has_permissions(
             group_id,
             user_id,
             privilege,
-            ow_group_is_always_allowed=ow_group_is_always_allowed,
             conn=conn,
         ):
             raise HTTPException(
@@ -139,13 +130,11 @@ class PermissionManager:
         user_id: UserId,
         privilege: PermissionPrivilege,
         *,
-        ow_group_is_always_allowed: bool = True,
         conn: Optional[Pool] = None,
     ) -> None:
         await self.raise_if_missing_permissions(
             group_id,
             user_id,
             (privilege,),
-            ow_group_is_always_allowed=ow_group_is_always_allowed,
             conn=conn,
         )

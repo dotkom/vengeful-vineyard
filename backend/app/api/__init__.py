@@ -38,6 +38,7 @@ class FastAPI(OriginalFastAPI):
     app_state: State
     ow_sync: OWSync
     permission_manager: PermissionManager
+    ow_permission_manager: PermissionManager
 
     def set_db(self, db: Database) -> None:
         self.db = db
@@ -53,6 +54,12 @@ class FastAPI(OriginalFastAPI):
 
     def set_permission_manager(self, permission_manager: PermissionManager) -> None:
         self.permission_manager = permission_manager
+
+    def set_ow_permission_manager(self, permission_manager: PermissionManager) -> None:
+        self.ow_permission_manager = permission_manager
+
+    def get_permission_manager(self, is_ow_group: bool = False) -> PermissionManager:
+        return self.ow_permission_manager if is_ow_group else self.permission_manager
 
 
 class Request(OriginalRequest):
@@ -117,7 +124,6 @@ def patched_get_swagger_ui_html(
         const [url, options] = args;
         if (options && options.headers) {
             if (options.headers instanceof Headers) {
-                console.log(options.headers)
                 options.headers.delete('X-Requested-With');
             } else {
                 delete options.headers['X-Requested-With'];

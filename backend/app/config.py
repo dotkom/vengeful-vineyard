@@ -8,11 +8,15 @@ from pathlib import Path
 
 from pydantic import BaseSettings
 
+from app.utils.permissions import ALWAYS, NEVER
+
 ROLES = (
     ("Group Owner", "group.owner"),
     ("Group Admin", "group.admin"),
     ("Group Moderator", "group.moderator"),
 )
+
+INDEXED_ROLES = {role: index for index, (_, role) in enumerate(ROLES)}
 
 PERMISSIONS = (
     # Roles
@@ -20,9 +24,48 @@ PERMISSIONS = (
     ("group.admin", ("group.owner",)),
     ("group.moderator", ("group.admin",)),
     # Permissions
+    ("group.ownership.transfer", ("group.owner",)),
+    ("group.delete", ("group.owner",)),
+    ("group.edit", ("group.admin",)),
+    ("group.punishment_types.add", ("group.edit",)),
+    ("group.punishment_types.delete", ("group.edit",)),
+    ("group.punishment_types.edit", ("group.edit",)),
     ("group.members.manage", ("group.admin",)),
+    ("group.members.add", ("group.members.manage",)),
+    ("group.members.remove", ("group.members.manage",)),
     ("group.punishments.add", ("group.moderator",)),
-    ("group.punishments.remove", ("group.moderator",)),
+    ("group.punishments.delete", ("group.moderator",)),
+    ("group.punishments.mark_paid", ("group.moderator",)),
+    ("group.punishments.mark_unpaid", ("group.moderator",)),
+    ("group.join_requests.view", ("group.admin",)),
+    ("group.join_requests.accept", ("group.admin",)),
+    ("group.join_requests.deny", ("group.admin",)),
+)
+
+# OW groups are managed automatically by the sync module. Also everyone should
+# have permission to give punishments.
+OW_GROUP_PERMISSIONS = (
+    # Roles
+    ("group.owner",),
+    ("group.admin", ("group.owner",)),
+    ("group.moderator", ("group.admin",)),
+    # Permissions
+    ("group.ownership.transfer", (NEVER,)),
+    ("group.delete", (NEVER,)),
+    ("group.edit", ("group.admin",)),
+    ("group.punishment_types.add", ("group.edit",)),
+    ("group.punishment_types.delete", ("group.edit",)),
+    ("group.punishment_types.edit", ("group.edit",)),
+    ("group.members.manage", (NEVER,)),
+    ("group.members.add", (NEVER,)),
+    ("group.members.remove", (NEVER,)),
+    ("group.punishments.add", (ALWAYS,)),
+    ("group.punishments.delete", ("group.moderator",)),
+    ("group.punishments.mark_paid", ("group.moderator",)),
+    ("group.punishments.mark_unpaid", ("group.moderator",)),
+    ("group.join_requests.view", (NEVER,)),
+    ("group.join_requests.accept", (NEVER,)),
+    ("group.join_requests.deny", (NEVER,)),
 )
 
 

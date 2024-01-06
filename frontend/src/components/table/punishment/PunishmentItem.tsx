@@ -1,19 +1,28 @@
-import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
+import axios, { AxiosResponse } from "axios"
 import {
+  VengefulApiError,
   addReaction,
   getPostPunishmentsPaidUrl,
   getPostPunishmentsUnpaidUrl,
   removeReaction,
+  useGroupLeaderboard,
 } from "../../../helpers/api"
-import axios, { AxiosResponse } from "axios"
-import { useContext, useState } from "react"
+import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../../helpers/types"
 
-import { BorderedButton } from "../../button"
-import { EmojiPicker } from "./emojies/EmojiPicker"
-import { NotificationContext } from "../../../helpers/notificationContext"
-import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 import dayjs from "dayjs"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
+import { useState } from "react"
+import { useNotification } from "../../../helpers/context/notificationContext"
+import { isAtLeastAsValuableRole } from "../../../helpers/permissions"
+import { Button } from "../../button"
+import { EmojiPicker } from "./emojies/EmojiPicker"
+import { ReactionsDisplay } from "./emojies/ReactionDisplay"
+import { classNames } from "../../../helpers/classNames"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 interface PunishmentItemProps {
   user: LeaderboardUser | GroupUser
@@ -26,13 +35,22 @@ interface PunishmentItemProps {
 }
 
 export const PunishmentItem = ({
+  user,
   punishment,
   punishmentTypes,
   isGroupContext = false,
   dataRefetch,
 }: PunishmentItemProps) => {
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
-  const { setNotification } = useContext(NotificationContext)
+  const { setNotification } = useNotification()
+
+  const { data: groupData } = useGroupLeaderboard((user as GroupUser).group_id, undefined, {
+    enabled: isGroupContext,
+  })
+
+  const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === user.user_id)
+  const currentGroupUserRole = currentGroupUser?.permissions.at(0) ?? ""
+  const currentGroupUserIsAtLeastModerator = isAtLeastAsValuableRole("group.moderator", currentGroupUserRole)
 
   let punishmentType = punishmentTypes.find((type) => type.punishment_type_id === punishment.punishment_type_id)
 
@@ -78,23 +96,21 @@ export const PunishmentItem = ({
 
   const { mutate: mutateAddReaction } = useMutation(addReactionCall, {
     onSuccess: () => dataRefetch(),
-    onError: () =>
+    onError: (e: VengefulApiError) =>
       setNotification({
-        show: true,
         type: "error",
-        title: "Noe gikk galt",
-        text: "Kunne ikke legge til reaction",
+        title: "Kunne ikke legge til reaction",
+        text: e.response.data.detail,
       }),
   })
 
   const { mutate: mutateRemoveReaction } = useMutation(removeReactionCall, {
     onSuccess: () => dataRefetch(),
-    onError: () =>
+    onError: (e: VengefulApiError) =>
       setNotification({
-        show: true,
         type: "error",
-        title: "Noe gikk galt",
-        text: "Kunne ikke fjerne reaction",
+        title: "Kunne ikke fjerne reaction",
+        text: e.response.data.detail,
       }),
   })
 
@@ -102,18 +118,16 @@ export const PunishmentItem = ({
     onSuccess: () => {
       dataRefetch()
       setNotification({
-        show: true,
         type: "success",
         title: "Betaling registrert",
         text: `Straff registrert betalt`,
       })
     },
-    onError: () => {
+    onError: (e: VengefulApiError) => {
       setNotification({
-        show: true,
         type: "error",
-        title: "Noe gikk galt",
-        text: "Kunne ikke registrere betaling",
+        title: "Kunne ikke registrere betaling",
+        text: e.response.data.detail,
       })
     },
   })
@@ -122,26 +136,26 @@ export const PunishmentItem = ({
     onSuccess: () => {
       dataRefetch()
       setNotification({
-        show: true,
         type: "success",
         title: "Betaling registrert",
         text: `Straff registrert ubetalt`,
       })
     },
-    onError: () => {
+    onError: (e: VengefulApiError) => {
       setNotification({
-        show: true,
         type: "error",
-        title: "Noe gikk galt",
-        text: "Kunne ikke registrere betaling",
+        title: "Kunne ikke registrere som ubetalt",
+        text: e.response.data.detail,
       })
     },
   })
 
-  const date = dayjs(punishment.created_at)
-  const formattedDate = date.format("DD. MMM YY")
+  const date = dayjs.utc(punishment.created_at).tz("Europe/Oslo")
 
-  const isWallOfShame = /wall-of-shame/.test(window.location.href)
+  const formattedDate = date.format("DD. MMM HH:mm")
+  const formattedLongerDate = date.format("DD. MMM YYYY HH:mm")
+
+  const isWallOfShame = !isGroupContext
 
   if (punishmentType === undefined) {
     return <p>Punishment type not found</p>
@@ -149,35 +163,45 @@ export const PunishmentItem = ({
 
   return (
     <div
-      className={`flex flex-col justify-between border-b border-l-8 md:border-l-4 px-4 pt-4 pb-4 min-h-[7rem] ${
-        !punishment.paid ? "border-l-indigo-600" : "border-l-slate-400"
-      }`}
+      className={classNames(
+        "flex flex-col justify-between border-l-4 md:border-l-[6px] px-4 pt-4 pb-4 min-h-[7rem] bg-white",
+        !punishment.paid ? "border-l-indigo-600" : "border-l-indigo-400"
+      )}
     >
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between gap-x-2">
         <div className="text-left font-light">
           <p>
-            <span className="block">
+            <span className="block text-sm md:text-base">
               {punishment.reason_hidden && isWallOfShame ? (
                 <span className="italic">*Årsak skjult*</span>
-              ) : (
+              ) : punishment.reason ? (
                 punishment.reason
+              ) : (
+                <span className="italic">Ingen årsak</span>
               )}
             </span>
-            <span className="block text-gray-500">- Gitt av {punishment.created_by_name}</span>
+            <span className="block text-gray-500 text-sm whitespace-nowrap md:text-base w-40 md:w-48 overflow-hidden text-ellipsis">
+              - Gitt av {punishment.created_by_name}
+            </span>
           </p>
         </div>
-        <div className="max-w-xs">
+        <div className="max-w-xs text-center">
           {Array.from({ length: punishment.amount }, (_, i) => (
             <span
               key={`${punishment.punishment_id}/${i}`}
-              className="text-xl"
+              className="md:text-xl"
               title={`${punishmentType?.name} (${punishmentType?.value}kr)`}
             >
-              {punishmentType?.logo_url}
+              {punishmentType?.emoji}
             </span>
           ))}
         </div>
-        <div className="text-gray-500 font-normal flex-end ml-auto">{formattedDate}</div>
+        <div
+          className="text-gray-500 font-normal flex-end ml-auto whitespace-nowrap text-sm md:text-base"
+          title={formattedLongerDate}
+        >
+          {formattedDate}
+        </div>
       </div>
       <div className="flex flex-row">
         <div className="flex flex-row gap-x-2 items-end">
@@ -189,28 +213,27 @@ export const PunishmentItem = ({
             reactions={punishment.reactions}
           />
         </div>
-        <div className="flex flex-row gap-x-4 ml-auto items-center text-slate-500">
-          {/* {isGroupContext && paidAmount && (
-            <span>{paidAmount}/{punishmentType.value}kr</span>
-          )} */}
-          {isGroupContext && !punishment.paid && (
-            <BorderedButton
-              label="Marker som betalt"
-              onClick={() => {
-                markPunishmentAsPaid()
-              }}
-            />
-          )}
-
-          {isGroupContext && punishment.paid && (
-            <BorderedButton
-              label="Marker som ubetalt"
-              onClick={() => {
-                markPunishmentAsUnpaid()
-              }}
-            />
-          )}
-        </div>
+        {isGroupContext && currentGroupUserIsAtLeastModerator && (
+          <div className="flex flex-row gap-x-4 ml-auto items-center text-slate-500">
+            {punishment.paid ? (
+              <Button
+                variant="OUTLINE"
+                label="Marker som ubetalt"
+                onClick={() => {
+                  markPunishmentAsUnpaid()
+                }}
+              />
+            ) : (
+              <Button
+                variant="OUTLINE"
+                label="Marker som betalt"
+                onClick={() => {
+                  markPunishmentAsPaid()
+                }}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

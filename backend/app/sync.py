@@ -145,8 +145,8 @@ class OWSync:
 
         try:
             await self.app.db.groups.insert_member(
+                group_id,
                 GroupMemberCreate(
-                    group_id=group_id,
                     user_id=user_id,
                     ow_group_user_id=user_data["id"],
                 ),
@@ -179,13 +179,14 @@ class OWSync:
             user_id = res[user_data["user"]["id"]]
             group_member_creates.append(
                 GroupMemberCreate(
-                    group_id=group_id,
                     user_id=user_id,
                     ow_group_user_id=user_data["id"],
                 )
             )
 
-        return await self.app.db.groups.insert_members(group_member_creates, conn=conn)
+        return await self.app.db.groups.insert_members(
+            group_id, group_member_creates, conn=conn
+        )
 
     def map_roles(self, roles: list[int]) -> list[PermissionPrivilege]:
         _roles = []
@@ -331,6 +332,7 @@ class OWSync:
         async with self.app.db.pool.acquire() as conn:
             group_res = await self.app.db.groups.insert_or_update(
                 group_create,
+                created_by=None,
                 conn=conn,
             )
             group_id = group_res["id"]
@@ -421,7 +423,6 @@ class OWSync:
                 ):  # They are opposite, so update if they match
                     group_members_to_update.append(
                         GroupMemberUpdate(
-                            group_id=group_id,
                             user_id=db_user["user_id"],
                             ow_group_user_id=group_user_data["id"],
                             active=not group_user_data["is_retired"],
@@ -436,6 +437,7 @@ class OWSync:
 
             if group_members_to_update:
                 await self.app.db.group_members.update_multiple(
+                    group_id,
                     group_members_to_update,
                     conn=conn,
                 )

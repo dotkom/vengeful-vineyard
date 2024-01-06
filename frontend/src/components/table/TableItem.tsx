@@ -1,10 +1,14 @@
-import { AccordionContent, AccordionItem, AccordionTrigger } from "./accordion/Accordion"
-import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../helpers/types"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
+import { FaCrown } from "react-icons/fa6"
+import { GiRoundStar } from "react-icons/gi"
+import { IoShield } from "react-icons/io5"
+import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../helpers/types"
+import { AccordionContent, AccordionItem, AccordionTrigger } from "./accordion/Accordion"
 
-import { PunishmentList } from "./punishment/PunishmentList"
-import { ReactNode } from "react"
+import { IconType } from "react-icons"
 import { textToEmoji } from "../../helpers/emojies"
+import { PERMISSION_GROUPS } from "../../helpers/permissions"
+import { PunishmentList } from "./punishment/PunishmentList"
 
 interface TableItemProps {
   groupUser?: GroupUser | undefined
@@ -24,7 +28,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
 
   const isGroupContext = groupUser !== undefined
 
-  const totalPunishment: ReactNode[] = []
+  const totalPunishments: { punishment: Punishment; punishmentType: PunishmentType }[] = []
   const punishmentTypeMap = new Map<string, PunishmentType>()
 
   punishmentTypes.forEach((type) => {
@@ -47,31 +51,30 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
       unpaidPunishments.push(punishment)
     }
 
-    let name: string
-    let value: number
-    let logoUrl: string
+    let fixedPunishmentType: PunishmentType
 
     if (isGroupContext) {
       const punishmentType = punishmentTypeMap.get(punishment.punishment_type_id)
 
-      name = punishmentType?.name ?? "N/A"
-      value = punishmentType?.value ?? 0
-      logoUrl = punishmentType?.logo_url ?? "?"
+      fixedPunishmentType = {
+        punishment_type_id: punishmentType?.punishment_type_id ?? "N/A",
+        name: punishmentType?.name ?? "N/A",
+        value: punishmentType?.value ?? 0,
+        emoji: punishmentType?.emoji ?? "?",
+      }
     } else {
       const innerPunishment = punishment as LeaderboardPunishment
-      name = innerPunishment.punishment_type.name
-      value = innerPunishment.punishment_type.value
-      logoUrl = innerPunishment.punishment_type.logo_url
+
+      fixedPunishmentType = {
+        punishment_type_id: innerPunishment.punishment_type.punishment_type_id,
+        name: innerPunishment.punishment_type.name,
+        value: innerPunishment.punishment_type.value,
+        emoji: innerPunishment.punishment_type.emoji,
+      }
     }
 
     if (!punishment.paid) {
-      for (let j = 0; j < punishment.amount; j++) {
-        totalPunishment.push(
-          <span key={`${punishment.punishment_id}/${i}/${j}`} className="text-lg" title={`${name} (${value}kr)`}>
-            <span>{logoUrl}</span>
-          </span>
-        )
-      }
+      totalPunishments.push({ punishment, punishmentType: fixedPunishmentType })
     }
   }
 
@@ -109,11 +112,48 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
   const today = new Date().getTime()
   const streak = weeklyStreak(today, dateToNumber)
 
+  let RoleIcon: IconType | undefined
+  if (isGroupContext) {
+    switch (groupUser?.permissions.at(0) ?? "") {
+      case "group.owner":
+        RoleIcon = FaCrown
+        break
+      case "group.admin":
+        RoleIcon = IoShield
+        break
+      case "group.moderator":
+        RoleIcon = GiRoundStar
+        break
+      default:
+        RoleIcon = undefined
+    }
+  }
+
+  let roleName: string | undefined
+  if (RoleIcon) {
+    roleName = PERMISSION_GROUPS.find((group) => group.value === groupUser?.permissions.at(0))?.label
+  }
+
+  const getPunishmentTypeAmounts = () =>
+    totalPunishments.reduce((acc, { punishment, punishmentType }) => {
+      const punishmentTypeId = punishmentType.punishment_type_id
+      if (acc.has(punishmentTypeId)) {
+        acc.set(punishmentTypeId, {
+          amount: (acc.get(punishmentTypeId)?.amount ?? 0) + punishment.amount,
+          punishmentType,
+        })
+      } else {
+        acc.set(punishmentTypeId, { amount: punishment.amount, punishmentType })
+      }
+
+      return acc
+    }, new Map<string, { punishmentType: PunishmentType; amount: number }>())
+
   return (
     <AccordionItem value={user.user_id.toString()}>
-      <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 hover:bg-gray-50">
+      <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 rounded-lg md:rounded-xl hover:bg-gray-50">
         <div className="flex items-center gap-x-2">
-          <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 text-lg md:text-3xl text-[#4C4C51]">
+          <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 text-lg md:text-3xl text-[#4C4C51] relative">
             {/* Displays the ith placement on the leaderboard if i is defined, otherwise displays an emoji */}
             {i !== undefined
               ? i + 1 === 1
@@ -124,17 +164,48 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
                 ? "🥉"
                 : i + 1
               : textToEmoji(user.first_name + user.last_name)}
+            {RoleIcon && (
+              <div className="absolute -top-2 -right-0.5">
+                <RoleIcon className="h-4 w-4 md:h-5 md:w-5 text-gray-700" title={roleName} />
+              </div>
+            )}
           </span>
           <p
-            className="w-48 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900"
+            className="w-32 md:w-44 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900"
             title={`${user.first_name} ${user.last_name}`}
           >
             {user.first_name} {user.last_name}
           </p>
         </div>
         <div className="flex items-center gap-x-4">
-          <div className="hidden sm:flex sm:flex-col sm:items-end">
-            <p className="max-w-sm text-right">{totalPunishment.map((punishment) => punishment)}</p>
+          <div className="flex flex-col items-end">
+            <p className="max-w-sm text-right hidden sm:block">
+              {totalPunishments.map(({ punishment, punishmentType }) =>
+                Array.from({ length: punishment.amount }, (_, i) => (
+                  <span
+                    key={`${punishment.punishment_id}/${i}`}
+                    className="text-lg"
+                    title={`${punishmentType.name} (${punishmentType.value}kr)`}
+                  >
+                    <span>{punishmentType.emoji}</span>
+                  </span>
+                ))
+              )}
+            </p>
+            <p className="max-w-sm text-center sm:hidden">
+              {Array.from(getPunishmentTypeAmounts())
+                .sort(([_, { punishmentType: a }], [__, { punishmentType: b }]) => b.value - a.value)
+                .map(([_, { amount, punishmentType }]) => (
+                  <span
+                    key={`${punishmentType.punishment_type_id}/${i}`}
+                    className="whitespace-nowrap"
+                    title={`${punishmentType.name} (${punishmentType.value}kr)`}
+                  >
+                    <span className="text-xs text-gray-800">{amount}x</span>
+                    <span className="text-lg">{punishmentType.emoji}</span>
+                  </span>
+                ))}
+            </p>
           </div>
         </div>
         {streak > 2 && (
@@ -148,7 +219,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
           </div>
         )}
       </AccordionTrigger>
-      <AccordionContent className="overflow-visible">
+      <AccordionContent>
         <PunishmentList
           groupUser={groupUser}
           leaderboardUser={leaderboardUser}

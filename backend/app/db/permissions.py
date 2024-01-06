@@ -58,6 +58,27 @@ class Permissions:
 
         return [row["privilege"] for row in res]
 
+    async def get_permission_privileges_for_multiple(
+        self,
+        group_id: GroupId,
+        user_ids: Iterable[UserId],
+        conn: Optional[Pool] = None,
+    ) -> dict[UserId, list[PermissionPrivilege]]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """
+                    SELECT
+                        gm.user_id,
+                        COALESCE(json_agg(gmp.privilege) FILTER (WHERE gmp.privilege IS NOT NULL), '[]') AS privileges
+                    FROM group_members gm
+                    LEFT JOIN group_member_permissions gmp
+                        ON gm.group_id = gmp.group_id AND gm.user_id = gmp.user_id
+                    WHERE gm.group_id = $1 AND gm.user_id = Any($2)
+                    GROUP BY gm.user_id
+                    """
+            res = await conn.fetch(query, group_id, user_ids)
+
+        return {row["user_id"]: row["privileges"] for row in res}
+
     async def has_permissions(
         self,
         group_id: GroupId,
@@ -101,6 +122,31 @@ class Permissions:
 
             await conn.executemany(query, data)
 
+    async def insert_permissions(
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        privileges: list[PermissionPrivilege],
+        created_by: Optional[UserId] = None,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        await self.insert_permissions_for_multiple_users(
+            group_id,
+            [(user_id, privilege) for privilege in privileges],
+            created_by,
+            conn,
+        )
+
+    async def insert_permission(
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        privilege: PermissionPrivilege,
+        created_by: Optional[UserId] = None,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        await self.insert_permissions(group_id, user_id, [privilege], created_by, conn)
+
     async def remove_permissions_for_multiple_users(
         self,
         group_id: GroupId,
@@ -118,30 +164,42 @@ class Permissions:
 
             await conn.executemany(query, data)
 
-    async def insert_permissions(
+    async def remove_permissions(
         self,
         group_id: GroupId,
         user_id: UserId,
         privileges: list[PermissionPrivilege],
-        created_by: Optional[UserId] = None,
         conn: Optional[Pool] = None,
     ) -> None:
-        async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """INSERT INTO group_member_permissions(group_id, user_id, privilege, created_by)
-                    VALUES ($1, $2, $3, $4)"""
+        await self.remove_permissions_for_multiple_users(
+            group_id, [(user_id, privilege) for privilege in privileges], conn
+        )
 
-            data = [
-                (group_id, user_id, privilege, created_by) for privilege in privileges
-            ]
-
-            await conn.executemany(query, data)
-
-    async def insert_permission(
+    async def remove_permission(
         self,
         group_id: GroupId,
         user_id: UserId,
         privilege: PermissionPrivilege,
-        created_by: Optional[UserId] = None,
         conn: Optional[Pool] = None,
     ) -> None:
-        await self.insert_permissions(group_id, user_id, [privilege], created_by, conn)
+        await self.remove_permissions(group_id, user_id, [privilege], conn)
+
+    async def remove_all_permissions_for_multiple_users(
+        self,
+        group_id: GroupId,
+        user_ids: Iterable[UserId],
+        conn: Optional[Pool] = None,
+    ) -> None:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """DELETE FROM group_member_permissions
+                    WHERE group_id = $1 AND user_id = Any($2)"""
+
+            await conn.execute(query, group_id, user_ids)
+
+    async def remove_all_permissions(
+        self,
+        group_id: GroupId,
+        user_id: UserId,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        await self.remove_all_permissions_for_multiple_users(group_id, [user_id], conn)

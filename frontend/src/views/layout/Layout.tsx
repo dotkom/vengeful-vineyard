@@ -1,26 +1,16 @@
-import { NotificationContext, NotificationType } from "../../helpers/notificationContext"
-
+import axios from "axios"
+import { useAuth } from "react-oidc-context"
+import { Outlet } from "react-router-dom"
 import { Footer } from "../../components/footer"
 import { Nav } from "../../components/nav"
 import { Notification } from "../../components/notification"
-import { Outlet } from "react-router-dom"
 import { Spinner } from "../../components/spinner"
-import { UserContext } from "../../helpers/userContext"
-import axios from "axios"
-import { useAuth } from "react-oidc-context"
-import { useState } from "react"
+import { CurrentUserProvider } from "../../helpers/context/currentUserContext"
+import { ConfirmModalProvider } from "../../helpers/context/modal/confirmModalContext"
+import { NotificationProvider } from "../../helpers/context/notificationContext"
 
 export const Layout = () => {
   const auth = useAuth()
-  const [notification, setNotification] = useState<NotificationType>({
-    show: false,
-    title: "",
-    text: "",
-    type: "success",
-  })
-  const [user, setUser] = useState({
-    user_id: "",
-  })
 
   switch (auth.activeNavigator) {
     case "signinSilent":
@@ -31,9 +21,9 @@ export const Layout = () => {
 
   if (auth.isLoading) {
     return (
-      <main className="flex h-screen flex-col justify-between bg-gray-50">
+      <main className="flex h-screen flex-col bg-gray-50">
         <Nav auth={auth} />
-        <div className="flex items-center justify-center">
+        <div className="flex justify-center mt-16">
           <Spinner />
         </div>
         <Footer />
@@ -42,12 +32,20 @@ export const Layout = () => {
   }
 
   if (auth.error) {
+    if (
+      auth.error.message === "No matching state found in storage" ||
+      auth.error.message.startsWith("The provided authorization grant or refresh token is invalid, expired") ||
+      auth.error.message === "invalid_grant"
+    ) {
+      auth.signinRedirect()
+    }
+
     return (
       <main className="flex h-screen flex-col justify-between bg-gray-50">
         <Nav auth={auth} />
-        <div className="flex items-center justify-center">
-          <h1>Ai ai ai ai ai!!!</h1>
-          <pre>{auth.error.message}</pre>
+        <div className="flex flex-col items-center justify-center mt-16">
+          <h1>Ai ai ai ai ai!!! En feil oppsto.</h1>
+          <p>Melding: {auth.error.message}</p>
         </div>
         <Footer />
       </main>
@@ -60,16 +58,18 @@ export const Layout = () => {
 
   return (
     <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50">
-      <UserContext.Provider value={{ user, setUserContext: setUser }}>
-        <NotificationContext.Provider value={{ notification, setNotification }}>
-          <Nav auth={auth} />
-          <div className="mb-auto">
-            <Outlet />
-          </div>
-          <Footer />
-          <Notification />
-        </NotificationContext.Provider>
-      </UserContext.Provider>
+      <CurrentUserProvider>
+        <ConfirmModalProvider>
+          <NotificationProvider>
+            <Nav auth={auth} />
+            <div className="mb-auto">
+              <Outlet />
+            </div>
+            <Footer />
+            <Notification />
+          </NotificationProvider>
+        </ConfirmModalProvider>
+      </CurrentUserProvider>
     </main>
   )
 }

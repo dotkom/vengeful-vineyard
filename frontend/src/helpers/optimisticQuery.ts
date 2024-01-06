@@ -1,4 +1,4 @@
-import { QueryKey, useQuery, UseQueryOptions, UseQueryResult } from "@tanstack/react-query"
+import { QueryKey, UseQueryOptions, UseQueryResult, useQuery } from "@tanstack/react-query"
 
 type QueryFn<T> = (key: QueryKey, optimistic: boolean) => Promise<T>
 type OptimisticQueryResult<T> = Omit<UseQueryResult<T, unknown>, "data"> & { data: T | undefined }

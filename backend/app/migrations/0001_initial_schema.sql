@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS groups (
 	group_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
 	ow_group_id INTEGER UNIQUE,
-	name TEXT NOT NULL UNIQUE,
+	name TEXT NOT NULL,
 	name_short TEXT NOT NULL,
 	rules TEXT NOT NULL,
 	image TEXT NOT NULL
@@ -31,7 +31,10 @@ CREATE TABLE IF NOT EXISTS punishment_types (
 	group_id uuid NOT NULL references groups(group_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	name TEXT NOT NULL,
 	value INTEGER NOT NULL,
-	logo_url TEXT NOT NULL,
+	emoji TEXT NOT NULL,
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
+	created_by uuid references users(user_id) ON DELETE SET null ON UPDATE CASCADE,
+	updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
 	UNIQUE (group_id, name)
 );
 
@@ -43,11 +46,11 @@ CREATE TABLE IF NOT EXISTS group_punishments (
 	reason TEXT NOT NULL,
 	reason_hidden BOOLEAN DEFAULT false,
 	amount INTEGER NOT NULL,
-	created_by uuid references users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
+	created_by uuid references users(user_id) ON DELETE SET null ON UPDATE CASCADE,
 	paid BOOLEAN DEFAULT false,
 	paid_at TIMESTAMP WITHOUT TIME ZONE,
-	marked_paid_by uuid references users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+	marked_paid_by uuid references users(user_id) ON DELETE SET null ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS group_events (
@@ -57,7 +60,7 @@ CREATE TABLE IF NOT EXISTS group_events (
 	description TEXT NOT NULL,
 	start_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	end_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	created_by uuid NOT NULL references users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	created_by uuid NOT NULL references users(user_id) ON DELETE SET null ON UPDATE CASCADE,
 	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
 );
 
@@ -65,7 +68,7 @@ CREATE TABLE IF NOT EXISTS punishment_reactions (
 	punishment_reaction_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
 	punishment_id uuid NOT NULL references group_punishments(punishment_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	emoji TEXT NOT NULL,
-	created_by uuid NOT NULL references users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	created_by uuid NOT NULL references users(user_id) ON DELETE SET null ON UPDATE CASCADE,
 	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL
 );
 
@@ -79,4 +82,12 @@ CREATE TABLE IF NOT EXISTS group_member_permissions (
 	PRIMARY KEY (group_id, user_id, privilege)
 );
 
+CREATE TABLE IF NOT EXISTS group_join_requests (
+	group_id uuid NOT NULL references groups(group_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	user_id uuid NOT NULL references users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL,
+	PRIMARY KEY (group_id, user_id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS groups_name_idx ON groups (LOWER(name));
 CREATE UNIQUE INDEX IF NOT EXISTS groups_short_name_idx ON groups (LOWER(name_short));

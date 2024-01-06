@@ -22,6 +22,7 @@ interface TableProps {
 export const Table = ({
   groupData,
   leaderboardUsers,
+  isLoading = false,
   searchTerm,
   punishmentTypesToShow,
   sortingAlternative,
@@ -44,51 +45,39 @@ export const Table = ({
     })
   }
 
+  const hasAnyRows = (groupData?.members.length ?? 0) !== 0 || (leaderboardUsers?.length ?? 0) !== 0
+
   return (
     <ul role="list">
       <Accordion.Root
         type="single"
         defaultValue="item-1"
         collapsible
-        className="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg md:rounded-xl"
+        className="divide-y divide-gray-100 bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg md:rounded-xl"
       >
-        {groupData ? (
-          <>
-            {groupData.members
-              .filter(filterUsers)
-              .sort(getSortGroupUsersFunc(punishmentTypesMap, sortingAlternative))
-              .map((user) => (
-                <TableItem
-                  key={user.user_id}
-                  groupUser={user}
-                  punishmentTypes={Array.from(punishmentTypesMap.values())}
-                  dataRefetch={dataRefetch}
-                />
-              ))}
-          </>
-        ) : (
-          <>
-            {leaderboardUsers ? (
-              <>
-                {leaderboardUsers.map((user, i) => (
-                  <TableItem
-                    key={user.user_id}
-                    punishmentTypes={[]}
-                    leaderboardUser={user}
-                    dataRefetch={dataRefetch}
-                    i={i}
-                  />
-                ))}
-              </>
-            ) : (
-              <>
-                {[...Array(3)].map((e, i) => (
-                  <SkeletonTableItem key={i} />
-                ))}
-              </>
-            )}
-          </>
+        {groupData?.members
+          .filter(filterUsers)
+          .sort(getSortGroupUsersFunc(punishmentTypesMap, sortingAlternative))
+          .map((user) => (
+            <TableItem
+              key={user.user_id}
+              groupUser={user}
+              punishmentTypes={Array.from(punishmentTypesMap.values())}
+              dataRefetch={dataRefetch}
+            />
+          ))}
+
+        {leaderboardUsers?.map((user, i) => (
+          <TableItem key={user.user_id} punishmentTypes={[]} leaderboardUser={user} dataRefetch={dataRefetch} i={i} />
+        ))}
+
+        {!hasAnyRows && !isLoading && (
+          <div className="flex flex-col items-center justify-center p-4">
+            <p className="text-gray-800">Ingen resultat</p>
+          </div>
         )}
+
+        {isLoading && [...Array(3)].map((e, i) => <SkeletonTableItem key={i} />)}
       </Accordion.Root>
     </ul>
   )

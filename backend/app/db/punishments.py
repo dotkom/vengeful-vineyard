@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional
 
 from asyncpg import Pool
 
-from app.exceptions import NotFound, PunishmentTypeNotExists
+from app.exceptions import NotFound
 from app.models.punishment import PunishmentCreate, PunishmentRead
 from app.models.punishment_reaction import PunishmentReactionRead
 from app.types import GroupId, PunishmentId, UserId
@@ -72,17 +72,6 @@ class Punishments:
         conn: Optional[Pool] = None,
     ) -> dict[str, list[PunishmentId]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT 1 FROM punishment_types
-                WHERE group_id = $1 AND punishment_type_id = ANY($2)
-                """
-            res = await conn.fetch(
-                query,
-                group_id,
-                [x.punishment_type_id for x in punishments],
-            )
-            if len(res) != len(punishments):
-                raise PunishmentTypeNotExists
-
             query = """INSERT INTO group_punishments(group_id,
                                                      user_id,
                                                      punishment_type_id,
@@ -122,8 +111,8 @@ class Punishments:
                         p.reason,
                         p.reason_hidden,
                         p.amount,
-                        created_by,
                         datetime.datetime.utcnow(),
+                        created_by,
                         False,
                         None,
                         None,

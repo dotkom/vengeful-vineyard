@@ -1,9 +1,11 @@
 import { Table } from "../../components/table"
+import { useAuth } from "react-oidc-context"
 import { useEffect } from "react"
 import { useLeaderboard } from "../../helpers/api"
 
 export const WallOfShame = () => {
-  const { isLoading, isFetching, data, refetch, fetchNextPage } = useLeaderboard()
+  const auth = useAuth()
+  const { isLoading, isFetching, data, refetch, fetchNextPage } = useLeaderboard({ enabled: auth.isAuthenticated })
 
   const handleScroll = () => {
     if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight) {
@@ -20,8 +22,8 @@ export const WallOfShame = () => {
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)
 
   return (
-    <section className="mt-16 max-w-5xl w-[90%] mx-auto">
-      <h1 className="mb-4 text-center text-xl font-medium">Wall of shame</h1>
+    <section className="mt-8 md:mt-16 max-w-5xl w-[90%] mx-auto">
+      <h1 className="mb-4 text-center md:text-xl font-medium">Wall of shame</h1>
       <Table leaderboardUsers={leaderboardUsers} isLoading={isLoading} dataRefetch={refetch} />
     </section>
   )

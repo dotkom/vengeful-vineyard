@@ -5,7 +5,7 @@ from asyncpg import Pool
 from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 
 from app.exceptions import DatabaseIntegrityException, NotFound
-from app.models.group import Group, GroupCreate
+from app.models.group import Group, GroupCreate, GroupSearchResult
 from app.models.group_member import GroupMember, GroupMemberCreate
 from app.models.punishment import TotalPunishmentValue
 from app.models.punishment_type import PunishmentTypeCreate
@@ -17,9 +17,9 @@ if TYPE_CHECKING:
 
 
 DEFAULT_PUSHISHMENT_TYPES = [
-    PunishmentTypeCreate(name="Ølstraff", value=33, logo_url="🍺"),
-    PunishmentTypeCreate(name="Vinstraff", value=100, logo_url="🍷"),
-    PunishmentTypeCreate(name="Spritstraff", value=300, logo_url="🍸"),
+    PunishmentTypeCreate(name="Ølstraff", value=33, emoji="🍺"),
+    PunishmentTypeCreate(name="Vinstraff", value=100, emoji="🍷"),
+    PunishmentTypeCreate(name="Spritstraff", value=300, emoji="🍸"),
 ]
 
 
@@ -47,21 +47,80 @@ class Groups:
             res = await conn.fetchval(query, group_id, user_id)
             return res is not None
 
+    async def combined_group_check(
+        self,
+        group_id: GroupId,
+        user_id: Union[UserId, OWUserId],
+        conn: Optional[Pool] = None,
+    ) -> tuple[bool, bool]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """
+                    SELECT
+                        g.ow_group_id IS NOT NULL AS is_ow_group,
+                        COALESCE((SELECT true FROM group_members WHERE group_id = $1 AND user_id = $2), false) AS is_group_member
+                    FROM groups AS g
+                    WHERE g.group_id = $1
+                    """
+
+            res = await conn.fetchrow(query, group_id, user_id)
+            if res is None:
+                return False, False
+            return res["is_ow_group"], res["is_group_member"]
+
+    async def is_in_any_ow_group(
+        self,
+        user_id: Union[UserId, OWUserId],
+        conn: Optional[Pool] = None,
+    ) -> bool:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """SELECT 1 FROM group_members gm
+                    INNER JOIN groups g ON g.group_id = gm.group_id AND g.ow_group_id IS NOT NULL
+                    WHERE gm.user_id = $1
+                    """
+
+            res = await conn.fetchval(query, user_id)
+            return res is not None
+
+    async def search(
+        self,
+        query: str,
+        limit: int = 5,
+        include_ow_groups: bool = True,
+        conn: Optional[Pool] = None,
+    ) -> list[GroupSearchResult]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            extra = "" if include_ow_groups else "AND ow_group_id IS NULL"
+
+            queryy = f"""SELECT * FROM groups
+                    WHERE (name ILIKE $1 OR name_short ILIKE $1) {extra}
+                    LIMIT $2"""
+            res = await conn.fetch(queryy, f"%{query}%", limit)
+
+        return [GroupSearchResult(**row) for row in res]
+
     async def get(
         self,
         group_id: GroupId,
+        include_members: bool = True,
         conn: Optional[Pool] = None,
     ) -> Group:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
+                WITH join_request_users AS (
+                    SELECT gjr.group_id, u.*
+                    FROM group_join_requests gjr
+                    LEFT JOIN users u ON gjr.user_id = u.user_id
+                    WHERE gjr.group_id = $1
+                )
                 SELECT
                     g.*,
-                    COALESCE(json_agg(pt.*) FILTER (WHERE pt.punishment_type_id IS NOT NULL), '[]') AS punishment_types
+                    COALESCE(json_agg(pt.* ORDER BY pt.created_at) FILTER (WHERE pt.punishment_type_id IS NOT NULL), '[]') AS punishment_types,
+                    COALESCE(json_agg(DISTINCT jru.*) FILTER (WHERE jru.user_id IS NOT NULL), '[]') AS join_requests
                 FROM groups g
-                LEFT JOIN punishment_types pt
-                    ON g.group_id = pt.group_id
+                LEFT JOIN punishment_types pt ON g.group_id = pt.group_id
+                LEFT JOIN join_request_users jru ON g.group_id = jru.group_id
                 WHERE g.group_id = $1
-                GROUP BY g.group_id
+                GROUP BY g.group_id;
                 """
 
             db_group = await conn.fetchrow(query, group_id)
@@ -69,11 +128,16 @@ class Groups:
             if db_group is None:
                 raise NotFound
 
+            if include_members:
+                members = await self.db.group_users.get_all(
+                    group_id,
+                    conn=conn,
+                )
+            else:
+                members = []
+
             group = dict(db_group)
-            group["members"] = await self.db.group_users.get_all(
-                group_id,
-                conn=conn,
-            )
+            group["members"] = members
 
             return Group(**group)
 
@@ -100,6 +164,7 @@ class Groups:
     async def insert(
         self,
         group: GroupCreate,
+        created_by: Optional[UserId],
         conn: Optional[Pool] = None,
     ) -> InsertOrUpdateGroup:
         async with MaybeAcquire(conn, self.db.pool) as conn:
@@ -120,49 +185,56 @@ class Groups:
 
             gid = cast(GroupId, group_id)
             await self.db.punishment_types.insert_multiple(
-                gid, DEFAULT_PUSHISHMENT_TYPES, conn=conn
+                gid, DEFAULT_PUSHISHMENT_TYPES, created_by, conn=conn
             )
-            # for punishment_type in DEFAULT_PUSHISHMENT_TYPES:
-            #     await self.db.punishment_types.insert(gid, punishment_type, conn=conn)
 
         return {"id": gid, "action": "CREATE"}
 
     async def update(
         self,
         group: GroupCreate,
+        group_id: Optional[GroupId] = None,
         conn: Optional[Pool] = None,
     ) -> InsertOrUpdateGroup:
-        if group.ow_group_id is None:
-            raise ValueError("ow_group_id must be set")
+        use_group_id = group_id is not None
 
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """UPDATE groups
+            where_clause = (
+                "WHERE group_id = $5" if use_group_id else "WHERE ow_group_id = $5"
+            )
+            query = f"""UPDATE groups
                     SET name = $1, name_short = $2, rules = $3, image = $4
-                    WHERE ow_group_id = $5
+                    {where_clause}
                     RETURNING group_id;"""
-            group_id = await conn.fetchval(
+            ret_group_id = await conn.fetchval(
                 query,
                 group.name,
                 group.name_short,
                 group.rules,
                 group.image,
-                group.ow_group_id,
+                group_id if use_group_id else group.ow_group_id,
             )
-            return {"id": group_id, "action": "UPDATE"}
+
+            return {
+                "id": ret_group_id,
+                "action": "UPDATE",
+            }
 
     async def insert_or_update(
         self,
         group: GroupCreate,
+        created_by: Optional[UserId],
         conn: Optional[Pool] = None,
     ) -> InsertOrUpdateGroup:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             try:
-                return await self.db.groups.insert(group, conn=conn)
+                return await self.db.groups.insert(group, created_by, conn=conn)
             except DatabaseIntegrityException:
                 return await self.db.groups.update(group, conn=conn)
 
     async def insert_member(
         self,
+        group_id: GroupId,
         member: GroupMemberCreate,
         conn: Optional[Pool] = None,
     ) -> dict[str, Union[GroupId, UserId]]:
@@ -174,7 +246,7 @@ class Groups:
             try:
                 res = await conn.fetchrow(
                     query,
-                    member.group_id,
+                    group_id,
                     member.user_id,
                     member.ow_group_user_id,
                     datetime.datetime.utcnow(),
@@ -191,6 +263,7 @@ class Groups:
 
     async def insert_members(
         self,
+        group_id: GroupId,
         members: list[GroupMemberCreate],
         conn: Optional[Pool] = None,
     ) -> list[GroupMember]:
@@ -208,7 +281,7 @@ class Groups:
                 query,
                 [
                     (
-                        x.group_id,
+                        group_id,
                         x.user_id,
                         x.ow_group_user_id,
                         True,
@@ -218,3 +291,15 @@ class Groups:
                 ],
             )
             return [GroupMember(**row) for row in res]
+
+    async def delete(
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool] = None,
+    ) -> None:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = "DELETE FROM groups WHERE group_id = $1 RETURNING *"
+            res = await conn.fetchval(query, group_id)
+
+            if res is None:
+                raise NotFound
