@@ -1,4 +1,5 @@
 import { Group, GroupUser, PunishmentType } from "./types"
+import { isAtLeastAsValuableRole } from "./permissions"
 
 export const groupMembersSortAlternatives = ["total_punishments", "total_value"] as const
 
@@ -62,12 +63,12 @@ export function getSortGroupUsersFunc(
     }
 
     if (a.permissions.length !== b.permissions.length) {
-      return b.permissions.length - a.permissions.length;
+      return b.permissions.length - a.permissions.length
     }
 
     for (let i = 0; i < a.permissions.length; i++) {
-      if (a.permissions[i].localeCompare(b.permissions[i]) !== 0) {
-        return b.permissions[i].localeCompare(a.permissions[i]);
+      if (a.permissions[i] !== b.permissions[i]) {
+        return isAtLeastAsValuableRole(a.permissions[i], b.permissions[i]) ? 1 : -1
       }
     }
 
