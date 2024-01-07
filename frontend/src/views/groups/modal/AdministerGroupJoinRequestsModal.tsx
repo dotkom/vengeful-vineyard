@@ -25,7 +25,9 @@ export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsMod
   const { selectedGroup } = useGroupNavigation()
   const queryClient = useQueryClient()
 
-  const { data: group } = useGroupLeaderboard(selectedGroup?.group_id)
+  const { data: group } = useGroupLeaderboard(selectedGroup?.group_id, undefined, {
+    enabled: !!selectedGroup,
+  })
 
   const { mutate: acceptJoinRequestMutate } = useMutation(
     async (userId: string) => await axios.post(getPostAcceptGroupJoinRequestUrl(selectedGroup?.group_id ?? "", userId)),

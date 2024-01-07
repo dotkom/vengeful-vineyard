@@ -1,32 +1,57 @@
-export const PERMISSION_GROUPS = [
-  { value: "group.owner", label: "Leder", canBeGiven: false },
-  { value: "group.admin", label: "Administrator" },
-  { value: "group.moderator", label: "Straffeansvarlig" },
-  { value: "", label: "Ingen rolle" },
-]
+import { GroupPermissions, GroupRole } from "./types"
 
-const INDEXED_PERMISSION_GROUPS: Map<string, number> = PERMISSION_GROUPS.slice()
-  .reverse()
-  .reduce((map, permissionGroup, index) => map.set(permissionGroup.value, index), new Map())
-
-export const isAtLeastAsValuableRole = (targetPermissionGroup: string, currentPermissionGroup: string): boolean => {
-  const targetPermissionGroupIndex = INDEXED_PERMISSION_GROUPS.get(targetPermissionGroup)
-  const currentPermissionGroupIndex = INDEXED_PERMISSION_GROUPS.get(currentPermissionGroup)
-
-  if (targetPermissionGroupIndex === undefined || currentPermissionGroupIndex === undefined) {
+export const hasPermission = (
+  permissions: GroupPermissions,
+  targetPermission: string,
+  currentPermission: string
+): boolean => {
+  if (targetPermission === "ALWAYS") {
+    return true
+  } else if (targetPermission === "NEVER") {
     return false
   }
 
-  return targetPermissionGroupIndex <= currentPermissionGroupIndex
+  if (targetPermission === currentPermission) {
+    return false
+  }
+
+  let permission = permissions[targetPermission]
+  while (permission) {
+    if (permission.includes(currentPermission) || permission.includes("ALWAYS")) {
+      return true
+    }
+
+    permission = permissions[permission[0]]
+  }
+
+  return false
 }
 
-export const isLessValuableRole = (targetPermissionGroup: string, currentPermissionGroup: string): boolean => {
-  const targetPermissionGroupIndex = INDEXED_PERMISSION_GROUPS.get(targetPermissionGroup)
-  const currentPermissionGroupIndex = INDEXED_PERMISSION_GROUPS.get(currentPermissionGroup)
-
-  if (targetPermissionGroupIndex === undefined || currentPermissionGroupIndex === undefined) {
+export const canGiveRole = (
+  roles: GroupRole[],
+  permissions: GroupPermissions,
+  targetRole: string,
+  currentRole: string
+): boolean => {
+  if (targetRole === currentRole) {
     return false
   }
 
-  return targetPermissionGroupIndex < currentPermissionGroupIndex
+  const foundTargetRole = roles.find(([_, role]) => role === targetRole)
+
+  if (!foundTargetRole) {
+    return false
+  }
+
+  const foundCurrentRole = roles.find(([_, role]) => role === currentRole)
+
+  if (!foundCurrentRole) {
+    return false
+  }
+
+  if (foundTargetRole[1] === "" && hasPermission(permissions, "group.members.manage", foundCurrentRole[1])) {
+    return true
+  }
+
+  return hasPermission(permissions, targetRole, currentRole)
 }

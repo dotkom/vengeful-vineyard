@@ -1,6 +1,6 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
 import { Listbox, ListboxOption } from "../../../components/listbox/Listbox"
-import { PERMISSION_GROUPS, isAtLeastAsValuableRole, isLessValuableRole } from "../../../helpers/permissions"
 import {
   VengefulApiError,
   getDeleteGroupMemberUrl,
@@ -8,30 +8,24 @@ import {
   getTransferGroupOwnershipUrl,
   useGroupLeaderboard,
 } from "../../../helpers/api"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { canGiveRole, hasPermission } from "../../../helpers/permissions"
 
-import { Button } from "../../../components/button"
-import { GroupUser } from "../../../helpers/types"
-import { Modal } from "../../../components/modal"
-import { PersonSelect } from "../../../components/input/PersonSelect"
-import { Spinner } from "../../../components/spinner"
 import { Transition } from "@headlessui/react"
 import axios from "axios"
-import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
+import { Button } from "../../../components/button"
+import { PersonSelect } from "../../../components/input/PersonSelect"
+import { Modal } from "../../../components/modal"
+import { Spinner } from "../../../components/spinner"
 import { useCurrentUser } from "../../../helpers/context/currentUserContext"
-import { useNotification } from "../../../helpers/context/notificationContext"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
+import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
+import { useNotification } from "../../../helpers/context/notificationContext"
+import { GroupUser } from "../../../helpers/types"
 
 interface EditGroupMembersModalProps {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
-
-const rolesOptions: ListboxOption<string>[] = PERMISSION_GROUPS.map((group) => ({
-  value: group.value,
-  label: group.label,
-  disabled: !group.canBeGiven,
-}))
 
 export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, setOpen }) => {
   const { selectedGroup } = useGroupNavigation()
@@ -50,21 +44,27 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
 
   const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(undefined)
   const [currentRole, setCurrentRole] = useState<string>("")
-  const [currentRolesOptions, setCurrentRolesOptions] = useState<ListboxOption<string>[]>(rolesOptions)
+  const [currentRolesOptions, setCurrentRolesOptions] = useState<ListboxOption<string>[]>([])
 
   const isCurrentUserSelected = selectedPerson?.user_id === currentUser.user_id
   const [currentUserRole, setCurrentUserRole] = useState<string>("")
 
   // Handlers and stuff
 
-  const { data: groupData } = useGroupLeaderboard(selectedGroup?.group_id, (group) => {
-    const newMembers = [...group.members]
-    newMembers.sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`))
-    setMembers(newMembers)
+  const { data: groupData } = useGroupLeaderboard(
+    selectedGroup?.group_id,
+    (group) => {
+      const newMembers = [...group.members]
+      newMembers.sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`))
+      setMembers(newMembers)
 
-    const newSelectedPerson = newMembers.find((member) => member.user_id === selectedPerson?.user_id)
-    setSelectedPerson(newSelectedPerson ? newSelectedPerson : newMembers[0])
-  })
+      const newSelectedPerson = newMembers.find((member) => member.user_id === selectedPerson?.user_id)
+      setSelectedPerson(newSelectedPerson ? newSelectedPerson : newMembers[0])
+    },
+    {
+      enabled: !!selectedGroup,
+    }
+  )
 
   useEffect(() => {
     if (!selectedPerson) return
@@ -72,12 +72,24 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
     const role = selectedPerson.permissions.at(0) ?? ""
     setCurrentRole(role)
 
-    const newRolesOptions = [...rolesOptions]
+    const newRolesOptions =
+      groupData?.roles.map(([roleName, rolePermission]) => ({
+        label: roleName,
+        value: rolePermission,
+        disabled: false,
+      })) ?? []
 
-    const hasLessThanCurrentUser = isLessValuableRole(currentUserRole, role)
-    const isCurrentUserAndIsOwner = selectedPerson.user_id === currentUser.user_id && currentUserRole === "group.owner"
+    const groupRoles = groupData?.roles ?? []
+    const groupPermissions = groupData?.permissions ?? {}
+    const isCurrentUser = selectedPerson.user_id === currentUser.user_id
+
     newRolesOptions.forEach((option) => {
-      if (isCurrentUserAndIsOwner || hasLessThanCurrentUser || !isLessValuableRole(option.value, currentUserRole)) {
+      const canGiveRoleCheck = canGiveRole(groupRoles, groupPermissions, option.value, currentUserRole)
+      console.log(option.value, canGiveRoleCheck)
+      if (
+        (isCurrentUser && (currentUserRole === "group.owner" || !canGiveRoleCheck)) ||
+        (!isCurrentUser && !canGiveRoleCheck)
+      ) {
         option.disabled = true
       } else {
         option.disabled = false
@@ -218,7 +230,7 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
                 </div>
 
                 <div className="flex flex-col gap-y-3">
-                  {isAtLeastAsValuableRole("group.owner", currentUserRole) && (
+                  {hasPermission(groupData.permissions, "group.ownership.transfer", currentUserRole) && (
                     <Button
                       variant="OUTLINE"
                       label="Overfør lederskap"
@@ -241,7 +253,7 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
                     />
                   )}
 
-                  {isAtLeastAsValuableRole("group.admin", currentUserRole) && (
+                  {hasPermission(groupData.permissions, "group.members.remove", currentUserRole) && (
                     <Button
                       variant="OUTLINE"
                       label="Fjern fra gruppa"

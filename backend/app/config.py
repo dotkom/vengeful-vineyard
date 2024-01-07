@@ -8,64 +8,76 @@ from pathlib import Path
 
 from pydantic import BaseSettings
 
+from app.types import PermissionPrivilege
 from app.utils.permissions import ALWAYS, NEVER
 
-ROLES = (
-    ("Group Owner", "group.owner"),
-    ("Group Admin", "group.admin"),
-    ("Group Moderator", "group.moderator"),
-)
+ROLES = [
+    ["Leder", "group.owner"],
+    ["Administrator", "group.admin"],
+    ["Straffeansvarlig", "group.moderator"],
+    ["Medlem", ""],
+]
+
+OW_GROUP_ROLES = ROLES
 
 INDEXED_ROLES = {role: index for index, (_, role) in enumerate(ROLES)}
 
-PERMISSIONS = (
+PERMISSIONS = [
     # Roles
-    ("group.owner",),
-    ("group.admin", ("group.owner",)),
-    ("group.moderator", ("group.admin",)),
+    ["group.owner", []],
+    ["group.admin", ["group.owner"]],
+    ["group.moderator", ["group.admin"]],
     # Permissions
-    ("group.ownership.transfer", ("group.owner",)),
-    ("group.delete", ("group.owner",)),
-    ("group.edit", ("group.admin",)),
-    ("group.punishment_types.add", ("group.edit",)),
-    ("group.punishment_types.delete", ("group.edit",)),
-    ("group.punishment_types.edit", ("group.edit",)),
-    ("group.members.manage", ("group.admin",)),
-    ("group.members.add", ("group.members.manage",)),
-    ("group.members.remove", ("group.members.manage",)),
-    ("group.punishments.add", ("group.moderator",)),
-    ("group.punishments.delete", ("group.moderator",)),
-    ("group.punishments.mark_paid", ("group.moderator",)),
-    ("group.punishments.mark_unpaid", ("group.moderator",)),
-    ("group.join_requests.view", ("group.admin",)),
-    ("group.join_requests.accept", ("group.admin",)),
-    ("group.join_requests.deny", ("group.admin",)),
+    ["group.ownership.transfer", ["group.owner"]],
+    ["group.delete", ["group.owner"]],
+    ["group.edit", ["group.admin"]],
+    ["group.punishment_types.add", ["group.edit"]],
+    ["group.punishment_types.delete", ["group.edit"]],
+    ["group.punishment_types.edit", ["group.edit"]],
+    ["group.members.manage", ["group.admin"]],
+    ["group.members.add", ["group.members.manage"]],
+    ["group.members.remove", ["group.members.manage"]],
+    ["group.punishments.add", ["group.moderator"]],
+    ["group.punishments.delete", ["group.moderator"]],
+    ["group.punishments.mark_paid", ["group.moderator"]],
+    ["group.punishments.mark_unpaid", ["group.moderator"]],
+    ["group.join_requests.view", ["group.admin"]],
+    ["group.join_requests.accept", ["group.admin"]],
+    ["group.join_requests.deny", ["group.admin"]],
+]
+PERMISSIONS_AS_DICT: dict[PermissionPrivilege, list[PermissionPrivilege]] = dict(
+    PERMISSIONS  # type: ignore
 )
 
 # OW groups are managed automatically by the sync module. Also everyone should
 # have permission to give punishments.
-OW_GROUP_PERMISSIONS = (
+OW_GROUP_PERMISSIONS = [
     # Roles
-    ("group.owner",),
-    ("group.admin", ("group.owner",)),
-    ("group.moderator", ("group.admin",)),
+    ["group.owner", []],
+    ["group.admin", ["group.owner"]],
+    ["group.moderator", ["group.admin"]],
     # Permissions
-    ("group.ownership.transfer", (NEVER,)),
-    ("group.delete", (NEVER,)),
-    ("group.edit", ("group.admin",)),
-    ("group.punishment_types.add", ("group.edit",)),
-    ("group.punishment_types.delete", ("group.edit",)),
-    ("group.punishment_types.edit", ("group.edit",)),
-    ("group.members.manage", (NEVER,)),
-    ("group.members.add", (NEVER,)),
-    ("group.members.remove", (NEVER,)),
-    ("group.punishments.add", (ALWAYS,)),
-    ("group.punishments.delete", ("group.moderator",)),
-    ("group.punishments.mark_paid", ("group.moderator",)),
-    ("group.punishments.mark_unpaid", ("group.moderator",)),
-    ("group.join_requests.view", (NEVER,)),
-    ("group.join_requests.accept", (NEVER,)),
-    ("group.join_requests.deny", (NEVER,)),
+    ["group.ownership.transfer", [NEVER]],
+    ["group.delete", [NEVER]],
+    ["group.edit", ["group.admin"]],
+    ["group.punishment_types.add", ["group.edit"]],
+    ["group.punishment_types.delete", ["group.edit"]],
+    ["group.punishment_types.edit", ["group.edit"]],
+    ["group.members.manage", [NEVER]],
+    ["group.members.add", [NEVER]],
+    ["group.members.remove", [NEVER]],
+    ["group.punishments.add", [ALWAYS]],
+    ["group.punishments.delete", ["group.moderator"]],
+    ["group.punishments.mark_paid", [ALWAYS]],
+    ["group.punishments.mark_unpaid", [ALWAYS]],
+    ["group.join_requests.view", [NEVER]],
+    ["group.join_requests.accept", [NEVER]],
+    ["group.join_requests.deny", [NEVER]],
+]
+OW_GROUP_PERMISSIONS_AS_DICT: dict[
+    PermissionPrivilege, list[PermissionPrivilege]
+] = dict(
+    OW_GROUP_PERMISSIONS  # type: ignore
 )
 
 

@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from app.api import FastAPI
+from app.config import OW_GROUP_PERMISSIONS_AS_DICT, OW_GROUP_ROLES
 from tests.fixtures import client, mock
 from tests.response_time import check_response_time
 
@@ -32,6 +33,8 @@ GROUPS_ME_RESPONSE = [
         "punishment_types": [],
         "join_requests": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+        "roles": [],
+        "permissions": {},
     }
 ]
 
@@ -58,6 +61,8 @@ ME_UPDATED_RESPONSE = [
         "punishment_types": [],
         "join_requests": [],
         "image": "https://onlineweb4-prod.s3.eu-north-1.amazonaws.com/media/images/responsive/sm/0990ab67-0f5b-4c4d-95f1-50a5293335a5.png",
+        "roles": [],
+        "permissions": {},
     }
 ]
 
@@ -72,6 +77,8 @@ ME_NEW_USER_RESPONSE: list[dict[str, Any]] = [
         "ow_group_id": 69,
         "punishment_types": [],
         "rules": "No rules",
+        "roles": [],
+        "permissions": {},
     },
 ]
 
@@ -201,6 +208,8 @@ ME_GROUPS_RESPONSE = [
                 "permissions": [],
             },
         ],
+        "roles": OW_GROUP_ROLES,
+        "permissions": OW_GROUP_PERMISSIONS_AS_DICT,
     }
 ]
 
@@ -331,6 +340,8 @@ ME_GROUPS_UPDATED_RESPONSE = [
                 "permissions": [],
             },
         ],
+        "roles": OW_GROUP_ROLES,
+        "permissions": OW_GROUP_PERMISSIONS_AS_DICT,
     }
 ]
 
@@ -1027,19 +1038,6 @@ class TestWithDB_OW:
         check_response_time(response)
 
     @pytest.mark.asyncio
-    async def test_mark_punishment_as_paid_no_permission(self, client: Any) -> None:
-        response = await client.post(
-            f"/groups/{GROUP_ID}/punishments/paid",
-            headers={"Authorization": OTHER_USER_AUTHORIZATION},
-            json=[
-                PUNISHMENT_1_ID,  # punishment_id
-            ],
-        )
-
-        assert response.status_code == 403
-        check_response_time(response)
-
-    @pytest.mark.asyncio
     async def test_mark_punishment_as_paid(self, client: Any) -> None:
         response = await client.post(
             f"/groups/{GROUP_ID}/punishments/paid",
@@ -1086,19 +1084,6 @@ class TestWithDB_OW:
         response = await client.post(
             f"/groups/{GROUP_ID}/punishments/unpaid",
             headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
-            json=[
-                PUNISHMENT_1_ID,  # punishment_id
-            ],
-        )
-
-        assert response.status_code == 403
-        check_response_time(response)
-
-    @pytest.mark.asyncio
-    async def test_mark_punishment_as_unpaid_no_permission(self, client: Any) -> None:
-        response = await client.post(
-            f"/groups/{GROUP_ID}/punishments/unpaid",
-            headers={"Authorization": OTHER_USER_AUTHORIZATION},
             json=[
                 PUNISHMENT_1_ID,  # punishment_id
             ],

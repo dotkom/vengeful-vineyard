@@ -14,12 +14,12 @@ import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import { useState } from "react"
+import { classNames } from "../../../helpers/classNames"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { isAtLeastAsValuableRole } from "../../../helpers/permissions"
+import { hasPermission } from "../../../helpers/permissions"
 import { Button } from "../../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
-import { classNames } from "../../../helpers/classNames"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -48,9 +48,9 @@ export const PunishmentItem = ({
     enabled: isGroupContext,
   })
 
+  const groupPermissions = groupData?.permissions ?? {}
   const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === user.user_id)
   const currentGroupUserRole = currentGroupUser?.permissions.at(0) ?? ""
-  const currentGroupUserIsAtLeastModerator = isAtLeastAsValuableRole("group.moderator", currentGroupUserRole)
 
   let punishmentType = punishmentTypes.find((type) => type.punishment_type_id === punishment.punishment_type_id)
 
@@ -213,25 +213,29 @@ export const PunishmentItem = ({
             reactions={punishment.reactions}
           />
         </div>
-        {isGroupContext && currentGroupUserIsAtLeastModerator && (
+        {isGroupContext && (
           <div className="flex flex-row gap-x-4 ml-auto items-center text-slate-500">
-            {punishment.paid ? (
-              <Button
-                variant="OUTLINE"
-                label="Marker som ubetalt"
-                onClick={() => {
-                  markPunishmentAsUnpaid()
-                }}
-              />
-            ) : (
-              <Button
-                variant="OUTLINE"
-                label="Marker som betalt"
-                onClick={() => {
-                  markPunishmentAsPaid()
-                }}
-              />
-            )}
+            {punishment.paid &&
+              hasPermission(groupPermissions, "group.punishments.mark_unpaid", currentGroupUserRole) && (
+                <Button
+                  variant="OUTLINE"
+                  label="Marker som ubetalt"
+                  onClick={() => {
+                    markPunishmentAsUnpaid()
+                  }}
+                />
+              )}
+
+            {!punishment.paid &&
+              hasPermission(groupPermissions, "group.punishments.mark_paid", currentGroupUserRole) && (
+                <Button
+                  variant="OUTLINE"
+                  label="Marker som betalt"
+                  onClick={() => {
+                    markPunishmentAsPaid()
+                  }}
+                />
+              )}
           </div>
         )}
       </div>

@@ -89,15 +89,21 @@ export const GroupsView = () => {
     (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
   )
 
-  const { isLoading, data, refetch } = useGroupLeaderboard(selectedGroup?.group_id, (group) => {
-    setToggledPunishmentTypesOptions(
-      group.punishment_types.map((punishmentType) => ({
-        text: punishmentType.name,
-        value: punishmentType.punishment_type_id.toString(),
-        checked: true,
-      }))
-    )
-  })
+  const { isLoading, data, refetch } = useGroupLeaderboard(
+    selectedGroup?.group_id,
+    (group) => {
+      setToggledPunishmentTypesOptions(
+        group.punishment_types.map((punishmentType) => ({
+          text: punishmentType.name,
+          value: punishmentType.punishment_type_id.toString(),
+          checked: true,
+        }))
+      )
+    },
+    {
+      enabled: selectedGroup !== undefined,
+    }
+  )
 
   useEffect(() => {
     setSelectedGroup(selectedGroup)

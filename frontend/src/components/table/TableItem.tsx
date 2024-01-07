@@ -2,16 +2,23 @@ import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanst
 import { FaCrown } from "react-icons/fa6"
 import { GiRoundStar } from "react-icons/gi"
 import { IoShield } from "react-icons/io5"
-import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../helpers/types"
+import {
+  Group,
+  GroupUser,
+  LeaderboardPunishment,
+  LeaderboardUser,
+  Punishment,
+  PunishmentType,
+} from "../../helpers/types"
 import { AccordionContent, AccordionItem, AccordionTrigger } from "./accordion/Accordion"
 
 import { IconType } from "react-icons"
 import { textToEmoji } from "../../helpers/emojies"
-import { PERMISSION_GROUPS } from "../../helpers/permissions"
 import { PunishmentList } from "./punishment/PunishmentList"
 
 interface TableItemProps {
   groupUser?: GroupUser | undefined
+  groupData?: Group | undefined
   leaderboardUser?: LeaderboardUser | undefined
   punishmentTypes: PunishmentType[]
   dataRefetch: <TPageData>(
@@ -20,7 +27,14 @@ interface TableItemProps {
   i?: number
 }
 
-export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], dataRefetch, i }: TableItemProps) => {
+export const TableItem = ({
+  groupUser,
+  groupData,
+  leaderboardUser,
+  punishmentTypes = [],
+  dataRefetch,
+  i,
+}: TableItemProps) => {
   const user = groupUser ?? leaderboardUser
   if (user === undefined) {
     return <p>user is undefined</p>
@@ -131,7 +145,7 @@ export const TableItem = ({ groupUser, leaderboardUser, punishmentTypes = [], da
 
   let roleName: string | undefined
   if (RoleIcon) {
-    roleName = PERMISSION_GROUPS.find((group) => group.value === groupUser?.permissions.at(0))?.label
+    roleName = groupData?.roles.find((role) => role.at(1) === groupUser?.permissions.at(0))?.at(0)
   }
 
   const getPunishmentTypeAmounts = () =>

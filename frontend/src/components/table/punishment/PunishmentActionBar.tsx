@@ -1,18 +1,18 @@
-import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
-import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
-import { GroupUser, LeaderboardUser } from "../../../helpers/types"
 import { Menu, Switch, Transition } from "@headlessui/react"
-import axios, { AxiosResponse } from "axios"
+import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import axios, { AxiosResponse } from "axios"
+import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
+import { GroupPermissions, GroupUser, LeaderboardUser } from "../../../helpers/types"
 
-import { PunishmentActionBarListItem } from "./PunishmentActionBarListItem"
-import { classNames } from "../../../helpers/classNames"
 import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, useGroupLeaderboard } from "../../../helpers/api"
+import { classNames } from "../../../helpers/classNames"
+import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 import { useGivePunishmentModal } from "../../../helpers/context/modal/givePunishmentModalContext"
 import { useNotification } from "../../../helpers/context/notificationContext"
 import { useTogglePunishments } from "../../../helpers/context/togglePunishmentsContext"
-import { isAtLeastAsValuableRole } from "../../../helpers/permissions"
-import { useCurrentUser } from "../../../helpers/context/currentUserContext"
+import { hasPermission } from "../../../helpers/permissions"
+import { PunishmentActionBarListItem } from "./PunishmentActionBarListItem"
 
 interface PunishmentActionBarProps {
   user: LeaderboardUser | GroupUser
@@ -40,6 +40,8 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
     enabled: isGroupContext,
   })
 
+  let groupPermissions: GroupPermissions = {}
+
   if (isGroupContext) {
     const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
     setOpen = newSetOpen
@@ -48,6 +50,10 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
     const { isToggled: newIsToggled, setIsToggled: newSetIsToggled } = useTogglePunishments()
     isToggled = newIsToggled
     setIsToggled = newSetIsToggled
+
+    if (groupData) {
+      groupPermissions = groupData.permissions
+    }
   }
 
   const markAllPunishmentsAsPaidCall = async () => {
@@ -84,9 +90,8 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
     if (currentGroupUser) {
       const isOwGroup = currentGroupUser.ow_group_user_id !== null
       const role = currentGroupUser.permissions.at(0) ?? ""
-      const isAtLeastModerator = isAtLeastAsValuableRole("group.moderator", role)
 
-      if (isOwGroup || isAtLeastModerator) {
+      if (isOwGroup || hasPermission(groupPermissions, "group.punishments.add", role)) {
         listItems.push({
           label: "Gi straff",
           icon: <PlusIcon className="h-5 w-5" />,
@@ -97,7 +102,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
         })
       }
 
-      if (isAtLeastModerator) {
+      if (hasPermission(groupPermissions, "group.punishments.mark_paid", role)) {
         listItems.push({
           label: "Marker alle straffer som betalte",
           icon: <PlusIcon className="h-5 w-5" />,

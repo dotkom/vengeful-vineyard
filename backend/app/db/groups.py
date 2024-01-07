@@ -4,6 +4,12 @@ from typing import TYPE_CHECKING, Optional, Union, cast
 from asyncpg import Pool
 from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 
+from app.config import (
+    OW_GROUP_PERMISSIONS_AS_DICT,
+    OW_GROUP_ROLES,
+    PERMISSIONS_AS_DICT,
+    ROLES,
+)
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group, GroupCreate, GroupSearchResult
 from app.models.group_member import GroupMember, GroupMemberCreate
@@ -123,9 +129,9 @@ class Groups:
                 GROUP BY g.group_id;
                 """
 
-            db_group = await conn.fetchrow(query, group_id)
+            group = await conn.fetchrow(query, group_id)
 
-            if db_group is None:
+            if group is None:
                 raise NotFound
 
             if include_members:
@@ -136,10 +142,16 @@ class Groups:
             else:
                 members = []
 
-            group = dict(db_group)
-            group["members"] = members
+            is_ow_group = group["ow_group_id"] is not None
 
-            return Group(**group)
+            return Group(
+                **dict(group),
+                members=members,
+                roles=OW_GROUP_ROLES if is_ow_group else ROLES,  # type: ignore
+                permissions=OW_GROUP_PERMISSIONS_AS_DICT
+                if is_ow_group
+                else PERMISSIONS_AS_DICT,
+            )
 
     async def get_total_punishment_value(
         self,

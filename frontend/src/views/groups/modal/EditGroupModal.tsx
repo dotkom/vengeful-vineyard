@@ -87,23 +87,29 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   const [editGroupErrors, setEditGroupErrors] = useErrorControl(EditGroup)
   const [mutatePunishmentTypeErrors, setMutatePunishmentTypeErrors] = useErrorControl(MutatePunishmentType)
 
-  const { data: groupData, isLoading } = useGroupLeaderboard(selectedGroup?.group_id, (group) => {
-    setEditGroupData({ name: group.name, name_short: group.name_short })
-    setInitialEditGroupData({ name: group.name, name_short: group.name_short })
+  const { data: groupData, isLoading } = useGroupLeaderboard(
+    selectedGroup?.group_id,
+    (group) => {
+      setEditGroupData({ name: group.name, name_short: group.name_short })
+      setInitialEditGroupData({ name: group.name, name_short: group.name_short })
 
-    const punishmentType =
-      group.punishment_types.find((pt) => pt.punishment_type_id === currentPunishmentType?.punishment_type_id) ??
-      group.punishment_types[0]
-    setCurrentPunishmentType(punishmentType)
+      const punishmentType =
+        group.punishment_types.find((pt) => pt.punishment_type_id === currentPunishmentType?.punishment_type_id) ??
+        group.punishment_types[0]
+      setCurrentPunishmentType(punishmentType)
 
-    const newEditPunishmentTypeData = {
-      name: punishmentType.name,
-      emoji: punishmentType.emoji,
-      value: punishmentType.value,
+      const newEditPunishmentTypeData = {
+        name: punishmentType.name,
+        emoji: punishmentType.emoji,
+        value: punishmentType.value,
+      }
+      setEditPunishmentTypeData({ ...newEditPunishmentTypeData })
+      setInitialEditPunishmentTypeData({ ...newEditPunishmentTypeData })
+    },
+    {
+      enabled: !!selectedGroup,
     }
-    setEditPunishmentTypeData({ ...newEditPunishmentTypeData })
-    setInitialEditPunishmentTypeData({ ...newEditPunishmentTypeData })
-  })
+  )
 
   const selectedGroupId = selectedGroup?.group_id ?? ""
   const punishmentTypeOptions = groupData?.punishment_types.map((pt) => ({
