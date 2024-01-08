@@ -74,10 +74,15 @@ export interface GroupBase {
   group_id: string
 }
 
+export type GroupRole = [string, string]
+export type GroupPermissions = Record<string, string[]>
+
 export interface Group extends GroupBase {
   punishment_types: PunishmentType[]
   members: GroupUser[]
   join_requests: User[]
+  roles: GroupRole[]
+  permissions: GroupPermissions
 }
 
 export interface GroupUser extends User {

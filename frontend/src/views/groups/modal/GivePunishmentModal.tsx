@@ -52,7 +52,9 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
       setSelectedPerson(preferredSelectedPerson)
   }, [preferredSelectedPerson])
 
-  const { data } = useGroupLeaderboard(selectedGroup?.group_id ?? "", onGroupLeaderboardFetched)
+  const { data } = useGroupLeaderboard(selectedGroup?.group_id, onGroupLeaderboardFetched, {
+    enabled: !!selectedGroup,
+  })
   const sortedMembers = sortGroupUsersByName([...(data?.members ?? [])])
 
   const createPunishmentCall = async () => {

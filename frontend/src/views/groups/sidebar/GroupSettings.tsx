@@ -7,20 +7,20 @@ import {
 } from "@heroicons/react/24/outline"
 import { VengefulApiError, getDeleteGroupMemberUrl, getDeleteGroupUrl, useGroupLeaderboard } from "../../../helpers/api"
 
+import { useMutation } from "@tanstack/react-query"
+import axios from "axios"
 import { FC } from "react"
-import { Group } from "../../../helpers/types"
 import { Menu } from "../../../components/menu/Menu"
 import { MenuItemProps } from "../../../components/menu/MenuItem"
-import axios from "axios"
-import { isAtLeastAsValuableRole } from "../../../helpers/permissions"
-import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
 import { useCurrentUser } from "../../../helpers/context/currentUserContext"
+import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
+import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
 import { useEditGroupMembersModal } from "../../../helpers/context/modal/editGroupMembersModalContext"
 import { useEditGroupModal } from "../../../helpers/context/modal/editGroupModalContext"
-import { useMutation } from "@tanstack/react-query"
 import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
+import { hasPermission } from "../../../helpers/permissions"
+import { Group } from "../../../helpers/types"
 
 interface GroupSettingsProps {
   groupData: Group | undefined
@@ -41,9 +41,12 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
 
   if (!groupData) return null
 
-  const { data: group } = useGroupLeaderboard(groupData.group_id)
+  const { data: group } = useGroupLeaderboard(groupData.group_id, undefined, {
+    enabled: !!groupData,
+  })
 
   const currentUserRole = group?.members.find((member) => member.user_id === currentUser.user_id)?.permissions[0] ?? ""
+  const groupPermissions = group?.permissions ?? {}
 
   const { mutate: leaveGroupMutate } = useMutation(
     async () => await axios.delete(getDeleteGroupMemberUrl(groupData.group_id, currentUser.user_id)),
@@ -89,23 +92,24 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
 
   const listItems: MenuItemProps[] = []
 
-  if (isAtLeastAsValuableRole("group.admin", currentUserRole)) {
-    listItems.unshift(
-      {
-        label: "Rediger gruppe",
-        icon: <PencilSquareIcon className="h-5 w-5" />,
-        onClick: () => {
-          setEditGroupModalOpen(true)
-        },
+  if (hasPermission(groupPermissions, "group.members.manage", currentUserRole)) {
+    listItems.unshift({
+      label: "Rediger medlemmer",
+      icon: <UserGroupIcon className="h-5 w-5" />,
+      onClick: () => {
+        setEditGroupMembersModalOpen(true)
       },
-      {
-        label: "Rediger medlemmer",
-        icon: <UserGroupIcon className="h-5 w-5" />,
-        onClick: () => {
-          setEditGroupMembersModalOpen(true)
-        },
-      }
-    )
+    })
+  }
+
+  if (hasPermission(groupPermissions, "group.edit", currentUserRole)) {
+    listItems.unshift({
+      label: "Rediger gruppe",
+      icon: <PencilSquareIcon className="h-5 w-5" />,
+      onClick: () => {
+        setEditGroupModalOpen(true)
+      },
+    })
   }
 
   if (groupData.ow_group_id === null) {
@@ -126,7 +130,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
       },
     })
 
-    if (isAtLeastAsValuableRole("group.owner", currentUserRole)) {
+    if (hasPermission(groupPermissions, "group.delete", currentUserRole)) {
       listItems.push({
         label: "Slett gruppe",
         icon: <TrashIcon className="h-5 w-5" />,

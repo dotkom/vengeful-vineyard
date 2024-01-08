@@ -4,6 +4,7 @@ from typing import Any
 
 import pytest
 
+from app.config import PERMISSIONS_AS_DICT, ROLES
 from tests.fixtures import client, no_groups_mock
 
 from .common import *
@@ -87,6 +88,8 @@ GET_GROUP_1_RESPONSE = {
         },
     ],
     "rules": "",
+    "roles": ROLES,
+    "permissions": PERMISSIONS_AS_DICT,
 }
 
 

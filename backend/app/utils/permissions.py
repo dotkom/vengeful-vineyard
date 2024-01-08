@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 StringAndOptionalIterable = Union[Sequence[str], tuple[str, Iterable[str]]]
 
 # don't mind these values
-NEVER = "88c35694-a18c-40ff-bdf7-3ec6e1c07cdf"
-ALWAYS = "71595420-8ebc-4cc9-8c48-20b1a9fc2e0b"
+NEVER = "NEVER"
+ALWAYS = "ALWAYS"
 
 
 class PermissionManager:

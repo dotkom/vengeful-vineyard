@@ -62,6 +62,7 @@ export const Table = ({
             <TableItem
               key={user.user_id}
               groupUser={user}
+              groupData={groupData}
               punishmentTypes={Array.from(punishmentTypesMap.values())}
               dataRefetch={dataRefetch}
             />

@@ -10,7 +10,7 @@ from pydantic import BaseModel  # pylint: disable=no-name-in-module
 from app.models.group_user import GroupUser
 from app.models.punishment_type import PunishmentTypeRead
 from app.models.user import User
-from app.types import GroupId
+from app.types import GroupId, PermissionPrivilege
 
 
 class GroupBase(BaseModel):
@@ -47,6 +47,8 @@ class Group(GroupCreate):
     punishment_types: list[PunishmentTypeRead] = []
     members: list[GroupUser] = []
     join_requests: list[User] = []
+    roles: list[tuple[str, PermissionPrivilege]] = []
+    permissions: dict[PermissionPrivilege, list[PermissionPrivilege]] = {}
 
 
 class UserWithGroups(User):
