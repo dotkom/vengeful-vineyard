@@ -22,6 +22,7 @@ class PunishmentReactionOut(PunishmentReactionCreate):
     punishment_id: PunishmentId
     created_by: UserId
     created_at: datetime
+    created_by_name: str = "N/A"
 
 
 class PunishmentReactionRead(PunishmentReactionOut):
