@@ -21,13 +21,15 @@ export const Layout = () => {
 
   if (auth.isLoading) {
     return (
-      <main className="flex h-screen flex-col bg-gray-50">
-        <Nav auth={auth} />
-        <div className="flex justify-center mt-16">
-          <Spinner />
-        </div>
+      <>
+        <main className="flex h-screen flex-col bg-gray-50">
+          <Nav auth={auth} />
+          <div className="flex justify-center mt-16">
+            <Spinner />
+          </div>
+        </main>
         <Footer />
-      </main>
+      </>
     )
   }
 
@@ -41,14 +43,16 @@ export const Layout = () => {
     }
 
     return (
-      <main className="flex h-screen flex-col justify-between bg-gray-50">
-        <Nav auth={auth} />
-        <div className="flex flex-col items-center justify-center mt-16">
-          <h1>Ai ai ai ai ai!!! En feil oppsto.</h1>
-          <p>Melding: {auth.error.message}</p>
-        </div>
+      <>
+        <main className="flex h-screen flex-col justify-between bg-gray-50">
+          <Nav auth={auth} />
+          <div className="flex flex-col items-center justify-center mt-16">
+            <h1>Ai ai ai ai ai!!! En feil oppsto.</h1>
+            <p>Melding: {auth.error.message}</p>
+          </div>
+        </main>
         <Footer />
-      </main>
+      </>
     )
   }
 
@@ -57,19 +61,22 @@ export const Layout = () => {
   }
 
   return (
-    <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50">
-      <CurrentUserProvider>
-        <ConfirmModalProvider>
-          <NotificationProvider>
-            <Nav auth={auth} />
-            <div className="mb-auto">
-              <Outlet />
-            </div>
-            <Footer />
-            <Notification />
-          </NotificationProvider>
-        </ConfirmModalProvider>
-      </CurrentUserProvider>
-    </main>
+    <>
+      <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50">
+        <CurrentUserProvider>
+          <ConfirmModalProvider>
+            <NotificationProvider>
+              <Nav auth={auth} />
+              <div className="mb-auto">
+                <Outlet />
+              </div>
+              <div className="h-16" />
+              <Notification />
+            </NotificationProvider>
+          </ConfirmModalProvider>
+        </CurrentUserProvider>
+      </main>
+      <Footer />
+    </>
   )
 }
