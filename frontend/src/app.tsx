@@ -11,29 +11,12 @@ import { router } from "./routes"
 
 const queryClient = new QueryClient()
 
-const scopes = [
-  "authentication.onlineuser.username.read",
-  "authentication.onlineuser.first_name.read",
-  "authentication.onlineuser.last_name.read",
-  "authentication.onlineuser.email.read",
-  "authentication.onlineuser.is_member.read",
-  "authentication.onlineuser.is_staff.read",
-  "authentication.onlineuser.is_superuser.read",
-  "authentication.onlineuser.field_of_study.read",
-  "authentication.onlineuser.nickname.read",
-  "authentication.onlineuser.rfid.read",
-]
-
 const configuration: AuthProviderProps = {
   client_id: "ksPx08as8bc9jCaRvG8R2Gte1twJChTuHbfVG0My",
   redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
-  scope: scopes.join(" "),
+  scope: "openid profile email online",
   authority: "https://old.online.ntnu.no/sso/",
-  metadata: {
-    authorization_endpoint: "https://old.online.ntnu.no/sso/authorize/",
-    token_endpoint: "https://old.online.ntnu.no/api/v1/auth/",
-    userinfo_endpoint: "https://old.online.ntnu.no/sso/user/",
-  },
+  metadataUrl: "https://old.online.ntnu.no/sso/.well-known/openid-configuration/",
   silent_redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
   automaticSilentRenew: true,
   filterProtocolClaims: true,
