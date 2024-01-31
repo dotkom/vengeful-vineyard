@@ -8,8 +8,17 @@ import { Spinner } from "../../components/spinner"
 import { CurrentUserProvider } from "../../helpers/context/currentUserContext"
 import { ConfirmModalProvider } from "../../helpers/context/modal/confirmModalContext"
 import { NotificationProvider } from "../../helpers/context/notificationContext"
+import { DarkModeProvider } from "../../DarkModeContext"
 
-export const Layout = () => {
+export const Layout: React.FC = () => {
+  return (
+    <DarkModeProvider>
+      <LayoutFields />
+    </DarkModeProvider>
+  )
+}
+
+const LayoutFields = () => {
   const auth = useAuth()
 
   switch (auth.activeNavigator) {
