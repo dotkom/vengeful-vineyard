@@ -94,7 +94,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
       if (isOwGroup || hasPermission(groupPermissions, "group.punishments.add", role)) {
         listItems.push({
           label: "Gi straff",
-          icon: <PlusIcon className="h-5 w-5" />,
+          icon: <PlusIcon className="h-5 w-5 text-black" />,
           onClick: () => {
             setOpen(true)
             setPreferredSelectedPerson(user as GroupUser)
@@ -105,7 +105,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
       if (hasPermission(groupPermissions, "group.punishments.mark_paid", role)) {
         listItems.push({
           label: "Marker alle straffer som betalte",
-          icon: <PlusIcon className="h-5 w-5" />,
+          icon: <PlusIcon className="h-5 w-5 text-black" />,
           onClick: () => {
             mutateMarkAllPunishmentsAsPaid()
           },
@@ -117,7 +117,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
   return (
     <div
       className={classNames(
-        `w-full h-16 border-t flex flex-row items-center px-4 justify-between`,
+        `w-full h-16 border-t flex flex-row items-center px-4 justify-between dark:border-gray-700`,
         !isGroupContext && !label && listItems.length === 0 ? "hidden" : ""
       )}
     >
@@ -148,7 +148,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
           <div>
             <Menu.Button className="flex rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-2">
               <span className="sr-only">Open user menu</span>
-              <EllipsisHorizontalIcon className="h-10 w-10" color="#555555" />
+              <EllipsisHorizontalIcon className="h-10 w-10 text-slate-600" />
             </Menu.Button>
           </div>
           <Transition

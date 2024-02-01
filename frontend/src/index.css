@@ -2,6 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .dark .bg-gray-50 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(15, 27, 45, var(--tw-bg-opacity)); /* blue-2 */
+  }
+  .dark .bg-gray-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(15, 23, 32, var(--tw-bg-opacity)); /* blue-1 */
+  }
+  .dark .bg-white {
+    --tw-bg-opacity: 1;
+    background-color: rgba(15, 23, 32, var(--tw-bg-opacity)); /* blue-1 */
+  }
+  .dark .text-black {
+    --tw-bg-opacity: 1;
+    color: rgba(229, 231, 235, var(--tw-text-opacity)); /* gray-200 */
+  }
+  .dark .text-gray-400 {
+    --tw-text-opacity: 1;
+    color: rgba(229, 231, 235, var(--tw-text-opacity)); /* gray-200 */
+  }
+  .dark .text-gray-500 {
+    --tw-text-opacity: 1;
+    color: rgba(229, 231, 235, var(--tw-text-opacity)); /* gray-200 */
+  }
+  .dark .text-gray-600 {
+    --tw-text-opacity: 1;
+    color: rgba(209, 213, 219, var(--tw-text-opacity)); /* gray-300 */
+  }
+  .dark .text-gray-700 {
+    --tw-text-opacity: 1;
+    color: rgba(209, 213, 219, var(--tw-text-opacity)); /* gray-300 */
+  }
+  .dark .text-gray-800 {
+    --tw-text-opacity: 1;
+    color: rgba(209, 213, 219, var(--tw-text-opacity)); /* gray-300 */
+  }
+  .dark .text-gray-900 {
+    --tw-text-opacity: 1;
+    color: rgba(156, 163, 175, var(--tw-text-opacity)); /* gray-500 */
+  }
+  .dark .border-gray-300 {
+    --tw-border-opacity: 1;
+    border-color: rgba(13, 56, 104, var(--tw-border-opacity)); /* blue-6 */
+  }
+  .dark .ring-gray-300 {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgba(13, 56, 104, var(--tw-ring-opacity)); /* blue-6 */
+  }
+  .dark .text-slate-600 {
+    --tw-text-opacity: 1;
+    color: rgba(156, 163, 175, var(--tw-text-opacity)); /* gray-500 */
+  }
+}
+
 @layer base {
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button,
@@ -23,13 +78,17 @@
   scrollbar-width: none; /* Firefox */
 }
 
-.with-horizontal-scroll-shadow {
-  background-image: linear-gradient(to right, white, white), linear-gradient(to right, white, white),
-    linear-gradient(to right, rgba(0, 0, 20, 0.1), rgba(255, 255, 255, 0)),
-    linear-gradient(to left, rgba(0, 0, 20, 0.1), rgba(255, 255, 255, 0));
-  background-position: left center, right center, left center, right center;
+.with-horizontal-scroll-shadow{
+  background-position:
+    left center,
+    right center,
+    left center,
+    right center;
   background-repeat: no-repeat;
-  background-color: white;
-  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-size:
+    20px 100%,
+    20px 100%,
+    10px 100%,
+    10px 100%;
   background-attachment: local, local, scroll, scroll;
 }

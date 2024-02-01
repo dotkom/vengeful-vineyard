@@ -53,7 +53,7 @@ export const Listbox = <T,>({ label, value, onChange, options }: ListboxProps<T>
                     className={({ active, disabled }) =>
                       classNames(
                         disabled ? "text-gray-500" : active ? "bg-gray-900/5" : "text-gray-900",
-                        "relative cursor-default select-none py-2 pr-9"
+                        "relative cursor-pointer select-none py-2 pr-9 hover:text-gray-500"
                       )
                     }
                   >
