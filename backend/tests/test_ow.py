@@ -956,6 +956,7 @@ class TestWithDB_OW:
                                         "punishment_id": "",
                                         "punishment_reaction_id": "",
                                         "created_by": "",
+                                        "created_by_name": "BrageUpdated Updated",
                                         "created_at": "",
                                     },
                                     {
@@ -963,6 +964,7 @@ class TestWithDB_OW:
                                         "punishment_id": "",
                                         "punishment_reaction_id": "",
                                         "created_by": "",
+                                        "created_by_name": "Felix ",
                                         "created_at": "",
                                     },
                                 ],
