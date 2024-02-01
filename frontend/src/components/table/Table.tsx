@@ -53,7 +53,7 @@ export const Table = ({
         type="single"
         defaultValue="item-1"
         collapsible
-        className="divide-y divide-gray-100 bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg md:rounded-xl"
+        className="divide-y divide-gray-100 dark:divide-gray-700 bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg md:rounded-xl"
       >
         {groupData?.members
           .filter(filterUsers)

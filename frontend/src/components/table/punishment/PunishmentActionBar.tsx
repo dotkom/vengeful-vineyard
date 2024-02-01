@@ -117,7 +117,7 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
   return (
     <div
       className={classNames(
-        `w-full h-16 border-t flex flex-row items-center px-4 justify-between`,
+        `w-full h-16 border-t flex flex-row items-center px-4 justify-between dark:border-gray-700`,
         !isGroupContext && !label && listItems.length === 0 ? "hidden" : ""
       )}
     >
