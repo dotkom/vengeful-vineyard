@@ -92,8 +92,8 @@ export const RequestToJoinGroupModal: FC<RequestToJoinGroupModalProps> = ({ open
                 className="flex flex-col hover:bg-indigo-100/50 py-2 px-3 justify-start items-start"
                 onClick={() => handleSearchResultClick(group)}
               >
-                <span className="font-semibold text-gray-900">{group.name}</span>
-                <span className="text-sm">{group.name_short}</span>
+                <span className="font-semibold text-black">{group.name}</span>
+                <span className="text-sm text-gray-900">{group.name_short}</span>
               </button>
             ))}
           </div>
