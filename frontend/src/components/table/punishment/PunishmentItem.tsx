@@ -168,7 +168,7 @@ export const PunishmentItem = ({
         !punishment.paid ? "border-l-indigo-600" : "border-l-indigo-400"
       )}
     >
-      <div className="flex flex-row justify-between gap-x-2">
+      <div className="flex flex-row justify-between gap-x-2 text-black">
         <div className="text-left font-light">
           <p>
             <span className="block text-sm md:text-base">

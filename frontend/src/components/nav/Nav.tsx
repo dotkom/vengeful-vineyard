@@ -103,9 +103,9 @@ export const Nav = ({ auth }: NavProps) => {
               <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <Menu.Button className="flex rounded-full bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
-                      <AvatarIcon className="h-10 w-10 " />
+                      <AvatarIcon className="h-10 w-10 text-black" />
                     </Menu.Button>
                   </div>
                   <Transition
