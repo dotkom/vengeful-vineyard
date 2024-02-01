@@ -51,6 +51,10 @@
     --tw-ring-opacity: 1;
     --tw-ring-color: rgba(13, 56, 104, var(--tw-ring-opacity)); /* blue-6 */
   }
+  .dark .text-slate-600 {
+    --tw-text-opacity: 1;
+    color: rgba(156, 163, 175, var(--tw-text-opacity)); /* gray-500 */
+  }
 }
 
 @layer base {
