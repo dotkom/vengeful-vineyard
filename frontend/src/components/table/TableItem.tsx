@@ -167,7 +167,7 @@ export const TableItem = ({
     <AccordionItem value={user.user_id.toString()}>
       <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 rounded-lg md:rounded-xl hover:bg-gray-50">
         <div className="flex items-center gap-x-2">
-          <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 text-lg md:text-3xl text-[#4C4C51] relative">
+          <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 dark:bg-gray-800 text-lg md:text-3xl text-[#4C4C51] relative">
             {/* Displays the ith placement on the leaderboard if i is defined, otherwise displays an emoji */}
             {i !== undefined
               ? i + 1 === 1
