@@ -188,7 +188,7 @@ export const TableItem = ({
           </span>
           <div className="flex flex-col text-left">
             <p
-              className="w-32 md:w-44 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900"
+              className="w-32 md:w-44 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
               title={`${user.first_name} ${user.last_name}`}
             >
               {user.first_name} {user.last_name}
