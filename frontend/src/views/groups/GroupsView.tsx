@@ -12,35 +12,31 @@ import { Spinner } from "../../components/spinner"
 import { Table } from "../../components/table"
 import { ToggleOption } from "../../components/toggle/MultipleToggle"
 import { useCurrentUser } from "../../helpers/context/currentUserContext"
-import { useAdministerGroupJoinRequestsModal } from "../../helpers/context/modal/administerGroupJoinRequestsModalContext"
 import { useCreateGroupModal } from "../../helpers/context/modal/createGroupModalContext"
 import { useEditGroupMembersModal } from "../../helpers/context/modal/editGroupMembersModalContext"
 import { useEditGroupModal } from "../../helpers/context/modal/editGroupModalContext"
-import { useRequestToJoinGroupModal } from "../../helpers/context/modal/requestToJoinGroupModalContext"
 import { useMyGroupsRefetch } from "../../helpers/context/myGroupsRefetchContext"
 import { Group } from "../../helpers/types"
 import { DefaultHero } from "../hero"
-import { AdministerGroupJoinRequestsModal } from "./modal/AdministerGroupJoinRequestsModal"
 import { CreateGroupModal } from "./modal/CreateGroupModal"
 import { EditGroupMembersModal } from "./modal/EditGroupMembersModal"
+import { InviteUsersModal } from "./modal/InviteUsersModal"
 import { EditGroupModal } from "./modal/EditGroupModal"
-import { RequestToJoinGroupModal } from "./modal/RequestToJoinGroupModal"
 import { GroupsSidebar } from "./sidebar/GroupsSidebar"
 import { TabNav } from "./tabnav/TabNav"
 import { useGroupNavigation } from "../../helpers/context/groupNavigationContext"
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
+import { useInviteUsersModal } from "../../helpers/context/modal/inviteUsersModalContext"
 
 export const GroupsView = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
   const { setSelectedGroup } = useGroupNavigation()
   const { open: givePunishmentModalOpen, setOpen: setGivePunishmentModalOpen } = useGivePunishmentModal()
   const { open: createGroupModalOpen, setOpen: setCreateGroupModalOpen } = useCreateGroupModal()
-  const { open: requestToJoinGroupModalOpen, setOpen: setRequestToJoinGroupModalOpen } = useRequestToJoinGroupModal()
   const { open: editGroupModalOpen, setOpen: setEditGroupModalOpen } = useEditGroupModal()
   const { open: editGroupMembersModalOpen, setOpen: setEditGroupMembersModalOpen } = useEditGroupMembersModal()
-  const { open: administerGroupJoinRequestsModalOpen, setOpen: setAdministerGroupJoinRequestsModalOpen } =
-    useAdministerGroupJoinRequestsModal()
+  const { open: inviteUsersModalOpen, setOpen: setInviteUsersModalOpen } = useInviteUsersModal()
   const navigate = useNavigate()
   const { setMyGroupsRefetch } = useMyGroupsRefetch()
   const { preferredGroupShortName, setPreferredGroupShortName } = useGroupNavigation()
@@ -128,24 +124,17 @@ export const GroupsView = () => {
     <>
       <GivePunishmentModal open={givePunishmentModalOpen} setOpen={setGivePunishmentModalOpen} />
       <CreateGroupModal open={createGroupModalOpen} setOpen={setCreateGroupModalOpen} />
-      <RequestToJoinGroupModal open={requestToJoinGroupModalOpen} setOpen={setRequestToJoinGroupModalOpen} />
       <EditGroupModal open={editGroupModalOpen} setOpen={setEditGroupModalOpen} />
+      <InviteUsersModal open={editGroupMembersModalOpen} setOpen={setEditGroupMembersModalOpen} />
       <EditGroupMembersModal open={editGroupMembersModalOpen} setOpen={setEditGroupMembersModalOpen} />
-      <AdministerGroupJoinRequestsModal
-        open={administerGroupJoinRequestsModalOpen}
-        setOpen={setAdministerGroupJoinRequestsModalOpen}
-      />
+      <InviteUsersModal open={inviteUsersModalOpen} setOpen={setInviteUsersModalOpen} />
       {userIsLoading && !selectedGroup && (
         <section className="w-full mt-16 flex items-center justify-center">
           <Spinner />
         </section>
       )}
       {currentUser && !userIsLoading && !selectedGroup && (user?.groups.length ?? 0) === 0 && (
-        <DefaultHero
-          auth={auth}
-          setCreateGroupModalOpen={setCreateGroupModalOpen}
-          setRequestToJoinGroupModalOpen={setRequestToJoinGroupModalOpen}
-        />
+        <DefaultHero auth={auth} setCreateGroupModalOpen={setCreateGroupModalOpen} />
       )}
       {currentUser && !userIsLoading && !selectedGroup && (user?.groups.length ?? 0) > 0 && (
         <section className="flex flex-col gap-y-6 items-center w-full text-gray-800 mt-16">

@@ -4,7 +4,6 @@ import { MultipleToggle, ToggleOption } from "../../../components/toggle/Multipl
 
 import { CheckBadgeIcon } from "@heroicons/react/20/solid"
 import { Group } from "../../../helpers/types"
-import { GroupJoinRequestsContainer } from "./GroupJoinRequestsContainer"
 import { GroupSettings } from "./GroupSettings"
 import { Listbox } from "../../../components/listbox/Listbox"
 import { SidebarSection } from "./SidebarSection"
@@ -61,7 +60,6 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
               )}
             </h1>
             <div className="flex flex-row gap-x-3">
-              <GroupJoinRequestsContainer groupData={groupData} />
               <GroupSettings groupData={groupData} />
             </div>
           </>

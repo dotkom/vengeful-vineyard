@@ -12,7 +12,7 @@ from app.config import INDEXED_ROLES
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import Group, GroupCreate, GroupCreateMinified, GroupSearchResult
 from app.models.group_event import GroupEvent, GroupEventCreate
-from app.models.group_join_requests import GroupJoinRequest
+from app.models.group_invites import GroupInvite
 from app.models.group_member import GroupMemberCreate
 from app.models.group_user import GroupUser
 from app.models.permission import GroupMemberPermissionPatch
@@ -37,6 +37,81 @@ router = APIRouter(
     tags=["Groups"],
     route_class=APIRoute,
 )
+
+
+@router.post(
+    "/{group_id}/invites/accept",
+    dependencies=[Depends(oidc)],
+)
+async def accept_group_invite(
+    request: Request,
+    group_id: GroupId,
+):
+    """
+    Endpoint to accept a group invite.
+    """
+
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        try:
+            await app.db.group_invites.get(group_id, user_id, conn=conn)
+        except NotFound as exc:
+            raise HTTPException(
+                status_code=404, detail="Invitasjonen ble ikke funnet"
+            ) from exc
+
+        await app.db.groups.insert_member(
+            group_id,
+            GroupMemberCreate(
+                user_id=user_id,
+                ow_group_user_id=None,
+                active=True,
+            ),
+            conn=conn,
+        )
+
+        await app.db.group_invites.delete(
+            group_id,
+            user_id,
+            conn=conn,
+        )
+
+
+@router.post(
+    "/{group_id}/invites/decline",
+    dependencies=[Depends(oidc)],
+)
+async def decline_group_invite(
+    request: Request,
+    group_id: GroupId,
+):
+    """
+    Endpoint to decline a group invite.
+    """
+
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        try:
+            await app.db.group_invites.get(group_id, user_id, conn=conn)
+        except NotFound as exc:
+            raise HTTPException(
+                status_code=404, detail="Invitasjonen ble ikke funnet"
+            ) from exc
+
+        await app.db.group_invites.delete(
+            group_id,
+            user_id,
+            conn=conn,
+        )
+
 
 
 @router.get(
@@ -71,30 +146,49 @@ async def get_my_groups(
     return groups
 
 
-@router.get(
-    "/search",
-    response_model=list[GroupSearchResult],
-    dependencies=[Depends(oidc)],
+@router.post(
+    "/{group_id}/invites/{user_id}",
+    dependencies=[Depends(oidc)]
 )
-async def search_groups(
+async def post_group_invite(
     request: Request,
-    query: str = Query(title="Query", default=""),
-    limit: int = Query(title="Limit", default=5, ge=1, le=10),
-    include_ow_groups: bool = Query(title="Include OW groups", default=True),
-) -> list[GroupSearchResult]:
+    group_id: GroupId,
+    user_id: UserId,
+):
     """
-    Endpoint to search for groups.
+    Endpoint to create a new group invite.
     """
-    request.raise_if_missing_authorization()
+    access_token = request.raise_if_missing_authorization()
+
     app = request.app
+    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
-    if len(query) < 1:
-        return []
+    async with app.db.pool.acquire() as conn:
+        try:
+            group = await app.db.groups.get(group_id, include_members=False, conn=conn)
+        except NotFound as exc:
+            raise HTTPException(
+                status_code=404, detail="Gruppen ble ikke funnet"
+            ) from exc
 
-    return await app.db.groups.search(
-        query, limit=limit, include_ow_groups=include_ow_groups
-    )
+        is_ow_group = group.ow_group_id is not None
+        permission_manager = app.get_permission_manager(is_ow_group=is_ow_group)
+        await permission_manager.raise_if_missing_permission(
+            group_id,
+            requester_user_id,
+            "group.invites.create",
+            conn=conn,
+        )
 
+        try:
+            return await app.db.group_invites.insert(
+                group_id=group_id,
+                user_id=user_id,
+                created_by=requester_user_id,
+                conn=conn,
+            )
+        except DatabaseIntegrityException as exc:
+            raise HTTPException(status_code=400, detail=exc.detail) from exc
 
 @router.get(
     "/{group_id}/users/{user_id}",
@@ -200,7 +294,7 @@ async def get_group_users(request: Request, group_id: GroupId) -> list[GroupUser
                 status_code=403, detail="Du er ikke et medlem av gruppen"
             )
 
-        return await app.db.group_users.get_all(group_id, conn=conn)
+        return await app.db.group_users.get_by_group(group_id, conn=conn)
 
 
 @router.get(
@@ -228,8 +322,18 @@ async def get_group(request: Request, group_id: GroupId) -> Group:
                 status_code=403, detail="Du er ikke et medlem av gruppen"
             )
 
+        permission_manager = app.get_permission_manager(
+            is_ow_group=await app.db.groups.is_ow_group(group_id, conn=conn)
+        )
+        include_invites = await permission_manager.has_permission(
+            group_id,
+            user_id,
+            "group.invites.view",
+            conn=conn,
+        )
+
         try:
-            return await app.db.groups.get(group_id, conn=conn)
+            return await app.db.groups.get(group_id, include_invites=include_invites, conn=conn)
         except NotFound as exc:
             raise HTTPException(
                 status_code=404, detail="Gruppen ble ikke funnet"
@@ -1210,13 +1314,14 @@ async def total_punishment_value(
 
 
 @router.get(
-    "/{group_id}/joinRequests",
+    "/{group_id}/invites",
+    response_model=list[GroupInvite],
     dependencies=[Depends(oidc)],
 )
-async def get_group_join_requests(
+async def get_group_invited_users(
     request: Request,
     group_id: GroupId,
-) -> list[GroupJoinRequest]:
+) -> list[GroupInvite]:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
@@ -1239,166 +1344,65 @@ async def get_group_join_requests(
         await permission_manager.raise_if_missing_permission(
             group_id,
             user_id,
-            "group.join_requests.view",
+            "group.invites.view",
             conn=conn,
         )
 
-        return await app.db.group_join_requests.get_all(
+        return await app.db.group_invites.get_by_group(
             group_id,
             conn=conn,
         )
 
 
-@router.post(
-    "/{group_id}/joinRequests",
+@router.delete(
+    "/{group_id}/invites/{invite_user_id}",
     dependencies=[Depends(oidc)],
 )
-async def create_group_join_request(
+async def delete_group_invite(
     request: Request,
     group_id: GroupId,
-) -> None:
+    invite_user_id: UserId,
+):
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        is_ow_group, is_in_group = await app.db.groups.combined_group_check(
+        is_ow_group, is_group_member = await app.db.groups.combined_group_check(
             group_id,
             user_id,
             conn=conn,
         )
 
-        if is_in_group:
+        if not is_group_member:
             raise HTTPException(
-                status_code=400,
-                detail="Du er allerede medlem av denne gruppen",
+                status_code=403,
+                detail="Du må være et medlem av gruppen for å utføre denne handlingen",
             )
 
         if is_ow_group:
             raise HTTPException(
                 status_code=400,
-                detail="Du kan ikke sende en forespørsel om å bli medlem av en automatisk administrert gruppe",
+                detail="Du kan ikke invitere brukere til en automatisk administrert gruppe",
             )
 
-        try:
-            await app.db.group_join_requests.get(
-                group_id,
-                user_id,
-                conn=conn,
-            )
-        except NotFound:
-            pass
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail="Du har allerede sendt en forespørsel om å bli medlem av denne gruppen",
-            )
-
-        await app.db.group_join_requests.insert(
+        permission_manager = app.get_permission_manager(is_ow_group=is_ow_group)
+        await permission_manager.raise_if_missing_permission(
             group_id,
             user_id,
-            conn=conn,
-        )
-
-
-@router.post(
-    "/{group_id}/joinRequests/{user_id}/accept",
-    dependencies=[Depends(oidc)],
-)
-async def accept_group_join_request(
-    request: Request,
-    group_id: GroupId,
-    user_id: UserId,
-) -> None:
-    access_token = request.raise_if_missing_authorization()
-
-    app = request.app
-    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
-
-    async with app.db.pool.acquire() as conn:
-        is_ow_group, is_group_member = await app.db.groups.combined_group_check(
-            group_id,
-            requester_user_id,
-            conn=conn,
-        )
-
-        if not is_group_member:
-            raise HTTPException(
-                status_code=403,
-                detail="Du må være et medlem av gruppen for å utføre denne handlingen",
-            )
-
-        permission_manager = app.get_permission_manager(is_ow_group=is_ow_group)
-        await permission_manager.raise_if_missing_permission(
-            group_id,
-            requester_user_id,
-            "group.join_requests.accept",
+            "group.invites.delete",
             conn=conn,
         )
 
         try:
-            await app.db.group_join_requests.delete(
-                group_id,
-                user_id,
+            await app.db.group_invites.delete(
+                group_id=group_id,
+                user_id=invite_user_id,
                 conn=conn,
             )
         except NotFound as exc:
             raise HTTPException(
                 status_code=404,
-                detail="Medlemsforespørselen ble ikke funnet",
-            ) from exc
-
-        await app.db.groups.insert_member(
-            group_id,
-            GroupMemberCreate(user_id=user_id, ow_group_user_id=None, active=True),
-            conn=conn,
-        )
-
-
-@router.post(
-    "/{group_id}/joinRequests/{user_id}/deny",
-    dependencies=[Depends(oidc)],
-)
-async def deny_group_join_request(
-    request: Request,
-    group_id: GroupId,
-    user_id: UserId,
-) -> None:
-    access_token = request.raise_if_missing_authorization()
-
-    app = request.app
-    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
-
-    async with app.db.pool.acquire() as conn:
-        is_ow_group, is_group_member = await app.db.groups.combined_group_check(
-            group_id,
-            requester_user_id,
-            conn=conn,
-        )
-
-        if not is_group_member:
-            raise HTTPException(
-                status_code=403,
-                detail="Du må være et medlem av gruppen for å utføre denne handlingen",
-            )
-
-        permission_manager = app.get_permission_manager(is_ow_group=is_ow_group)
-        await permission_manager.raise_if_missing_permission(
-            group_id,
-            requester_user_id,
-            "group.join_requests.deny",
-            conn=conn,
-        )
-
-        try:
-            await app.db.group_join_requests.delete(
-                group_id,
-                user_id,
-                conn=conn,
-            )
-        except NotFound as exc:
-            raise HTTPException(
-                status_code=404,
-                detail="Medlemsforespørselen ble ikke funnet",
+                detail="Invitasjonen ble ikke funnet",
             ) from exc

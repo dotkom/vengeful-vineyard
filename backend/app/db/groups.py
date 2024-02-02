@@ -104,27 +104,33 @@ class Groups:
 
         return [GroupSearchResult(**row) for row in res]
 
+    async def is_ow_group(
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool] = None,
+    ) -> bool:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = "SELECT ow_group_id FROM groups WHERE group_id = $1"
+            res = await conn.fetchval(query, group_id)
+            return res is not None
+
     async def get(
         self,
         group_id: GroupId,
         include_members: bool = True,
+        include_invites: bool = False,
         conn: Optional[Pool] = None,
     ) -> Group:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
-                WITH join_request_users AS (
-                    SELECT gjr.group_id, u.*
-                    FROM group_join_requests gjr
-                    LEFT JOIN users u ON gjr.user_id = u.user_id
-                    WHERE gjr.group_id = $1
-                )
                 SELECT
                     g.*,
-                    COALESCE(json_agg(pt.* ORDER BY pt.created_at) FILTER (WHERE pt.punishment_type_id IS NOT NULL), '[]') AS punishment_types,
-                    COALESCE(json_agg(DISTINCT jru.*) FILTER (WHERE jru.user_id IS NOT NULL), '[]') AS join_requests
+                    COALESCE(json_agg(pt.* ORDER BY pt.created_at) FILTER (WHERE pt.punishment_type_id IS NOT NULL), '[]') AS punishment_types
+                    -- Here we comment out the invites part if include_invites is False
+                    """ + ("" if include_invites else "--") + """ , COALESCE(json_agg(gi.* ORDER BY gi.created_at) FILTER (WHERE gi.group_id IS NOT NULL), '[]') AS invites
                 FROM groups g
                 LEFT JOIN punishment_types pt ON g.group_id = pt.group_id
-                LEFT JOIN join_request_users jru ON g.group_id = jru.group_id
+                LEFT JOIN group_invites gi ON g.group_id = gi.group_id
                 WHERE g.group_id = $1
                 GROUP BY g.group_id;
                 """

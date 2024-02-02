@@ -7,7 +7,7 @@ import { Group, GroupUser } from "../../../helpers/types"
 import { Transition } from "@headlessui/react"
 import { z } from "zod"
 import { AlcoholInput } from "../../../components/input/AlcoholInput"
-import { PersonSelect } from "../../../components/input/PersonSelect"
+import { MemberSelect } from "../../../components/input/MemberSelect"
 import { TextInput } from "../../../components/input/TextInput"
 import { Toggle } from "../../../components/input/Toggle"
 import { Modal } from "../../../components/modal/Modal"
@@ -132,11 +132,11 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
         <div className="mt-4 flex flex-col gap-4 font-normal">
           {data ? (
             <>
-              <PersonSelect
+              <MemberSelect
                 label="Gi straff til"
                 members={sortedMembers}
-                selectedPerson={selectedPerson}
-                setSelectedPerson={setSelectedPerson}
+                selectedMember={selectedPerson}
+                setSelectedMember={setSelectedPerson}
               />
               <TextInput
                 label="Begrunnelse"

@@ -1,3 +1,5 @@
+import { User } from "./types"
+
 const emojis = [
   "😀",
   "😃",
@@ -114,4 +116,8 @@ const simpleHash = (str: string) => {
 export const textToEmoji = (text: string) => {
   const hash = simpleHash(text)
   return emojis[Math.abs(hash) % emojis.length]
+}
+
+export const userEmoji = (user: User) => {
+  return textToEmoji(user.first_name + user.last_name)
 }

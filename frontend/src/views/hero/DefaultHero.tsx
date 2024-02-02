@@ -3,11 +3,10 @@ import { Button } from "../../components/button"
 
 interface DefaultHeroProps {
   auth: AuthContextProps
-  setRequestToJoinGroupModalOpen?: (open: boolean) => void
   setCreateGroupModalOpen?: (open: boolean) => void
 }
 
-export const DefaultHero = ({ auth, setRequestToJoinGroupModalOpen, setCreateGroupModalOpen }: DefaultHeroProps) => (
+export const DefaultHero = ({ auth, setCreateGroupModalOpen }: DefaultHeroProps) => (
   <div className="relative isolate overflow-hidden bg-white">
     <svg
       className="absolute inset-0 -z-10 h-full w-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
@@ -47,11 +46,6 @@ export const DefaultHero = ({ auth, setRequestToJoinGroupModalOpen, setCreateGro
                 variant="REGULAR"
                 label="Lag ny gruppe"
                 onClick={() => setCreateGroupModalOpen && setCreateGroupModalOpen(true)}
-              />
-              <Button
-                variant="REGULAR"
-                label="Søk etter gruppe"
-                onClick={() => setRequestToJoinGroupModalOpen && setRequestToJoinGroupModalOpen(true)}
               />
             </>
           )}

@@ -9,6 +9,7 @@ from aiohttp import ClientSession
 from .exceptions import NotAuthorizedException
 
 BASE_OLD_ONLINE = "https://old.online.ntnu.no"
+url = ""
 
 
 def create_aiohttp_closed_event(session: ClientSession) -> asyncio.Event:

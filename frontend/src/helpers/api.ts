@@ -1,4 +1,4 @@
-import { Group, Leaderboard, MeUser, PunishmentCreate } from "./types"
+import { Group, Leaderboard, MeUser, PunishmentCreate, User } from "./types"
 import { QueryKey, UseInfiniteQueryOptions, UseQueryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
@@ -21,6 +21,9 @@ export const getGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
 
 export const getGroupsSearchUrl = (query: string, includeOwGroups: boolean = false, limit: number = 5) =>
   BASE_URL + `/groups/search?query=${query}&include_ow_groups=${includeOwGroups}&limit=${limit}`
+
+export const getUserSearchUrl = (query: string, limit: number = 5) =>
+  BASE_URL + `/users/search?query=${query}&limit=${limit}`
 
 export const getPostGroupUrl = () => BASE_URL + "/groups"
 
@@ -103,6 +106,17 @@ export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser, [
     options
   )
 
+export const useUserSearch = (
+  query: string,
+  limit: number = 5,
+  options?: UseQueryOptions<User[], unknown, User[], [string, string, string]>
+) =>
+  useQuery<User[], unknown, User[], [string, string, string]>(
+    ["userSearch", query, limit.toString()],
+    () => axios.get<User[]>(getUserSearchUrl(query, limit)).then((res: AxiosResponse<User[]>) => res.data),
+    options
+  )
+
 export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {
   return addManyPunishments(groupId, userId, [punishment])
 }
@@ -114,6 +128,19 @@ export const addReaction = async (punishmentId: string, emoji: string) =>
   (await axios.post(getAddReactionUrl(punishmentId), { emoji })).data
 
 export const removeReaction = async (punishmentId: string) => (await axios.delete(getAddReactionUrl(punishmentId))).data
+
+const getInviteToGroupUrl = (groupId: string, user_id: string) => BASE_URL + `/groups/${groupId}/invites/${user_id}`
+
+export const inviteUserToGroup = async (groupId: string, userId: string) =>
+  (await axios.post(getInviteToGroupUrl(groupId, userId))).data
+
+const getAcceptGroupInviteUrl = (groupId: string) => BASE_URL + `/groups/${groupId}/invites/accept`
+
+export const acceptGroupInvite = async (groupId: string) => (await axios.post(getAcceptGroupInviteUrl(groupId))).data
+
+const getDenyGroupInviteUrl = (groupId: string) => BASE_URL + `/groups/${groupId}/invites/decline`
+
+export const declineGroupInvite = async (groupId: string) => (await axios.post(getDenyGroupInviteUrl(groupId))).data
 
 const getLeaderboard = ({ pageParam = LEADERBOARD_URL }) =>
   axios.get(pageParam).then((res: AxiosResponse<Leaderboard>) => res.data)

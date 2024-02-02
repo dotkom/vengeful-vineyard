@@ -13,7 +13,7 @@ import {
 import { AccordionContent, AccordionItem, AccordionTrigger } from "./accordion/Accordion"
 
 import { IconType } from "react-icons"
-import { textToEmoji } from "../../helpers/emojies"
+import { textToEmoji, userEmoji } from "../../helpers/emojies"
 import { PunishmentList } from "./punishment/PunishmentList"
 
 interface TableItemProps {
@@ -171,15 +171,7 @@ export const TableItem = ({
         <div className="flex items-center gap-x-2">
           <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 dark:bg-gray-800 text-lg md:text-3xl text-[#4C4C51] relative">
             {/* Displays the ith placement on the leaderboard if i is defined, otherwise displays an emoji */}
-            {i !== undefined
-              ? i + 1 === 1
-                ? "🥇"
-                : i + 1 === 2
-                ? "🥈"
-                : i + 1 === 3
-                ? "🥉"
-                : i + 1
-              : textToEmoji(user.first_name + user.last_name)}
+            {i !== undefined ? (i + 1 === 1 ? "🥇" : i + 1 === 2 ? "🥈" : i + 1 === 3 ? "🥉" : i + 1) : userEmoji(user)}
             {RoleIcon && (
               <div className="absolute -top-2 -right-0.5">
                 <RoleIcon className="h-4 w-4 md:h-5 md:w-5 text-gray-700" title={roleName} />

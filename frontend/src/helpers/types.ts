@@ -8,6 +8,7 @@ export interface User {
 
 export interface MeUser extends User {
   groups: Group[]
+  invites: GroupInviteWithMetadata[]
 }
 
 export interface Leaderboard {
@@ -77,10 +78,27 @@ export interface GroupBase {
 export type GroupRole = [string, string]
 export type GroupPermissions = Record<string, string[]>
 
+export interface GroupInviteBase {
+  group_id: string
+  user_id: string
+}
+
+export interface GroupInviteCreate extends GroupInviteBase {}
+
+export interface GroupInvite extends GroupInviteBase {
+  created_at: string
+}
+
+export interface GroupInviteWithMetadata {
+  invite: GroupInvite
+  created_by_name: string
+  group_name: string
+}
+
 export interface Group extends GroupBase {
   punishment_types: PunishmentType[]
   members: GroupUser[]
-  join_requests: User[]
+  invites: GroupInvite[]
   roles: GroupRole[]
   permissions: GroupPermissions
 }

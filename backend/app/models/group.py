@@ -7,6 +7,7 @@ from typing import Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
+from app.models.group_invites import GroupInvite, GroupInviteWithMetadata
 from app.models.group_user import GroupUser
 from app.models.punishment_type import PunishmentTypeRead
 from app.models.user import User
@@ -46,10 +47,13 @@ class Group(GroupCreate):
     group_id: GroupId
     punishment_types: list[PunishmentTypeRead] = []
     members: list[GroupUser] = []
-    join_requests: list[User] = []
+    invites: Optional[list[GroupInvite]] = []
     roles: list[tuple[str, PermissionPrivilege]] = []
     permissions: dict[PermissionPrivilege, list[PermissionPrivilege]] = {}
 
 
-class UserWithGroups(User):
-    groups: list[Group]
+class UserWithGroupsAndInvites(User):
+    groups: Optional[list[Group]] = []
+    invites: Optional[list[GroupInviteWithMetadata]] = []
+
+

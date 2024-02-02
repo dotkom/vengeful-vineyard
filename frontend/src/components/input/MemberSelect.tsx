@@ -4,16 +4,16 @@ import { Dispatch, Fragment, SetStateAction, useState } from "react"
 import { GroupUser } from "../../helpers/types"
 
 import { classNames } from "../../helpers/classNames"
-import { textToEmoji } from "../../helpers/emojies"
+import { textToEmoji, userEmoji } from "../../helpers/emojies"
 
-interface PersonSelectProps {
+interface MemberSelectProps {
   label?: string
   members: GroupUser[]
-  selectedPerson: GroupUser | undefined
-  setSelectedPerson: Dispatch<SetStateAction<GroupUser | undefined>>
+  selectedMember: GroupUser | undefined
+  setSelectedMember: Dispatch<SetStateAction<GroupUser | undefined>>
 }
 
-export const PersonSelect = ({ label, members, selectedPerson, setSelectedPerson }: PersonSelectProps) => {
+export const MemberSelect = ({ label, members, selectedMember, setSelectedMember }: MemberSelectProps) => {
   const [query, setQuery] = useState("")
 
   const filteredMembers = members.filter((member) => {
@@ -21,9 +21,9 @@ export const PersonSelect = ({ label, members, selectedPerson, setSelectedPerson
     return fullName.includes(query.toLowerCase())
   })
 
-  if (selectedPerson)
+  if (selectedMember)
     return (
-      <Combobox value={selectedPerson} onChange={setSelectedPerson}>
+      <Combobox value={selectedMember} onChange={setSelectedMember}>
         {({ activeOption }) => (
           <div className="relative flex flex-col gap-y-1">
             {label && <span className="font-bold text-sm ml-1 text-gray-700">{label}</span>}
@@ -35,7 +35,7 @@ export const PersonSelect = ({ label, members, selectedPerson, setSelectedPerson
             >
               {query === "" && !activeOption && (
                 <span className="absolute flex items-center h-full top-0 left-2 text-base">
-                  {textToEmoji(selectedPerson.first_name + selectedPerson.last_name)}
+                  {userEmoji(selectedMember)}
                 </span>
               )}
               <Combobox.Input
@@ -75,7 +75,7 @@ export const PersonSelect = ({ label, members, selectedPerson, setSelectedPerson
                       <>
                         <div className="flex items-center">
                           <span className="flex h-5 w-5 items-center justify-center rounded-full  align-middle text-xl">
-                            {textToEmoji(person.first_name + person.last_name)}
+                            {userEmoji(person)}
                           </span>
                           <span
                             className={classNames(selected ? "font-semibold" : "font-normal", "ml-3 block truncate")}

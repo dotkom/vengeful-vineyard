@@ -41,9 +41,9 @@ PERMISSIONS = [
     ["group.punishments.delete", ["group.moderator"]],
     ["group.punishments.mark_paid", ["group.moderator"]],
     ["group.punishments.mark_unpaid", ["group.moderator"]],
-    ["group.join_requests.view", ["group.admin"]],
-    ["group.join_requests.accept", ["group.admin"]],
-    ["group.join_requests.deny", ["group.admin"]],
+    ["group.invites.view", ["group.admin"]],
+    ["group.invites.create", ["group.admin"]],
+    ["group.invites.delete", ["group.admin"]],
 ]
 PERMISSIONS_AS_DICT: dict[PermissionPrivilege, list[PermissionPrivilege]] = dict(
     PERMISSIONS  # type: ignore
@@ -70,9 +70,9 @@ OW_GROUP_PERMISSIONS = [
     ["group.punishments.delete", ["group.moderator"]],
     ["group.punishments.mark_paid", [ALWAYS]],
     ["group.punishments.mark_unpaid", [ALWAYS]],
-    ["group.join_requests.view", [NEVER]],
-    ["group.join_requests.accept", [NEVER]],
-    ["group.join_requests.deny", [NEVER]],
+    ["group.invites.view", [NEVER]],
+    ["group.invites.create", [NEVER]],
+    ["group.invites.delete", [NEVER]],
 ]
 OW_GROUP_PERMISSIONS_AS_DICT: dict[
     PermissionPrivilege, list[PermissionPrivilege]

@@ -13,7 +13,7 @@ import { canGiveRole, hasPermission } from "../../../helpers/permissions"
 import { Transition } from "@headlessui/react"
 import axios from "axios"
 import { Button } from "../../../components/button"
-import { PersonSelect } from "../../../components/input/PersonSelect"
+import { MemberSelect } from "../../../components/input/MemberSelect"
 import { Modal } from "../../../components/modal"
 import { Spinner } from "../../../components/spinner"
 import { useCurrentUser } from "../../../helpers/context/currentUserContext"
@@ -188,11 +188,11 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
               <div className="w-64"></div>
 
               <div className="flex flex-col gap-y-4">
-                <PersonSelect
+                <MemberSelect
                   label="Rediger gruppemedlem"
                   members={members}
-                  selectedPerson={selectedPerson}
-                  setSelectedPerson={setSelectedPerson}
+                  selectedMember={selectedPerson}
+                  setSelectedMember={setSelectedPerson}
                 />
                 <div className="flex flex-col gap-y-3 w-full border-l-2 border-l-gray-500/50 pl-3">
                   <Listbox

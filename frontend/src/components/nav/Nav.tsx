@@ -12,6 +12,9 @@ import OnlineLogo from "../../assets/online.png"
 import axios from "axios"
 import { classNames } from "../../helpers/classNames"
 import { useQueryClient } from "@tanstack/react-query"
+import { MdNotificationImportant, MdNotifications, MdOutlineNotifications } from "react-icons/md"
+import { NotificationsMenu } from "./NotificationsMenu"
+import { UserMenu } from "./UserMenu"
 import { useDarkMode } from "../../DarkModeContext"
 
 interface NavItem {
@@ -61,6 +64,10 @@ export const Nav = ({ auth }: NavProps) => {
     },
   ]
 
+  const { data: user } = useMyGroups({
+    enabled: auth.isAuthenticated,
+  })
+
   const { darkMode, setDarkMode } = useDarkMode()
 
   return (
@@ -101,53 +108,8 @@ export const Nav = ({ auth }: NavProps) => {
                 </div>
               </div>
               <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
-                <Menu as="div" className="relative ml-3">
-                  <div>
-                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                      <span className="sr-only">Open user menu</span>
-                      <AvatarIcon className="h-10 w-10 text-black" />
-                    </Menu.Button>
-                  </div>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white  py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-gray-700 ">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Fragment>
-                            <button
-                              onClick={() => setDarkMode(!darkMode)}
-                              className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm")}
-                            >
-                              {darkMode ? "Lightmode" : "Darkmode"}
-                            </button>
-                            {auth.isAuthenticated ? (
-                              <button
-                                onClick={() => void auth.removeUser()}
-                                className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm")}
-                              >
-                                Logg ut
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => void auth.signinRedirect()}
-                                className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm")}
-                              >
-                                Logg inn
-                              </button>
-                            )}
-                          </Fragment>
-                        )}
-                      </Menu.Item>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
+                <NotificationsMenu invites={user?.invites ?? []} />
+                <UserMenu auth={auth} />
               </div>
             </div>
           </div>

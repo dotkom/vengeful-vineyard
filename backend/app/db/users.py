@@ -431,3 +431,18 @@ class Users:
 
             result = await conn.fetch(query, user_id)
             return [Group(**row) for row in result]
+
+    async def search(
+        self,
+        query: str,
+        limit: int = 5,
+        conn: Optional[Pool] = None,
+    ) -> list[User]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            sqlquery = f"""SELECT * FROM users
+                    WHERE (first_name || ' ' || last_name) ILIKE $1
+                    LIMIT $2"""
+            res = await conn.fetch(sqlquery, f"%{query}%", limit)
+
+        # Don't leak email of users (GDPR moment), probably a better way to do this though
+        return [User(**{k: v for k, v in row.items() if k != "email"}) for row in res]

@@ -1,5 +1,5 @@
-export const Spinner = ({ width = undefined, height = undefined }) => (
-  <div role="status" style={{ width, height }}>
+export const SmallSpinner = () => (
+  <div role="status" className="flex items-center justify-center w-6 h-6">
     <svg
       aria-hidden="true"
       className="mr-2 h-12 w-12 animate-spin fill-blue-600 text-gray-200 dark:text-gray-100"

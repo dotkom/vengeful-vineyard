@@ -4,11 +4,9 @@ import { Menu } from "../../../components/menu/Menu"
 import { MenuItemProps } from "../../../components/menu/MenuItem"
 import { PlusIcon } from "@radix-ui/react-icons"
 import { useCreateGroupModal } from "../../../helpers/context/modal/createGroupModalContext"
-import { useRequestToJoinGroupModal } from "../../../helpers/context/modal/requestToJoinGroupModalContext"
 
 export const AdditionalGroupNavItem = () => {
   const { setOpen: setCreateGroupModalOpen } = useCreateGroupModal()
-  const { setOpen: setRequestToJoinGroupModal } = useRequestToJoinGroupModal()
 
   const listItems: MenuItemProps[] = [
     {
@@ -17,14 +15,6 @@ export const AdditionalGroupNavItem = () => {
       color: "REGULAR",
       onClick: () => {
         setCreateGroupModalOpen(true)
-      },
-    },
-    {
-      label: "Bli med i eksisterende gruppe",
-      icon: <MagnifyingGlassIcon className="h-5 w-5" />,
-      color: "REGULAR",
-      onClick: () => {
-        setRequestToJoinGroupModal(true)
       },
     },
   ]

@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api import APIRoute, Request, oidc
 from app.exceptions import NotFound
-from app.models.group import UserWithGroups
-from app.models.user import LeaderboardUser
+from app.models.group import UserWithGroupsAndInvites
+from app.models.user import LeaderboardUser, User
 from app.utils.pagination import Page, Pagination
 
 router = APIRouter(
@@ -19,15 +19,16 @@ router = APIRouter(
 
 @router.get(
     "/me",
-    response_model=UserWithGroups,
+    response_model=UserWithGroupsAndInvites,
     dependencies=[Depends(oidc)],
 )
 async def get_me(
     request: Request,
     include_groups: bool = Query(title="Include groups", default=True),
+    include_invites: bool = Query(title="Include invites", default=True),
     wait_for_updates: bool = Query(title="Wait for updates", default=True),
     optimistic: bool = Query(title="Optimistic", default=False),
-) -> UserWithGroups:
+) -> User:
     app = request.app
     access_token = request.raise_if_missing_authorization()
 
@@ -50,13 +51,42 @@ async def get_me(
         groups = []
         if include_groups:
             groups = await app.db.users.get_groups(user_id, conn=conn)
+        if include_invites:
+            invites = await app.db.group_invites.get_with_metadata_by_user(user_id, conn=conn)
+
 
         user = await app.db.users.get(user_id=user_id, conn=conn)
 
-        return UserWithGroups(
+        return UserWithGroupsAndInvites(
             groups=groups,
+            invites=invites,
             **dict(user),
         )
+
+
+@router.get(
+    "/search",
+    response_model=list[User],
+    dependencies=[Depends(oidc)],
+)
+async def search_users(
+    request: Request,
+    query: str = Query(title="Query", default=""),
+    limit: int = Query(title="Limit", default=5, ge=1, le=10),
+) -> list[User]:
+    """
+    Endpoint to search for users.
+    """
+    request.raise_if_missing_authorization()
+    app = request.app
+
+    if len(query) < 1:
+        return []
+
+    return await app.db.users.search(
+        query, limit=limit
+    )
+
 
 
 @router.get(

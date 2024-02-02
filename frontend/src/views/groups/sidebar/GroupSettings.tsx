@@ -21,6 +21,8 @@ import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchCont
 import { useNotification } from "../../../helpers/context/notificationContext"
 import { hasPermission } from "../../../helpers/permissions"
 import { Group } from "../../../helpers/types"
+import { AiOutlineUsergroupAdd } from "react-icons/ai"
+import { useInviteUsersModal } from "../../../helpers/context/modal/inviteUsersModalContext"
 
 interface GroupSettingsProps {
   groupData: Group | undefined
@@ -29,6 +31,7 @@ interface GroupSettingsProps {
 export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   const { setOpen: setEditGroupModalOpen } = useEditGroupModal()
   const { setOpen: setEditGroupMembersModalOpen } = useEditGroupMembersModal()
+  const { setOpen: setAddGroupMembersModalOpen } = useInviteUsersModal()
   const { currentUser } = useCurrentUser()
   const { setNotification } = useNotification()
   const { myGroupsRefetch } = useMyGroupsRefetch()
@@ -91,6 +94,16 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   )
 
   const listItems: MenuItemProps[] = []
+
+  if (hasPermission(groupPermissions, "group.invites.create", currentUserRole)) {
+    listItems.unshift({
+      label: "Inviter brukere",
+      icon: <AiOutlineUsergroupAdd className="h-5 w-5" />,
+      onClick: () => {
+        setAddGroupMembersModalOpen(true)
+      },
+    })
+  }
 
   if (hasPermission(groupPermissions, "group.members.manage", currentUserRole)) {
     listItems.unshift({
