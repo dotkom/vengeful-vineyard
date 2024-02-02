@@ -1,33 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
-import { Listbox, ListboxOption } from "../../../components/listbox/Listbox"
-import {
-  VengefulApiError,
-  getDeleteGroupMemberUrl,
-  getPatchGroupMemberPermissionsUrl,
-  getTransferGroupOwnershipUrl,
-  useGroupLeaderboard,
-  useUserSearch,
-} from "../../../helpers/api"
-import { canGiveRole, hasPermission } from "../../../helpers/permissions"
+import { Dispatch, FC, Fragment, SetStateAction, useRef, useState } from "react"
+import { useUserSearch } from "../../../helpers/api"
 
-import { Combobox, Transition } from "@headlessui/react"
-import axios from "axios"
-import { Button } from "../../../components/button"
-import { MemberSelect } from "../../../components/input/MemberSelect"
+import { Transition } from "@headlessui/react"
 import { Modal } from "../../../components/modal"
 import { Spinner } from "../../../components/spinner"
-import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
-import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
-import { useNotification } from "../../../helpers/context/notificationContext"
-import { GroupUser } from "../../../helpers/types"
-import { InputConfirmModal } from "../../../components/modal/InputConfirmModal"
-import { ChevronUpDownIcon } from "@heroicons/react/20/solid"
-import { textToEmoji, userEmoji } from "../../../helpers/emojies"
 import { useDebounce } from "use-debounce"
-import { AiOutlineUsergroupAdd } from "react-icons/ai"
 import { InviteUserButton } from "../../../components/button/InviteUserButton"
+import { userEmoji } from "../../../helpers/emojies"
 
 interface InviteGroupMembersModalProps {
   open: boolean
@@ -36,7 +16,6 @@ interface InviteGroupMembersModalProps {
 
 export const InviteUsersModal: FC<InviteGroupMembersModalProps> = ({ open, setOpen }) => {
   const { selectedGroup } = useGroupNavigation()
-  const { setNotification } = useNotification()
 
   const [query, setQuery] = useState("")
   const { data: userSearchResults, isLoading: isSearching } = useUserSearch(query, 5)
