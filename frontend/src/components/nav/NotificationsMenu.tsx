@@ -6,6 +6,7 @@ import { GroupInviteWithMetadata } from "../../helpers/types"
 import { useMutation } from "@tanstack/react-query"
 import { acceptGroupInvite, declineGroupInvite } from "../../helpers/api"
 import { useNavigate } from "react-router-dom"
+import { useDarkMode } from "../../DarkModeContext"
 
 export const NotificationsMenu = ({ invites }: { invites: GroupInviteWithMetadata[] }) => {
   const navigate = useNavigate()
@@ -18,12 +19,14 @@ export const NotificationsMenu = ({ invites }: { invites: GroupInviteWithMetadat
     onSuccess: () => alert("TODO: Implement invite decline"),
   })
 
+  const { darkMode } = useDarkMode()
+
   return (
     <Menu as="div" className="relative ml-3">
       <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
         <span className="sr-only">Open notifications</span>
         <div className="relative">
-          <MdOutlineNotifications className="h-10 w-10" />
+          <MdOutlineNotifications className={classNames("h-10 w-10", darkMode ? "text-gray-300" : "text-gray-700")} />
           {invites.length > 0 && <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-600"></span>}
         </div>
       </Menu.Button>

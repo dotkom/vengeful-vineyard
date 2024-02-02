@@ -2,18 +2,20 @@ import { Menu, Transition } from "@headlessui/react"
 import { AvatarIcon } from "@radix-ui/react-icons"
 import { Fragment } from "react"
 import { classNames } from "../../helpers/classNames"
+import { useDarkMode } from "../../DarkModeContext"
 
 export const UserMenu = ({
   auth,
 }: {
   auth: { isAuthenticated: boolean; signinRedirect: () => void; removeUser: () => void }
 }) => {
+  const { darkMode, setDarkMode } = useDarkMode()
   return (
     <Menu as="div" className="relative ml-3">
       <div className="flex flex-row gap-2">
         <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           <span className="sr-only">Open user menu</span>
-          <AvatarIcon className="h-10 w-10" />
+          <AvatarIcon className={classNames("h-10 w-10", darkMode ? "text-gray-300" : "text-gray-700")} />
         </Menu.Button>
       </div>
       <Transition
@@ -48,6 +50,14 @@ export const UserMenu = ({
                 )}
               </Fragment>
             )}
+          </Menu.Item>
+          <Menu.Item>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={classNames("block px-4 py-2 text-sm text-gray-700")}
+            >
+              {darkMode ? "Lightmode" : "Darkmode"}
+            </button>
           </Menu.Item>
         </Menu.Items>
       </Transition>

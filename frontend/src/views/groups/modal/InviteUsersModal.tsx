@@ -56,7 +56,7 @@ export const InviteUsersModal: FC<InviteGroupMembersModalProps> = ({ open, setOp
       >
         <div className="mb-4 md:mt-2 flex flex-col gap-6 font-normal h-80">
           <input
-            className="w-full border-none text-sm leading-5 text-gray-900 focus:ring-0"
+            className="w-full border-none text-sm leading-5 text-gray-900 focus:ring-0 bg-white"
             onChange={(event) => setQuery(event.target.value)}
             type={"text"}
             placeholder={"Søk etter bruker"}

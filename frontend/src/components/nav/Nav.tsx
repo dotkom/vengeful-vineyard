@@ -1,10 +1,8 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
-import { Disclosure, Menu, Transition } from "@headlessui/react"
+import { Disclosure } from "@headlessui/react"
 import { LEADERBOARD_URL, useMyGroups } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
-import { AvatarIcon } from "@radix-ui/react-icons"
-import { Fragment } from "react"
 import { Leaderboard } from "../../helpers/types"
 import { Link, useLocation } from "react-router-dom"
 import { NavLink } from "./NavLink"
@@ -12,10 +10,8 @@ import OnlineLogo from "../../assets/online.png"
 import axios from "axios"
 import { classNames } from "../../helpers/classNames"
 import { useQueryClient } from "@tanstack/react-query"
-import { MdNotificationImportant, MdNotifications, MdOutlineNotifications } from "react-icons/md"
 import { NotificationsMenu } from "./NotificationsMenu"
 import { UserMenu } from "./UserMenu"
-import { useDarkMode } from "../../DarkModeContext"
 
 interface NavItem {
   label: string
@@ -67,8 +63,6 @@ export const Nav = ({ auth }: NavProps) => {
   const { data: user } = useMyGroups({
     enabled: auth.isAuthenticated,
   })
-
-  const { darkMode, setDarkMode } = useDarkMode()
 
   return (
     <Disclosure as="nav" className="bg-white shadow">
