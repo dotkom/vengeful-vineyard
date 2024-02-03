@@ -5,7 +5,13 @@ import {
   TrashIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline"
-import { VengefulApiError, getDeleteGroupMemberUrl, getDeleteGroupUrl, useGroupLeaderboard } from "../../../helpers/api"
+import {
+  VengefulApiError,
+  getDeleteGroupMemberUrl,
+  getDeleteGroupUrl,
+  useGroupLeaderboard,
+  useMyGroups,
+} from "../../../helpers/api"
 
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
@@ -21,6 +27,8 @@ import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchCont
 import { useNotification } from "../../../helpers/context/notificationContext"
 import { hasPermission } from "../../../helpers/permissions"
 import { Group } from "../../../helpers/types"
+import { getFallbackNavigationUrl } from "../../../helpers/navigation"
+import { useNavigate } from "react-router-dom"
 
 interface GroupSettingsProps {
   groupData: Group | undefined
@@ -32,6 +40,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   const { currentUser } = useCurrentUser()
   const { setNotification } = useNotification()
   const { myGroupsRefetch } = useMyGroupsRefetch()
+  const { data: myGroups } = useMyGroups()
   const { setPreferredGroupShortName } = useGroupNavigation()
   const {
     setOpen: setConfirmModalOpen,
@@ -47,17 +56,19 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
 
   const currentUserRole = group?.members.find((member) => member.user_id === currentUser.user_id)?.permissions[0] ?? ""
   const groupPermissions = group?.permissions ?? {}
+  const navigate = useNavigate()
 
   const { mutate: leaveGroupMutate } = useMutation(
     async () => await axios.delete(getDeleteGroupMemberUrl(groupData.group_id, currentUser.user_id)),
     {
-      onSuccess: () => {
+      onSuccess: async () => {
         setPreferredGroupShortName("")
-        if (myGroupsRefetch) myGroupsRefetch()
+        if (myGroupsRefetch) await myGroupsRefetch()
         setNotification({
           type: "success",
           text: "Gruppen ble forlatt",
         })
+        navigate(getFallbackNavigationUrl(myGroups))
       },
       onError: (e: VengefulApiError) => {
         setNotification({
@@ -72,13 +83,14 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   const { mutate: deleteGroupMutate } = useMutation(
     async () => await axios.delete(getDeleteGroupUrl(groupData.group_id)),
     {
-      onSuccess: () => {
+      onSuccess: async () => {
         setPreferredGroupShortName("")
-        if (myGroupsRefetch) myGroupsRefetch()
+        if (myGroupsRefetch) await myGroupsRefetch()
         setNotification({
           type: "success",
           text: "Gruppen ble slettet",
         })
+        navigate(getFallbackNavigationUrl(myGroups))
       },
       onError: (e: VengefulApiError) => {
         setNotification({
