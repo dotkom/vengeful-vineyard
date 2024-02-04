@@ -12,7 +12,7 @@ from typing import Any
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from app.api.endpoints import group, punishment, user
+from app.api.endpoints import group, punishment, user, statistics
 from app.config import OW_GROUP_PERMISSIONS, PERMISSIONS, settings
 from app.db.core import Database
 from app.http import HTTPClient
@@ -60,6 +60,7 @@ def init_routes(app: FastAPI) -> None:
     app.include_router(user.router)
     app.include_router(group.router)
     app.include_router(punishment.router)
+    app.include_router(statistics.router)
 
 
 def init_events(app: FastAPI, **db_settings: str) -> None:
