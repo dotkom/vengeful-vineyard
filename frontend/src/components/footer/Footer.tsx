@@ -73,7 +73,7 @@ export const FooterLink = ({ label }: FooterLinkProps) => (
 
 export const Footer = () => {
   return (
-    <footer className="bg-blue flex w-full flex-col py-16">
+    <footer className="bg-white flex w-full flex-col pt-16 pb-8 text-black border-t-[1px] border-gray-300">
       <SoMeSection />
       <LinksSection links={footerLinks} />
       <ContactSection />

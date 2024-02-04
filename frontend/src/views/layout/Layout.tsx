@@ -79,7 +79,6 @@ const LayoutFields = () => {
               <div className="mb-auto">
                 <Outlet />
               </div>
-              <div className="h-16" />
               <Notification />
             </NotificationProvider>
           </ConfirmModalProvider>
