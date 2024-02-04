@@ -56,7 +56,14 @@ class Users:
                         SELECT
                             gp.*,
                             u.first_name || ' ' || u.last_name as created_by_name,
-                            array_remove(array_agg(pr.*), NULL) as reactions
+                            COALESCE(json_agg(json_build_object(
+                                'punishment_reaction_id', pr.punishment_reaction_id,
+                                'punishment_id', pr.punishment_id,
+                                'emoji', pr.emoji,
+                                'created_at', pr.created_at,
+                                'created_by', pr.created_by,
+                                'created_by_name', (SELECT first_name || ' ' || last_name FROM users WHERE user_id = pr.created_by)
+                            )) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
                         FROM group_punishments gp
                         LEFT JOIN punishment_reactions pr
                             ON pr.punishment_id = gp.punishment_id

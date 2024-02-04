@@ -23,7 +23,7 @@ export const WallOfShame = () => {
 
   return (
     <section className="mt-8 md:mt-16 max-w-5xl w-[90%] mx-auto">
-      <h1 className="mb-4 text-center md:text-xl font-medium">Wall of shame</h1>
+      <h1 className="mb-4 text-center md:text-xl font-medium text-black">Wall of shame</h1>
       <Table leaderboardUsers={leaderboardUsers} isLoading={isLoading} dataRefetch={refetch} />
     </section>
   )

@@ -117,7 +117,10 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     </div>
                     <div className={`${description ? "" : "mt-3"} sm:ml-2 sm:mt-0 sm:text-left`}>
                       {title && (
-                        <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                        <Dialog.Title
+                          as="h3"
+                          className="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100"
+                        >
                           {title}
                         </Dialog.Title>
                       )}
