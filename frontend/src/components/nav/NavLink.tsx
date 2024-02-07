@@ -13,8 +13,8 @@ export const NavLink = ({ label, url, isActive, ...props }: NavLinkProps) => (
         isActive === undefined
           ? innerIsActive
           : isActive
-          ? "border-indigo-500 text-gray-900"
-          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+          ? "border-indigo-500 text-gray-900 dark:text-gray-100"
+          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-500"
       } px-1 pt-1 text-sm font-medium `
     }
     to={url}

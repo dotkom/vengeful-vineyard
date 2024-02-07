@@ -22,7 +22,7 @@ export const NumberInput = ({ label, value, suffix, error, ...props }: NumberInp
           type="number"
           name="number"
           id={randomId}
-          className={`block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm ${
+          className={`block bg-white text-black w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm ${
             error ? "border-red-400" : "border-gray-300"
           }`}
           value={value !== 0 ? value : ""}

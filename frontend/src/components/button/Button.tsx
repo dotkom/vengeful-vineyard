@@ -51,7 +51,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     if (disabled) {
       switch (variant) {
         case "REGULAR":
-          colorClass = "text-gray-600 bg-gray-200 cursor-not-allowed"
+          colorClass = "text-gray-600 bg-gray-200 dark:bg-gray-800 dark:border-0 cursor-not-allowed"
           break
         case "OUTLINE":
           colorClass = "text-gray-400 border-gray-600 bg-gray-100 cursor-not-allowed"

@@ -49,6 +49,7 @@ export const TableItem = ({
     punishmentTypeMap.set(type.punishment_type_id, type)
   })
 
+  let unpaidPunishmentsValue = 0
   const unpaidPunishments: Punishment[] = []
   const paidPunishments: Punishment[] = []
 
@@ -89,6 +90,7 @@ export const TableItem = ({
 
     if (!punishment.paid) {
       totalPunishments.push({ punishment, punishmentType: fixedPunishmentType })
+      unpaidPunishmentsValue += fixedPunishmentType.value * punishment.amount
     }
   }
 
@@ -167,7 +169,7 @@ export const TableItem = ({
     <AccordionItem value={user.user_id.toString()}>
       <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 rounded-lg md:rounded-xl hover:bg-gray-50">
         <div className="flex items-center gap-x-2">
-          <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 text-lg md:text-3xl text-[#4C4C51] relative">
+          <span className="flex h-8 w-8 md:h-12 md:w-12 pt-1 items-center justify-center rounded-full bg-indigo-100 dark:bg-gray-800 text-lg md:text-3xl text-[#4C4C51] relative">
             {/* Displays the ith placement on the leaderboard if i is defined, otherwise displays an emoji */}
             {i !== undefined
               ? i + 1 === 1
@@ -184,12 +186,15 @@ export const TableItem = ({
               </div>
             )}
           </span>
-          <p
-            className="w-32 md:w-44 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900"
-            title={`${user.first_name} ${user.last_name}`}
-          >
-            {user.first_name} {user.last_name}
-          </p>
+          <div className="flex flex-col text-left">
+            <p
+              className="w-32 md:w-44 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
+              title={`${user.first_name} ${user.last_name}`}
+            >
+              {user.first_name} {user.last_name}
+            </p>
+            <span className="text-gray-700 text-xs">{unpaidPunishmentsValue}kr</span>
+          </div>
         </div>
         <div className="flex items-center gap-x-4">
           <div className="flex flex-col items-end">

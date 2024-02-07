@@ -28,7 +28,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             id={randomId}
             disabled={disabled}
             className={classNames(
-              "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm",
+              "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm bg-white text-black dark:placeholder-gray-400",
               disabled ? "text-gray-500 bg-gray-100" : ""
             )}
             value={value}
