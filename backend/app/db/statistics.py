@@ -8,7 +8,7 @@ class Statistics:
     def __init__(self, db: "Database") -> None:
         self.db = db
 
-    async def get_group_statistics(self, conn: Optional[Pool] = None) -> dict[str, int]:
+    async def get_all_group_statistics(self, conn: Optional[Pool] = None) -> dict[str, int]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
            SELECT

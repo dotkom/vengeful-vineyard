@@ -13,7 +13,7 @@ async def get_group_statistics(
 ):
     app = request.app
     async with app.db.pool.acquire() as conn:
-        return await app.db.statistics.get_group_statistics(conn=conn)
+        return await app.db.statistics.get_all_group_statistics(conn=conn)
 
 @router.get("/groups/{group_id}")
 async def get_group_statistics(
