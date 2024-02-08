@@ -155,7 +155,7 @@ export const GroupsView = () => {
       )}
       {shouldShowMain && (
         <section className="md:grid gap-x-6 md:grid-cols-[20rem_minmax(26rem,_1fr)] max-w-screen-xl w-[90%] mx-auto">
-          <div className="md:mt-[5.5rem] hidden md:block">{sidebarElement}</div>
+          <div className="md:mt-[5.5rem] md:block">{sidebarElement}</div>
           <div className="mt-8 md:mt-12 w-full mx-auto md:mx-0">
             <div className="flex flex-row justify-between items-end w-full mb-px">
               <TabNav
