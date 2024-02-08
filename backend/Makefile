@@ -56,18 +56,15 @@ docs:
 	poetry run pdoc3 --html --force .
 
 docker-build:
-	docker build -f lambda.Dockerfile --platform linux/amd64 -t vengeful-vineyard:latest .
+	docker build -f Dockerfile --platform linux/amd64 -t vengeful-vineyard-server:latest .
 
 docker-push-dev:
-	docker tag vengeful-vineyard:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
+	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-dev:0.2.2 && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-dev:0.2.2
 
 docker-login:
 	aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
 
-lambda-update-dev:
-	aws lambda update-function-code --function-name vengeful-vineyard-dev --image-uri 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
-
-deploy: docker-build docker-login docker-push-dev lambda-update-dev
+deploy: docker-build docker-login docker-push-dev
 
 help:
 	@echo "Makefile commands:"
