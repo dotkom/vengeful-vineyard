@@ -19,6 +19,7 @@ from .permissions import Permissions
 from .punishment_reactions import PunishmentReactions
 from .punishment_types import PunishmentTypes
 from .punishments import Punishments
+from .statistics import Statistics
 from .users import Users
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ class Database:
 
         self.users = Users(self)
         self.groups = Groups(self)
+        self.statistics = Statistics(self)
         self.permissions = Permissions(self)
         self.punishments = Punishments(self)
         self.punishment_types = PunishmentTypes(self)
