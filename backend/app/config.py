@@ -93,6 +93,7 @@ class Settings(BaseSettings):
     max_active_punishments_per_group: int = 1000
     max_group_members: int = 300
     migrations_directory: Path = Path("app/migrations")
+    client_origin: str = "http://localhost:3000"
     debug: bool = True
 
 
