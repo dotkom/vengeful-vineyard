@@ -64,7 +64,13 @@ docker-push-dev:
 docker-login:
 	aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
 
-deploy: docker-build docker-login docker-push-dev
+lightsail-redeploy:
+	./lightsail-deploy.sh
+
+wait-for-lightsail:
+	./wait-for-lightsail-deploy.sh
+
+deploy: docker-build docker-login docker-push-dev lightsail-redeploy wait-for-lightsail
 
 help:
 	@echo "Makefile commands:"
