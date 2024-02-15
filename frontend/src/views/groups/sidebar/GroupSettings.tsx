@@ -27,7 +27,6 @@ import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchCont
 import { useNotification } from "../../../helpers/context/notificationContext"
 import { hasPermission } from "../../../helpers/permissions"
 import { Group } from "../../../helpers/types"
-import { getFallbackNavigationUrl } from "../../../helpers/navigation"
 import { useNavigate } from "react-router-dom"
 
 interface GroupSettingsProps {
@@ -87,7 +86,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
           type: "success",
           text: "Gruppen ble slettet",
         })
-        navigate(getFallbackNavigationUrl(myGroups))
+        navigate("/")
       },
       onError: (e: VengefulApiError) => {
         setNotification({
