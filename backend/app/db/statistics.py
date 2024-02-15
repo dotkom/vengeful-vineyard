@@ -25,9 +25,10 @@ class Statistics:
                 LEFT JOIN punishment_types pt ON gp.punishment_type_id = pt.punishment_type_id
             WHERE g.ow_group_id IS NOT NULL
             GROUP BY g.group_id, g.name, g.name_short, g.image
+            ORDER BY total_value DESC
                     """
-            res = await conn.fetchrow(query)
-            return dict(res)
+            res = await conn.fetch(query)
+            return [dict(row) for row in res]
 
     async def get_group_statistics(self, group_id: str, conn: Optional[Pool] = None):
         """
