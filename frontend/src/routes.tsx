@@ -3,6 +3,7 @@ import { Layout } from "./views/layout"
 import { Home } from "./pages/home"
 import { Profile } from "./pages/profile"
 import { WallOfShame } from "./pages/wallOfShame"
+import { Committees } from "./pages/committees"
 
 export const router = createHashRouter(
   createRoutesFromElements(
@@ -11,6 +12,7 @@ export const router = createHashRouter(
       <Route path="/komiteer/:groupName" element={<Home />} />
       <Route path="/profil" element={<Profile />} />
       <Route path="/wall-of-shame" element={<WallOfShame />} />
+      <Route path="/committees" element={<Committees />} />
     </Route>
   )
 )

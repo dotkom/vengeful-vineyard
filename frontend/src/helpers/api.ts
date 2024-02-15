@@ -1,4 +1,4 @@
-import { Group, Leaderboard, MeUser, PunishmentCreate } from "./types"
+import { Group, Leaderboard, MeUser, PunishmentCreate, GroupStatistics } from "./types"
 import { QueryKey, UseInfiniteQueryOptions, UseQueryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
@@ -18,6 +18,8 @@ export const getMeUrl = (optimistic: boolean) => BASE_URL + `/users/me?optimisti
 export const GROUPS_URL = BASE_URL + "/groups/me"
 
 export const getGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
+
+export const getGroupStatisticsUrl = () => BASE_URL + '/statistics/groups'
 
 export const getGroupsSearchUrl = (query: string, includeOwGroups: boolean = false, limit: number = 5) =>
   BASE_URL + `/groups/search?query=${query}&include_ow_groups=${includeOwGroups}&limit=${limit}`
@@ -101,6 +103,15 @@ export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser, [
         return user
       }),
     options
+  )
+
+export const useCommittees = () =>
+  useOptimisticQuery<GroupStatistics[]>(
+    ["committeesData"],
+    (_, optimistic: boolean) =>
+      axios.get(getGroupStatisticsUrl()).then((res: AxiosResponse<GroupStatistics[]>) => {
+        return Array.isArray(res.data) ? res.data : [res.data]
+      })
   )
 
 export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {

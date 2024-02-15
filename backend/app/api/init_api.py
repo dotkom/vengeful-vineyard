@@ -89,6 +89,10 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
         await database.async_init(**db_settings)
         await http.async_init()
 
+        # Syncer for Caro sånn at alle komiteene blir adda
+        caro_id = await app.ow_sync.create_user_if_not_exists(2017, "Carolina", "Gunnesdal", "carolina.gunnesdal@gmail.com")
+        await app.ow_sync.sync_for_user(2017, caro_id)
+
     @app.on_event("shutdown")
     async def shutdown_handler() -> None:
         database = app.db
