@@ -60,10 +60,10 @@ export const Nav = ({ auth }: NavProps) => {
       prefetch: prefetchWallOfShame,
     },
     {
-      label: "Komiteer",
+      label: "Statistikk",
       url: "/committees",
       isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`)
-    }
+    },
   ]
 
   const { darkMode, setDarkMode } = useDarkMode()
