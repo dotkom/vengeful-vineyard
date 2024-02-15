@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+sleep 5
 
 echo "Waiting for deployment to complete..."
 while [ 1 ] ; do
@@ -8,5 +9,7 @@ while [ 1 ] ; do
   if [ $state = '"ACTIVE"' ]; then
     break
   fi
-  sleep 1
+  sleep 5
 done
+
+echo -e "\a"
