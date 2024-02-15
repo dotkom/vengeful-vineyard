@@ -30,7 +30,6 @@ import { TabNav } from "./tabnav/TabNav"
 import { useGroupNavigation } from "../../helpers/context/groupNavigationContext"
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
-import { getFallbackNavigationUrl } from "../../helpers/navigation"
 
 export const GroupsView = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
@@ -44,7 +43,6 @@ export const GroupsView = () => {
     useAdministerGroupJoinRequestsModal()
   const navigate = useNavigate()
   const { setMyGroupsRefetch } = useMyGroupsRefetch()
-  const { preferredGroupShortName, setPreferredGroupShortName } = useGroupNavigation()
   const auth = useAuth()
 
   const params = useParams<{ groupName?: string }>()
@@ -63,25 +61,24 @@ export const GroupsView = () => {
   }, [myGroupsRefetch])
 
   useEffect(() => {
-    if (user) setCurrentUser({ user_id: user.user_id })
+    if (!user) return
 
-    let targetGroup: Group | undefined = undefined
-    if (user && (selectedGroupName === undefined || preferredGroupShortName !== undefined)) {
-      if (preferredGroupShortName) {
-        const preferredGroup = user.groups.find(
-          (group) => group.name_short.toLowerCase() === preferredGroupShortName.toLowerCase()
-        )
-        if (preferredGroup) {
-          targetGroup = preferredGroup
-          setPreferredGroupShortName(undefined)
-        }
-      }
+    setCurrentUser({ user_id: user.user_id })
+
+    if (selectedGroupName === undefined) {
+      navigate(`/gruppe/${user.groups[0].name_short.toLowerCase()}`)
     }
 
-    if (targetGroup === undefined) {
-      navigate(getFallbackNavigationUrl(user))
-    } else {
-      navigate(`/komiteer/${targetGroup.name_short.toLowerCase()}`)
+    if (selectedGroupName !== undefined) {
+      const targetGroup = user.groups.find(
+        (group) => group.name_short.toLowerCase() === selectedGroupName.toLowerCase()
+      )
+
+      if (!targetGroup) {
+        navigate("/")
+      } else {
+        setSelectedGroup(targetGroup)
+      }
     }
   }, [user, selectedGroupName])
 
@@ -160,7 +157,7 @@ export const GroupsView = () => {
             <div className="flex flex-row justify-between items-end w-full mb-px">
               <TabNav
                 selectedGroup={selectedGroup}
-                setSelectedGroup={(group: Group) => group && navigate(`/komiteer/${group.name_short.toLowerCase()}`)}
+                setSelectedGroup={(group: Group) => group && navigate(`/gruppe/${group.name_short.toLowerCase()}`)}
                 groups={user ? user.groups : undefined}
               />
               <Popover className="relative mb-1 mr-2 block md:hidden">

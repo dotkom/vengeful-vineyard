@@ -85,7 +85,6 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
 
     newRolesOptions.forEach((option) => {
       const canGiveRoleCheck = canGiveRole(groupRoles, groupPermissions, option.value, currentUserRole)
-      console.log(option.value, canGiveRoleCheck)
       if (
         (isCurrentUser && (currentUserRole === "group.owner" || !canGiveRoleCheck)) ||
         (!isCurrentUser && !canGiveRoleCheck)

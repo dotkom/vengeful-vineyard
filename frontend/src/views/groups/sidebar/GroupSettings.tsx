@@ -41,7 +41,6 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   const { setNotification } = useNotification()
   const { myGroupsRefetch } = useMyGroupsRefetch()
   const { data: myGroups } = useMyGroups()
-  const { setPreferredGroupShortName } = useGroupNavigation()
   const {
     setOpen: setConfirmModalOpen,
     setType: setConfirmModalType,
@@ -62,13 +61,12 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     async () => await axios.delete(getDeleteGroupMemberUrl(groupData.group_id, currentUser.user_id)),
     {
       onSuccess: async () => {
-        setPreferredGroupShortName("")
         if (myGroupsRefetch) await myGroupsRefetch()
         setNotification({
           type: "success",
           text: "Gruppen ble forlatt",
         })
-        navigate(getFallbackNavigationUrl(myGroups))
+        navigate("/")
       },
       onError: (e: VengefulApiError) => {
         setNotification({
@@ -84,7 +82,6 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     async () => await axios.delete(getDeleteGroupUrl(groupData.group_id)),
     {
       onSuccess: async () => {
-        setPreferredGroupShortName("")
         if (myGroupsRefetch) await myGroupsRefetch()
         setNotification({
           type: "success",
