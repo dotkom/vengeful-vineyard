@@ -30,6 +30,7 @@ import { TabNav } from "./tabnav/TabNav"
 import { useGroupNavigation } from "../../helpers/context/groupNavigationContext"
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
+import { getFallbackNavigationUrl } from "../../helpers/navigation"
 
 export const GroupsView = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
@@ -64,9 +65,8 @@ export const GroupsView = () => {
   useEffect(() => {
     if (user) setCurrentUser({ user_id: user.user_id })
 
-    if (user && (selectedGroupName === undefined || preferredGroupShortName !== undefined) && user.groups.length > 0) {
-      let targetGroup: Group | undefined = undefined
-
+    let targetGroup: Group | undefined = undefined
+    if (user && (selectedGroupName === undefined || preferredGroupShortName !== undefined)) {
       if (preferredGroupShortName) {
         const preferredGroup = user.groups.find(
           (group) => group.name_short.toLowerCase() === preferredGroupShortName.toLowerCase()
@@ -76,11 +76,11 @@ export const GroupsView = () => {
           setPreferredGroupShortName(undefined)
         }
       }
+    }
 
-      if (!targetGroup) {
-        targetGroup = user.groups[0]
-      }
-
+    if (targetGroup === undefined) {
+      navigate(getFallbackNavigationUrl(user))
+    } else {
       navigate(`/komiteer/${targetGroup.name_short.toLowerCase()}`)
     }
   }, [user, selectedGroupName])
