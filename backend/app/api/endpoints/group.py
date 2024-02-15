@@ -1,7 +1,7 @@
 """
 Group endpoints
 """
-
+import time
 from functools import partial
 
 from emoji import is_emoji
@@ -1249,6 +1249,9 @@ async def get_group_join_requests(
         )
 
 
+join_request_cooldowns = {}
+
+
 @router.post(
     "/{group_id}/joinRequests",
     dependencies=[Depends(oidc)],
@@ -1294,6 +1297,17 @@ async def create_group_join_request(
                 status_code=400,
                 detail="Du har allerede sendt en forespørsel om å bli medlem av denne gruppen",
             )
+
+        if user_id in join_request_cooldowns:
+            cooldown_time = time.time() - join_request_cooldowns[user_id]
+
+            if cooldown_time < 30:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Vent 30 sekunder før du sender en ny forespørsel",
+                )
+
+        join_request_cooldowns[user_id] = time.time()
 
         await app.db.group_join_requests.insert(
             group_id,
