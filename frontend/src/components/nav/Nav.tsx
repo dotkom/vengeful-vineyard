@@ -59,6 +59,11 @@ export const Nav = ({ auth }: NavProps) => {
       shouldShowPredicate: () => isInAnyOWGroup,
       prefetch: prefetchWallOfShame,
     },
+    {
+      label: "Komiteer",
+      url: "/committees",
+      isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`)
+    }
   ]
 
   const { darkMode, setDarkMode } = useDarkMode()

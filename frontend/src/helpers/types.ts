@@ -93,6 +93,16 @@ export interface GroupUser extends User {
   permissions: string[]
 }
 
+export interface GroupStatistics {
+  group_id: string
+  group_image: string
+  group_name: string
+  group_name_short: string
+  total_count: number
+  total_unpaid_value: number
+  total_value: number
+}
+
 export interface PunishmentStreaks {
   current_streak: number
   longest_streak: number
