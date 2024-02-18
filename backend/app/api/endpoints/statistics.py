@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.api import APIRoute, Request
 
 router = APIRouter(
@@ -17,7 +17,7 @@ async def get_group_statistics(
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        is_in_any_ow_group = app.db.groups.is_in_any_ow_group(user_id, conn=conn)
+        is_in_any_ow_group = await app.db.groups.is_in_any_ow_group(user_id, conn=conn)
         if not is_in_any_ow_group:
             raise HTTPException(
                 status_code=403, detail="Du har ikke tilgang til denne ressursen"
