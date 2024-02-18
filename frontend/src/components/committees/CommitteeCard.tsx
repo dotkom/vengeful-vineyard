@@ -1,7 +1,7 @@
 interface CommitteeCardProps {
   name: string
   amount: number
-  img: string | JSX.Element
+  img: string
 }
 
 export const CommitteeCard = ({ name, amount, img }: CommitteeCardProps) => (

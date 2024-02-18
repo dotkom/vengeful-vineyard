@@ -20,7 +20,7 @@ export const CommitteeList = () => {
             key={index}
             name={groupStatistic.group_name_short}
             amount={groupStatistic.total_value}
-            img={groupStatistic.group_image === "NoImage" ? NoImage : groupStatistic.group_image}
+            img={groupStatistic.group_image === "NoImage" ? (NoImage as string) : groupStatistic.group_image}
           />
         ))
       )}
