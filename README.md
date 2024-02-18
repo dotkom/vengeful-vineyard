@@ -65,7 +65,5 @@ Install Docker engine
 * Sign into doppler `doppler login`
 * Setup doppler `doppler setup` (select `vengeful-vineyard`, `dev`)
 * Build Vite export `doppler run pnpm build`
-* Empty S3 bucket `aws s3 rm s3://dev.redwine-static.online.ntnu.no/ --recursive`
-* Upload new dist `aws s3 cp dist s3://dev.redwine-static.online.ntnu.no/ --recursive`
-
-
+* Empty S3 bucket `aws s3 rm s3://dev.vinstraff.no/ --recursive`
+* Upload new dist `aws s3 cp dist s3://dev.vinstraff.no/ --recursive`
