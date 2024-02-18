@@ -11,8 +11,18 @@ router = APIRouter(
 async def get_group_statistics(
     request: Request
 ):
+    access_token = request.raise_if_missing_authorization()
+
     app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
     async with app.db.pool.acquire() as conn:
+        is_in_any_ow_group = app.db.groups.is_in_any_ow_group(user_id, conn=conn)
+        if not is_in_any_ow_group:
+            raise HTTPException(
+                status_code=403, detail="Du har ikke tilgang til denne ressursen"
+            )
+
         return await app.db.statistics.get_all_group_statistics(conn=conn)
 
 @router.get("/groups/{group_id}")
