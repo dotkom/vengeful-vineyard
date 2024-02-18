@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query"
 import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
 import { useNotification } from "../../../helpers/context/notificationContext"
 import { z } from "zod"
-import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
+import { useNavigate } from "react-router-dom"
 
 interface CreateGroupModalProps {
   open: boolean
@@ -28,7 +28,6 @@ export const CreateGroupModal: FC<CreateGroupModalProps> = ({ open, setOpen }) =
   const ref = useRef(null)
   const { setNotification } = useNotification()
   const { myGroupsRefetch } = useMyGroupsRefetch()
-  const { setPreferredGroupShortName } = useGroupNavigation()
 
   const [createGroupData, setCreateGroupData] = useState<GroupCreateType>({
     name: "",
@@ -45,6 +44,8 @@ export const CreateGroupModal: FC<CreateGroupModalProps> = ({ open, setOpen }) =
     }))
   }
 
+  const navigate = useNavigate()
+
   const handleCreateClicked = (): boolean => {
     const data = GroupCreate.safeParse(createGroupData)
     setErrors(data)
@@ -56,10 +57,10 @@ export const CreateGroupModal: FC<CreateGroupModalProps> = ({ open, setOpen }) =
   }
 
   const { mutate: createGroupMutate } = useMutation(async () => await axios.post(getPostGroupUrl(), createGroupData), {
-    onSuccess: () => {
+    onSuccess: async () => {
       if (myGroupsRefetch) {
-        setPreferredGroupShortName(createGroupData.name_short)
-        myGroupsRefetch()
+        await myGroupsRefetch()
+        navigate(`/gruppe/${createGroupData.name_short}`)
       }
       setCreateGroupData({
         name: "",

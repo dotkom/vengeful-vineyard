@@ -64,7 +64,7 @@ const baseEditPunishmentTypeData = {
 }
 
 export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
-  const { selectedGroup, setPreferredGroupShortName } = useGroupNavigation()
+  const { selectedGroup } = useGroupNavigation()
   const { myGroupsRefetch } = useMyGroupsRefetch()
   const { setNotification } = useNotification()
   const queryClient = useQueryClient()
@@ -195,7 +195,6 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
 
   const { mutate: editGroupMutate } = useMutation(() => axios.patch(getPutGroupUrl(selectedGroupId), editGroupData), {
     onSuccess: () => {
-      setPreferredGroupShortName(editGroupData.name_short)
       // queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroupId] })
       if (myGroupsRefetch) myGroupsRefetch()
       setNotification({

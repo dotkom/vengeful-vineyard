@@ -2,8 +2,6 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useStat
 import { Group } from "../types"
 
 interface GroupNavigationContextProps {
-  preferredGroupShortName: string | undefined
-  setPreferredGroupShortName: Dispatch<SetStateAction<string | undefined>>
   selectedGroup: Group | undefined
   setSelectedGroup: Dispatch<SetStateAction<Group | undefined>>
 }
@@ -24,13 +22,10 @@ interface GroupNavigationProviderProps {
 }
 
 export function GroupNavigationProvider({ children }: GroupNavigationProviderProps) {
-  const [preferredGroupShortName, setPreferredGroupShortName] = useState<string | undefined>(undefined)
   const [selectedGroup, setSelectedGroup] = useState<Group | undefined>(undefined)
 
   return (
-    <GroupNavigationContext.Provider
-      value={{ preferredGroupShortName, setPreferredGroupShortName, selectedGroup, setSelectedGroup }}
-    >
+    <GroupNavigationContext.Provider value={{ selectedGroup, setSelectedGroup }}>
       {children}
     </GroupNavigationContext.Provider>
   )
