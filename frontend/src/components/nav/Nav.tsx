@@ -62,7 +62,8 @@ export const Nav = ({ auth }: NavProps) => {
     {
       label: "Statistikk",
       url: "/committees",
-      isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`)
+      isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
+      shouldShowPredicate: () => isInAnyOWGroup,
     },
   ]
 

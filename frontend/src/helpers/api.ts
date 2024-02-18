@@ -105,13 +105,14 @@ export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser, [
     options
   )
 
-export const useCommittees = () =>
+export const useCommittees = (options?: UseQueryOptions<GroupStatistics[], unknown, GroupStatistics[], [QueryKey, boolean]>) =>
   useOptimisticQuery<GroupStatistics[]>(
     ["committeesData"],
     (_, optimistic: boolean) =>
       axios.get(getGroupStatisticsUrl()).then((res: AxiosResponse<GroupStatistics[]>) => {
         return Array.isArray(res.data) ? res.data : [res.data]
-      })
+      }),
+      options
   )
 
 export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {

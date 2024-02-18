@@ -1,9 +1,11 @@
 import { CommitteeCard } from "./CommitteeCard"
+import { useAuth } from "react-oidc-context"
 import { useCommittees } from "../../helpers/api"
 import { GroupStatistics } from "../../helpers/types"
 
 export const CommitteeList = () => {
-  const { data: groupsStatistics } = useCommittees()
+  const auth = useAuth()
+  const { data: groupsStatistics } = useCommittees({ enabled: auth.isAuthenticated })
 
   const filteredGroupsStatistics = groupsStatistics?.filter(
     (groupStatistic) => groupStatistic.group_image && groupStatistic.group_image != "NoImage"
