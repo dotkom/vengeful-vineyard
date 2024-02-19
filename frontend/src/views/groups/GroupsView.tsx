@@ -65,7 +65,7 @@ export const GroupsView = () => {
 
     setCurrentUser({ user_id: user.user_id })
 
-    if (selectedGroupName === undefined) {
+    if (selectedGroupName === undefined && user.groups.length > 0) {
       navigate(`/gruppe/${user.groups[0].name_short.toLowerCase()}`)
     }
 
