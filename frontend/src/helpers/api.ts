@@ -1,9 +1,20 @@
-import { Group, Leaderboard, MeUser, PunishmentCreate, GroupStatistics } from "./types"
+import {
+  Group,
+  Leaderboard,
+  MeUser,
+  PunishmentCreate,
+  GroupStatistics,
+  GroupStatisticsSchema,
+  LeaderboardSchema,
+  MeUserSchema,
+  GroupSchema,
+} from "./types"
 import { QueryKey, UseInfiniteQueryOptions, UseQueryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
 
 import { useOptimisticQuery } from "./optimisticQuery"
+import { z } from "zod"
 
 export interface VengefulApiError {
   response: { data: { detail: string }; status: number; statusText: string }
@@ -19,7 +30,7 @@ export const GROUPS_URL = BASE_URL + "/groups/me"
 
 export const getGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
 
-export const getGroupStatisticsUrl = () => BASE_URL + '/statistics/groups'
+export const getGroupStatisticsUrl = () => BASE_URL + "/statistics/groups"
 
 export const getGroupsSearchUrl = (query: string, includeOwGroups: boolean = false, limit: number = 5) =>
   BASE_URL + `/groups/search?query=${query}&include_ow_groups=${includeOwGroups}&limit=${limit}`
@@ -77,12 +88,7 @@ export const useGroupLeaderboard = (
   useQuery({
     queryKey: ["groupLeaderboard", groupId],
     queryFn: () =>
-      axios.get(getGroupUrl(groupId ?? "")).then(async (res: AxiosResponse<Group>) => {
-        const group = res.data
-        // group.members = sortGroupUsers(group.members, group.punishment_types)
-
-        return group
-      }),
+      axios.get(getGroupUrl(groupId ?? "")).then(async (res: AxiosResponse<Group>) => GroupSchema.parse(res.data)),
     onSuccess: (group: Group) => {
       if (cb) {
         cb(group)
@@ -100,19 +106,21 @@ export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser, [
         const user = res.data
         user.groups = sortGroups(user.groups)
         user.groups.forEach((group) => (group.members = sortGroupUsers(group.members, group.punishment_types)))
-        return user
+        return MeUserSchema.parse(user)
       }),
     options
   )
 
-export const useCommittees = (options?: UseQueryOptions<GroupStatistics[], unknown, GroupStatistics[], [QueryKey, boolean]>) =>
+export const useCommittees = (
+  options?: UseQueryOptions<GroupStatistics[], unknown, GroupStatistics[], [QueryKey, boolean]>
+) =>
   useOptimisticQuery<GroupStatistics[]>(
     ["committeesData"],
-    (_, optimistic: boolean) =>
+    () =>
       axios.get(getGroupStatisticsUrl()).then((res: AxiosResponse<GroupStatistics[]>) => {
-        return Array.isArray(res.data) ? res.data : [res.data]
+        return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
       }),
-      options
+    options
   )
 
 export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {
@@ -127,8 +135,8 @@ export const addReaction = async (punishmentId: string, emoji: string) =>
 
 export const removeReaction = async (punishmentId: string) => (await axios.delete(getAddReactionUrl(punishmentId))).data
 
-const getLeaderboard = ({ pageParam = LEADERBOARD_URL }) =>
-  axios.get(pageParam).then((res: AxiosResponse<Leaderboard>) => res.data)
+const getLeaderboard = async ({ pageParam = LEADERBOARD_URL }) =>
+  LeaderboardSchema.parse(await axios.get(pageParam).then((res: AxiosResponse<Leaderboard>) => res.data))
 
 export const useLeaderboard = (
   options?: Omit<

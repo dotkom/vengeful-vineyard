@@ -3,21 +3,20 @@ import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
-import { GroupPermissions, GroupUser, LeaderboardUser } from "../../../helpers/types"
+import { GroupPermissions, GroupUser } from "../../helpers/types"
 
-import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, useGroupLeaderboard } from "../../../helpers/api"
-import { classNames } from "../../../helpers/classNames"
-import { useCurrentUser } from "../../../helpers/context/currentUserContext"
-import { useGivePunishmentModal } from "../../../helpers/context/modal/givePunishmentModalContext"
-import { useNotification } from "../../../helpers/context/notificationContext"
-import { useTogglePunishments } from "../../../helpers/context/togglePunishmentsContext"
-import { hasPermission } from "../../../helpers/permissions"
+import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, useGroupLeaderboard } from "../../helpers/api"
+import { classNames } from "../../helpers/classNames"
+import { useCurrentUser } from "../../helpers/context/currentUserContext"
+import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
+import { useNotification } from "../../helpers/context/notificationContext"
+import { useTogglePunishments } from "../../helpers/context/togglePunishmentsContext"
+import { hasPermission } from "../../helpers/permissions"
 import { PunishmentActionBarListItem } from "./PunishmentActionBarListItem"
 
 interface PunishmentActionBarProps {
-  user: LeaderboardUser | GroupUser
+  user: GroupUser
   label?: string
-  isGroupContext?: boolean
 }
 
 interface ActionBarItem {
@@ -26,7 +25,7 @@ interface ActionBarItem {
   onClick?: () => void
 }
 
-export const PunishmentActionBar = ({ user, label, isGroupContext = true }: PunishmentActionBarProps) => {
+export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) => {
   let setOpen: Dispatch<SetStateAction<boolean>>
   let setPreferredSelectedPerson: Dispatch<SetStateAction<GroupUser | undefined>>
   let isToggled: boolean | undefined
@@ -36,24 +35,20 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
   const queryClient = useQueryClient()
   const { currentUser } = useCurrentUser()
 
-  const { data: groupData } = useGroupLeaderboard((user as GroupUser).group_id, undefined, {
-    enabled: isGroupContext,
-  })
+  const { data: groupData } = useGroupLeaderboard((user as GroupUser).group_id, undefined, {})
 
   let groupPermissions: GroupPermissions = {}
 
-  if (isGroupContext) {
-    const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
-    setOpen = newSetOpen
-    setPreferredSelectedPerson = newSetPreferredSelectedPerson
+  const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
+  setOpen = newSetOpen
+  setPreferredSelectedPerson = newSetPreferredSelectedPerson
 
-    const { isToggled: newIsToggled, setIsToggled: newSetIsToggled } = useTogglePunishments()
-    isToggled = newIsToggled
-    setIsToggled = newSetIsToggled
+  const { isToggled: newIsToggled, setIsToggled: newSetIsToggled } = useTogglePunishments()
+  isToggled = newIsToggled
+  setIsToggled = newSetIsToggled
 
-    if (groupData) {
-      groupPermissions = groupData.permissions
-    }
+  if (groupData) {
+    groupPermissions = groupData.permissions
   }
 
   const markAllPunishmentsAsPaidCall = async () => {
@@ -85,32 +80,30 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
   })
 
   const listItems: ActionBarItem[] = []
-  if (isGroupContext) {
-    const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)
-    if (currentGroupUser) {
-      const isOwGroup = currentGroupUser.ow_group_user_id !== null
-      const role = currentGroupUser.permissions.at(0) ?? ""
+  const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)
+  if (currentGroupUser) {
+    const isOwGroup = currentGroupUser.ow_group_user_id !== null
+    const role = currentGroupUser.permissions.at(0) ?? ""
 
-      if (isOwGroup || hasPermission(groupPermissions, "group.punishments.add", role)) {
-        listItems.push({
-          label: "Gi straff",
-          icon: <PlusIcon className="h-5 w-5 text-black" />,
-          onClick: () => {
-            setOpen(true)
-            setPreferredSelectedPerson(user as GroupUser)
-          },
-        })
-      }
+    if (isOwGroup || hasPermission(groupPermissions, "group.punishments.add", role)) {
+      listItems.push({
+        label: "Gi straff",
+        icon: <PlusIcon className="h-5 w-5 text-black" />,
+        onClick: () => {
+          setOpen(true)
+          setPreferredSelectedPerson(user as GroupUser)
+        },
+      })
+    }
 
-      if (hasPermission(groupPermissions, "group.punishments.mark_paid", role)) {
-        listItems.push({
-          label: "Marker alle straffer som betalte",
-          icon: <PlusIcon className="h-5 w-5 text-black" />,
-          onClick: () => {
-            mutateMarkAllPunishmentsAsPaid()
-          },
-        })
-      }
+    if (hasPermission(groupPermissions, "group.punishments.mark_paid", role)) {
+      listItems.push({
+        label: "Marker alle straffer som betalte",
+        icon: <PlusIcon className="h-5 w-5 text-black" />,
+        onClick: () => {
+          mutateMarkAllPunishmentsAsPaid()
+        },
+      })
     }
   }
 
@@ -118,10 +111,10 @@ export const PunishmentActionBar = ({ user, label, isGroupContext = true }: Puni
     <div
       className={classNames(
         `w-full h-16 border-t flex flex-row items-center px-4 justify-between dark:border-gray-700`,
-        !isGroupContext && !label && listItems.length === 0 ? "hidden" : ""
+        !label && listItems.length === 0 ? "hidden" : ""
       )}
     >
-      {isGroupContext && setIsToggled ? (
+      {setIsToggled ? (
         <div className="flex flex-row gap-x-2 items-center">
           <Switch
             checked={isToggled}

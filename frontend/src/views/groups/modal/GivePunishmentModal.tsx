@@ -43,7 +43,7 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
     setSelectedPerson(preferredSelectedPerson ?? group.members[0])
     setNewPunishmentData({
       ...newPunishmentData,
-      punishment_type_id: group.punishment_types[0].punishment_type_id,
+      punishment_type_id: Object.keys(group.punishment_types)[0],
     })
   }
 

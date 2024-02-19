@@ -1,30 +1,27 @@
 import * as Accordion from "@radix-ui/react-accordion"
 
-import { Group, LeaderboardUser, PunishmentType, User } from "../../helpers/types"
+import { Group, User } from "../../helpers/types"
 import { GroupMembersSortAlternative, getSortGroupUsersFunc } from "../../helpers/sorting"
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
 
 import { SkeletonTableItem } from "./SkeletonTableItem"
-import { TableItem } from "./TableItem"
+import { GroupUserTableItem } from "./GroupUserTableItem"
 
 interface TableProps {
   groupData?: Group | undefined
-  leaderboardUsers?: LeaderboardUser[] | undefined
   isLoading: boolean
   searchTerm?: string
   punishmentTypesToShow?: string[]
   sortingAlternative?: GroupMembersSortAlternative
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<any, unknown>>
+  ) => Promise<QueryObserverResult<any, any>>
 }
 
-export const Table = ({
+export const GroupUserTable = ({
   groupData,
-  leaderboardUsers,
   isLoading = false,
   searchTerm,
-  punishmentTypesToShow,
   sortingAlternative,
   dataRefetch,
 }: TableProps) => {
@@ -34,18 +31,6 @@ export const Table = ({
     const fullName = `${user.first_name} ${user.last_name}`
     return fullName.toLowerCase().includes(searchTerm.toLowerCase())
   }
-
-  let punishmentTypesMap = new Map<string, PunishmentType>()
-
-  if (groupData && punishmentTypesToShow) {
-    groupData?.punishment_types.forEach((punishmentType) => {
-      if (punishmentTypesToShow.includes(punishmentType.punishment_type_id.toString())) {
-        punishmentTypesMap.set(punishmentType.punishment_type_id, punishmentType)
-      }
-    })
-  }
-
-  const hasAnyRows = (groupData?.members.length ?? 0) !== 0 || (leaderboardUsers?.length ?? 0) !== 0
 
   return (
     <ul role="list">
@@ -57,22 +42,18 @@ export const Table = ({
       >
         {groupData?.members
           .filter(filterUsers)
-          .sort(getSortGroupUsersFunc(punishmentTypesMap, sortingAlternative))
+          .sort(getSortGroupUsersFunc(groupData?.punishment_types, sortingAlternative))
           .map((user) => (
-            <TableItem
+            <GroupUserTableItem
               key={user.user_id}
               groupUser={user}
               groupData={groupData}
-              punishmentTypes={Array.from(punishmentTypesMap.values())}
+              punishmentTypes={groupData.punishment_types}
               dataRefetch={dataRefetch}
             />
           ))}
 
-        {leaderboardUsers?.map((user, i) => (
-          <TableItem key={user.user_id} punishmentTypes={[]} leaderboardUser={user} dataRefetch={dataRefetch} i={i} />
-        ))}
-
-        {!hasAnyRows && !isLoading && (
+        {groupData && groupData.members.length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center p-4">
             <p className="text-gray-800">Ingen resultat</p>
           </div>

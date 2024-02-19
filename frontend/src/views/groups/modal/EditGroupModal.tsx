@@ -93,15 +93,13 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
       setEditGroupData({ name: group.name, name_short: group.name_short })
       setInitialEditGroupData({ name: group.name, name_short: group.name_short })
 
-      const punishmentType =
-        group.punishment_types.find((pt) => pt.punishment_type_id === currentPunishmentType?.punishment_type_id) ??
-        group.punishment_types[0]
+      const punishmentType = group.punishment_types[Object.keys(group.punishment_types)[0]]
       setCurrentPunishmentType(punishmentType)
 
       const newEditPunishmentTypeData = {
-        name: punishmentType.name,
-        emoji: punishmentType.emoji,
-        value: punishmentType.value,
+        name: punishmentType?.name ?? "",
+        emoji: punishmentType?.emoji ?? "",
+        value: punishmentType?.value ?? 0,
       }
       setEditPunishmentTypeData({ ...newEditPunishmentTypeData })
       setInitialEditPunishmentTypeData({ ...newEditPunishmentTypeData })
@@ -112,7 +110,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   )
 
   const selectedGroupId = selectedGroup?.group_id ?? ""
-  const punishmentTypeOptions = groupData?.punishment_types.map((pt) => ({
+  const punishmentTypeOptions = Object.values(groupData?.punishment_types ?? []).map((pt) => ({
     value: pt.punishment_type_id,
     label: pt.name,
   }))
@@ -127,8 +125,8 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
     setEditGroupData({ ...editGroupData, name_short: e.target.value })
   }
 
-  const currentPunishmentTypeChangeHandler = (punishmentTypeId: SetStateAction<string>) => {
-    const punishmentType = groupData?.punishment_types.find((pt) => pt.punishment_type_id === punishmentTypeId)
+  const currentPunishmentTypeChangeHandler: SetStateAction<string> = (punishmentTypeId: string): string => {
+    const punishmentType = groupData?.punishment_types[punishmentTypeId]
     setCurrentPunishmentType(punishmentType)
     setInitialEditPunishmentTypeData({
       ...initialEditPunishmentTypeData,
@@ -138,6 +136,8 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
       ...editPunishmentTypeData,
       ...punishmentType,
     })
+
+    return punishmentTypeId
   }
 
   const punishmentTypeNameChangeHandler = (mode: "CREATE" | "EDIT", e: ChangeEvent<HTMLInputElement>) => {

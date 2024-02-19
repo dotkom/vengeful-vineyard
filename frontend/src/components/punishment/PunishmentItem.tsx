@@ -7,17 +7,17 @@ import {
   getPostPunishmentsUnpaidUrl,
   removeReaction,
   useGroupLeaderboard,
-} from "../../../helpers/api"
-import { GroupUser, LeaderboardPunishment, LeaderboardUser, Punishment, PunishmentType } from "../../../helpers/types"
+} from "../../helpers/api"
+import { LeaderboardPunishment, Punishment, PunishmentType } from "../../helpers/types"
 
 import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import { useState } from "react"
-import { classNames } from "../../../helpers/classNames"
-import { useNotification } from "../../../helpers/context/notificationContext"
-import { hasPermission } from "../../../helpers/permissions"
-import { Button } from "../../button"
+import { classNames } from "../../helpers/classNames"
+import { useNotification } from "../../helpers/context/notificationContext"
+import { hasPermission } from "../../helpers/permissions"
+import { Button } from "../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 
@@ -25,9 +25,10 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 interface PunishmentItemProps {
-  user: LeaderboardUser | GroupUser
+  group_id?: string
+  user_id: string
   punishment: Punishment | LeaderboardPunishment
-  punishmentTypes: PunishmentType[]
+  punishmentTypes?: Record<string, PunishmentType>
   isGroupContext?: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -35,7 +36,8 @@ interface PunishmentItemProps {
 }
 
 export const PunishmentItem = ({
-  user,
+  group_id,
+  user_id,
   punishment,
   punishmentTypes,
   isGroupContext = false,
@@ -44,15 +46,15 @@ export const PunishmentItem = ({
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
   const { setNotification } = useNotification()
 
-  const { data: groupData } = useGroupLeaderboard((user as GroupUser).group_id, undefined, {
+  const { data: groupData } = useGroupLeaderboard(group_id, undefined, {
     enabled: isGroupContext,
   })
 
   const groupPermissions = groupData?.permissions ?? {}
-  const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === user.user_id)
+  const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === user_id)
   const currentGroupUserRole = currentGroupUser?.permissions.at(0) ?? ""
 
-  let punishmentType = punishmentTypes.find((type) => type.punishment_type_id === punishment.punishment_type_id)
+  let punishmentType = punishmentTypes ? punishmentTypes[punishment.punishment_type_id] : undefined
 
   if (!punishmentType) {
     const innerPunishment = punishment as LeaderboardPunishment

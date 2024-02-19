@@ -14,7 +14,7 @@ from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group, GroupCreate, GroupSearchResult
 from app.models.group_member import GroupMember, GroupMemberCreate
 from app.models.punishment import TotalPunishmentValue
-from app.models.punishment_type import PunishmentTypeCreate
+from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.types import GroupId, InsertOrUpdateGroup, OWUserId, UserId
 from app.utils.db import MaybeAcquire
 
@@ -142,10 +142,17 @@ class Groups:
             else:
                 members = []
 
+            group = dict(group)
+
+            group["punishment_types"] = {
+                x["punishment_type_id"]: PunishmentTypeRead(**x)
+                for x in group["punishment_types"]
+            }
+
             is_ow_group = group["ow_group_id"] is not None
 
             return Group(
-                **dict(group),
+                **group,
                 members=members,
                 roles=OW_GROUP_ROLES if is_ow_group else ROLES,  # type: ignore
                 permissions=OW_GROUP_PERMISSIONS_AS_DICT

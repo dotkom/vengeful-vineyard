@@ -1,7 +1,7 @@
-import { PunishmentReaction } from "../../../../helpers/types"
+import { PunishmentReaction } from "../../../helpers/types"
 import React from "react"
 import { UseMutateFunction } from "@tanstack/react-query"
-import { useCurrentUser } from "../../../../helpers/context/currentUserContext"
+import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 
 interface ReactionsDisplayProps {
   reactions: PunishmentReaction[]
