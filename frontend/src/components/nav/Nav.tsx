@@ -50,7 +50,7 @@ export const Nav = ({ auth }: NavProps) => {
     {
       label: "Hjem",
       url: "/",
-      isActivePredicate: (_, currentLocation) => currentLocation.toLowerCase().startsWith("/komiteer/"),
+      isActivePredicate: (_, currentLocation) => currentLocation.toLowerCase().startsWith("/grupper/"),
     },
     {
       label: "Wall of Shame",

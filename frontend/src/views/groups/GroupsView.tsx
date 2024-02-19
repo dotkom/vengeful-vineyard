@@ -9,7 +9,6 @@ import { Cog6ToothIcon } from "@heroicons/react/24/outline"
 import { useAuth } from "react-oidc-context"
 import { Button } from "../../components/button"
 import { Spinner } from "../../components/spinner"
-import { Table } from "../../components/table"
 import { ToggleOption } from "../../components/toggle/MultipleToggle"
 import { useCurrentUser } from "../../helpers/context/currentUserContext"
 import { useAdministerGroupJoinRequestsModal } from "../../helpers/context/modal/administerGroupJoinRequestsModalContext"
@@ -30,6 +29,7 @@ import { TabNav } from "./tabnav/TabNav"
 import { useGroupNavigation } from "../../helpers/context/groupNavigationContext"
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
+import { GroupUserTable } from "../../components/groupusertable"
 
 export const GroupsView = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
@@ -90,9 +90,9 @@ export const GroupsView = () => {
     selectedGroup?.group_id,
     (group) => {
       setToggledPunishmentTypesOptions(
-        group.punishment_types.map((punishmentType) => ({
+        Object.entries(group.punishment_types).map(([punishmentTypeId, punishmentType]) => ({
           text: punishmentType.name,
-          value: punishmentType.punishment_type_id.toString(),
+          value: punishmentTypeId.toString(),
           checked: true,
         }))
       )
@@ -191,7 +191,7 @@ export const GroupsView = () => {
                 )}
               </Popover>
             </div>
-            <Table
+            <GroupUserTable
               groupData={data}
               isLoading={isLoading}
               dataRefetch={refetch}

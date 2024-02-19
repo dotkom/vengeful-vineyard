@@ -44,7 +44,7 @@ class GroupSearchResult(GroupCreateMinified):
 
 class Group(GroupCreate):
     group_id: GroupId
-    punishment_types: list[PunishmentTypeRead] = []
+    punishment_types: dict[str, PunishmentTypeRead] = {}
     members: list[GroupUser] = []
     join_requests: list[User] = []
     roles: list[tuple[str, PermissionPrivilege]] = []

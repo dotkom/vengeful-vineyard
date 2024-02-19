@@ -78,17 +78,9 @@
   scrollbar-width: none; /* Firefox */
 }
 
-.with-horizontal-scroll-shadow{
-  background-position:
-    left center,
-    right center,
-    left center,
-    right center;
+.with-horizontal-scroll-shadow {
+  background-position: left center, right center, left center, right center;
   background-repeat: no-repeat;
-  background-size:
-    20px 100%,
-    20px 100%,
-    10px 100%,
-    10px 100%;
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
   background-attachment: local, local, scroll, scroll;
 }

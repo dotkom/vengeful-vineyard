@@ -1,7 +1,7 @@
 import React from "react"
 import * as Accordion from "@radix-ui/react-accordion"
 import { ChevronDownIcon } from "@radix-ui/react-icons"
-import { classNames } from "../../../helpers/classNames"
+import { classNames } from "../../helpers/classNames"
 
 export const AccordionItem = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Accordion.Item>>(
   ({ children, className, ...props }, forwardedRef) => (

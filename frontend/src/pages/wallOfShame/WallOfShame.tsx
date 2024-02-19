@@ -1,7 +1,7 @@
-import { Table } from "../../components/table"
 import { useAuth } from "react-oidc-context"
 import { useEffect } from "react"
 import { useLeaderboard } from "../../helpers/api"
+import { LeaderboardTable } from "../../components/leaderboardtable"
 
 export const WallOfShame = () => {
   const auth = useAuth()
@@ -24,7 +24,7 @@ export const WallOfShame = () => {
   return (
     <section className="mt-8 md:mt-16 max-w-5xl w-[90%] mx-auto">
       <h1 className="mb-4 text-center md:text-xl font-medium text-black">Wall of shame</h1>
-      <Table leaderboardUsers={leaderboardUsers} isLoading={isLoading} dataRefetch={refetch} />
+      <LeaderboardTable leaderboardUsers={leaderboardUsers} isLoading={isLoading} dataRefetch={refetch} />
     </section>
   )
 }

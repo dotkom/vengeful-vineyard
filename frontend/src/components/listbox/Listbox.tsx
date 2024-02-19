@@ -1,4 +1,4 @@
-import { Dispatch, Fragment, SetStateAction } from "react"
+import { Fragment } from "react"
 import { Listbox as HeadlessUiListbox, Transition } from "@headlessui/react"
 
 import { CheckIcon } from "@radix-ui/react-icons"
@@ -14,7 +14,7 @@ export interface ListboxOption<T = unknown> {
 interface ListboxProps<T = unknown> {
   label?: string
   value: T
-  onChange?: Dispatch<SetStateAction<T>>
+  onChange?: (value: T) => void
   options: ListboxOption<T>[]
 }
 
