@@ -37,7 +37,7 @@ PERMISSIONS = [
     ["group.members.manage", ["group.admin"]],
     ["group.members.add", ["group.members.manage"]],
     ["group.members.remove", ["group.members.manage"]],
-    ["group.punishments.add", ["group.moderator"]],
+    ["group.punishments.add", [""]],
     ["group.punishments.delete", ["group.moderator"]],
     ["group.punishments.mark_paid", ["group.moderator"]],
     ["group.punishments.mark_unpaid", ["group.moderator"]],
