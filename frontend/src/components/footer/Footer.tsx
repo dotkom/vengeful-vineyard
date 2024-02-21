@@ -6,7 +6,7 @@ export const ContactSection = () => (
     <div>Feil på nettsiden?</div>
     <div>
       Ta kontakt med{" "}
-      <a className="text-red-11" href="mailto:dotkom@online.ntnu.no">
+      <a className="text-red-600" href="mailto:dotkom@online.ntnu.no">
         Dotkom
       </a>
     </div>
@@ -14,19 +14,33 @@ export const ContactSection = () => (
 )
 
 export const SoMeSection = () => {
-  const icons = [
-    <SlackIcon key="slack" />,
-    <GitHubIcon key="github" />,
-    <InstagramIcon key="instagram" />,
-    <FacebookIcon key="facebook" />,
+  const links = [
+    {
+      icon: <SlackIcon key="slack" />,
+      url: "https://onlinentnu.slack.com/"
+    },
+    {
+      icon: <GitHubIcon key="github" />,
+      url: "https://www.github.com/dotkom/"
+    },
+    {
+      icon: <InstagramIcon key="instagram" />,
+      url: "https://www.instagram.com/online_ntnu/"
+    },
+    {
+      icon: <FacebookIcon key="facebook" />,
+      url: "http://facebook.com/LinjeforeningenOnline/"
+    },
   ]
 
   return (
     <ul className="mx-8 mb-4 flex sm:justify-center">
-      {icons.map((icon) => (
-        <li key={icon.key} className="mx-4 w-16 cursor-pointer">
-          {icon}
-        </li>
+      {links.map((link) => (
+        <a href={link.url} className="mx-4">
+          <li key={link.icon.key} className="w-16 cursor-pointer">
+            {link.icon}
+          </li>
+        </a>
       ))}
     </ul>
   )
