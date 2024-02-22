@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "doppler setup -c dev -p vengeful-vineyard && doppler run vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint --max-warnings 0 --ext .js,.jsx,.ts,.tsx .",
@@ -12,7 +12,7 @@
     "type-check": "tsc --noEmit",
     "pre-commit": "lint-staged && tsc --noEmit",
     "deploy": "./deploy.sh staging",
-    "deploy:prod": "./deploy.sh production"
+    "deploy:prod": "./deploy.sh prod"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.10",
