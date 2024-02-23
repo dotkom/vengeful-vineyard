@@ -62,7 +62,7 @@ export const GroupView = () => {
   const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading } = useMyGroups()
 
   useEffect(() => {
-    setMyGroupsRefetch(() => myGroupsRefetch)
+    setMyGroupsRefetch(() => myGroupsRefetch as any)
   }, [myGroupsRefetch])
 
   useEffect(() => {
@@ -179,8 +179,10 @@ export const GroupView = () => {
               <h3>
                 {publicGroup.is_official ? (
                   <>
-                    Du er ikke et medlem av {publicGroup.name_short}. Logget inn som {user?.first_name}{" "}
-                    {user?.last_name}
+                    Du er ikke registrert som medlem av {publicGroup.name_short}.<br />
+                    Logget inn som {user?.first_name} {user?.last_name}
+                    <br />
+                    Ta kontakt med Dotkom om dette er feil.
                   </>
                 ) : (
                   <>
