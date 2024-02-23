@@ -1,5 +1,5 @@
 import { Popover, Transition } from "@headlessui/react"
-import { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { getPostGroupJoinRequestUrl, useGroupLeaderboard, useMyGroups, usePublicGroup } from "../../helpers/api"
 import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../helpers/sorting"
@@ -79,9 +79,7 @@ export const GroupView = () => {
         (group) => group.name_short.toLowerCase() === selectedGroupName.toLowerCase()
       )
 
-      if (!targetGroup) {
-        console.log(`Group ${selectedGroupName} not found`)
-      } else {
+      if (targetGroup) {
         setSelectedGroup(targetGroup)
       }
     }
@@ -182,7 +180,11 @@ export const GroupView = () => {
                     Du er ikke registrert som medlem av {publicGroup.name_short}.<br />
                     Logget inn som {user?.first_name} {user?.last_name}
                     <br />
-                    Ta kontakt med Dotkom om dette er feil.
+                    Ta kontakt med{" "}
+                    <a className="font-bold underline" href="mailto:dotkom@online.ntnu.no">
+                      Dotkom
+                    </a>{" "}
+                    om dette er feil.
                   </>
                 ) : (
                   <>

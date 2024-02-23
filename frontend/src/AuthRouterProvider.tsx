@@ -1,11 +1,4 @@
-import {
-  createRoutesFromElements,
-  Route,
-  createHashRouter,
-  RouterProvider,
-  Navigate,
-  useNavigate,
-} from "react-router-dom"
+import { createRoutesFromElements, Route, createHashRouter, RouterProvider, Navigate } from "react-router-dom"
 import { Layout } from "./views/layout"
 import { Profile } from "./pages/profile"
 import { WallOfShame } from "./pages/wallOfShame"
@@ -14,8 +7,6 @@ import { useAuth } from "react-oidc-context"
 import { LandingPage } from "./views/hero"
 import { GroupView } from "./views/groups"
 import LoginRegisterPromptPage from "./views/LoginRegisterPromptPage"
-import { checkSigninRedirect } from "./helpers/auth"
-import { useEffect } from "react"
 
 const authenticatedRouter = createHashRouter(
   createRoutesFromElements(

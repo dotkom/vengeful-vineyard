@@ -19,7 +19,6 @@ import { FC } from "react"
 import { Menu } from "../../../components/menu/Menu"
 import { MenuItemProps } from "../../../components/menu/MenuItem"
 import { useCurrentUser } from "../../../helpers/context/currentUserContext"
-import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
 import { useEditGroupMembersModal } from "../../../helpers/context/modal/editGroupMembersModalContext"
 import { useEditGroupModal } from "../../../helpers/context/modal/editGroupModalContext"
@@ -39,7 +38,6 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   const { currentUser } = useCurrentUser()
   const { setNotification } = useNotification()
   const { myGroupsRefetch } = useMyGroupsRefetch()
-  const { data: myGroups } = useMyGroups()
   const {
     setOpen: setConfirmModalOpen,
     setType: setConfirmModalType,

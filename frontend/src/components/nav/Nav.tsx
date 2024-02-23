@@ -45,7 +45,9 @@ export const Nav = ({ auth }: NavProps) => {
     )
   }
 
-  const { data: user } = useMyGroups()
+  const { data: user } = useMyGroups({
+    enabled: auth.isAuthenticated,
+  })
 
   const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
 

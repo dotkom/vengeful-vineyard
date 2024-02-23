@@ -82,7 +82,6 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   const listItems: ActionBarItem[] = []
   const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)
   if (currentGroupUser) {
-    const isOwGroup = currentGroupUser.ow_group_user_id !== null
     const role = currentGroupUser.permissions.at(0) ?? ""
 
     /*
