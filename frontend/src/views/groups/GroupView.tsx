@@ -93,11 +93,13 @@ export const GroupView = () => {
     selectedGroup?.group_id,
     (group) => {
       setToggledPunishmentTypesOptions(
-        Object.entries(group.punishment_types).map(([punishmentTypeId, punishmentType]) => ({
-          text: punishmentType.name,
-          value: punishmentTypeId.toString(),
-          checked: true,
-        }))
+        Object.entries(group.punishment_types)
+          .map(([punishmentTypeId, punishmentType]) => ({
+            text: punishmentType.name,
+            value: punishmentTypeId.toString(),
+            checked: true,
+          }))
+          .sort((a, b) => b.text.localeCompare(a.text))
       )
     },
     {
