@@ -7,12 +7,11 @@ else
   ENVIRONMENT=$1
 fi
 
-doppler setup -c $ENVIRONMENT -p vengeful-vineyard
+FRONTEND_S3_BUCKET=$(doppler run --command 'echo $FRONTEND_S3_BUCKET') &&
+CLOUDFRONT_DISTRIBUTION_ID=$(doppler run --command 'echo $CLOUDFRONT_DISTRIBUTION_ID') &&
 
-doppler run pnpm build
-
-FRONTEND_S3_BUCKET=$(doppler run --command 'echo $FRONTEND_S3_BUCKET')
-aws s3 rm $FRONTEND_S3_BUCKET --recursive
-aws s3 cp dist $FRONTEND_S3_BUCKET --recursive
-echo $FRONTEND_S3_BUCKET
-# aws cloudfront create-invalidation --distribution-id EJKLH539HRJU2 --paths '/*'
+doppler setup -c $ENVIRONMENT -p vengeful-vineyard &&
+doppler run pnpm build &&
+aws s3 rm $FRONTEND_S3_BUCKET --recursive &&
+aws s3 cp dist $FRONTEND_S3_BUCKET --recursive &&
+aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths '/*'
