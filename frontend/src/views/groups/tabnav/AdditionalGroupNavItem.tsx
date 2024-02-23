@@ -20,7 +20,7 @@ export const AdditionalGroupNavItem = () => {
       },
     },
     {
-      label: "Bli med i eksisterende gruppe",
+      label: "Finn gruppe",
       icon: <MagnifyingGlassIcon className="h-5 w-5" />,
       color: "REGULAR",
       onClick: () => {
