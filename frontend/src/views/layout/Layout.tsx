@@ -80,15 +80,13 @@ const LayoutFields = () => {
     <>
       <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50">
         <CurrentUserProvider>
-          <ConfirmModalProvider>
-            <NotificationProvider>
-              <Nav auth={auth} />
-              <div className="mb-auto">
-                <Outlet />
-              </div>
-              <Notification />
-            </NotificationProvider>
-          </ConfirmModalProvider>
+          <NotificationProvider>
+            <Nav auth={auth} />
+            <div className="mb-auto">
+              <Outlet />
+            </div>
+            <Notification />
+          </NotificationProvider>
         </CurrentUserProvider>
       </main>
       <Footer />

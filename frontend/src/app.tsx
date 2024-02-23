@@ -12,6 +12,7 @@ import { TogglePunishmentsProvider } from "./helpers/context/togglePunishmentsCo
 import ModalProvider from "./views/groups/modal/AllModalProvider"
 import { GroupNavigationProvider } from "./helpers/context/groupNavigationContext"
 import { MyGroupsRefetchProvider } from "./helpers/context/myGroupsRefetchContext"
+import { ConfirmModalProvider } from "./helpers/context/modal/confirmModalContext"
 
 envSchema.parse(import.meta.env)
 
@@ -39,9 +40,11 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <MyGroupsRefetchProvider>
           <GroupNavigationProvider>
             <TogglePunishmentsProvider>
-              <QueryClientProvider client={queryClient}>
-                <AuthRouterProvider />
-              </QueryClientProvider>
+              <ConfirmModalProvider>
+                <QueryClientProvider client={queryClient}>
+                  <AuthRouterProvider />
+                </QueryClientProvider>
+              </ConfirmModalProvider>
             </TogglePunishmentsProvider>
           </GroupNavigationProvider>
         </MyGroupsRefetchProvider>

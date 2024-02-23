@@ -15,9 +15,7 @@ export default function ModalProvider({ children }: { children: React.ReactNode 
         <RequestToJoinGroupModalProvider>
           <EditGroupModalProvider>
             <EditGroupMembersModalProvider>
-              <ConfirmModalProvider>
-                <AdministerGroupJoinRequestsModalProvider>{children}</AdministerGroupJoinRequestsModalProvider>
-              </ConfirmModalProvider>
+              <AdministerGroupJoinRequestsModalProvider>{children}</AdministerGroupJoinRequestsModalProvider>
             </EditGroupMembersModalProvider>
           </EditGroupModalProvider>
         </RequestToJoinGroupModalProvider>
