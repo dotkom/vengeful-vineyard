@@ -232,8 +232,10 @@ export const GroupView = () => {
                   group z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75`}
                     >
                       <Cog6ToothIcon
-                        className={`${open ? "text-gray-900" : "text-gray-900/70"}
-                    h-5 w-5 md:h-6 md:w-6 transition duration-150 ease-in-out group-hover:text-gray-900/80`}
+                        className={`${
+                          open ? "text-gray-900 dark:text-gray-300" : "text-gray-900/70 dark:text-gray-300/70"
+                        }
+                    h-5 w-5 md:h-6 md:w-6 transition duration-150 ease-in-out group-hover:text-gray-900/80 dark:group-hover:text-gray-300/80`}
                         aria-hidden="true"
                       />
                     </Popover.Button>
