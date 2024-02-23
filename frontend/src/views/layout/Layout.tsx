@@ -1,6 +1,6 @@
 import axios from "axios"
 import { useAuth } from "react-oidc-context"
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import { Footer } from "../../components/footer"
 import { Nav } from "../../components/nav"
 import { Notification } from "../../components/notification"
@@ -9,16 +9,21 @@ import { CurrentUserProvider } from "../../helpers/context/currentUserContext"
 import { ConfirmModalProvider } from "../../helpers/context/modal/confirmModalContext"
 import { NotificationProvider } from "../../helpers/context/notificationContext"
 import { DarkModeProvider } from "../../DarkModeContext"
+import React, { useEffect } from "react"
+import ConfirmModal from "../../components/modal/ConfirmModal"
+import { checkSigninRedirect } from "../../helpers/auth"
 
 export const Layout: React.FC = () => {
   return (
     <DarkModeProvider>
+      <ConfirmModal />
       <LayoutFields />
     </DarkModeProvider>
   )
 }
 
 const LayoutFields = () => {
+  const navigate = useNavigate()
   const auth = useAuth()
 
   switch (auth.activeNavigator) {
@@ -27,6 +32,8 @@ const LayoutFields = () => {
     case "signoutRedirect":
       return <div>Signing you out...</div>
   }
+
+  useEffect(() => checkSigninRedirect(navigate), [])
 
   if (auth.isLoading) {
     return (
@@ -48,7 +55,7 @@ const LayoutFields = () => {
       auth.error.message.startsWith("The provided authorization grant or refresh token is invalid, expired") ||
       auth.error.message === "invalid_grant"
     ) {
-      auth.signinRedirect()
+      auth.signinRedirect().then()
     }
 
     return (

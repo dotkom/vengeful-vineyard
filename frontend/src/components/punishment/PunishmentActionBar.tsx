@@ -85,16 +85,17 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
     const isOwGroup = currentGroupUser.ow_group_user_id !== null
     const role = currentGroupUser.permissions.at(0) ?? ""
 
+    /*
     if (isOwGroup || hasPermission(groupPermissions, "group.punishments.add", role)) {
-      listItems.push({
-        label: "Gi straff",
-        icon: <PlusIcon className="h-5 w-5 text-black" />,
-        onClick: () => {
-          setOpen(true)
-          setPreferredSelectedPerson(user as GroupUser)
-        },
-      })
-    }
+     */
+    listItems.push({
+      label: "Gi straff",
+      icon: <PlusIcon className="h-5 w-5 text-black" />,
+      onClick: () => {
+        setOpen(true)
+        setPreferredSelectedPerson(user as GroupUser)
+      },
+    })
 
     if (hasPermission(groupPermissions, "group.punishments.mark_paid", role)) {
       listItems.push({

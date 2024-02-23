@@ -38,6 +38,15 @@ class GroupCreate(GroupBase):
         )
 
 
+class GroupPublic(GroupBase):
+    group_id: GroupId
+    name: str
+    name_short: str
+    image: str = ""
+    is_official: bool = False
+    is_member: bool = False
+
+
 class GroupSearchResult(GroupCreateMinified):
     group_id: GroupId
 

@@ -1,7 +1,7 @@
 import { Popover, Transition } from "@headlessui/react"
 import { Fragment, useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { useGroupLeaderboard, useMyGroups } from "../../helpers/api"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { getPostGroupJoinRequestUrl, useGroupLeaderboard, useMyGroups, usePublicGroup } from "../../helpers/api"
 import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../helpers/sorting"
 
 // TODO: Remove some stuff for ow groups
@@ -18,7 +18,7 @@ import { useEditGroupModal } from "../../helpers/context/modal/editGroupModalCon
 import { useRequestToJoinGroupModal } from "../../helpers/context/modal/requestToJoinGroupModalContext"
 import { useMyGroupsRefetch } from "../../helpers/context/myGroupsRefetchContext"
 import { Group } from "../../helpers/types"
-import { DefaultHero } from "../hero"
+import { LandingPage } from "../hero"
 import { AdministerGroupJoinRequestsModal } from "./modal/AdministerGroupJoinRequestsModal"
 import { CreateGroupModal } from "./modal/CreateGroupModal"
 import { EditGroupMembersModal } from "./modal/EditGroupMembersModal"
@@ -30,8 +30,12 @@ import { useGroupNavigation } from "../../helpers/context/groupNavigationContext
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
 import { GroupUserTable } from "../../components/groupusertable"
+import { useMutation } from "@tanstack/react-query"
+import axios from "axios"
+import { useNotification } from "../../helpers/context/notificationContext"
+import { signinAndReturn } from "../../helpers/auth"
 
-export const GroupsView = () => {
+export const GroupView = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
   const { setSelectedGroup } = useGroupNavigation()
   const { open: givePunishmentModalOpen, setOpen: setGivePunishmentModalOpen } = useGivePunishmentModal()
@@ -44,6 +48,7 @@ export const GroupsView = () => {
   const navigate = useNavigate()
   const { setMyGroupsRefetch } = useMyGroupsRefetch()
   const auth = useAuth()
+  const location = useLocation()
 
   const params = useParams<{ groupName?: string }>()
   const selectedGroupName = params.groupName
@@ -75,7 +80,7 @@ export const GroupsView = () => {
       )
 
       if (!targetGroup) {
-        navigate("/")
+        console.log(`Group ${selectedGroupName} not found`)
       } else {
         setSelectedGroup(targetGroup)
       }
@@ -102,6 +107,10 @@ export const GroupsView = () => {
     }
   )
 
+  const { data: publicGroup } = usePublicGroup(selectedGroupName?.toLowerCase(), {
+    enabled: !!currentUser && !userIsLoading && !selectedGroup && selectedGroupName !== null,
+  })
+
   useEffect(() => {
     setSelectedGroup(selectedGroup)
   }, [selectedGroup])
@@ -119,7 +128,28 @@ export const GroupsView = () => {
     />
   )
 
-  const shouldShowMain = user && (user.groups.length ?? 0) > 0 && selectedGroup
+  const { setNotification } = useNotification()
+
+  const { mutate: requestToJoinGroupMutate } = useMutation(async () => {
+    if (!publicGroup) return
+
+    try {
+      await axios.post(getPostGroupJoinRequestUrl(publicGroup.group_id))
+
+      setNotification({
+        type: "success",
+        text: "Forespørselen ble sendt",
+      })
+    } catch (error: any) {
+      setNotification({
+        type: "error",
+        title: "Kunne ikke sende forespørselen",
+        text: error.response.data.detail,
+      })
+    }
+  })
+
+  const shouldShowMain = user && selectedGroup
 
   return (
     <>
@@ -137,22 +167,49 @@ export const GroupsView = () => {
           <Spinner />
         </section>
       )}
-      {currentUser && !userIsLoading && !selectedGroup && (user?.groups.length ?? 0) === 0 && (
-        <DefaultHero
-          auth={auth}
-          setCreateGroupModalOpen={setCreateGroupModalOpen}
-          setRequestToJoinGroupModalOpen={setRequestToJoinGroupModalOpen}
-        />
-      )}
-      {currentUser && !userIsLoading && !selectedGroup && (user?.groups.length ?? 0) > 0 && (
+      {currentUser && !userIsLoading && !selectedGroup && !selectedGroupName && <LandingPage />}
+      {currentUser && !userIsLoading && !selectedGroup && selectedGroupName && (
         <section className="flex flex-col gap-y-6 items-center w-full text-gray-800 mt-16">
-          <p>Ojsann. Denne gruppen ble ikke funnet.</p>
-          <Button label="Refresh" variant="OUTLINE" onClick={() => navigate("/")} />
+          {publicGroup && (
+            <div className="flex flex-col gap-y-4 items-center text-center">
+              <h1 className="text-4xl font-bold">
+                {publicGroup.is_official ? `${publicGroup.name_short}` : `Bli medlem av ${publicGroup.name_short}!`}
+              </h1>
+              {publicGroup.image && <img className="w-60" src={publicGroup.image} alt={publicGroup.name} />}
+              <h3>
+                {publicGroup.is_official ? (
+                  <>
+                    Du er ikke et medlem av {publicGroup.name_short}. Logget inn som {user?.first_name}{" "}
+                    {user?.last_name}
+                  </>
+                ) : (
+                  <>
+                    Du er ikke et medlem av gruppen {publicGroup.name_short}.<br />
+                    Trykk på knappen under for å bli medlem
+                  </>
+                )}
+              </h3>
+              <div className="flex flex-row gap-x-4 items-center">
+                {!publicGroup.is_official && (
+                  <Button onClick={() => requestToJoinGroupMutate()}>Send forespørsel</Button>
+                )}
+                <Button
+                  onClick={async () => {
+                    await auth.removeUser()
+                    signinAndReturn(auth, location)
+                  }}
+                  variant="OUTLINE"
+                >
+                  Bytt konto
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
       )}
       {shouldShowMain && (
         <section className="md:grid gap-x-6 md:grid-cols-[20rem_minmax(26rem,_1fr)] max-w-screen-xl w-[90%] mx-auto">
-          <div className="md:mt-[5.5rem] md:block">{sidebarElement}</div>
+          <div className="md:mt-[5.5rem] hidden md:block">{sidebarElement}</div>
           <div className="mt-8 md:mt-12 w-full mx-auto md:mx-0">
             <div className="flex flex-row justify-between items-end w-full mb-px">
               <TabNav

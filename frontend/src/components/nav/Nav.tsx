@@ -6,7 +6,7 @@ import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
 import { Fragment } from "react"
 import { Leaderboard } from "../../helpers/types"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { NavLink } from "./NavLink"
 import OnlineLogo from "../../assets/online.png"
 import axios from "axios"
@@ -41,16 +41,19 @@ export const Nav = ({ auth }: NavProps) => {
       ({ pageParam = LEADERBOARD_URL }) => axios.get(pageParam).then((res) => res.data),
       {
         getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
-        staleTime: 1000 * 60 * 5,
       }
     )
   }
 
+  const { data: user } = useMyGroups()
+
+  const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
+
   const items: NavItem[] = [
     {
       label: "Hjem",
-      url: "/",
-      isActivePredicate: (_, currentLocation) => currentLocation.toLowerCase().startsWith("/grupper/"),
+      url: homeLocation,
+      isActivePredicate: (_, currentLocation) => currentLocation.toLowerCase().startsWith("/gruppe/"),
     },
     {
       label: "Wall of Shame",
@@ -66,6 +69,8 @@ export const Nav = ({ auth }: NavProps) => {
       shouldShowPredicate: () => isInAnyOWGroup,
     },
   ]
+
+  const navigate = useNavigate()
 
   const { darkMode, setDarkMode } = useDarkMode()
 
@@ -135,7 +140,11 @@ export const Nav = ({ auth }: NavProps) => {
                             </button>
                             {auth.isAuthenticated ? (
                               <button
-                                onClick={() => void auth.removeUser()}
+                                onClick={() => {
+                                  auth.removeUser().then(() => {
+                                    navigate("/")
+                                  })
+                                }}
                                 className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm")}
                               >
                                 Logg ut

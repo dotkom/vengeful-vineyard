@@ -70,7 +70,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
         )}
       </div>
 
-      <div className="h-px w-full bg-gray-300 opacity-50 hidden md:block"></div>
+      <div className="h-px w-full bg-gray-300 opacity-50"></div>
 
       <SidebarSection title="Søk">
         <TextInput

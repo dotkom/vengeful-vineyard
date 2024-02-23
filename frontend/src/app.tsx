@@ -5,10 +5,13 @@ import { WebStorageStateStore } from "oidc-client-ts"
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { AuthProvider, AuthProviderProps } from "react-oidc-context"
-import { RouterProvider } from "react-router-dom"
 import { onSigninCallback } from "./helpers/auth"
-import { router } from "./routes"
+import AuthRouterProvider from "./AuthRouterProvider"
 import { envSchema } from "../env"
+import { TogglePunishmentsProvider } from "./helpers/context/togglePunishmentsContext"
+import ModalProvider from "./views/groups/modal/AllModalProvider"
+import { GroupNavigationProvider } from "./helpers/context/groupNavigationContext"
+import { MyGroupsRefetchProvider } from "./helpers/context/myGroupsRefetchContext"
 
 envSchema.parse(import.meta.env)
 
@@ -20,7 +23,6 @@ const configuration: AuthProviderProps = {
   scope: "openid profile email online",
   authority: import.meta.env.VITE_TOKEN_ISSUER,
   metadataUrl: `${import.meta.env.VITE_TOKEN_ISSUER}/.well-known/openid-configuration`,
-  // silent_redirect_uri: import.meta.env.VITE_REDIRECT_URI,
   automaticSilentRenew: true,
   filterProtocolClaims: true,
   loadUserInfo: true,
@@ -33,9 +35,17 @@ const configuration: AuthProviderProps = {
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <AuthProvider {...configuration}>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
+      <ModalProvider>
+        <MyGroupsRefetchProvider>
+          <GroupNavigationProvider>
+            <TogglePunishmentsProvider>
+              <QueryClientProvider client={queryClient}>
+                <AuthRouterProvider />
+              </QueryClientProvider>
+            </TogglePunishmentsProvider>
+          </GroupNavigationProvider>
+        </MyGroupsRefetchProvider>
+      </ModalProvider>
     </AuthProvider>
   </React.StrictMode>
 )

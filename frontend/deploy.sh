@@ -14,4 +14,5 @@ doppler run pnpm build
 FRONTEND_S3_BUCKET=$(doppler run --command 'echo $FRONTEND_S3_BUCKET')
 aws s3 rm $FRONTEND_S3_BUCKET --recursive
 aws s3 cp dist $FRONTEND_S3_BUCKET --recursive
+echo $FRONTEND_S3_BUCKET
 # aws cloudfront create-invalidation --distribution-id EJKLH539HRJU2 --paths '/*'
