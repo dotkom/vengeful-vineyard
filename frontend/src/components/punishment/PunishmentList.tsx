@@ -29,6 +29,8 @@ export const PunishmentList = ({
     return <Fragment>{groupUser && <PunishmentActionBar label="Ingen straffer" user={groupUser} />}</Fragment>
   }
 
+  punishments.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
   return (
     <Fragment>
       {groupUser && <PunishmentActionBar user={groupUser} />}
