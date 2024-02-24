@@ -86,7 +86,7 @@ export const RequestToJoinGroupModal: FC<RequestToJoinGroupModalProps> = ({ open
             onChange={(e) => setSearchTerm(e.target.value)}
             isLoading={groupsSearchIsLoading && enabled}
           />
-          <div className="group-focus-within:flex flex-col absolute top-16 bg-white drop-shadow-2xl w-full hidden divide-y divide-gray-900/5 rounded-b-md overflow-hidden">
+          <div className="flex flex-col absolute top-16 bg-white drop-shadow-2xl w-full divide-y divide-gray-900/5 rounded-b-md overflow-hidden">
             {groups?.map((group) => (
               <button
                 className="flex flex-col hover:bg-indigo-100/50 py-2 px-3 justify-start items-start"
