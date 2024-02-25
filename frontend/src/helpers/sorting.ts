@@ -39,7 +39,9 @@ export function getSortGroupUsersFunc(
     if (punishmentMap) {
       if (sortAlternative === "total_punishments") {
         const count_punishments = (user: GroupUser) =>
-          user.punishments.reduce((acc, curr) => (punishmentMap[curr.punishment_type_id]?.value ? acc + 1 : acc), 0)
+          user.punishments
+            .filter((p) => !p.paid)
+            .reduce((acc, curr) => (punishmentMap[curr.punishment_type_id]?.value ? acc + 1 : acc), 0)
 
         const a_punishments = count_punishments(a)
         const b_punishments = count_punishments(b)

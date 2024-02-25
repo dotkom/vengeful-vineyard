@@ -41,7 +41,7 @@ function getPunishmentTypeCounts(punishments: Punishment[]): Map<string, number>
 
 export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, dataRefetch }: TableItemProps) => {
   const unpaidPunishmentsValue = getUnpaidPunishmentsValue(groupUser.punishments, punishmentTypes)
-  const punishmentTypeCounts = getPunishmentTypeCounts(groupUser.punishments)
+  const punishmentTypeCounts = getPunishmentTypeCounts(groupUser.punishments.filter((p) => !p.paid))
 
   const dateToNumber = groupUser.punishments
     .map((punishment) => {
@@ -103,18 +103,20 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
         <div className="flex items-center gap-x-4">
           <div className="flex flex-col items-end">
             <p className="max-w-sm text-right hidden sm:block">
-              {Object.values(groupUser.punishments).map((punishment) => {
-                const punishmentType = punishmentTypes[punishment.punishment_type_id]
-                return Array.from({ length: punishment.amount }, (_, i) => (
-                  <span
-                    key={`${punishment.punishment_id}/${i}`}
-                    className="text-lg"
-                    title={`${punishmentType.name} (${punishmentType.value}kr)`}
-                  >
-                    <span>{punishmentType.emoji}</span>
-                  </span>
-                ))
-              })}
+              {Object.values(groupUser.punishments)
+                .filter((p) => !p.paid)
+                .map((punishment) => {
+                  const punishmentType = punishmentTypes[punishment.punishment_type_id]
+                  return Array.from({ length: punishment.amount }, (_, i) => (
+                    <span
+                      key={`${punishment.punishment_id}/${i}`}
+                      className="text-lg"
+                      title={`${punishmentType.name} (${punishmentType.value}kr)`}
+                    >
+                      <span>{punishmentType.emoji}</span>
+                    </span>
+                  ))
+                })}
             </p>
             <p className="max-w-sm text-center sm:hidden">
               {Array.from(punishmentTypeCounts)
