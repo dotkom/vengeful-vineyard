@@ -1,7 +1,16 @@
 import React from "react"
-import { FacebookIcon, GitHubIcon, InstagramIcon, SlackIcon } from "../../icons"
+import {
+  FacebookIcon,
+  GitHubIcon,
+  InstagramIcon,
+  SlackIcon,
+  BriefcaseIcon,
+  EnvelopeIcon,
+  MobileIcon,
+  FileIcon,
+} from "../../icons"
 
-export const ContactSection = () => (
+export const FeedbackSection = () => (
   <div className="text-slate-12 flex flex-col text-center font-medium">
     <div>Feil på nettsiden?</div>
     <div>
@@ -13,84 +22,99 @@ export const ContactSection = () => (
   </div>
 )
 
-export const SoMeSection = () => {
-  const links = [
+interface FooterContactInfoGroup {
+  title: string
+  items: React.ReactNode[]
+}
+
+export const ContactInfoSection = () => {
+  const contactInfoGroups: FooterContactInfoGroup[] = [
     {
-      icon: <SlackIcon key="slack" />,
-      url: "https://onlinentnu.slack.com/"
+      title: "Besøksadresse",
+      items: ["A-blokka, A4-137", "Høgskoleringen 5", "NTNU Gløshaugen"],
     },
     {
-      icon: <GitHubIcon key="github" />,
-      url: "https://www.github.com/dotkom/"
+      title: "Kontaktinformasjon",
+      items: [
+        <p>
+          <BriefcaseIcon key="briefcase" />
+          992 548 045 (OrgNr)
+        </p>,
+        <p>
+          <EnvelopeIcon key="envelope" />
+          <a href="mailto:kontakt@online.ntnu.no">kontakt@online.ntnu.no</a>
+        </p>,
+        <p>
+          <FileIcon key="file" />
+          <a href="mailto:okonomi@online.ntnu.no">okonomi@online.ntnu.no</a>
+        </p>,
+        <p>
+          <MobileIcon key="mobile" />
+          454 61 372
+        </p>,
+      ],
     },
     {
-      icon: <InstagramIcon key="instagram" />,
-      url: "https://www.instagram.com/online_ntnu/"
-    },
-    {
-      icon: <FacebookIcon key="facebook" />,
-      url: "http://facebook.com/LinjeforeningenOnline/"
+      title: "Post og faktura",
+      items: ["Online Linjeforening", "Sem Sælands vei 9", "7491 Trondheim"],
     },
   ]
 
   return (
-    <ul className="mx-8 mb-4 flex sm:justify-center">
+    <div className="mx-12 mt-4 mb-8 flex items-center sm:items-start justify-center flex-col sm:flex-row gap-4 sm:gap-8">
+      {contactInfoGroups.map((group, index) => (
+        <div key={index} className="text-center sm:text-left">
+          <p className="text-lg font-medium text-slate-12">{group.title}</p>
+          <ul className="justify-center gap-8 sm:flex-row">
+            {group.items.map((item, itemIndex) => (
+              <li key={itemIndex} className="text-md my-2">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export const SoMeSection = () => {
+  const links = [
+    {
+      icon: <SlackIcon key="slack" />,
+      url: "https://onlinentnu.slack.com/",
+    },
+    {
+      icon: <GitHubIcon key="github" />,
+      url: "https://www.github.com/dotkom/",
+    },
+    {
+      icon: <InstagramIcon key="instagram" />,
+      url: "https://www.instagram.com/online_ntnu/",
+    },
+    {
+      icon: <FacebookIcon key="facebook" />,
+      url: "http://facebook.com/LinjeforeningenOnline/",
+    },
+  ]
+
+  return (
+    <ul className="mx-8 mb-4 flex justify-center flex-wrap">
       {links.map((link) => (
-        <a href={link.url} className="mx-4">
-          <li key={link.icon.key} className="w-16 cursor-pointer">
-            {link.icon}
-          </li>
-        </a>
+        <li key={link.icon.key} className="mx-4 w-16 cursor-pointer">
+          <a href={link.url}>{link.icon}</a>
+        </li>
       ))}
     </ul>
   )
 }
 
-interface LinksSectionProps {
-  links: FooterLinkType
-}
-
-export const LinksSection = ({ links }: LinksSectionProps) => (
-  <div className="mx-12 mb-4 flex items-start gap-8 sm:flex-col sm:items-center sm:gap-0">
-    <ul className="my-8 flex flex-col justify-center gap-8 sm:flex-row">
-      {links.main.map((link) => (
-        <FooterLink label={link} key={link} large />
-      ))}
-    </ul>
-
-    <ul className="my-8 flex flex-col justify-center gap-8 sm:flex-row">
-      {links.second.map((link) => (
-        <FooterLink label={link} key={link} />
-      ))}
-    </ul>
-  </div>
-)
-
-interface FooterLinkProps {
-  label: string
-  large?: boolean
-}
-
-export interface FooterLinkType {
-  main: string[]
-  second: string[]
-}
-
-const footerLinks: FooterLinkType = {
-  main: ["PROFIL", "HJEM", "KARRIERE", "WIKI", "BIDRA"],
-  second: ["Besøksadresse", "Kontaktinformasjon", "Post og faktura"],
-}
-
-export const FooterLink = ({ label }: FooterLinkProps) => (
-  <li className="text-lg font-medium text-slate-12 cursor-pointer">{label}</li>
-)
-
 export const Footer = () => {
   return (
     <footer className="bg-white flex w-full flex-col pt-16 pb-8 text-black border-t-[1px] border-gray-300">
       <SoMeSection />
-      <LinksSection links={footerLinks} />
-      <ContactSection />
+      <ContactInfoSection />
+      <FeedbackSection />
     </footer>
   )
 }
