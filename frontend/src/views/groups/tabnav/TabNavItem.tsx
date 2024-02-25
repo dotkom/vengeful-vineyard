@@ -36,7 +36,8 @@ export const TabNavItem = ({ group, selectedGroup, ...props }: TabNavItemProps) 
           group.name_short === selectedGroup?.name_short
             ? "text-gray-900 dark:text-gray-100"
             : "text-gray-500 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-gray-100",
-          "-mt-1 h-6 w-6 md:h-7 md:w-7"
+          "-mt-1 h-6 w-6 md:h-7 md:w-7",
+          group.ow_group_id !== null ? "grayscale dark:invert" : ""
         )}
         aria-hidden="true"
       />
