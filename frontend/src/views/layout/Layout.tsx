@@ -38,7 +38,7 @@ const LayoutFields = () => {
   if (auth.isLoading) {
     return (
       <>
-        <main className="flex h-screen flex-col bg-gray-50">
+        <main className="flex h-screen flex-col bg-gray-50 pb-40">
           <Nav auth={auth} />
           <div className="flex justify-center mt-16">
             <Spinner />
@@ -60,7 +60,7 @@ const LayoutFields = () => {
 
     return (
       <>
-        <main className="flex h-screen flex-col justify-between bg-gray-50">
+        <main className="flex h-screen flex-col justify-between bg-gray-50 pb-40">
           <Nav auth={auth} />
           <div className="flex flex-col items-center justify-center mt-16">
             <h1>Ai ai ai ai ai!!! En feil oppsto.</h1>
@@ -78,7 +78,7 @@ const LayoutFields = () => {
 
   return (
     <>
-      <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50">
+      <main className="flex h-full min-h-screen flex-col justify-between bg-gray-50 pb-40">
         <CurrentUserProvider>
           <NotificationProvider>
             <Nav auth={auth} />
