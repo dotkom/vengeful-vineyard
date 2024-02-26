@@ -36,22 +36,22 @@ export const ContactInfoSection = () => {
     {
       title: "Kontaktinformasjon",
       items: [
-        <p>
+        <>
           <BriefcaseIcon key="briefcase" />
           992 548 045 (OrgNr)
-        </p>,
-        <p>
+        </>,
+        <>
           <EnvelopeIcon key="envelope" />
           <a href="mailto:kontakt@online.ntnu.no">kontakt@online.ntnu.no</a>
-        </p>,
-        <p>
+        </>,
+        <>
           <FileIcon key="file" />
           <a href="mailto:okonomi@online.ntnu.no">okonomi@online.ntnu.no</a>
-        </p>,
-        <p>
+        </>,
+        <>
           <MobileIcon key="mobile" />
           454 61 372
-        </p>,
+        </>,
       ],
     },
     {
@@ -68,7 +68,7 @@ export const ContactInfoSection = () => {
           <ul className="justify-center gap-8 sm:flex-row">
             {group.items.map((item, itemIndex) => (
               <li key={itemIndex} className="text-md my-2">
-                {item}
+                <p className="inline-flex gap-1 items-center">{item}</p>
               </li>
             ))}
           </ul>
