@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState } from "react"
 
-import { ConfirmModalProps } from "../../../components/modal/ConfirmModal"
+import { ConfirmModalProps } from "../../../components/modal/YesNoConfirmModal"
 import { InputConfirmModalProps } from "../../../components/modal/InputConfirmModal"
 
 type ConfirmModalType = "YESNO" | "INPUT"

@@ -11,7 +11,7 @@ from app.config import (
     ROLES,
 )
 from app.exceptions import DatabaseIntegrityException, NotFound
-from app.models.group import Group, GroupCreate, GroupSearchResult
+from app.models.group import Group, GroupCreate, GroupSearchResult, GroupPublic
 from app.models.group_member import GroupMember, GroupMemberCreate
 from app.models.punishment import TotalPunishmentValue
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
@@ -159,6 +159,27 @@ class Groups:
                 if is_ow_group
                 else PERMISSIONS_AS_DICT,
             )
+
+    async def get_public_group_profile(
+        self,
+        group_short_name: str,
+        user_id: Optional[UserId] = None,
+        conn: Optional[Pool] = None,
+    ) -> GroupPublic:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = "SELECT * FROM groups WHERE lower(name_short) = lower($1)"
+            group = await conn.fetchrow(query, group_short_name)
+
+            if group is None:
+                raise NotFound
+
+            if user_id is not None:
+                query = "SELECT 1 FROM group_members WHERE group_id = $1 AND user_id = $2"
+                is_member = bool(await conn.fetchval(query, group["group_id"], user_id))
+            else:
+                is_member = False
+
+            return GroupPublic(**group, is_official=group["ow_group_id"] is not None, is_member=is_member)
 
     async def get_total_punishment_value(
         self,

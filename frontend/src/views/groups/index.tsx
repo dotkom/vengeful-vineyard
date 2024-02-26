@@ -1,3 +1,3 @@
-import { GroupsView } from "./GroupsView"
+import { GroupView } from "./GroupView"
 
-export { GroupsView }
+export { GroupView }

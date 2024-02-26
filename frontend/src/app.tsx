@@ -5,24 +5,30 @@ import { WebStorageStateStore } from "oidc-client-ts"
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { AuthProvider, AuthProviderProps } from "react-oidc-context"
-import { RouterProvider } from "react-router-dom"
 import { onSigninCallback } from "./helpers/auth"
-import { router } from "./routes"
+import AuthRouterProvider from "./AuthRouterProvider"
+import { envSchema } from "../env"
+import { TogglePunishmentsProvider } from "./helpers/context/togglePunishmentsContext"
+import ModalProvider from "./views/groups/modal/AllModalProvider"
+import { GroupNavigationProvider } from "./helpers/context/groupNavigationContext"
+import { MyGroupsRefetchProvider } from "./helpers/context/myGroupsRefetchContext"
+import { ConfirmModalProvider } from "./helpers/context/modal/confirmModalContext"
+
+envSchema.parse(import.meta.env)
 
 const queryClient = new QueryClient()
 
 const configuration: AuthProviderProps = {
-  client_id: "ksPx08as8bc9jCaRvG8R2Gte1twJChTuHbfVG0My",
-  redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
+  client_id: import.meta.env.VITE_CLIENT_ID,
+  redirect_uri: import.meta.env.VITE_REDIRECT_URI,
   scope: "openid profile email online",
-  authority: "https://old.online.ntnu.no/sso/",
-  metadataUrl: "https://old.online.ntnu.no/sso/.well-known/openid-configuration/",
-  silent_redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
+  authority: import.meta.env.VITE_TOKEN_ISSUER,
+  metadataUrl: `${import.meta.env.VITE_TOKEN_ISSUER}/.well-known/openid-configuration`,
   automaticSilentRenew: true,
   filterProtocolClaims: true,
   loadUserInfo: true,
   revokeTokensOnSignout: true,
-  post_logout_redirect_uri: import.meta.env.VITE_REDIRECT_URI ?? "http://localhost:3000",
+  post_logout_redirect_uri: import.meta.env.VITE_REDIRECT_URI,
   onSigninCallback: onSigninCallback,
   userStore: new WebStorageStateStore({ store: window.localStorage }),
 }
@@ -30,9 +36,19 @@ const configuration: AuthProviderProps = {
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <AuthProvider {...configuration}>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
+      <ModalProvider>
+        <MyGroupsRefetchProvider>
+          <GroupNavigationProvider>
+            <TogglePunishmentsProvider>
+              <ConfirmModalProvider>
+                <QueryClientProvider client={queryClient}>
+                  <AuthRouterProvider />
+                </QueryClientProvider>
+              </ConfirmModalProvider>
+            </TogglePunishmentsProvider>
+          </GroupNavigationProvider>
+        </MyGroupsRefetchProvider>
+      </ModalProvider>
     </AuthProvider>
   </React.StrictMode>
 )

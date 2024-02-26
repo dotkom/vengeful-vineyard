@@ -7,7 +7,7 @@ interface SidebarSectionProps {
 
 export const SidebarSection: FC<SidebarSectionProps> = ({ title, children }) => {
   return (
-    <div className="flex flex-col gap-y-1 hidden md:block">
+    <div className="flex-col gap-y-1">
       <span className="ml-1 text-sm text-gray-600">{title}</span>
       {children}
     </div>

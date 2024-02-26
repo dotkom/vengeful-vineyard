@@ -51,7 +51,12 @@ export const AlcoholInput = ({
             onChange={typeInputHandler}
           >
             {Object.values(data.punishment_types).map((ptype) => (
-              <option key={ptype.punishment_type_id} value={ptype.punishment_type_id} title={`Verdi: ${ptype.value}kr`}>
+              <option
+                className="text-black dark:text-black"
+                key={ptype.punishment_type_id}
+                value={ptype.punishment_type_id}
+                title={`Verdi: ${ptype.value}kr`}
+              >
                 {ptype.name} {ptype.emoji}
               </option>
             ))}

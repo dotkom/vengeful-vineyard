@@ -70,7 +70,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
         )}
       </div>
 
-      <div className="h-px w-full bg-gray-300 opacity-50 hidden md:block"></div>
+      <div className="h-px w-full bg-gray-300 opacity-50"></div>
 
       <SidebarSection title="Søk">
         <TextInput
@@ -79,6 +79,8 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
           value={searchTerm}
         />
       </SidebarSection>
+
+      {/*
 
       <SidebarSection title="Sorter etter">
         <Listbox value={sortingAlternative} onChange={setSortingAlternative} options={listboxOptions} />
@@ -97,6 +99,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
           isLoading={groupDataIsLoading}
         />
       </SidebarSection>
+      */}
     </div>
   )
 }

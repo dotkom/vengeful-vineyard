@@ -23,15 +23,9 @@ export const TabNav = ({ selectedGroup, setSelectedGroup, groups }: TabNavProps)
   }, [groups])
 
   const prefetchGroup = async (group: Group) => {
-    queryClient.prefetchQuery(
-      ["groupLeaderboard", group.group_id],
-      () => {
-        return axios.get(getGroupUrl(group.group_id)).then((res) => res.data)
-      },
-      {
-        staleTime: 1000 * 60 * 5,
-      }
-    )
+    queryClient.prefetchQuery(["groupLeaderboard", group.group_id], () => {
+      return axios.get(getGroupUrl(group.group_id)).then((res) => res.data)
+    })
   }
 
   return (

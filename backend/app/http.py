@@ -83,7 +83,7 @@ class HTTPClient:
 
     async def get_ow_profile_by_access_token(self, access_token: str) -> Optional[Any]:
         async with self._session.get(
-            f"{BASE_OLD_ONLINE}/api/v1/profile",
+            f"{BASE_OLD_ONLINE}/api/v1/profile/",
             headers={"Authorization": f"Bearer {access_token}"},
         ) as response:
             if response.status == 401:
@@ -103,7 +103,7 @@ class HTTPClient:
             headers["Authorization"] = f"Bearer {access_token}"
 
         async with self._session.get(
-            f"{BASE_OLD_ONLINE}/api/v1/profile/search/{user_id}",
+            f"{BASE_OLD_ONLINE}/api/v1/profile/search/{user_id}/",
             headers=headers,
         ) as response:
             if response.status == 404:
@@ -128,7 +128,7 @@ class HTTPClient:
         }
 
         async with self._session.get(
-            f"{BASE_OLD_ONLINE}/api/v1/profile/search",
+            f"{BASE_OLD_ONLINE}/api/v1/profile/search/",
             headers=headers,
             params=params,
         ) as response:
@@ -144,14 +144,14 @@ class HTTPClient:
         }
 
         async with self._session.get(
-            f"{BASE_OLD_ONLINE}/api/v1/group/online-groups",
+            f"{BASE_OLD_ONLINE}/api/v1/group/online-groups/",
             params=params,
         ) as response:
             return await response.json()  # TODO?: Implement pagination?
 
     async def get_ow_group_users(self, group_id: int) -> Any:
         async with self._session.get(
-            f"{BASE_OLD_ONLINE}/api/v1/group/online-groups/{group_id}/group-users",
+            f"{BASE_OLD_ONLINE}/api/v1/group/online-groups/{group_id}/group-users/",
         ) as response:
             if response.status == 404:
                 return []

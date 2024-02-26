@@ -8,6 +8,8 @@ import {
   LeaderboardSchema,
   MeUserSchema,
   GroupSchema,
+  PublicGroupSchema,
+  PublicGroup,
 } from "./types"
 import { QueryKey, UseInfiniteQueryOptions, UseQueryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
@@ -98,6 +100,20 @@ export const useGroupLeaderboard = (
     ...options,
   })
 
+export const usePublicGroup = (
+  groupNameShort?: string,
+  options?: UseQueryOptions<PublicGroup, unknown, PublicGroup, [string, string]>
+) =>
+  useQuery(
+    ["publicGroup", groupNameShort === undefined ? "" : groupNameShort],
+    async () => {
+      const response = await axios.get(BASE_URL + `/groups/public_profiles/${groupNameShort}`)
+
+      return PublicGroupSchema.parse(response.data)
+    },
+    options
+  )
+
 export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser, [QueryKey, boolean]>) =>
   useOptimisticQuery<MeUser>(
     ["groupsData"],
@@ -146,6 +162,5 @@ export const useLeaderboard = (
 ) =>
   useInfiniteQuery(["leaderboard"], ({ pageParam = LEADERBOARD_URL }) => getLeaderboard(pageParam), {
     getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
-    staleTime: 1000 * 60,
     ...options,
   })

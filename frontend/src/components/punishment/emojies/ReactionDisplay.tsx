@@ -26,25 +26,27 @@ export const ReactionsDisplay = ({ reactions, mutate, removeMutation, setSelecte
 
   return (
     <div className="flex space-x-2">
-      {Object.entries(emojiCounts).map(([emoji, count]) => (
-        <div
-          key={emoji}
-          className={`flex cursor-pointer items-center justify-center rounded-full border-[1px] px-2 ${
-            emoji === userReactionEmoji ? "border-blue-500 bg-blue-100 dark:bg-blue-3" : "border-gray-400 bg-gray-50"
-          }`}
-          onClick={() => {
-            if (emoji === userReactionEmoji) {
-              removeMutation()
-            } else {
-              setSelectedEmoji(emoji)
-              mutate(emoji)
-            }
-          }}
-        >
-          <span className="text-md">{emoji}</span>
-          <span className="ml-1 text-sm">{count}</span>
-        </div>
-      ))}
+      {Object.entries(emojiCounts)
+        .sort((a, b) => b[0].localeCompare(a[0]))
+        .map(([emoji, count]) => (
+          <div
+            key={emoji}
+            className={`flex cursor-pointer items-center justify-center rounded-full border-[1px] px-2 ${
+              emoji === userReactionEmoji ? "border-blue-500 bg-blue-100 dark:bg-blue-3" : "border-gray-400 bg-gray-50"
+            }`}
+            onClick={() => {
+              if (emoji === userReactionEmoji) {
+                removeMutation()
+              } else {
+                setSelectedEmoji(emoji)
+                mutate(emoji)
+              }
+            }}
+          >
+            <span className="text-md">{emoji}</span>
+            <span className="ml-1 text-sm text-black dark:text-white">{count}</span>
+          </div>
+        ))}
     </div>
   )
 }

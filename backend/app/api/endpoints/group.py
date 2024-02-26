@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from app.api import APIRoute, Request, oidc
 from app.config import INDEXED_ROLES
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
-from app.models.group import Group, GroupCreate, GroupCreateMinified, GroupSearchResult
+from app.models.group import Group, GroupPublic, GroupCreate, GroupCreateMinified, GroupSearchResult
 from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_join_requests import GroupJoinRequest
 from app.models.group_member import GroupMemberCreate
@@ -230,6 +230,32 @@ async def get_group(request: Request, group_id: GroupId) -> Group:
 
         try:
             return await app.db.groups.get(group_id, conn=conn)
+        except NotFound as exc:
+            raise HTTPException(
+                status_code=404, detail="Gruppen ble ikke funnet"
+            ) from exc
+
+
+@router.get(
+    "/public_profiles/{group_name_short}",
+    response_model=GroupPublic,
+    dependencies=[Depends(oidc)],
+)
+async def get_public_group(request: Request, group_name_short: str) -> GroupPublic:
+    """
+    Endpoint to get a public group.
+    """
+    app = request.app
+
+    if request.access_token is not None:
+        user_id, _ = await app.ow_sync.sync_for_access_token(request.access_token)
+    else:
+        user_id = None
+
+
+    async with app.db.pool.acquire() as conn:
+        try:
+            return await app.db.groups.get_public_group_profile(group_name_short, user_id, conn=conn)
         except NotFound as exc:
             raise HTTPException(
                 status_code=404, detail="Gruppen ble ikke funnet"
@@ -784,6 +810,7 @@ async def add_punishment(
                 status_code=404, detail="Gruppen ble ikke funnet"
             ) from exc
 
+        """
         is_ow_group = group.ow_group_id is not None
         permission_manager = app.get_permission_manager(is_ow_group=is_ow_group)
         await permission_manager.raise_if_missing_permission(
@@ -792,6 +819,7 @@ async def add_punishment(
             "group.punishments.add",
             conn=conn,
         )
+        """
 
         res = await app.db.groups.is_in_group(
             created_by,
