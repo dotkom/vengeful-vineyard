@@ -1,6 +1,7 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
 import { LEADERBOARD_URL, useMyGroups } from "../../helpers/api"
+import BekkLogo from "../../assets/bekk.svg"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
@@ -114,6 +115,16 @@ export const Nav = ({ auth }: NavProps) => {
                 </div>
               </div>
               <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
+                <div>
+                  <Link to="https://www.bekk.no/">
+                    <img
+                      className="h-8 w-auto cursor-pointer dark:invert-0 invert opacity-70"
+                      src={BekkLogo}
+                      alt="Bekk Logo"
+                    />
+                  </Link>
+                </div>
+
                 <Menu as="div" className="relative ml-3">
                   <div>
                     <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -121,6 +132,7 @@ export const Nav = ({ auth }: NavProps) => {
                       <AvatarIcon className="h-10 w-10 text-black" />
                     </Menu.Button>
                   </div>
+
                   <Transition
                     as={Fragment}
                     enter="transition ease-out duration-200"
