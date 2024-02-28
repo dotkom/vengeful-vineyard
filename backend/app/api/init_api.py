@@ -111,6 +111,8 @@ def init_api(**db_settings: str) -> FastAPI:
         swagger_ui_init_oauth=oauth,
         swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect",
     )
+
+    app.openapi_version = "3.0.0"
     app.router.route_class = APIRoute
     init_middlewares(app)
     init_routes(app)
