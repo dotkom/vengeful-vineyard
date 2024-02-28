@@ -32,15 +32,15 @@ interface EditGroupModalProps {
 }
 
 const EditGroup = z.object({
-  name: z.string().min(3, { message: "Navn må være minst tre tegn" }),
-  name_short: z.string().min(3, { message: "Kort navn må være minst tre tegn" }),
+  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
+  name_short: z.string().trim().min(3, { message: "Kort navn må være minst tre tegn" }),
 })
 
 type EditGroupType = z.infer<typeof EditGroup>
 
 const MutatePunishmentType = z.object({
-  name: z.string().min(3, { message: "Navn må være minst tre tegn" }),
-  emoji: z.string().min(1, { message: "Emoji må være minst ett tegn" }),
+  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
+  emoji: z.string().trim().min(1, { message: "Emoji må være minst ett tegn" }),
   value: z.number().min(1, { message: "Verdi må være minst 1" }),
 })
 

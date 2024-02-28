@@ -215,8 +215,8 @@ class Groups:
                 group_id = await conn.fetchval(
                     query,
                     group.ow_group_id,
-                    group.name,
-                    group.name_short,
+                    group.name.strip(),
+                    group.name_short.strip(),
                     group.rules,
                     group.image,
                 )
@@ -248,8 +248,8 @@ class Groups:
                     RETURNING group_id;"""
             ret_group_id = await conn.fetchval(
                 query,
-                group.name,
-                group.name_short,
+                group.name.strip(),
+                group.name_short.strip(),
                 group.rules,
                 group.image,
                 group_id if use_group_id else group.ow_group_id,
