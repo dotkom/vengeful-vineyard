@@ -5,6 +5,7 @@ Values can be overridden by environment variables.
 VENGEFUL_DATABASE=test.db will set vengeful_database="test.db"
 """
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseSettings
 
@@ -95,6 +96,7 @@ class Settings(BaseSettings):
     migrations_directory: Path = Path("app/migrations")
     client_origin: str = "http://localhost:3000"
     debug: bool = True
+    sentry_dsn: Optional[str] = None
 
 
 settings = Settings()

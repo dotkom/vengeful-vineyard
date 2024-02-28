@@ -6,8 +6,10 @@ Sets up the API (FastAPI)
 """
 
 import logging
+import os
 from timeit import default_timer as timer
 from typing import Any
+import sentry_sdk
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -111,6 +113,20 @@ def init_api(**db_settings: str) -> FastAPI:
         swagger_ui_init_oauth=oauth,
         swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect",
     )
+
+    print(settings, os.environ)
+    if settings.sentry_dsn:
+        print("Sentry DSN found, enabling Sentry")
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+        )
+
+    @app.get("/sentry-debug")
+    async def trigger_error():
+        division_by_zero = 1 / 0
+
     app.router.route_class = APIRoute
     init_middlewares(app)
     init_routes(app)
