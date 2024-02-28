@@ -4,6 +4,7 @@ import { LEADERBOARD_URL, useMyGroups } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
+import BugIcon from "../../icons/BugIcon"
 import { Fragment } from "react"
 import { Leaderboard } from "../../helpers/types"
 import { Link, useLocation, useNavigate } from "react-router-dom"
@@ -119,6 +120,17 @@ export const Nav = ({ auth }: NavProps) => {
                     ))}
                 </div>
               </div>
+              <div className="hidden md:flex flex-row justify-end w-full">
+                <div className="flex items-center">
+                  <Link
+                    to="mailto:dotkom@online.ntnu.no"
+                    title="Rapporter bug"
+                    className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    <BugIcon className="w-10 h-10 p-1 dark:grayscale dark:invert" />
+                  </Link>
+                </div>
+              </div>
               <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
                 <Menu as="div" className="relative ml-3">
                   <div>
@@ -194,6 +206,13 @@ export const Nav = ({ auth }: NavProps) => {
                 ))}
             </div>
             <div className="border-t border-gray-200">
+              <div className="space-y-1">
+                <Link to="mailto:dotkom@online.ntnu.no">
+                  <span className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
+                    Rapporter bug
+                  </span>
+                </Link>
+              </div>
               <div className="space-y-1">
                 <Disclosure.Button
                   as="a"
