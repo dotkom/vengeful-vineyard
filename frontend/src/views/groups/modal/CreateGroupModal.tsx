@@ -18,8 +18,8 @@ interface CreateGroupModalProps {
 }
 
 const GroupCreate = z.object({
-  name: z.string().min(3, { message: "Navn må være minst tre tegn" }),
-  name_short: z.string().min(3, { message: "Kort navn må være minst tre tegn" }),
+  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
+  name_short: z.string().trim().min(3, { message: "Kort navn må være minst tre tegn" }),
 })
 
 type GroupCreateType = z.infer<typeof GroupCreate>

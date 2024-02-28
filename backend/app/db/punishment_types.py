@@ -65,7 +65,7 @@ class PunishmentTypes:
                     (
                         None,
                         group_id,
-                        x.name,
+                        x.name.strip(),
                         x.value,
                         x.emoji,
                         datetime.utcnow(),
@@ -99,7 +99,7 @@ class PunishmentTypes:
                 query,
                 group_id,
                 punishment_type_id,
-                punishment_type.name,
+                punishment_type.name.strip(),
                 punishment_type.value,
                 punishment_type.emoji,
                 datetime.utcnow(),
