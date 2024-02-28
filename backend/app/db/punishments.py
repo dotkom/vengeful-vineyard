@@ -82,7 +82,8 @@ class Punishments:
                                                      created_at,
                                                      paid,
                                                      paid_at,
-                                                     marked_paid_by)
+                                                     marked_paid_by,
+                                                     legacy)
                     (SELECT
                         p.group_id,
                         p.user_id,
@@ -94,7 +95,8 @@ class Punishments:
                         p.created_at,
                         p.paid,
                         p.paid_at,
-                        p.marked_paid_by
+                        p.marked_paid_by,
+                        p.legacy
                     FROM
                         unnest($1::group_punishments[]) as p
                     )
@@ -116,6 +118,7 @@ class Punishments:
                         False,
                         None,
                         None,
+                        p.legacy,
                     )
                     for p in punishments
                 ],
