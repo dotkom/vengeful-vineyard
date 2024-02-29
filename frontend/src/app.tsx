@@ -19,11 +19,11 @@ envSchema.parse(import.meta.env)
 const queryClient = new QueryClient()
 
 const configuration: AuthProviderProps = {
-  client_id: import.meta.env.VITE_CLIENT_ID,
+  client_id: import.meta.env.AUTH0_CLIENT_ID,
   redirect_uri: import.meta.env.VITE_REDIRECT_URI,
-  scope: "openid profile email online",
-  authority: import.meta.env.VITE_TOKEN_ISSUER,
-  metadataUrl: `${import.meta.env.VITE_TOKEN_ISSUER}/.well-known/openid-configuration`,
+  scope: "openid profile email",
+  authority: import.meta.env.AUTH0_ISSUER,
+  metadataUrl: `${import.meta.env.AUTH0_ISSUER}/.well-known/openid-configuration`,
   automaticSilentRenew: true,
   filterProtocolClaims: true,
   loadUserInfo: true,
