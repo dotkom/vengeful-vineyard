@@ -8,7 +8,8 @@ import { Fragment } from "react"
 import { Leaderboard } from "../../helpers/types"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { NavLink } from "./NavLink"
-import OnlineLogo from "../../assets/online.png"
+import OnlineLogo from "../../assets/online-logo-blue.png"
+import OnlineLogoWhite from "../../assets/online-logo-white.png"
 import axios from "axios"
 import { classNames } from "../../helpers/classNames"
 import { useQueryClient } from "@tanstack/react-query"
@@ -95,7 +96,12 @@ export const Nav = ({ auth }: NavProps) => {
                 </div>
                 <div className="flex flex-shrink-0 items-center">
                   <Link to="/">
-                    <img className="h-8 w-auto cursor-pointer" src={OnlineLogo} alt="Online Logo" />
+                    <img className="h-8 w-auto cursor-pointer dark:hidden" src={OnlineLogo} alt="Online Logo" />
+                    <img
+                      className="h-8 w-auto cursor-pointer hidden dark:block"
+                      src={OnlineLogoWhite}
+                      alt="White Online Logo"
+                    />
                   </Link>
                 </div>
                 <div className="hidden md:ml-6 md:flex md:space-x-8">
