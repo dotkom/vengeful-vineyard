@@ -18,7 +18,7 @@ function getGroupIcon(image: string) {
 }
 
 export const TabNavItem = ({ group, selectedGroup, ...props }: TabNavItemProps) => {
-  const GroupIcon = group.ow_group_id !== null ? getGroupIcon(group.image) : UserGroupIcon
+  const GroupIcon = group.image !== "NoImage" && group.image ? getGroupIcon(group.image) : UserGroupIcon
 
   return (
     <a
@@ -37,7 +37,7 @@ export const TabNavItem = ({ group, selectedGroup, ...props }: TabNavItemProps) 
             ? "text-gray-900 dark:text-gray-100"
             : "text-gray-500 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-gray-100",
           "-mt-1 h-6 w-6 md:h-7 md:w-7",
-          group.ow_group_id !== null ? "grayscale dark:invert" : ""
+          group.image ? "grayscale dark:invert" : ""
         )}
         aria-hidden="true"
       />

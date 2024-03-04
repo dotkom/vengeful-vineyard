@@ -23,7 +23,7 @@ class Statistics:
                 groups g
                 LEFT JOIN group_punishments gp ON g.group_id = gp.group_id
                 LEFT JOIN punishment_types pt ON gp.punishment_type_id = pt.punishment_type_id
-            WHERE g.ow_group_id IS NOT NULL
+            WHERE g.ow_group_id IS NOT NULL or special
             GROUP BY g.group_id, g.name, g.name_short, g.image
             ORDER BY total_value DESC
                     """

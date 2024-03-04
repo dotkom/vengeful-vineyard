@@ -5,6 +5,9 @@ import functools
 from typing import Any, Optional
 
 from aiohttp import ClientSession
+from app.config import (
+    settings,
+)
 
 from .exceptions import NotAuthorizedException
 

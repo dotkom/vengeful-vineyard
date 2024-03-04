@@ -37,7 +37,7 @@ class Users:
                 INNER JOIN group_members ON group_members.user_id = users.user_id
                 INNER JOIN groups ON groups.group_id = group_members.group_id
                 INNER JOIN group_punishments ON group_punishments.user_id = users.user_id
-                WHERE groups.ow_group_id IS NOT NULL;
+                WHERE groups.ow_group_id IS NOT NULL OR special;
                 """,
             )
             assert isinstance(res, int)
@@ -71,7 +71,7 @@ class Users:
                             ON u.user_id = gp.created_by
                         LEFT JOIN groups g
                             ON g.group_id = gp.group_id
-                        WHERE g.ow_group_id IS NOT NULL
+                        WHERE g.ow_group_id IS NOT NULL OR special
                         GROUP BY gp.punishment_id, created_by_name
                     )
                     SELECT u.*,
@@ -109,7 +109,7 @@ class Users:
                     LEFT JOIN punishment_types pt
                         ON pt.punishment_type_id = pwr.punishment_type_id
                     INNER JOIN groups g
-                        ON g.group_id = pwr.group_id AND g.ow_group_id IS NOT NULL
+                        ON g.group_id = pwr.group_id AND g.ow_group_id IS NOT NULL OR special
                     GROUP BY u.user_id
                     ORDER BY total_value DESC, u.first_name ASC
                     OFFSET $1

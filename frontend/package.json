@@ -12,7 +12,7 @@
     "type-check": "tsc --noEmit",
     "pre-commit": "lint-staged && tsc --noEmit",
     "deploy": "./deploy.sh staging",
-    "deploy:prod": "./deploy.sh prod"
+    "deploy:prod": "./deploy.sh prd"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.10",
