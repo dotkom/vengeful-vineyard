@@ -80,7 +80,7 @@ class Groups:
     ) -> bool:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """SELECT 1 FROM group_members gm
-                    INNER JOIN groups g ON g.group_id = gm.group_id AND g.ow_group_id IS NOT NULL
+                    INNER JOIN groups g ON g.group_id = gm.group_id AND g.ow_group_id IS NOT NULL or special
                     WHERE gm.user_id = $1
                     """
 
