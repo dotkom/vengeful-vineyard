@@ -127,7 +127,12 @@ export const Nav = ({ auth }: NavProps) => {
                     title="Rapporter bug"
                     className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >
-                    <BugIcon className="w-10 h-10 p-1 dark:grayscale dark:invert" />
+                    <figure className="relative group">
+                      <BugIcon className="w-10 h-10 p-1 dark:grayscale dark:invert" />
+                      <figcaption className="absolute text-center top-[50px] left-[-40px] right-[-40px] py-2 text-xs text-gray-700 hidden group-hover:block bg-white p-1 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                        Rapporter bug
+                      </figcaption>
+                    </figure>
                   </Link>
                 </div>
               </div>
