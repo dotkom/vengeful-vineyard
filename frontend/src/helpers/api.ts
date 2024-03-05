@@ -160,7 +160,9 @@ export const useLeaderboard = (
     "queryFn" | "queryKey"
   >
 ) =>
-  useInfiniteQuery(["leaderboard"], ({ pageParam = LEADERBOARD_URL }) => getLeaderboard(pageParam), {
-    getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
+  useInfiniteQuery(["leaderboard"], getLeaderboard, {
+    getNextPageParam: (lastPage, _pages) => {
+      return lastPage.next
+    },
     ...options,
   })

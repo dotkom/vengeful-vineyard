@@ -32,12 +32,13 @@ class Users:
     ) -> int:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             res = await conn.fetchval(
-                """SELECT COUNT(DISTINCT users.user_id)
-                FROM users
-                INNER JOIN group_members ON group_members.user_id = users.user_id
-                INNER JOIN groups ON groups.group_id = group_members.group_id
-                INNER JOIN group_punishments ON group_punishments.user_id = users.user_id
-                WHERE groups.ow_group_id IS NOT NULL OR special;
+                """SELECT
+                        count(DISTINCT(user_id))
+                    FROM
+                        group_members
+                        INNER JOIN GROUPS ON group_members.group_id = groups.group_id
+                    WHERE
+                        groups.ow_group_id IS NOT NULL OR groups.special;
                 """,
             )
             assert isinstance(res, int)
