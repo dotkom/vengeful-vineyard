@@ -39,7 +39,7 @@ export const Nav = ({ auth }: NavProps) => {
 
   const prefetchWallOfShame = () => {
     queryClient.prefetchInfiniteQuery(
-      ["leaderboard"],
+      ["leaderboard", { pageParam: LEADERBOARD_URL }],
       ({ pageParam = LEADERBOARD_URL }) => axios.get(pageParam).then((res) => res.data),
       {
         getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
