@@ -26,6 +26,8 @@ export const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
 
 export const LEADERBOARD_URL = BASE_URL + "/users/leaderboard"
 
+export const getLeaderboardUrl = (page: number) => `${LEADERBOARD_URL}?page=${page}`
+
 export const getMeUrl = (optimistic: boolean) => BASE_URL + `/users/me?optimistic=${optimistic}`
 
 export const GROUPS_URL = BASE_URL + "/groups/me"
@@ -151,8 +153,8 @@ export const addReaction = async (punishmentId: string, emoji: string) =>
 
 export const removeReaction = async (punishmentId: string) => (await axios.delete(getAddReactionUrl(punishmentId))).data
 
-const getLeaderboard = async ({ pageParam = LEADERBOARD_URL }) =>
-  LeaderboardSchema.parse(await axios.get(pageParam).then((res: AxiosResponse<Leaderboard>) => res.data))
+const getLeaderboard = async ({ pageParam = 0 }) =>
+  LeaderboardSchema.parse(await axios.get(getLeaderboardUrl(pageParam)).then((res) => res.data))
 
 export const useLeaderboard = (
   options?: Omit<
@@ -161,8 +163,10 @@ export const useLeaderboard = (
   >
 ) =>
   useInfiniteQuery(["leaderboard"], getLeaderboard, {
-    getNextPageParam: (lastPage, _pages) => {
-      return lastPage.next
+    getNextPageParam: (lastPage) => {
+      // Assuming you can determine the next page number from the last page data
+      const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
+      return nextPage ? Number(nextPage) : undefined
     },
     ...options,
   })
