@@ -24,7 +24,7 @@ export const WallOfShame = () => {
   return (
     <section className="mt-8 md:mt-16 max-w-5xl w-[90%] mx-auto">
       <h1 className="mb-4 text-center md:text-xl font-medium text-black">Wall of Shame</h1>
-      <LeaderboardTable leaderboardUsers={leaderboardUsers} isLoading={isLoading} dataRefetch={refetch} />
+      <LeaderboardTable leaderboardUsers={leaderboardUsers} isFetching={isFetching} dataRefetch={refetch} />
     </section>
   )
 }

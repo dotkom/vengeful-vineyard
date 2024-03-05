@@ -8,13 +8,13 @@ import { LeaderboardTableItem } from "./LeaderboardTableItem"
 
 interface LeaderboardTableProps {
   leaderboardUsers?: LeaderboardUser[] | undefined
-  isLoading: boolean
+  isFetching: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
 }
 
-export const LeaderboardTable = ({ leaderboardUsers, isLoading = false, dataRefetch }: LeaderboardTableProps) => {
+export const LeaderboardTable = ({ leaderboardUsers, isFetching = false, dataRefetch }: LeaderboardTableProps) => {
   return (
     <ul role="list">
       <Accordion.Root
@@ -27,13 +27,13 @@ export const LeaderboardTable = ({ leaderboardUsers, isLoading = false, dataRefe
           <LeaderboardTableItem key={user.user_id} leaderboardUser={user} dataRefetch={dataRefetch} i={i} />
         ))}
 
-        {leaderboardUsers && leaderboardUsers.length === 0 && !isLoading && (
+        {leaderboardUsers && leaderboardUsers.length === 0 && !isFetching && (
           <div className="flex flex-col items-center justify-center p-4">
             <p className="text-gray-800">Ingen resultat</p>
           </div>
         )}
 
-        {isLoading && [...Array(3)].map((e, i) => <SkeletonTableItem key={i} />)}
+        {isFetching && [...Array(3)].map((e, i) => <SkeletonTableItem key={i} />)}
       </Accordion.Root>
     </ul>
   )
