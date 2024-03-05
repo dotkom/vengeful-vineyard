@@ -11,7 +11,7 @@
     "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix .",
     "type-check": "tsc --noEmit",
     "pre-commit": "lint-staged && tsc --noEmit",
-    "deploy": "./deploy.sh staging",
+    "deploy": "./deploy.sh stg",
     "deploy:prod": "./deploy.sh prd"
   },
   "dependencies": {
