@@ -2,7 +2,7 @@
 
 if [ -z "$1" ]; then
   echo "No environment specified, defaulting to staging"
-  ENVIRONMENT="staging"
+  ENVIRONMENT="stg"
 else
   ENVIRONMENT=$1
 fi
