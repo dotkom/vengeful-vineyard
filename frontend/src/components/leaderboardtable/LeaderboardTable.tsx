@@ -5,18 +5,38 @@ import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanst
 
 import { SkeletonTableItem } from "./SkeletonTableItem"
 import { LeaderboardTableItem } from "./LeaderboardTableItem"
+import { useEffect, useRef } from "react"
 
 interface LeaderboardTableProps {
   leaderboardUsers?: LeaderboardUser[] | undefined
-  isLoading: boolean
+  isFetching: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
+  fetchNextPage: () => Promise<QueryObserverResult<any, unknown>>
 }
 
-export const LeaderboardTable = ({ leaderboardUsers, isLoading = false, dataRefetch }: LeaderboardTableProps) => {
+export const LeaderboardTable = ({
+  leaderboardUsers,
+  isFetching,
+  dataRefetch,
+  fetchNextPage,
+}: LeaderboardTableProps) => {
+  const ref = useRef<HTMLUListElement>(null)
+
+  useEffect(() => {
+    document.addEventListener("scroll", () => {
+      if (ref.current && !isFetching) {
+        const lastItem = ref.current.firstElementChild?.lastElementChild
+        if (lastItem && lastItem.getBoundingClientRect().top < window.innerHeight) {
+          fetchNextPage().then()
+        }
+      }
+    })
+  }, [])
+
   return (
-    <ul role="list">
+    <ul role="list" ref={ref}>
       <Accordion.Root
         type="single"
         defaultValue="item-1"
@@ -27,13 +47,13 @@ export const LeaderboardTable = ({ leaderboardUsers, isLoading = false, dataRefe
           <LeaderboardTableItem key={user.user_id} leaderboardUser={user} dataRefetch={dataRefetch} i={i} />
         ))}
 
-        {leaderboardUsers && leaderboardUsers.length === 0 && !isLoading && (
+        {leaderboardUsers && leaderboardUsers.length === 0 && !isFetching && (
           <div className="flex flex-col items-center justify-center p-4">
             <p className="text-gray-800">Ingen resultat</p>
           </div>
         )}
 
-        {isLoading && [...Array(3)].map((e, i) => <SkeletonTableItem key={i} />)}
+        {isFetching && [...Array(3)].map((e, i) => <SkeletonTableItem key={i} />)}
       </Accordion.Root>
     </ul>
   )
