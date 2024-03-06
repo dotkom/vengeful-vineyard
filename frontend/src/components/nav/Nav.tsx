@@ -123,7 +123,7 @@ export const Nav = ({ auth }: NavProps) => {
               <div className="hidden md:flex flex-row justify-end w-full">
                 <div className="flex items-center">
                   <Link
-                    to="mailto:dotkom@online.ntnu.no?subject=[Vinstraff.no%20bug%20report]"
+                    to="https://github.com/dotkom/vengeful-vineyard/issues/new/choose"
                     title="Rapporter bug"
                     className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >

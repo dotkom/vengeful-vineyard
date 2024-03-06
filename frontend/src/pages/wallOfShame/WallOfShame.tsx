@@ -13,7 +13,7 @@ export const WallOfShame = () => {
       <h1 className="mb-4 text-center md:text-xl font-medium text-black">Wall of Shame</h1>
       <LeaderboardTable
         leaderboardUsers={leaderboardUsers}
-        isLoading={isFetching}
+        isFetching={isFetching}
         dataRefetch={refetch}
         fetchNextPage={fetchNextPage}
       />
