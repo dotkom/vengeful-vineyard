@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from "axios"
 import {
   VengefulApiError,
   addReaction,
+  getDeletePunishmentUrl,
   getPostPunishmentsPaidUrl,
   getPostPunishmentsUnpaidUrl,
   removeReaction,
@@ -96,6 +97,20 @@ export const PunishmentItem = ({
     return res.data
   }
 
+  const deletePunishmentCall = async () => {
+    if (punishment.group_id === null) {
+      // this should never happen
+      return
+    }
+
+    const DELETE_PUNISHMENT_URL = getDeletePunishmentUrl(punishment.group_id, punishment.punishment_id)
+    const res: AxiosResponse<string> = await axios.delete(DELETE_PUNISHMENT_URL, {
+      data: { punishment_id: punishment.punishment_id, group_id: punishment.group_id },
+    })
+
+    return res.data
+  }
+
   const { mutate: mutateAddReaction } = useMutation(addReactionCall, {
     onSuccess: () => dataRefetch(),
     onError: (e: VengefulApiError) =>
@@ -147,6 +162,24 @@ export const PunishmentItem = ({
       setNotification({
         type: "error",
         title: "Kunne ikke registrere som ubetalt",
+        text: e.response.data.detail,
+      })
+    },
+  })
+
+  const { mutate: deletePunishment } = useMutation(deletePunishmentCall, {
+    onSuccess: () => {
+      dataRefetch()
+      setNotification({
+        type: "success",
+        title: "Straff slettet",
+        text: `Straff slettet`,
+      })
+    },
+    onError: (e: VengefulApiError) => {
+      setNotification({
+        type: "error",
+        title: "Kunne ikke slette straff",
         text: e.response.data.detail,
       })
     },
@@ -238,6 +271,17 @@ export const PunishmentItem = ({
                   }}
                 />
               )}
+
+            {hasPermission(groupPermissions, "group.punishments.delete", currentGroupUserRole) && (
+              <Button
+                variant="OUTLINE"
+                color="RED"
+                label="Slett straff"
+                onClick={() => {
+                  deletePunishment()
+                }}
+              />
+            )}
           </div>
         )}
       </div>

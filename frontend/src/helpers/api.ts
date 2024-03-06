@@ -66,6 +66,9 @@ export const getPostPunishmentsPaidUrl = (groupId: string) => BASE_URL + `/group
 
 export const getPostPunishmentsUnpaidUrl = (groupId: string) => BASE_URL + `/groups/${groupId}/punishments/unpaid`
 
+export const getDeletePunishmentUrl = (groupId: string, punishmentId: string) =>
+  BASE_URL + `/groups/${groupId}/punishments/${punishmentId}`
+
 export const getPostAllPunishmentsPaidForUserUrl = (groupId: string, userId: string) =>
   BASE_URL + `/groups/${groupId}/users/${userId}/punishments/paid/all`
 
