@@ -21,6 +21,7 @@ import { hasPermission } from "../../helpers/permissions"
 import { Button } from "../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
+import { useConfirmModal } from "../../helpers/context/modal/confirmModalContext"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -196,6 +197,12 @@ export const PunishmentItem = ({
     return <p>Punishment type not found</p>
   }
 
+  const {
+    setOpen: setConfirmModalOpen,
+    setType: setConfirmModalType,
+    setOptions: setConfirmModalOptions,
+  } = useConfirmModal()
+
   return (
     <div
       className={classNames(
@@ -278,7 +285,15 @@ export const PunishmentItem = ({
                 color="RED"
                 label="Slett straff"
                 onClick={() => {
-                  deletePunishment()
+                  setConfirmModalType("YESNO")
+                  setConfirmModalOptions({
+                    onClose: (retVal) => {
+                      if (retVal) deletePunishment()
+                    },
+                    primaryButtonLabel: "Slett",
+                    cancelButtonLabel: "Avbryt",
+                  })
+                  setConfirmModalOpen(true)
                 }}
               />
             )}
