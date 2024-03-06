@@ -124,6 +124,7 @@ export const Nav = ({ auth }: NavProps) => {
                 <div className="flex items-center">
                   <Link
                     to="https://github.com/dotkom/vengeful-vineyard/issues/new/choose"
+		    target="_blank"
                     title="Rapporter bug"
                     className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >
