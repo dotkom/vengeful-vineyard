@@ -25,6 +25,7 @@ import { PunishmentType } from "../../../helpers/types"
 import { areObjectsEqual } from "../../../helpers/utils"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
+import { useNavigate } from "react-router-dom"
 
 interface EditGroupModalProps {
   open: boolean
@@ -86,6 +87,8 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
 
   const [editGroupErrors, setEditGroupErrors] = useErrorControl(EditGroup)
   const [mutatePunishmentTypeErrors, setMutatePunishmentTypeErrors] = useErrorControl(MutatePunishmentType)
+
+  const navigate = useNavigate()
 
   const { data: groupData, isLoading } = useGroupLeaderboard(
     selectedGroup?.group_id,
@@ -193,24 +196,26 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
 
   // Mutations
 
-  const { mutate: editGroupMutate } = useMutation(() => axios.patch(getPutGroupUrl(selectedGroupId), editGroupData), {
-    onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroupId] })
-      if (myGroupsRefetch) myGroupsRefetch()
-      setNotification({
-        type: "success",
-        title: "Suksess",
-        text: "Gruppen ble redigert",
-      })
-    },
-    onError: (e: VengefulApiError) => {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke redigere gruppen",
-        text: e.response.data.detail,
-      })
-    },
-  })
+  const { mutate: editGroupMutate } = useMutation(
+    async () => await axios.patch(getPutGroupUrl(selectedGroupId), editGroupData),
+    {
+      onSuccess: () => {
+        myGroupsRefetch!().then(() => navigate(`/gruppe/${editGroupData.name_short}`))
+        setNotification({
+          type: "success",
+          title: "Suksess",
+          text: "Gruppen ble redigert",
+        })
+      },
+      onError: (e: VengefulApiError) => {
+        setNotification({
+          type: "error",
+          title: "Kunne ikke redigere gruppen",
+          text: e.response.data.detail,
+        })
+      },
+    }
+  )
 
   const { mutate: createPunishmentTypeMutate } = useMutation(
     () => axios.post(getPostPunishmentTypeUrl(selectedGroupId), createPunishmentTypeData),
