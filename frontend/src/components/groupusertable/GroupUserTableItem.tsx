@@ -79,6 +79,8 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
 
   const punishments = groupUser.punishments.filter((punishment) => !punishment.paid || isToggled)
 
+  const displayName = groupUser.first_name && groupUser.last_name ? `${groupUser.first_name} ${groupUser.last_name}` : groupUser.email
+
   return (
     <AccordionItem value={groupUser.user_id}>
       <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 rounded-lg md:rounded-xl hover:bg-gray-50">
@@ -94,9 +96,9 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
           <div className="flex flex-col text-left">
             <p
               className="w-32 md:w-44 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
-              title={`${groupUser.first_name} ${groupUser.last_name}`}
+              title={displayName}
             >
-              {groupUser.first_name} {groupUser.last_name}
+              {displayName}
             </p>
             <span className="text-gray-700 text-xs">{unpaidPunishmentsValue}kr</span>
           </div>
@@ -140,7 +142,7 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
           <div className="absolute right-12 cursor-default inline-block">
             <span
               className="text-lg"
-              title={`${groupUser.first_name} ${groupUser.last_name} har fått straffer ${streak} uker på rad`}
+              title={`${displayName} har fått straffer ${streak} uker på rad`}
             >
               {streak} 🔥
             </span>

@@ -45,6 +45,8 @@ export const LeaderboardTableItem = ({ leaderboardUser, dataRefetch, i }: TableI
   const today = new Date().getTime()
   const streak = weeklyStreak(today, dateToNumber)
 
+  const displayName = leaderboardUser.first_name && leaderboardUser.last_name ? `${leaderboardUser.first_name} ${leaderboardUser.last_name}` : leaderboardUser.email
+
   return (
     <AccordionItem value={leaderboardUser.user_id}>
       <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 rounded-lg md:rounded-xl hover:bg-gray-50">
@@ -58,14 +60,14 @@ export const LeaderboardTableItem = ({ leaderboardUser, dataRefetch, i }: TableI
                 : i + 1 === 3
                 ? "🥉"
                 : i + 1
-              : textToEmoji(leaderboardUser.first_name + leaderboardUser.last_name)}
+              : textToEmoji(displayName)}
           </span>
           <div className="flex flex-col text-left">
             <p
               className="w-32 md:w-44 overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs md:text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
-              title={`${leaderboardUser.first_name} ${leaderboardUser.last_name}`}
+              title={displayName}
             >
-              {leaderboardUser.first_name} {leaderboardUser.last_name}
+              {displayName}
             </p>
             <span className="text-gray-700 text-xs">{totalPunishmentValue}kr</span>
           </div>
@@ -105,7 +107,7 @@ export const LeaderboardTableItem = ({ leaderboardUser, dataRefetch, i }: TableI
           <div className="absolute right-12 cursor-default inline-block">
             <span
               className="text-lg"
-              title={`${leaderboardUser.first_name} ${leaderboardUser.last_name} har fått straffer ${streak} uker på rad`}
+              title={`${displayName} har fått straffer ${streak} uker på rad`}
             >
               {streak} 🔥
             </span>
