@@ -49,6 +49,7 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
       const [year, month, day] = date.split("-").map(Number)
       return new Date(year, month - 1, day).getTime()
     })
+    .sort((a, b) => a - b)
     .reverse()
 
   const today = new Date().getTime()
@@ -135,7 +136,7 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
             </p>
           </div>
         </div>
-        {streak > 2 && (
+        {streak > 1 && (
           <div className="absolute right-12 cursor-default inline-block">
             <span
               className="text-lg"
