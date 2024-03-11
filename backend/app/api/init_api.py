@@ -6,6 +6,7 @@ Sets up the API (FastAPI)
 """
 
 import logging
+import sentry_sdk
 from timeit import default_timer as timer
 from typing import Any
 
@@ -23,6 +24,11 @@ from app.utils.permissions import PermissionManager
 from . import APIRoute, FastAPI, Request
 
 logging.basicConfig(level=logging.DEBUG if settings.debug else logging.INFO)
+
+sentry_sdk.init(
+    dsn="https://80cad5acf775f3d9222169585e83249f@o93837.ingest.us.sentry.io/4506824149237760",
+    enable_tracing=True
+)
 
 
 def init_middlewares(app: FastAPI) -> None:
@@ -111,6 +117,10 @@ def init_api(**db_settings: str) -> FastAPI:
         swagger_ui_init_oauth=oauth,
         swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect",
     )
+
+    @app.get("/crash")
+    async def crash():
+        raise Exception("wow i crashed")
 
     app.openapi_version = "3.0.0"
     app.router.route_class = APIRoute
