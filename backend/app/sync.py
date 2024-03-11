@@ -78,7 +78,6 @@ class OWSync:
         user_id: UserId,
         wait_for_updates: bool = True,
     ) -> None:
-        return
         groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
         filtered_groups_data = [
             g
@@ -118,7 +117,6 @@ class OWSync:
         *,
         conn: Optional[Pool] = None,
     ) -> UserId:
-        return
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             user_create = UserCreate(
                 ow_user_id=ow_user_id,
@@ -135,7 +133,6 @@ class OWSync:
         user_data: dict[str, Any],
         conn: Optional[Pool] = None,
     ) -> None:
-        return
         user_create = UserCreate(
             ow_user_id=user_data["user"]["id"],
             first_name=user_data["user"]["first_name"],
@@ -164,7 +161,6 @@ class OWSync:
         users_data: list[dict[str, Any]],
         conn: Optional[Pool] = None,
     ) -> list[GroupMember]:
-        return
         user_creates = {}
         for user_data in users_data:
             user_creates[user_data["user"]["id"]] = UserCreate(
@@ -209,7 +205,6 @@ class OWSync:
         group_users: list[dict[str, Any]],
         conn: Optional[Pool] = None,
     ) -> None:
-        return
         ids_map = {m.ow_group_user_id: m.user_id for m in members}
         privileges = []
         for u in group_users:
@@ -232,7 +227,6 @@ class OWSync:
         member_ids: list[int],
         conn: Optional[Pool] = None,
     ) -> None:
-        return
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             group_members = await self.app.db.group_members.get_all_raw(
                 group_id, conn=conn
@@ -314,7 +308,6 @@ class OWSync:
         ow_user_id: OWUserId,
         group_data: dict[str, Any],
     ) -> None:
-        return
         group_users = await self.app.http.get_ow_group_users(group_data["id"])
 
         image_data = group_data["image"]
@@ -378,7 +371,6 @@ class OWSync:
         user_data: dict[str, Any],
         conn: Optional[Pool] = None,
     ) -> None:
-        return
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             user_update = UserUpdate(
                 user_id=user_id,
@@ -399,7 +391,6 @@ class OWSync:
         group_users: list[dict[str, Any]],
         conn: Optional[Pool] = None,
     ) -> None:
-        return
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
             db_group_users = await self.app.db.group_users.get_all_raw(
                 group_id=group_id,
