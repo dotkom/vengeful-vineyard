@@ -56,7 +56,7 @@ export const GroupView = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [toggledPunishmentTypesOptions, setToggledPunishmentTypesOptions] = useState<ToggleOption<string>[]>([])
   const [sortingAlternative, setSortingAlternative] = useState<GroupMembersSortAlternative>(
-    groupMembersSortAlternatives[0]
+    groupMembersSortAlternatives[1]
   )
 
   const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading } = useMyGroups()

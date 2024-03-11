@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from "axios"
 import {
   VengefulApiError,
   addReaction,
+  getDeletePunishmentUrl,
   getPostPunishmentsPaidUrl,
   getPostPunishmentsUnpaidUrl,
   removeReaction,
@@ -20,6 +21,7 @@ import { hasPermission } from "../../helpers/permissions"
 import { Button } from "../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
+import { useConfirmModal } from "../../helpers/context/modal/confirmModalContext"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -96,6 +98,20 @@ export const PunishmentItem = ({
     return res.data
   }
 
+  const deletePunishmentCall = async () => {
+    if (punishment.group_id === null) {
+      // this should never happen
+      return
+    }
+
+    const DELETE_PUNISHMENT_URL = getDeletePunishmentUrl(punishment.group_id, punishment.punishment_id)
+    const res: AxiosResponse<string> = await axios.delete(DELETE_PUNISHMENT_URL, {
+      data: { punishment_id: punishment.punishment_id, group_id: punishment.group_id },
+    })
+
+    return res.data
+  }
+
   const { mutate: mutateAddReaction } = useMutation(addReactionCall, {
     onSuccess: () => dataRefetch(),
     onError: (e: VengefulApiError) =>
@@ -152,6 +168,24 @@ export const PunishmentItem = ({
     },
   })
 
+  const { mutate: deletePunishment } = useMutation(deletePunishmentCall, {
+    onSuccess: () => {
+      dataRefetch()
+      setNotification({
+        type: "success",
+        title: "Straff slettet",
+        text: `Straff slettet`,
+      })
+    },
+    onError: (e: VengefulApiError) => {
+      setNotification({
+        type: "error",
+        title: "Kunne ikke slette straff",
+        text: e.response.data.detail,
+      })
+    },
+  })
+
   const date = dayjs.utc(punishment.created_at).tz("Europe/Oslo")
 
   const formattedDate = date.format("DD. MMM HH:mm")
@@ -162,6 +196,12 @@ export const PunishmentItem = ({
   if (punishmentType === undefined) {
     return <p>Punishment type not found</p>
   }
+
+  const {
+    setOpen: setConfirmModalOpen,
+    setType: setConfirmModalType,
+    setOptions: setConfirmModalOptions,
+  } = useConfirmModal()
 
   return (
     <div
@@ -238,6 +278,25 @@ export const PunishmentItem = ({
                   }}
                 />
               )}
+
+            {hasPermission(groupPermissions, "group.punishments.delete", currentGroupUserRole) && (
+              <Button
+                variant="OUTLINE"
+                color="RED"
+                label="Slett straff"
+                onClick={() => {
+                  setConfirmModalType("YESNO")
+                  setConfirmModalOptions({
+                    onClose: (retVal) => {
+                      if (retVal) deletePunishment()
+                    },
+                    primaryButtonLabel: "Slett",
+                    cancelButtonLabel: "Avbryt",
+                  })
+                  setConfirmModalOpen(true)
+                }}
+              />
+            )}
           </div>
         )}
       </div>
