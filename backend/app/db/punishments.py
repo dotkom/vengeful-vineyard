@@ -51,7 +51,7 @@ class Punishments:
         conn: Optional[Pool] = None,
     ) -> PunishmentRead:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT gp.*, CONCAT(COALESCE(NULLIF('', users.first_name, users.email)), ' ', users.last_name) AS created_by_name, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions FROM group_punishments gp
+            query = """SELECT gp.*, CONCAT(COALESCE(NULLIF(users.first_name, ''), users.email)), ' ', users.last_name) AS created_by_name, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions FROM group_punishments gp
                        LEFT JOIN punishment_reactions pr ON pr.punishment_id = gp.punishment_id
                        LEFT JOIN users ON gp.created_by = users.user_id
                        WHERE gp.punishment_id = $1
