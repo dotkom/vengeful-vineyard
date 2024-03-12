@@ -125,6 +125,7 @@ export const GroupStatisticsSchema = z.object({
   total_count: z.number(),
   total_unpaid_value: z.number(),
   total_value: z.number(),
+  total_value_this_year: z.number(),
 })
 export type GroupStatistics = z.infer<typeof GroupStatisticsSchema>
 

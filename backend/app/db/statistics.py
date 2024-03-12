@@ -13,6 +13,9 @@ class Statistics:
             query = """
            SELECT
                 COALESCE(SUM(gp.amount * pt.value), 0) AS total_value,
+                COALESCE(SUM(CASE WHEN EXTRACT(YEAR FROM gp.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
+                      THEN gp.amount * pt.value
+                      ELSE 0 END), 0) AS total_value_this_year,
                 COALESCE(SUM(gp.amount * pt.value * CAST((NOT COALESCE(gp.paid, FALSE)) AS INT)), 0) AS total_unpaid_value,
                 COUNT(gp.group_id) AS total_count,
                 g.group_id AS group_id,
@@ -42,6 +45,9 @@ class Statistics:
                 u.first_name || ' ' || u.last_name AS user_name,
                 u.email AS user_email,
                 COALESCE(SUM(gp.amount * pt.value), 0) AS total_value,
+                COALESCE(SUM(CASE WHEN EXTRACT(YEAR FROM gp.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
+                      THEN gp.amount * pt.value
+                      ELSE 0 END), 0) AS total_value_this_year,
                 COALESCE(SUM(gp.amount * pt.value * CAST((NOT COALESCE(gp.paid, FALSE)) AS INT)), 0) AS total_unpaid_value,
                 COUNT(gp.punishment_id) AS total_count
             FROM
