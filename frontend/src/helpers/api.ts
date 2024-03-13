@@ -11,11 +11,10 @@ import {
   PublicGroupSchema,
   PublicGroup,
 } from "./types"
-import { QueryKey, UseInfiniteQueryOptions, UseQueryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query"
+import { UseInfiniteQueryOptions, UseQueryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
 
-import { useOptimisticQuery } from "./optimisticQuery"
 import { z } from "zod"
 
 export interface VengefulApiError {
@@ -27,8 +26,6 @@ export const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
 export const LEADERBOARD_URL = BASE_URL + "/users/leaderboard"
 
 export const getLeaderboardUrl = (page: number) => `${LEADERBOARD_URL}?page=${page}`
-
-export const getMeUrl = (optimistic: boolean) => BASE_URL + `/users/me?optimistic=${optimistic}`
 
 export const GROUPS_URL = BASE_URL + "/groups/me"
 
@@ -119,30 +116,28 @@ export const usePublicGroup = (
     options
   )
 
-export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser, [QueryKey, boolean]>) =>
-  useOptimisticQuery<MeUser>(
-    ["groupsData"],
-    (_, optimistic: boolean) =>
-      axios.get(getMeUrl(optimistic)).then((res: AxiosResponse<MeUser>) => {
+export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser>) =>
+  useQuery<MeUser>({
+    queryKey: ["groupsData"],
+    queryFn: () =>
+      axios.get(GROUPS_URL).then((res: AxiosResponse<MeUser>) => {
         const user = res.data
         user.groups = sortGroups(user.groups)
         user.groups.forEach((group) => (group.members = sortGroupUsers(group.members, group.punishment_types)))
         return MeUserSchema.parse(user)
       }),
-    options
-  )
+    ...options,
+  })
 
-export const useCommittees = (
-  options?: UseQueryOptions<GroupStatistics[], unknown, GroupStatistics[], [QueryKey, boolean]>
-) =>
-  useOptimisticQuery<GroupStatistics[]>(
-    ["committeesData"],
-    () =>
+export const useCommittees = (options?: UseQueryOptions<GroupStatistics[], unknown, GroupStatistics[]>) =>
+  useQuery<GroupStatistics[]>({
+    queryKey: ["committeesData"],
+    queryFn: () =>
       axios.get(getGroupStatisticsUrl()).then((res: AxiosResponse<GroupStatistics[]>) => {
         return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
       }),
-    options
-  )
+    ...options,
+  })
 
 export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {
   return addManyPunishments(groupId, userId, [punishment])
