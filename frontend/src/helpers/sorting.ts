@@ -52,10 +52,9 @@ export function getSortGroupUsersFunc(
       }
 
       const value_punishments = (user: GroupUser) =>
-        user.punishments.reduce(
-          (acc, curr) => acc + curr.amount * (punishmentMap[curr.punishment_type_id]?.value ?? 0),
-          0
-        )
+        user.punishments
+          .filter((p) => !p.paid)
+          .reduce((acc, curr) => acc + curr.amount * (punishmentMap[curr.punishment_type_id]?.value ?? 0), 0)
 
       const a_value = value_punishments(a)
       const b_value = value_punishments(b)
