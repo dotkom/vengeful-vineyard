@@ -5,13 +5,7 @@ import {
   TrashIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline"
-import {
-  VengefulApiError,
-  getDeleteGroupMemberUrl,
-  getDeleteGroupUrl,
-  useGroupLeaderboard,
-  useUser,
-} from "../../../helpers/api"
+import { VengefulApiError, getDeleteGroupMemberUrl, getDeleteGroupUrl } from "../../../helpers/api"
 
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
@@ -24,9 +18,9 @@ import { useEditGroupMembersModal } from "../../../helpers/context/modal/editGro
 import { useEditGroupModal } from "../../../helpers/context/modal/editGroupModalContext"
 import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
 import { useNotification } from "../../../helpers/context/notificationContext"
-import { hasPermission } from "../../../helpers/permissions"
 import { Group } from "../../../helpers/types"
 import { useNavigate } from "react-router-dom"
+import { usePermission } from "../../../helpers/permissions"
 
 interface GroupSettingsProps {
   groupData: Group | undefined
@@ -46,12 +40,6 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
 
   if (!groupData) return null
 
-  const { data: group } = useGroupLeaderboard(groupData.group_id, undefined, {
-    enabled: !!groupData,
-  })
-
-  const currentUserRole = group?.members.find((member) => member.user_id === currentUser.user_id)?.permissions[0] ?? ""
-  const groupPermissions = group?.permissions ?? {}
   const navigate = useNavigate()
 
   const { mutate: leaveGroupMutate } = useMutation(
@@ -98,7 +86,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
 
   const listItems: MenuItemProps[] = []
 
-  if (hasPermission(groupPermissions, "group.members.manage", currentUserRole)) {
+  if (usePermission("group.members.manage", groupData)) {
     listItems.unshift({
       label: "Rediger medlemmer",
       icon: <UserGroupIcon className="h-5 w-5" />,
@@ -108,7 +96,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     })
   }
 
-  if (hasPermission(groupPermissions, "group.edit", currentUserRole)) {
+  if (usePermission("group.edit", groupData)) {
     listItems.unshift({
       label: "Rediger gruppe",
       icon: <PencilSquareIcon className="h-5 w-5" />,
@@ -136,7 +124,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
       },
     })
 
-    if (hasPermission(groupPermissions, "group.delete", currentUserRole)) {
+    if (usePermission("group.delete", groupData)) {
       listItems.push({
         label: "Slett gruppe",
         icon: <TrashIcon className="h-5 w-5" />,

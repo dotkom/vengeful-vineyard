@@ -3,7 +3,7 @@ import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
-import { GroupPermissions, GroupUser } from "../../helpers/types"
+import { GroupUser } from "../../helpers/types"
 
 import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, useGroupLeaderboard } from "../../helpers/api"
 import { classNames } from "../../helpers/classNames"
@@ -11,8 +11,8 @@ import { useCurrentUser } from "../../helpers/context/currentUserContext"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
 import { useNotification } from "../../helpers/context/notificationContext"
 import { useTogglePunishments } from "../../helpers/context/togglePunishmentsContext"
-import { hasPermission } from "../../helpers/permissions"
 import { PunishmentActionBarListItem } from "./PunishmentActionBarListItem"
+import { usePermission } from "../../helpers/permissions"
 
 interface PunishmentActionBarProps {
   user: GroupUser
@@ -37,8 +37,6 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
 
   const { data: groupData } = useGroupLeaderboard((user as GroupUser).group_id, undefined, {})
 
-  let groupPermissions: GroupPermissions = {}
-
   const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
   setOpen = newSetOpen
   setPreferredSelectedPerson = newSetPreferredSelectedPerson
@@ -46,10 +44,6 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   const { isToggled: newIsToggled, setIsToggled: newSetIsToggled } = useTogglePunishments()
   isToggled = newIsToggled
   setIsToggled = newSetIsToggled
-
-  if (groupData) {
-    groupPermissions = groupData.permissions
-  }
 
   const markAllPunishmentsAsPaidCall = async () => {
     const groupUser = user as GroupUser
@@ -82,11 +76,6 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   const listItems: ActionBarItem[] = []
   const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)
   if (currentGroupUser) {
-    const role = currentGroupUser.permissions.at(0) ?? ""
-
-    /*
-    if (isOwGroup || hasPermission(groupPermissions, "group.punishments.add", role)) {
-     */
     listItems.push({
       label: "Gi straff",
       icon: <PlusIcon className="h-5 w-5 text-black" />,
@@ -96,7 +85,7 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
       },
     })
 
-    if (hasPermission(groupPermissions, "group.punishments.mark_paid", role)) {
+    if (usePermission("group.punishments.mark_paid", groupData)) {
       listItems.push({
         label: "Marker alle straffer som betalte",
         icon: <PlusIcon className="h-5 w-5 text-black" />,

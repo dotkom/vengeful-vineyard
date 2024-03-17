@@ -17,12 +17,11 @@ import utc from "dayjs/plugin/utc"
 import { useState } from "react"
 import { classNames } from "../../helpers/classNames"
 import { useNotification } from "../../helpers/context/notificationContext"
-import { hasPermission } from "../../helpers/permissions"
 import { Button } from "../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 import { useConfirmModal } from "../../helpers/context/modal/confirmModalContext"
-import { useCurrentUser } from "../../helpers/context/currentUserContext"
+import { usePermission } from "../../helpers/permissions"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -40,7 +39,6 @@ interface PunishmentItemProps {
 
 export const PunishmentItem = ({
   group_id,
-  user_id,
   punishment,
   punishmentTypes,
   isGroupContext = false,
@@ -52,12 +50,6 @@ export const PunishmentItem = ({
   const { data: groupData } = useGroupLeaderboard(group_id, undefined, {
     enabled: isGroupContext,
   })
-
-  const { currentUser } = useCurrentUser()
-
-  const groupPermissions = groupData?.permissions ?? {}
-  const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)
-  const currentGroupUserRole = currentGroupUser?.permissions.at(0) ?? ""
 
   let punishmentType = punishmentTypes ? punishmentTypes[punishment.punishment_type_id] : undefined
 
@@ -260,29 +252,27 @@ export const PunishmentItem = ({
         </div>
         {isGroupContext && (
           <div className="flex flex-row gap-x-4 ml-auto items-center text-slate-500">
-            {punishment.paid &&
-              hasPermission(groupPermissions, "group.punishments.mark_unpaid", currentGroupUserRole) && (
-                <Button
-                  variant="OUTLINE"
-                  label="Marker som ubetalt"
-                  onClick={() => {
-                    markPunishmentAsUnpaid()
-                  }}
-                />
-              )}
+            {punishment.paid && usePermission("group.punishments.mark_unpaid", groupData) && (
+              <Button
+                variant="OUTLINE"
+                label="Marker som ubetalt"
+                onClick={() => {
+                  markPunishmentAsUnpaid()
+                }}
+              />
+            )}
 
-            {!punishment.paid &&
-              hasPermission(groupPermissions, "group.punishments.mark_paid", currentGroupUserRole) && (
-                <Button
-                  variant="OUTLINE"
-                  label="Marker som betalt"
-                  onClick={() => {
-                    markPunishmentAsPaid()
-                  }}
-                />
-              )}
+            {!punishment.paid && usePermission("group.punishments.mark_paid", groupData) && (
+              <Button
+                variant="OUTLINE"
+                label="Marker som betalt"
+                onClick={() => {
+                  markPunishmentAsPaid()
+                }}
+              />
+            )}
 
-            {hasPermission(groupPermissions, "group.punishments.delete", currentGroupUserRole) && (
+            {usePermission("group.punishments.delete", groupData) && (
               <Button
                 variant="OUTLINE"
                 color="RED"
