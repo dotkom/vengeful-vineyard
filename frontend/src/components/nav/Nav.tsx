@@ -1,6 +1,6 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
-import { LEADERBOARD_URL, useMyGroups } from "../../helpers/api"
+import { LEADERBOARD_URL, useUser } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
@@ -32,7 +32,7 @@ export const Nav = ({ auth }: NavProps) => {
   const queryClient = useQueryClient()
   const location = useLocation()
 
-  const { data: groups } = useMyGroups({
+  const { data: groups } = useUser({
     enabled: auth.isAuthenticated,
   })
   const isInAnyOWGroup = groups?.groups.some((group) => group.ow_group_id !== null) ?? false
@@ -47,7 +47,7 @@ export const Nav = ({ auth }: NavProps) => {
     )
   }
 
-  const { data: user } = useMyGroups({
+  const { data: user } = useUser({
     enabled: auth.isAuthenticated,
   })
 
@@ -124,7 +124,7 @@ export const Nav = ({ auth }: NavProps) => {
                 <div className="flex items-center">
                   <Link
                     to="https://github.com/dotkom/vengeful-vineyard/issues/new/choose"
-		    target="_blank"
+                    target="_blank"
                     title="Rapporter bug"
                     className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >

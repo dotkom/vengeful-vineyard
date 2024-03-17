@@ -10,7 +10,7 @@ import {
   getDeleteGroupMemberUrl,
   getDeleteGroupUrl,
   useGroupLeaderboard,
-  useMyGroups,
+  useUser,
 } from "../../../helpers/api"
 
 import { useMutation } from "@tanstack/react-query"

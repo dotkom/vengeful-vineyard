@@ -1,7 +1,7 @@
 import { Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { getPostGroupJoinRequestUrl, useGroupLeaderboard, useMyGroups, usePublicGroup } from "../../helpers/api"
+import { getPostGroupJoinRequestUrl, useGroupLeaderboard, useUser, usePublicGroup } from "../../helpers/api"
 import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../helpers/sorting"
 
 // TODO: Remove some stuff for ow groups
@@ -59,7 +59,7 @@ export const GroupView = () => {
     groupMembersSortAlternatives[1]
   )
 
-  const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading } = useMyGroups()
+  const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading } = useUser()
 
   useEffect(() => {
     setMyGroupsRefetch(() => myGroupsRefetch as any)

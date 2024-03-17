@@ -29,6 +29,8 @@ export const getLeaderboardUrl = (page: number) => `${LEADERBOARD_URL}?page=${pa
 
 export const GROUPS_URL = BASE_URL + "/groups/me"
 
+export const ME_URL = BASE_URL + "/groups/me"
+
 export const getGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
 
 export const getGroupStatisticsUrl = () => BASE_URL + "/statistics/groups"
@@ -116,11 +118,11 @@ export const usePublicGroup = (
     options
   )
 
-export const useMyGroups = (options?: UseQueryOptions<MeUser, unknown, MeUser>) =>
+export const useUser = (options?: UseQueryOptions<MeUser, unknown, MeUser>) =>
   useQuery<MeUser>({
     queryKey: ["groupsData"],
     queryFn: () =>
-      axios.get(GROUPS_URL).then((res: AxiosResponse<MeUser>) => {
+      axios.get(ME_URL).then((res: AxiosResponse<MeUser>) => {
         const user = res.data
         user.groups = sortGroups(user.groups)
         user.groups.forEach((group) => (group.members = sortGroupUsers(group.members, group.punishment_types)))
