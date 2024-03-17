@@ -35,7 +35,7 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   const queryClient = useQueryClient()
   const { currentUser } = useCurrentUser()
 
-  const { data: groupData } = useGroupLeaderboard((user as GroupUser).group_id, undefined, {})
+  const { data: groupData } = useGroupLeaderboard(user.group_id, undefined, {})
 
   const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
   setOpen = newSetOpen
