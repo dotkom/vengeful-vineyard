@@ -1,12 +1,17 @@
 import { CommitteeCard } from "./CommitteeCard"
 import { useAuth } from "react-oidc-context"
-import { useCommittees } from "../../helpers/api"
 import { GroupStatistics } from "../../helpers/types"
 import NoImage from "../../assets/NoImage.png"
+import { committeesQuery } from "../../helpers/api"
+import { useQuery } from "@tanstack/react-query"
 
 export const CommitteeList = () => {
   const auth = useAuth()
-  const { data: groupsStatistics } = useCommittees({ enabled: auth.isAuthenticated })
+
+  const { data: groupsStatistics } = useQuery({
+    ...committeesQuery(),
+    enabled: auth.isAuthenticated,
+  })
 
   return (
     <div className="flex flex-wrap -m-2 gap-16 justify-center">

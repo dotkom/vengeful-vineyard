@@ -34,7 +34,7 @@ export const ME_URL = BASE_URL + "/users/me"
 
 export const getGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
 
-export const getGroupStatisticsUrl = () => BASE_URL + "/statistics/groups"
+export const GROUP_STATISTICS_URL = BASE_URL + "/statistics/groups"
 
 export const getGroupsSearchUrl = (query: string, includeOwGroups: boolean = false, limit: number = 5) =>
   BASE_URL + `/groups/search?query=${query}&include_ow_groups=${includeOwGroups}&limit=${limit}`
@@ -115,15 +115,13 @@ export const userQuery = () => {
   }
 }
 
-export const useCommittees = (options?: UseQueryOptions<GroupStatistics[], unknown, GroupStatistics[]>) =>
-  useQuery<GroupStatistics[]>({
-    queryKey: ["committeesData"],
-    queryFn: () =>
-      axios.get(getGroupStatisticsUrl()).then((res: AxiosResponse<GroupStatistics[]>) => {
-        return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
-      }),
-    ...options,
-  })
+export const committeesQuery = () => ({
+  queryKey: ["committeesData"],
+  queryFn: () =>
+    axios.get(GROUP_STATISTICS_URL).then((res: AxiosResponse<GroupStatistics[]>) => {
+      return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
+    }),
+})
 
 export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {
   return addManyPunishments(groupId, userId, [punishment])
