@@ -1,7 +1,7 @@
 import { Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { getPostGroupJoinRequestUrl, groupLeaderboardQuery, publicGroupQuery, userQuery } from "../../helpers/api"
+import { groupLeaderboardQuery, postGroupJoinRequestMutation, publicGroupQuery, userQuery } from "../../helpers/api"
 import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../helpers/sorting"
 
 // TODO: Remove some stuff for ow groups
@@ -31,7 +31,6 @@ import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
 import { GroupUserTable } from "../../components/groupusertable"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import axios from "axios"
 import { useNotification } from "../../helpers/context/notificationContext"
 import { signinAndReturn } from "../../helpers/auth"
 
@@ -126,26 +125,7 @@ export const GroupView = () => {
     />
   )
 
-  const { setNotification } = useNotification()
-
-  const { mutate: requestToJoinGroupMutate } = useMutation(async () => {
-    if (!publicGroup) return
-
-    try {
-      await axios.post(getPostGroupJoinRequestUrl(publicGroup.group_id))
-
-      setNotification({
-        type: "success",
-        text: "Forespørselen ble sendt",
-      })
-    } catch (error: any) {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke sende forespørselen",
-        text: error.response.data.detail,
-      })
-    }
-  })
+  const { mutate: requestToJoinGroupMutate } = useMutation(postGroupJoinRequestMutation(publicGroup?.group_id))
 
   const shouldShowMain = user && selectedGroup
 
@@ -195,7 +175,7 @@ export const GroupView = () => {
               </h3>
               <div className="flex flex-row gap-x-4 items-center">
                 {!publicGroup.is_official && (
-                  <Button onClick={() => requestToJoinGroupMutate()}>Send forespørsel</Button>
+                  <Button onClick={() => requestToJoinGroupMutate(publicGroup?.group_id)}>Send forespørsel</Button>
                 )}
                 <Button
                   onClick={async () => {

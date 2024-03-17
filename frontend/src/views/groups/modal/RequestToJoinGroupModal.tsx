@@ -1,5 +1,5 @@
 import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
-import { VengefulApiError, getGroupsSearchUrl, getPostGroupJoinRequestUrl } from "../../../helpers/api"
+import { getGroupsSearchUrl, postGroupJoinRequestMutation } from "../../../helpers/api"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
 import { GroupBase } from "../../../helpers/types"
@@ -7,7 +7,7 @@ import { Modal } from "../../../components/modal"
 import { TextInput } from "../../../components/input/TextInput"
 import { Transition } from "@headlessui/react"
 import axios from "axios"
-import { useNotification } from "../../../helpers/context/notificationContext"
+import { z } from "zod"
 
 interface RequestToJoinGroupModalProps {
   open: boolean
@@ -17,7 +17,6 @@ interface RequestToJoinGroupModalProps {
 export const RequestToJoinGroupModal: FC<RequestToJoinGroupModalProps> = ({ open, setOpen }) => {
   const ref = useRef(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const { setNotification } = useNotification()
 
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedGroup, setSelectedGroup] = useState<GroupBase | undefined>(undefined)
@@ -30,24 +29,7 @@ export const RequestToJoinGroupModal: FC<RequestToJoinGroupModalProps> = ({ open
     enabled,
   })
 
-  const { mutate: requestToJoinGroupMutate } = useMutation(
-    async () => await axios.post(getPostGroupJoinRequestUrl(selectedGroup?.group_id ?? "")),
-    {
-      onSuccess: () => {
-        setNotification({
-          type: "success",
-          text: `Forespørselen ble sendt`,
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke sende forespørselen",
-          text: e.response.data.detail,
-        })
-      },
-    }
-  )
+  const { mutate: requestToJoinGroupMutate } = useMutation(postGroupJoinRequestMutation(selectedGroup?.group_id))
 
   const handleSearchResultClick = (group: GroupBase) => {
     setSelectedGroup(group)
@@ -56,7 +38,7 @@ export const RequestToJoinGroupModal: FC<RequestToJoinGroupModalProps> = ({ open
   }
 
   const handleRequestToJoinClicked = (): boolean => {
-    requestToJoinGroupMutate()
+    requestToJoinGroupMutate(z.string().parse(selectedGroup?.group_id))
     setSearchTerm("")
     return true
   }

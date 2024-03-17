@@ -10,12 +10,13 @@ import {
   GroupSchema,
   PublicGroupSchema,
 } from "./types"
-import type { UseInfiniteQueryOptions, UseQueryOptions } from "@tanstack/react-query"
+import type { UseInfiniteQueryOptions, UseMutationOptions, UseQueryOptions } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
 
 import { z } from "zod"
 import { useAuth } from "react-oidc-context"
+import { useNotification } from "./context/notificationContext"
 
 export interface VengefulApiError {
   response: { data: { detail: string }; status: number; statusText: string }
@@ -73,7 +74,32 @@ export const getPostAllPunishmentsPaidForUserUrl = (groupId: string, userId: str
 
 export const getAddReactionUrl = (punishmentId: string) => BASE_URL + `/punishments/${punishmentId}/reactions`
 
-export const getPostGroupJoinRequestUrl = (groupId: string) => BASE_URL + `/groups/${groupId}/joinRequests`
+const getPostGroupJoinRequestUrl = (groupId: string) => BASE_URL + `/groups/${groupId}/joinRequests`
+export const postGroupJoinRequestMutation = (
+  groupId?: string
+): UseMutationOptions<unknown, VengefulApiError, string> => {
+  const { setNotification } = useNotification()
+  if (!groupId) throw new Error("groupId is required")
+
+  return {
+    mutationFn: async (message: string) => {
+      try {
+        await axios.post(getPostGroupJoinRequestUrl(groupId), { message })
+
+        setNotification({
+          type: "success",
+          text: "Forespørselen ble sendt",
+        })
+      } catch (e: any) {
+        setNotification({
+          type: "error",
+          title: "Forespørselen kunne ikke sendes",
+          text: e.response.data.detail,
+        })
+      }
+    },
+  }
+}
 
 export const getPostAcceptGroupJoinRequestUrl = (groupId: string, userId: string) =>
   BASE_URL + `/groups/${groupId}/joinRequests/${userId}/accept`
