@@ -16,6 +16,7 @@ import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
 
 import { z } from "zod"
+import { useAuth } from "react-oidc-context"
 
 export interface VengefulApiError {
   response: { data: { detail: string }; status: number; statusText: string }
@@ -100,18 +101,19 @@ export const publicGroupQuery = (groupNameShort?: string) => ({
   enabled: groupNameShort !== undefined,
 })
 
-export const useUser = (options?: UseQueryOptions<MeUser, unknown, MeUser>) =>
-  useQuery<MeUser>({
-    queryKey: ["groupsData"],
-    queryFn: () =>
-      axios.get(ME_URL).then((res: AxiosResponse<MeUser>) => {
-        const user = res.data
-        user.groups = sortGroups(user.groups)
-        user.groups.forEach((group) => (group.members = sortGroupUsers(group.members, group.punishment_types)))
-        return MeUserSchema.parse(user)
-      }),
-    ...options,
-  })
+export const userQuery = () => {
+  const auth = useAuth()
+  return {
+    queryKey: ["user"],
+    queryFn: async () => {
+      const user = await axios.get(ME_URL).then((res: AxiosResponse<MeUser>) => res.data)
+      user.groups = sortGroups(user.groups)
+      user.groups.forEach((group) => (group.members = sortGroupUsers(group.members, group.punishment_types)))
+      return MeUserSchema.parse(user)
+    },
+    enabled: auth.isAuthenticated,
+  }
+}
 
 export const useCommittees = (options?: UseQueryOptions<GroupStatistics[], unknown, GroupStatistics[]>) =>
   useQuery<GroupStatistics[]>({
