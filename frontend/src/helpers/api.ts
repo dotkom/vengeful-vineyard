@@ -9,9 +9,8 @@ import {
   MeUserSchema,
   GroupSchema,
   PublicGroupSchema,
-  PublicGroup,
 } from "./types"
-import { UseInfiniteQueryOptions, UseQueryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query"
+import type { UseInfiniteQueryOptions, UseQueryOptions } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
 
@@ -85,19 +84,32 @@ export const getPostDenyGroupJoinRequestUrl = (groupId: string, userId: string) 
 export const getPatchGroupMemberPermissionsUrl = (groupId: string, userId: string) =>
   BASE_URL + `/groups/${groupId}/users/${userId}/permissions`
 
+export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {
+  return addManyPunishments(groupId, userId, [punishment])
+}
+
+export const addManyPunishments = async (groupId: string, userId: string, punishments: PunishmentCreate[]) =>
+  (await axios.post(getAddPunishmentUrl(groupId, userId), punishments)).data
+
+export const addReaction = async (punishmentId: string, emoji: string) =>
+  (await axios.post(getAddReactionUrl(punishmentId), { emoji })).data
+
+export const removeReaction = async (punishmentId: string) => (await axios.delete(getAddReactionUrl(punishmentId))).data
+
 export const groupLeaderboardQuery = (
   groupId?: string
 ): UseQueryOptions<Group, unknown, Group, (string | undefined)[]> => ({
   queryKey: ["groupLeaderboard", groupId],
-  queryFn: () =>
-    axios.get(getGroupUrl(groupId ?? "")).then(async (res: AxiosResponse<Group>) => GroupSchema.parse(res.data)),
+  queryFn: () => axios.get(getGroupUrl(z.string().parse(groupId))).then((res) => GroupSchema.parse(res.data)),
   enabled: groupId !== undefined,
 })
 
 export const publicGroupQuery = (groupNameShort?: string) => ({
   queryKey: ["publicGroup", groupNameShort],
   queryFn: () =>
-    axios.get(BASE_URL + `/groups/public_profiles/${groupNameShort}`).then((res) => PublicGroupSchema.parse(res.data)),
+    axios
+      .get(BASE_URL + `/groups/public_profiles/${z.string().parse(groupNameShort)}`)
+      .then((res) => PublicGroupSchema.parse(res.data)),
   enabled: groupNameShort !== undefined,
 })
 
@@ -122,18 +134,6 @@ export const committeesQuery = () => ({
       return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
     }),
 })
-
-export const addPunishment = (groupId: string, userId: string, punishment: PunishmentCreate) => {
-  return addManyPunishments(groupId, userId, [punishment])
-}
-
-export const addManyPunishments = async (groupId: string, userId: string, punishments: PunishmentCreate[]) =>
-  (await axios.post(getAddPunishmentUrl(groupId, userId), punishments)).data
-
-export const addReaction = async (punishmentId: string, emoji: string) =>
-  (await axios.post(getAddReactionUrl(punishmentId), { emoji })).data
-
-export const removeReaction = async (punishmentId: string) => (await axios.delete(getAddReactionUrl(punishmentId))).data
 
 const getLeaderboard = async ({ pageParam = 0 }) =>
   LeaderboardSchema.parse(await axios.get(getLeaderboardUrl(pageParam)).then((res) => res.data))
