@@ -36,6 +36,11 @@ export const Nav = ({ auth }: NavProps) => {
   const prefetchWallOfShame = () => queryClient.prefetchInfiniteQuery(leaderboardQuery())
   const prefetchStatistics = () => queryClient.prefetchQuery(committeesQuery())
 
+  if (auth.isAuthenticated) {
+    prefetchStatistics()
+    prefetchWallOfShame()
+  }
+
   const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
 
   const items: NavItem[] = [
