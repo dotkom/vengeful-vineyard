@@ -4,11 +4,12 @@ import { GroupStatistics } from "../../helpers/types"
 import NoImage from "../../assets/NoImage.png"
 import { committeesQuery } from "../../helpers/api"
 import { useQuery } from "@tanstack/react-query"
+import { SkeletonCommitteeCard } from "./SkeletonCommitteeCard"
 
 export const CommitteeList = () => {
   const auth = useAuth()
 
-  const { data: groupsStatistics } = useQuery({
+  const { data: groupsStatistics, isLoading } = useQuery({
     ...committeesQuery(),
     enabled: auth.isAuthenticated,
   })
@@ -32,6 +33,8 @@ export const CommitteeList = () => {
             />
           ))
       )}
+
+      {isLoading && !groupsStatistics && [...Array(4)].map((e, i) => <SkeletonCommitteeCard key={i} />)}
     </div>
   )
 }
