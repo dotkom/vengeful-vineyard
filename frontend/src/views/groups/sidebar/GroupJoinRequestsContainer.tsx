@@ -15,7 +15,7 @@ export const GroupJoinRequestsContainer: FC<GroupJoinRequestsContainerProps> = (
 
   const { data: group } = useQuery(groupLeaderboardQuery(groupData?.group_id))
 
-  const canViewJoinRequests = usePermission("group.join_requests.view", groupData)
+  const canViewJoinRequests = usePermission("group.join_requests.view", group)
 
   return (
     <>
