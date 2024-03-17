@@ -22,6 +22,7 @@ import { Button } from "../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 import { useConfirmModal } from "../../helpers/context/modal/confirmModalContext"
+import { useCurrentUser } from "../../helpers/context/currentUserContext"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -52,8 +53,10 @@ export const PunishmentItem = ({
     enabled: isGroupContext,
   })
 
+  const { currentUser } = useCurrentUser()
+
   const groupPermissions = groupData?.permissions ?? {}
-  const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === user_id)
+  const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)
   const currentGroupUserRole = currentGroupUser?.permissions.at(0) ?? ""
 
   let punishmentType = punishmentTypes ? punishmentTypes[punishment.punishment_type_id] : undefined
