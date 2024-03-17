@@ -30,9 +30,7 @@ interface EditGroupMembersModalProps {
 export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, setOpen }) => {
   const { selectedGroup } = useGroupNavigation()
   const { currentUser } = useCurrentUser()
-  const { setNotification } = useNotification()
   const ref = useRef(null)
-  const queryClient = useQueryClient()
 
   const {
     setOpen: setConfirmModalOpen,
@@ -48,8 +46,6 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
 
   const isCurrentUserSelected = selectedPerson?.user_id === currentUser.user_id
   const [currentUserRole, setCurrentUserRole] = useState<string>("")
-
-  // Handlers and stuff
 
   const { data: groupData } = useQuery({
     onSuccess: (group) => {

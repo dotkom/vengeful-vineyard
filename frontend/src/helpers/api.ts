@@ -107,13 +107,16 @@ export const putGroupMutation = (groupId: string, editGroupData: EditGroupType) 
 }
 
 const getDeleteGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
-export const deleteGroupMutation = (groupId: string) => {
+export const deleteGroupMutation = (groupId?: string) => {
   const { setNotification } = useNotification()
   const { myGroupsRefetch } = useMyGroupsRefetch()
   const navigate = useNavigate()
 
   return {
-    mutationFn: async () => await axios.delete(getDeleteGroupUrl(groupId)),
+    mutationFn: async () => {
+      if (!groupId) throw new Error("groupId is required")
+      await axios.delete(getDeleteGroupUrl(groupId))
+    },
     onSuccess: async () => {
       if (myGroupsRefetch) await myGroupsRefetch()
       setNotification({
@@ -133,13 +136,16 @@ export const deleteGroupMutation = (groupId: string) => {
 }
 
 const getDeleteGroupMemberUrl = (groupId: string, userId: string) => BASE_URL + `/groups/${groupId}/users/${userId}`
-export const deleteGroupMemberMutation = (groupId: string, userId: string) => {
+export const deleteGroupMemberMutation = (groupId?: string, userId?: string) => {
   const queryClient = useQueryClient()
   const { setNotification } = useNotification()
   const { currentUser } = useCurrentUser()
   const isSelf = userId === currentUser.user_id
   return {
-    mutationFn: async () => await axios.delete(getDeleteGroupMemberUrl(groupId ?? "", userId ?? "")),
+    mutationFn: async () => {
+      if (!groupId || !userId) throw new Error("groupId and userId are required")
+      await axios.delete(getDeleteGroupMemberUrl(groupId, userId))
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
       setNotification({
@@ -498,11 +504,14 @@ const addManyPunishments = async (groupId: string, userId: string, punishments: 
 
 export const addManyPunishmentsMutation = (punishments: PunishmentCreate[], groupId?: string, userId?: string) => {
   const { setNotification } = useNotification()
+  const queryClient = useQueryClient()
+
   return {
     mutationFn: async () => {
       if (!groupId || !userId) throw new Error("groupId and userId are required")
       try {
         await addManyPunishments(groupId, userId, punishments)
+        await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
       } catch (e: any) {
         setNotification({
           type: "error",

@@ -31,7 +31,6 @@ import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
 import { GroupUserTable } from "../../components/groupusertable"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { useNotification } from "../../helpers/context/notificationContext"
 import { signinAndReturn } from "../../helpers/auth"
 
 export const GroupView = () => {

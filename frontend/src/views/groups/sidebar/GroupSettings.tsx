@@ -5,10 +5,9 @@ import {
   TrashIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline"
-import { deleteGroupMemberMutation, deleteGroupMutation, VengefulApiError } from "../../../helpers/api"
+import { deleteGroupMemberMutation, deleteGroupMutation } from "../../../helpers/api"
 
 import { useMutation } from "@tanstack/react-query"
-import axios from "axios"
 import { FC } from "react"
 import { Menu } from "../../../components/menu/Menu"
 import { MenuItemProps } from "../../../components/menu/MenuItem"
@@ -16,10 +15,7 @@ import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
 import { useEditGroupMembersModal } from "../../../helpers/context/modal/editGroupMembersModalContext"
 import { useEditGroupModal } from "../../../helpers/context/modal/editGroupModalContext"
-import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
-import { useNotification } from "../../../helpers/context/notificationContext"
 import { Group } from "../../../helpers/types"
-import { useNavigate } from "react-router-dom"
 import { usePermission } from "../../../helpers/permissions"
 
 interface GroupSettingsProps {
@@ -30,21 +26,15 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
   const { setOpen: setEditGroupModalOpen } = useEditGroupModal()
   const { setOpen: setEditGroupMembersModalOpen } = useEditGroupMembersModal()
   const { currentUser } = useCurrentUser()
-  const { setNotification } = useNotification()
-  const { myGroupsRefetch } = useMyGroupsRefetch()
   const {
     setOpen: setConfirmModalOpen,
     setType: setConfirmModalType,
     setOptions: setConfirmModalOptions,
   } = useConfirmModal()
 
-  if (!groupData) return null
+  const { mutate: leaveGroupMutate } = useMutation(deleteGroupMemberMutation(groupData?.group_id, currentUser.user_id))
 
-  const navigate = useNavigate()
-
-  const { mutate: leaveGroupMutate } = useMutation(deleteGroupMemberMutation(groupData.group_id, currentUser.user_id))
-
-  const { mutate: deleteGroupMutate } = useMutation(deleteGroupMutation(groupData.group_id))
+  const { mutate: deleteGroupMutate } = useMutation(deleteGroupMutation(groupData?.group_id))
 
   const listItems: MenuItemProps[] = []
 
@@ -68,7 +58,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     })
   }
 
-  if (groupData.ow_group_id === null) {
+  if (groupData?.ow_group_id === null) {
     listItems.push({
       label: "Forlat gruppe",
       icon: <ArrowLeftOnRectangleIcon className="h-5 w-5" />,
