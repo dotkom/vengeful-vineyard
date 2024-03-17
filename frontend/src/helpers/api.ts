@@ -138,17 +138,17 @@ export const removeReaction = async (punishmentId: string) => (await axios.delet
 const getLeaderboard = async ({ pageParam = 0 }) =>
   LeaderboardSchema.parse(await axios.get(getLeaderboardUrl(pageParam)).then((res) => res.data))
 
-export const useLeaderboard = (
-  options?: Omit<
-    UseInfiniteQueryOptions<Leaderboard, unknown, Leaderboard, Leaderboard, string[]>,
-    "queryFn" | "queryKey"
-  >
-) =>
-  useInfiniteQuery(["leaderboard"], getLeaderboard, {
-    getNextPageParam: (lastPage) => {
-      // Assuming you can determine the next page number from the last page data
-      const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
-      return nextPage ? Number(nextPage) : undefined
-    },
-    ...options,
-  })
+export const leaderboardQuery = (): UseInfiniteQueryOptions<
+  Leaderboard,
+  unknown,
+  Leaderboard,
+  Leaderboard,
+  string[]
+> => ({
+  queryKey: ["leaderboard"],
+  queryFn: getLeaderboard,
+  getNextPageParam: (lastPage: Leaderboard) => {
+    const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
+    return nextPage ? Number(nextPage) : undefined
+  },
+})
