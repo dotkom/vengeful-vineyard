@@ -1,7 +1,7 @@
 import { Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { getPostGroupJoinRequestUrl, useGroupLeaderboard, useUser, usePublicGroup } from "../../helpers/api"
+import { getPostGroupJoinRequestUrl, useUser, usePublicGroup, groupLeaderboardOptions } from "../../helpers/api"
 import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../helpers/sorting"
 
 // TODO: Remove some stuff for ow groups
@@ -30,7 +30,7 @@ import { useGroupNavigation } from "../../helpers/context/groupNavigationContext
 import { GivePunishmentModal } from "./modal/GivePunishmentModal"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
 import { GroupUserTable } from "../../components/groupusertable"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import { useNotification } from "../../helpers/context/notificationContext"
 import { signinAndReturn } from "../../helpers/auth"
@@ -89,9 +89,9 @@ export const GroupView = () => {
     (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
   )
 
-  const { isLoading, data, refetch } = useGroupLeaderboard(
-    selectedGroup?.group_id,
-    (group) => {
+  const { isLoading, data, refetch } = useQuery({
+    ...groupLeaderboardOptions(selectedGroup?.group_id),
+    onSuccess: (group) => {
       setToggledPunishmentTypesOptions(
         Object.entries(group.punishment_types)
           .map(([punishmentTypeId, punishmentType]) => ({
@@ -102,10 +102,7 @@ export const GroupView = () => {
           .sort((a, b) => b.text.localeCompare(a.text))
       )
     },
-    {
-      enabled: selectedGroup !== undefined,
-    }
-  )
+  })
 
   const { data: publicGroup } = usePublicGroup(selectedGroupName?.toLowerCase(), {
     enabled: !!currentUser && !userIsLoading && !selectedGroup && selectedGroupName !== null,

@@ -1,4 +1,4 @@
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import {
   VengefulApiError,
@@ -7,7 +7,7 @@ import {
   getPostPunishmentsPaidUrl,
   getPostPunishmentsUnpaidUrl,
   removeReaction,
-  useGroupLeaderboard,
+  groupLeaderboardOptions,
 } from "../../helpers/api"
 import { LeaderboardPunishment, Punishment, PunishmentType } from "../../helpers/types"
 
@@ -47,9 +47,7 @@ export const PunishmentItem = ({
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
   const { setNotification } = useNotification()
 
-  const { data: groupData } = useGroupLeaderboard(group_id, undefined, {
-    enabled: isGroupContext,
-  })
+  const { data: groupData } = useQuery(groupLeaderboardOptions(group_id))
 
   let punishmentType = punishmentTypes ? punishmentTypes[punishment.punishment_type_id] : undefined
 

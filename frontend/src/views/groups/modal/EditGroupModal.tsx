@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useRef, useState } from "react"
 import {
   VengefulApiError,
@@ -6,7 +6,7 @@ import {
   getPostPunishmentTypeUrl,
   getPutGroupUrl,
   getPutPunishmentTypeUrl,
-  useGroupLeaderboard,
+  groupLeaderboardOptions,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
@@ -90,9 +90,8 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
 
   const navigate = useNavigate()
 
-  const { data: groupData, isLoading } = useGroupLeaderboard(
-    selectedGroup?.group_id,
-    (group) => {
+  const { data: groupData, isLoading } = useQuery({
+    onSuccess: (group) => {
       setEditGroupData({ name: group.name, name_short: group.name_short })
       setInitialEditGroupData({ name: group.name, name_short: group.name_short })
 
@@ -107,10 +106,8 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
       setEditPunishmentTypeData({ ...newEditPunishmentTypeData })
       setInitialEditPunishmentTypeData({ ...newEditPunishmentTypeData })
     },
-    {
-      enabled: !!selectedGroup,
-    }
-  )
+    ...groupLeaderboardOptions(selectedGroup?.group_id),
+  })
 
   const selectedGroupId = selectedGroup?.group_id ?? ""
   const punishmentTypeOptions = Object.values(groupData?.punishment_types ?? []).map((pt) => ({

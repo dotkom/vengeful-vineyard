@@ -1,11 +1,11 @@
 import { Menu, Switch, Transition } from "@headlessui/react"
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
 import { GroupUser } from "../../helpers/types"
 
-import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, useGroupLeaderboard } from "../../helpers/api"
+import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, groupLeaderboardOptions } from "../../helpers/api"
 import { classNames } from "../../helpers/classNames"
 import { useCurrentUser } from "../../helpers/context/currentUserContext"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
@@ -35,7 +35,7 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   const queryClient = useQueryClient()
   const { currentUser } = useCurrentUser()
 
-  const { data: groupData } = useGroupLeaderboard(user.group_id, undefined, {})
+  const { data: groupData } = useQuery(groupLeaderboardOptions(user.group_id))
 
   const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
   setOpen = newSetOpen

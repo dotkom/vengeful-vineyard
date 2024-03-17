@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
 import { Listbox, ListboxOption } from "../../../components/listbox/Listbox"
 import {
@@ -6,7 +6,7 @@ import {
   getDeleteGroupMemberUrl,
   getPatchGroupMemberPermissionsUrl,
   getTransferGroupOwnershipUrl,
-  useGroupLeaderboard,
+  groupLeaderboardOptions,
 } from "../../../helpers/api"
 import { canGiveRole, usePermission } from "../../../helpers/permissions"
 
@@ -51,9 +51,8 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
 
   // Handlers and stuff
 
-  const { data: groupData } = useGroupLeaderboard(
-    selectedGroup?.group_id,
-    (group) => {
+  const { data: groupData } = useQuery({
+    onSuccess: (group) => {
       const newMembers = [...group.members]
       newMembers.sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`))
       setMembers(newMembers)
@@ -61,10 +60,8 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
       const newSelectedPerson = newMembers.find((member) => member.user_id === selectedPerson?.user_id)
       setSelectedPerson(newSelectedPerson ? newSelectedPerson : newMembers[0])
     },
-    {
-      enabled: !!selectedGroup,
-    }
-  )
+    ...groupLeaderboardOptions(selectedGroup?.group_id),
+  })
 
   useEffect(() => {
     if (!selectedPerson) return

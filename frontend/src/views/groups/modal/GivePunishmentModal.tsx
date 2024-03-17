@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axios, { AxiosResponse } from "axios"
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
-import { VengefulApiError, getAddPunishmentUrl, useGroupLeaderboard } from "../../../helpers/api"
+import { VengefulApiError, getAddPunishmentUrl, groupLeaderboardOptions } from "../../../helpers/api"
 import { Group, GroupUser } from "../../../helpers/types"
 
 import { Transition } from "@headlessui/react"
@@ -52,8 +52,9 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
       setSelectedPerson(preferredSelectedPerson)
   }, [preferredSelectedPerson])
 
-  const { data } = useGroupLeaderboard(selectedGroup?.group_id, onGroupLeaderboardFetched, {
-    enabled: !!selectedGroup,
+  const { data } = useQuery({
+    ...groupLeaderboardOptions(selectedGroup?.group_id),
+    onSuccess: onGroupLeaderboardFetched,
   })
   const sortedMembers = sortGroupUsersByName([...(data?.members ?? [])])
 

@@ -1,11 +1,11 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Dispatch, FC, Fragment, SetStateAction, useRef } from "react"
 import {
   VengefulApiError,
   getPostAcceptGroupJoinRequestUrl,
   getPostDenyGroupJoinRequestUrl,
-  useGroupLeaderboard,
+  groupLeaderboardOptions,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
@@ -25,9 +25,7 @@ export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsMod
   const { selectedGroup } = useGroupNavigation()
   const queryClient = useQueryClient()
 
-  const { data: group } = useGroupLeaderboard(selectedGroup?.group_id, undefined, {
-    enabled: !!selectedGroup,
-  })
+  const { data: group } = useQuery(groupLeaderboardOptions(selectedGroup?.group_id))
 
   const { mutate: acceptJoinRequestMutate } = useMutation(
     async (userId: string) => await axios.post(getPostAcceptGroupJoinRequestUrl(selectedGroup?.group_id ?? "", userId)),
