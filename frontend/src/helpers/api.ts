@@ -29,7 +29,7 @@ export const getLeaderboardUrl = (page: number) => `${LEADERBOARD_URL}?page=${pa
 
 export const GROUPS_URL = BASE_URL + "/groups/me"
 
-export const ME_URL = BASE_URL + "/groups/me"
+export const ME_URL = BASE_URL + "/users/me"
 
 export const getGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
 
