@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { postPunishmentTypeMutation } from "./api"
 
 export const UserSchema = z.object({
   ow_user_id: z.number(),
@@ -134,3 +135,25 @@ export const PunishmentStreaksSchema = z.object({
   longest_inverse_streak: z.number(),
 })
 export type PunishmentStreaks = z.infer<typeof PunishmentStreaksSchema>
+
+export const GroupCreate = z.object({
+  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
+  name_short: z.string().trim().min(3, { message: "Kort navn må være minst tre tegn" }),
+})
+
+export type GroupCreateType = z.infer<typeof GroupCreate>
+
+export const EditGroup = z.object({
+  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
+  name_short: z.string().trim().min(3, { message: "Kort navn må være minst tre tegn" }),
+})
+
+export type EditGroupType = z.infer<typeof EditGroup>
+
+export const MutatePunishment = z.object({
+  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
+  emoji: z.string().trim().min(1, { message: "Emoji må være minst ett tegn" }),
+  value: z.number().min(1, { message: "Verdi må være minst 1" }),
+})
+
+export type MutatePunishmentType = z.infer<typeof MutatePunishment>

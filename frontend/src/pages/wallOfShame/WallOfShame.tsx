@@ -1,10 +1,10 @@
 import { useAuth } from "react-oidc-context"
-import { useLeaderboard } from "../../helpers/api"
 import { LeaderboardTable } from "../../components/leaderboardtable"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { leaderboardQuery } from "../../helpers/api"
 
 export const WallOfShame = () => {
-  const auth = useAuth()
-  const { isFetching, data, refetch, fetchNextPage } = useLeaderboard({ enabled: auth.isAuthenticated })
+  const { isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(leaderboardQuery())
 
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)
 

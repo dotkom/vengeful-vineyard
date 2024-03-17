@@ -1,19 +1,17 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
-import { LEADERBOARD_URL, useUser } from "../../helpers/api"
+import { committeesQuery, leaderboardQuery, userQuery } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
 import BugIcon from "../../icons/BugIcon"
 import { Fragment } from "react"
-import { Leaderboard } from "../../helpers/types"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { NavLink } from "./NavLink"
 import OnlineLogo from "../../assets/online-logo-blue.png"
 import OnlineLogoWhite from "../../assets/online-logo-white.png"
-import axios from "axios"
 import { classNames } from "../../helpers/classNames"
-import { useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useDarkMode } from "../../DarkModeContext"
 
 interface NavItem {
@@ -32,24 +30,11 @@ export const Nav = ({ auth }: NavProps) => {
   const queryClient = useQueryClient()
   const location = useLocation()
 
-  const { data: groups } = useUser({
-    enabled: auth.isAuthenticated,
-  })
-  const isInAnyOWGroup = groups?.groups.some((group) => group.ow_group_id !== null) ?? false
+  const { data: user } = useQuery(userQuery())
+  const isInAnyOWGroup = user?.groups.some((group) => group.ow_group_id !== null) ?? false
 
-  const prefetchWallOfShame = () => {
-    queryClient.prefetchInfiniteQuery(
-      ["leaderboard", { pageParam: LEADERBOARD_URL }],
-      ({ pageParam = LEADERBOARD_URL }) => axios.get(pageParam).then((res) => res.data),
-      {
-        getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
-      }
-    )
-  }
-
-  const { data: user } = useUser({
-    enabled: auth.isAuthenticated,
-  })
+  const prefetchWallOfShame = () => queryClient.prefetchInfiniteQuery(leaderboardQuery())
+  const prefetchStatistics = () => queryClient.prefetchQuery(committeesQuery())
 
   const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
 
@@ -71,6 +56,7 @@ export const Nav = ({ auth }: NavProps) => {
       url: "/committees",
       isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
       shouldShowPredicate: () => isInAnyOWGroup,
+      prefetch: prefetchStatistics,
     },
   ]
 

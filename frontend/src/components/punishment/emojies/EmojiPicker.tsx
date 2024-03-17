@@ -5,7 +5,7 @@ import { FaceSmileIcon } from "@heroicons/react/24/outline"
 import { UseMutateFunction } from "@tanstack/react-query"
 
 interface EmojiPickerProps {
-  mutate: UseMutateFunction<string, unknown, string, unknown>
+  mutate: UseMutateFunction<void, unknown, string, unknown>
   setSelectedEmoji: React.Dispatch<React.SetStateAction<string>>
 }
 

@@ -6,7 +6,7 @@ export function usePermission(permission: string, group?: Group): boolean {
     currentUser: { user_id: currentUserId },
   } = useCurrentUser()
   if (!group) return false
-  const currentUser = group?.members.find((member) => member.user_id === currentUserId)
+  const currentUser = group.members.find((member) => member.user_id === currentUserId)
   const currentUserRole = currentUser?.permissions[0] ?? ""
 
   return hasPermission(group.permissions, permission, currentUserRole)

@@ -5,8 +5,8 @@ import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 
 interface ReactionsDisplayProps {
   reactions: PunishmentReaction[]
-  mutate: UseMutateFunction<string, unknown, string, unknown>
-  removeMutation: UseMutateFunction<string, unknown, void, unknown>
+  mutate: UseMutateFunction<void, unknown, string, unknown>
+  removeMutation: UseMutateFunction<void, unknown, void, unknown>
   setSelectedEmoji: React.Dispatch<React.SetStateAction<string>>
 }
 

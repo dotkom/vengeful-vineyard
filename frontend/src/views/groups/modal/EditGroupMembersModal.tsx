@@ -1,17 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
 import { Listbox, ListboxOption } from "../../../components/listbox/Listbox"
 import {
-  VengefulApiError,
-  getDeleteGroupMemberUrl,
-  getPatchGroupMemberPermissionsUrl,
-  getTransferGroupOwnershipUrl,
-  useGroupLeaderboard,
+  groupLeaderboardQuery,
+  patchGroupMemberPermissionsMutation,
+  transferGroupOwnershipMutation,
+  deleteGroupMemberMutation,
 } from "../../../helpers/api"
 import { canGiveRole, usePermission } from "../../../helpers/permissions"
 
 import { Transition } from "@headlessui/react"
-import axios from "axios"
 import { Button } from "../../../components/button"
 import { PersonSelect } from "../../../components/input/PersonSelect"
 import { Modal } from "../../../components/modal"
@@ -19,7 +17,6 @@ import { Spinner } from "../../../components/spinner"
 import { useCurrentUser } from "../../../helpers/context/currentUserContext"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 import { useConfirmModal } from "../../../helpers/context/modal/confirmModalContext"
-import { useNotification } from "../../../helpers/context/notificationContext"
 import { GroupUser } from "../../../helpers/types"
 
 interface EditGroupMembersModalProps {
@@ -30,9 +27,7 @@ interface EditGroupMembersModalProps {
 export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, setOpen }) => {
   const { selectedGroup } = useGroupNavigation()
   const { currentUser } = useCurrentUser()
-  const { setNotification } = useNotification()
   const ref = useRef(null)
-  const queryClient = useQueryClient()
 
   const {
     setOpen: setConfirmModalOpen,
@@ -49,11 +44,8 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
   const isCurrentUserSelected = selectedPerson?.user_id === currentUser.user_id
   const [currentUserRole, setCurrentUserRole] = useState<string>("")
 
-  // Handlers and stuff
-
-  const { data: groupData } = useGroupLeaderboard(
-    selectedGroup?.group_id,
-    (group) => {
+  const { data: groupData } = useQuery({
+    onSuccess: (group) => {
       const newMembers = [...group.members]
       newMembers.sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`))
       setMembers(newMembers)
@@ -61,10 +53,8 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
       const newSelectedPerson = newMembers.find((member) => member.user_id === selectedPerson?.user_id)
       setSelectedPerson(newSelectedPerson ? newSelectedPerson : newMembers[0])
     },
-    {
-      enabled: !!selectedGroup,
-    }
-  )
+    ...groupLeaderboardQuery(selectedGroup?.group_id),
+  })
 
   useEffect(() => {
     if (!selectedPerson) return
@@ -104,70 +94,20 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
   }, [currentUser, groupData])
 
   const { mutate: transferOwnershipMutate } = useMutation(
-    async () =>
-      await axios.post(getTransferGroupOwnershipUrl(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Lederskap ble overført",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Lederskap kunne ikke overføres",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    transferGroupOwnershipMutation(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")
   )
 
   const { mutate: removeMemberMutate } = useMutation(
-    async () =>
-      await axios.delete(getDeleteGroupMemberUrl(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Medlem ble fjernet",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Medlem kunne ikke fjernes",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    deleteGroupMemberMutation(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")
   )
 
   const { mutate: changeRoleMutate } = useMutation(
-    async () =>
-      await axios.patch(
-        getPatchGroupMemberPermissionsUrl(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? ""),
-        { privilege: currentRole }
-      ),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Rolle ble endret",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Rolle kunne ikke endres",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    patchGroupMemberPermissionsMutation(selectedGroup?.group_id, selectedPerson?.user_id, currentRole)
   )
+
+  const canTransferOwnership = usePermission("group.transfer_ownership", groupData)
+  const canRemoveMembers = usePermission("group.members.remove", groupData)
+  const canChangeRoles = usePermission("group.members.manage", groupData)
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -194,42 +134,46 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
                   setSelectedPerson={setSelectedPerson}
                 />
                 <div className="flex flex-col gap-y-3 w-full border-l-2 border-l-gray-500/50 pl-3">
-                  <Listbox
-                    label="Rolle"
-                    options={currentRolesOptions}
-                    value={currentRole}
-                    onChange={(value) => setCurrentRole(value)}
-                  />
-                  <Button
-                    variant="OUTLINE"
-                    label="Endre rolle"
-                    color="BLUE"
-                    disabled={
-                      !currentRolesOptions.find((option) => !option.disabled) ||
-                      currentRole === (selectedPerson?.permissions.at(0) ?? "")
-                    }
-                    onClick={() => {
-                      if (isCurrentUserSelected) {
-                        setConfirmModalType("YESNO")
-                        setConfirmModalOptions({
-                          message:
-                            "Dersom du bytter rolle på deg selv vil du ikke selv ville gjenopprette den gamle rollen din",
-                          onClose: (retval) => {
-                            if (retval) {
-                              changeRoleMutate()
-                            }
-                          },
-                        })
-                        setConfirmModalOpen(true)
-                      } else {
-                        changeRoleMutate()
-                      }
-                    }}
-                  />
+                  {canChangeRoles && (
+                    <>
+                      <Listbox
+                        label="Rolle"
+                        options={currentRolesOptions}
+                        value={currentRole}
+                        onChange={(value) => setCurrentRole(value)}
+                      />
+                      <Button
+                        variant="OUTLINE"
+                        label="Endre rolle"
+                        color="BLUE"
+                        disabled={
+                          !currentRolesOptions.find((option) => !option.disabled) ||
+                          currentRole === (selectedPerson?.permissions.at(0) ?? "")
+                        }
+                        onClick={() => {
+                          if (isCurrentUserSelected) {
+                            setConfirmModalType("YESNO")
+                            setConfirmModalOptions({
+                              message:
+                                "Dersom du bytter rolle på deg selv vil du ikke selv ville gjenopprette den gamle rollen din",
+                              onClose: (retval) => {
+                                if (retval) {
+                                  changeRoleMutate()
+                                }
+                              },
+                            })
+                            setConfirmModalOpen(true)
+                          } else {
+                            changeRoleMutate()
+                          }
+                        }}
+                      />
+                    </>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-y-3">
-                  {usePermission("group.transfer_ownership", groupData) && (
+                  {canTransferOwnership && (
                     <Button
                       variant="OUTLINE"
                       label="Overfør lederskap"
@@ -252,7 +196,7 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
                     />
                   )}
 
-                  {usePermission("group.members.remove", groupData) && (
+                  {canRemoveMembers && (
                     <Button
                       variant="OUTLINE"
                       label="Fjern fra gruppa"

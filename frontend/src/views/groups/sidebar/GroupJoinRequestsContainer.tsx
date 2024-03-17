@@ -1,9 +1,10 @@
 import { UserPlusIcon } from "@heroicons/react/24/outline"
 import { FC } from "react"
-import { useGroupLeaderboard } from "../../../helpers/api"
 import { useAdministerGroupJoinRequestsModal } from "../../../helpers/context/modal/administerGroupJoinRequestsModalContext"
 import { usePermission } from "../../../helpers/permissions"
 import { Group } from "../../../helpers/types"
+import { groupLeaderboardQuery } from "../../../helpers/api"
+import { useQuery } from "@tanstack/react-query"
 
 interface GroupJoinRequestsContainerProps {
   groupData: Group | undefined
@@ -12,11 +13,9 @@ interface GroupJoinRequestsContainerProps {
 export const GroupJoinRequestsContainer: FC<GroupJoinRequestsContainerProps> = ({ groupData }) => {
   const { setOpen } = useAdministerGroupJoinRequestsModal()
 
-  const { data: group } = useGroupLeaderboard(groupData?.group_id, undefined, {
-    enabled: !!groupData,
-  })
+  const { data: group } = useQuery(groupLeaderboardQuery(groupData?.group_id))
 
-  const canViewJoinRequests = usePermission("group.join_requests.view", groupData)
+  const canViewJoinRequests = usePermission("group.join_requests.view", group)
 
   return (
     <>

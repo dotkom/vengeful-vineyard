@@ -1,13 +1,11 @@
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from "@tanstack/react-query"
-import axios, { AxiosResponse } from "axios"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
 import {
-  VengefulApiError,
-  addReaction,
-  getDeletePunishmentUrl,
-  getPostPunishmentsPaidUrl,
-  getPostPunishmentsUnpaidUrl,
-  removeReaction,
-  useGroupLeaderboard,
+  groupLeaderboardQuery,
+  addReactionMutation,
+  removeReactionMutation,
+  deletePunishmentMutation,
+  postPunishmentsUnpaidMutation,
+  postPunishmentsPaidMutation,
 } from "../../helpers/api"
 import { LeaderboardPunishment, Punishment, PunishmentType } from "../../helpers/types"
 
@@ -16,7 +14,6 @@ import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import { useState } from "react"
 import { classNames } from "../../helpers/classNames"
-import { useNotification } from "../../helpers/context/notificationContext"
 import { Button } from "../button"
 import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
@@ -45,11 +42,8 @@ export const PunishmentItem = ({
   dataRefetch,
 }: PunishmentItemProps) => {
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
-  const { setNotification } = useNotification()
 
-  const { data: groupData } = useGroupLeaderboard(group_id, undefined, {
-    enabled: isGroupContext,
-  })
+  const { data: groupData } = useQuery(groupLeaderboardQuery(group_id))
 
   let punishmentType = punishmentTypes ? punishmentTypes[punishment.punishment_type_id] : undefined
 
@@ -58,128 +52,28 @@ export const PunishmentItem = ({
     punishmentType = innerPunishment.punishment_type
   }
 
-  const addReactionCall = async (emoji: string) => addReaction(punishment.punishment_id, emoji)
-  const removeReactionCall = async () => removeReaction(punishment.punishment_id)
-
-  const markPunishmentAsPaidCall = async () => {
-    if (!punishmentType) {
-      throw new Error("Punishment type is undefined")
-    }
-
-    if (punishment.group_id === null) {
-      // this should never happen
-      return
-    }
-
-    const POST_PUNISHMENTS_PAID_URL = getPostPunishmentsPaidUrl(punishment.group_id)
-    const res: AxiosResponse<string> = await axios.post(POST_PUNISHMENTS_PAID_URL, [punishment.punishment_id])
-
-    return res.data
-  }
-
-  const markPunishmentAsUnpaidCall = async () => {
-    if (!punishmentType) {
-      throw new Error("Punishment type is undefined")
-    }
-
-    if (punishment.group_id === null) {
-      // this should never happen
-      return
-    }
-
-    const POST_PUNISHMENTS_PAID_URL = getPostPunishmentsUnpaidUrl(punishment.group_id)
-    const res: AxiosResponse<string> = await axios.post(POST_PUNISHMENTS_PAID_URL, [punishment.punishment_id])
-
-    return res.data
-  }
-
-  const deletePunishmentCall = async () => {
-    if (punishment.group_id === null) {
-      // this should never happen
-      return
-    }
-
-    const DELETE_PUNISHMENT_URL = getDeletePunishmentUrl(punishment.group_id, punishment.punishment_id)
-    const res: AxiosResponse<string> = await axios.delete(DELETE_PUNISHMENT_URL, {
-      data: { punishment_id: punishment.punishment_id, group_id: punishment.group_id },
-    })
-
-    return res.data
-  }
-
-  const { mutate: mutateAddReaction } = useMutation(addReactionCall, {
+  const { mutate: mutateAddReaction } = useMutation({
+    ...addReactionMutation(punishment.punishment_id),
     onSuccess: () => dataRefetch(),
-    onError: (e: VengefulApiError) =>
-      setNotification({
-        type: "error",
-        title: "Kunne ikke legge til reaction",
-        text: e.response.data.detail,
-      }),
   })
 
-  const { mutate: mutateRemoveReaction } = useMutation(removeReactionCall, {
-    onSuccess: () => dataRefetch(),
-    onError: (e: VengefulApiError) =>
-      setNotification({
-        type: "error",
-        title: "Kunne ikke fjerne reaction",
-        text: e.response.data.detail,
-      }),
-  })
+  const { mutate: removeReaction } = useMutation(removeReactionMutation(punishment.punishment_id))
 
-  const { mutate: markPunishmentAsPaid } = useMutation(markPunishmentAsPaidCall, {
-    onSuccess: () => {
-      dataRefetch()
-      setNotification({
-        type: "success",
-        title: "Betaling registrert",
-        text: `Straff registrert betalt`,
-      })
-    },
-    onError: (e: VengefulApiError) => {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke registrere betaling",
-        text: e.response.data.detail,
-      })
-    },
-  })
+  const { mutate: markPunishmentAsPaid } = useMutation(
+    postPunishmentsPaidMutation(punishment.group_id!, [punishment.punishment_id])
+  )
 
-  const { mutate: markPunishmentAsUnpaid } = useMutation(markPunishmentAsUnpaidCall, {
-    onSuccess: () => {
-      dataRefetch()
-      setNotification({
-        type: "success",
-        title: "Betaling registrert",
-        text: `Straff registrert ubetalt`,
-      })
-    },
-    onError: (e: VengefulApiError) => {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke registrere som ubetalt",
-        text: e.response.data.detail,
-      })
-    },
-  })
+  const { mutate: markPunishmentAsUnpaid } = useMutation(
+    postPunishmentsUnpaidMutation(punishment.group_id!, [punishment.punishment_id])
+  )
 
-  const { mutate: deletePunishment } = useMutation(deletePunishmentCall, {
-    onSuccess: () => {
-      dataRefetch()
-      setNotification({
-        type: "success",
-        title: "Straff slettet",
-        text: `Straff slettet`,
-      })
-    },
-    onError: (e: VengefulApiError) => {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke slette straff",
-        text: e.response.data.detail,
-      })
-    },
-  })
+  const { mutate: deletePunishment } = useMutation(
+    deletePunishmentMutation(punishment.group_id!, punishment.punishment_id)
+  )
+
+  const canMarkAsPaid = usePermission("group.punishments.mark_paid", groupData)
+  const canMarkAsUnpaid = usePermission("group.punishments.mark_unpaid", groupData)
+  const canDelete = usePermission("group.punishments.delete", groupData)
 
   const date = dayjs.utc(punishment.created_at).tz("Europe/Oslo")
 
@@ -245,14 +139,14 @@ export const PunishmentItem = ({
           <EmojiPicker mutate={mutateAddReaction} setSelectedEmoji={setSelectedEmoji} />
           <ReactionsDisplay
             mutate={mutateAddReaction}
-            removeMutation={mutateRemoveReaction}
+            removeMutation={removeReaction}
             setSelectedEmoji={setSelectedEmoji}
             reactions={punishment.reactions}
           />
         </div>
         {isGroupContext && (
           <div className="flex flex-row gap-x-4 ml-auto items-center text-slate-500">
-            {punishment.paid && usePermission("group.punishments.mark_unpaid", groupData) && (
+            {punishment.paid && canMarkAsPaid && (
               <Button
                 variant="OUTLINE"
                 label="Marker som ubetalt"
@@ -262,7 +156,7 @@ export const PunishmentItem = ({
               />
             )}
 
-            {!punishment.paid && usePermission("group.punishments.mark_paid", groupData) && (
+            {!punishment.paid && canMarkAsUnpaid && (
               <Button
                 variant="OUTLINE"
                 label="Marker som betalt"
@@ -272,7 +166,7 @@ export const PunishmentItem = ({
               />
             )}
 
-            {usePermission("group.punishments.delete", groupData) && (
+            {canDelete && (
               <Button
                 variant="OUTLINE"
                 color="RED"
