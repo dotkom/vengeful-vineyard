@@ -53,7 +53,7 @@ export const LeaderboardTable = ({
           </div>
         )}
 
-        {isFetching && [...Array(3)].map((e, i) => <SkeletonTableItem key={i} />)}
+        {isFetching && !leaderboardUsers && [...Array(3)].map((e, i) => <SkeletonTableItem key={i} />)}
       </Accordion.Root>
     </ul>
   )

@@ -4,7 +4,6 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import { leaderboardQuery } from "../../helpers/api"
 
 export const WallOfShame = () => {
-  const auth = useAuth()
   const { isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(leaderboardQuery())
 
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)

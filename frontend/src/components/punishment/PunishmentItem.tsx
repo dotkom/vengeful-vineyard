@@ -71,6 +71,10 @@ export const PunishmentItem = ({
     deletePunishmentMutation(punishment.group_id!, punishment.punishment_id)
   )
 
+  const canMarkAsPaid = usePermission("group.punishments.mark_paid", groupData)
+  const canMarkAsUnpaid = usePermission("group.punishments.mark_unpaid", groupData)
+  const canDelete = usePermission("group.punishments.delete", groupData)
+
   const date = dayjs.utc(punishment.created_at).tz("Europe/Oslo")
 
   const formattedDate = date.format("DD. MMM HH:mm")
@@ -142,7 +146,7 @@ export const PunishmentItem = ({
         </div>
         {isGroupContext && (
           <div className="flex flex-row gap-x-4 ml-auto items-center text-slate-500">
-            {punishment.paid && usePermission("group.punishments.mark_unpaid", groupData) && (
+            {punishment.paid && canMarkAsPaid && (
               <Button
                 variant="OUTLINE"
                 label="Marker som ubetalt"
@@ -152,7 +156,7 @@ export const PunishmentItem = ({
               />
             )}
 
-            {!punishment.paid && usePermission("group.punishments.mark_paid", groupData) && (
+            {!punishment.paid && canMarkAsUnpaid && (
               <Button
                 variant="OUTLINE"
                 label="Marker som betalt"
@@ -162,7 +166,7 @@ export const PunishmentItem = ({
               />
             )}
 
-            {usePermission("group.punishments.delete", groupData) && (
+            {canDelete && (
               <Button
                 variant="OUTLINE"
                 color="RED"

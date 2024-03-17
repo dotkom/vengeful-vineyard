@@ -1,6 +1,6 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
-import { leaderboardQuery, userQuery } from "../../helpers/api"
+import { committeesQuery, leaderboardQuery, userQuery } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
@@ -34,6 +34,7 @@ export const Nav = ({ auth }: NavProps) => {
   const isInAnyOWGroup = user?.groups.some((group) => group.ow_group_id !== null) ?? false
 
   const prefetchWallOfShame = queryClient.prefetchInfiniteQuery(leaderboardQuery())
+  const prefetchStatistics = queryClient.prefetchQuery(committeesQuery())
 
   const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
 
@@ -55,6 +56,7 @@ export const Nav = ({ auth }: NavProps) => {
       url: "/committees",
       isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
       shouldShowPredicate: () => isInAnyOWGroup,
+      prefetch: () => prefetchStatistics,
     },
   ]
 

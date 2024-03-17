@@ -5,9 +5,9 @@ import {
   TrashIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline"
-import { deleteGroupMemberMutation, deleteGroupMutation } from "../../../helpers/api"
+import { deleteGroupMemberMutation, deleteGroupMutation, groupLeaderboardQuery } from "../../../helpers/api"
 
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { FC } from "react"
 import { Menu } from "../../../components/menu/Menu"
 import { MenuItemProps } from "../../../components/menu/MenuItem"
@@ -32,13 +32,17 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     setOptions: setConfirmModalOptions,
   } = useConfirmModal()
 
+  const { data: group } = useQuery(groupLeaderboardQuery(groupData?.group_id))
+
+  if (!groupData) return null
+
   const { mutate: leaveGroupMutate } = useMutation(deleteGroupMemberMutation(groupData?.group_id, currentUser.user_id))
 
   const { mutate: deleteGroupMutate } = useMutation(deleteGroupMutation(groupData?.group_id))
 
   const listItems: MenuItemProps[] = []
 
-  if (usePermission("group.members.manage", groupData)) {
+  if (usePermission("group.members.manage", group)) {
     listItems.unshift({
       label: "Rediger medlemmer",
       icon: <UserGroupIcon className="h-5 w-5" />,
@@ -48,7 +52,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     })
   }
 
-  if (usePermission("group.edit", groupData)) {
+  if (usePermission("group.edit", group)) {
     listItems.unshift({
       label: "Rediger gruppe",
       icon: <PencilSquareIcon className="h-5 w-5" />,
@@ -58,7 +62,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
     })
   }
 
-  if (groupData?.ow_group_id === null) {
+  if (groupData.ow_group_id === null) {
     listItems.push({
       label: "Forlat gruppe",
       icon: <ArrowLeftOnRectangleIcon className="h-5 w-5" />,
@@ -76,7 +80,7 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
       },
     })
 
-    if (usePermission("group.delete", groupData)) {
+    if (usePermission("group.delete", group)) {
       listItems.push({
         label: "Slett gruppe",
         icon: <TrashIcon className="h-5 w-5" />,
