@@ -20,14 +20,17 @@ export const CommitteeList = () => {
           <p className="text-gray-800">Ingen resultat</p>
         </div>
       ) : (
-        groupsStatistics?.map((groupStatistic: GroupStatistics, index) => (
-          <CommitteeCard
-            key={index}
-            name={groupStatistic.group_name_short}
-            amount={groupStatistic.total_value}
-            img={groupStatistic.group_image === "NoImage" ? (NoImage as string) : groupStatistic.group_image}
-          />
-        ))
+        groupsStatistics
+          ?.sort((a, b) => b.total_value_this_year - a.total_value_this_year)
+          ?.map((groupStatistic: GroupStatistics, index) => (
+            <CommitteeCard
+              image={groupStatistic.group_image === "NoImage" ? (NoImage as string) : groupStatistic.group_image}
+              name={groupStatistic.group_name_short}
+              total_value={groupStatistic.total_value}
+              total_value_this_year={groupStatistic.total_value_this_year}
+              key={index}
+            />
+          ))
       )}
     </div>
   )
