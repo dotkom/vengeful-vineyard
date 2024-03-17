@@ -5,7 +5,7 @@ import {
   TrashIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline"
-import { VengefulApiError, getDeleteGroupMemberUrl, getDeleteGroupUrl } from "../../../helpers/api"
+import { deleteGroupMemberMutation, deleteGroupMutation, VengefulApiError } from "../../../helpers/api"
 
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
@@ -42,47 +42,9 @@ export const GroupSettings: FC<GroupSettingsProps> = ({ groupData }) => {
 
   const navigate = useNavigate()
 
-  const { mutate: leaveGroupMutate } = useMutation(
-    async () => await axios.delete(getDeleteGroupMemberUrl(groupData.group_id, currentUser.user_id)),
-    {
-      onSuccess: async () => {
-        if (myGroupsRefetch) await myGroupsRefetch()
-        setNotification({
-          type: "success",
-          text: "Gruppen ble forlatt",
-        })
-        navigate("/")
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke forlate gruppen",
-          text: e.response.data.detail,
-        })
-      },
-    }
-  )
+  const { mutate: leaveGroupMutate } = useMutation(deleteGroupMemberMutation(groupData.group_id, currentUser.user_id))
 
-  const { mutate: deleteGroupMutate } = useMutation(
-    async () => await axios.delete(getDeleteGroupUrl(groupData.group_id)),
-    {
-      onSuccess: async () => {
-        if (myGroupsRefetch) await myGroupsRefetch()
-        setNotification({
-          type: "success",
-          text: "Gruppen ble slettet",
-        })
-        navigate("/")
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke slette gruppen",
-          text: e.response.data.detail,
-        })
-      },
-    }
-  )
+  const { mutate: deleteGroupMutate } = useMutation(deleteGroupMutation(groupData.group_id))
 
   const listItems: MenuItemProps[] = []
 

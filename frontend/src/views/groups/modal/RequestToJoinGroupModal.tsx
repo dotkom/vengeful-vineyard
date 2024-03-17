@@ -1,12 +1,11 @@
 import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
-import { getGroupsSearchUrl, postGroupJoinRequestMutation } from "../../../helpers/api"
+import { groupsSearchQuery, postGroupJoinRequestMutation } from "../../../helpers/api"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
 import { GroupBase } from "../../../helpers/types"
 import { Modal } from "../../../components/modal"
 import { TextInput } from "../../../components/input/TextInput"
 import { Transition } from "@headlessui/react"
-import axios from "axios"
 import { z } from "zod"
 
 interface RequestToJoinGroupModalProps {
@@ -21,13 +20,7 @@ export const RequestToJoinGroupModal: FC<RequestToJoinGroupModalProps> = ({ open
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedGroup, setSelectedGroup] = useState<GroupBase | undefined>(undefined)
 
-  const enabled = searchTerm.length > 0 && selectedGroup === undefined
-
-  const { data: groups, isLoading: groupsSearchIsLoading } = useQuery({
-    queryKey: ["groupsSearch", searchTerm],
-    queryFn: () => axios.get<GroupBase[]>(getGroupsSearchUrl(searchTerm)).then((res) => res.data),
-    enabled,
-  })
+  const { data: groups, isLoading: groupsSearchIsLoading } = useQuery(groupsSearchQuery(searchTerm))
 
   const { mutate: requestToJoinGroupMutate } = useMutation(postGroupJoinRequestMutation(selectedGroup?.group_id))
 
@@ -66,7 +59,7 @@ export const RequestToJoinGroupModal: FC<RequestToJoinGroupModalProps> = ({ open
             placeholder="Skriv inn et gruppenavn"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            isLoading={groupsSearchIsLoading && enabled}
+            isLoading={groupsSearchIsLoading}
           />
           <div className="flex flex-col absolute top-16 bg-white drop-shadow-2xl w-full divide-y divide-gray-900/5 rounded-b-md overflow-hidden">
             {groups?.map((group) => (

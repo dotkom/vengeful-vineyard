@@ -2,16 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useRef, useState } from "react"
 import {
   VengefulApiError,
-  getDeletePunishmentTypeUrl,
-  getPostPunishmentTypeUrl,
-  getPutGroupUrl,
-  getPutPunishmentTypeUrl,
   groupLeaderboardQuery,
+  putGroupMutation,
+  postPunishmentTypeMutation,
+  putPunishmentTypeMutation,
+  deletePunishmentTypeMutation,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
 import axios from "axios"
-import { z } from "zod"
 import { Button } from "../../../components/button"
 import { NumberInput } from "../../../components/input/NumberInput"
 import { TextInput } from "../../../components/input/TextInput"
@@ -21,31 +20,20 @@ import { Spinner } from "../../../components/spinner"
 import { Tabs } from "../../../components/tabs/Tabs"
 import { useNotification } from "../../../helpers/context/notificationContext"
 import { useErrorControl } from "../../../helpers/form"
-import { PunishmentType } from "../../../helpers/types"
+import {
+  EditGroup,
+  EditGroupType,
+  MutatePunishment,
+  MutatePunishmentType,
+  PunishmentType,
+} from "../../../helpers/types"
 import { areObjectsEqual } from "../../../helpers/utils"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
-import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
-import { useNavigate } from "react-router-dom"
 
 interface EditGroupModalProps {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
-
-const EditGroup = z.object({
-  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
-  name_short: z.string().trim().min(3, { message: "Kort navn må være minst tre tegn" }),
-})
-
-type EditGroupType = z.infer<typeof EditGroup>
-
-const MutatePunishmentType = z.object({
-  name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
-  emoji: z.string().trim().min(1, { message: "Emoji må være minst ett tegn" }),
-  value: z.number().min(1, { message: "Verdi må være minst 1" }),
-})
-
-type MutatePunishmentTypeType = z.infer<typeof MutatePunishmentType>
 
 const baseEditGroupData = {
   name: "",
@@ -66,29 +54,26 @@ const baseEditPunishmentTypeData = {
 
 export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   const { selectedGroup } = useGroupNavigation()
-  const { myGroupsRefetch } = useMyGroupsRefetch()
   const { setNotification } = useNotification()
   const queryClient = useQueryClient()
   const ref = useRef(null)
 
   const [editGroupData, setEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
   const [initialEditGropuData, setInitialEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
-  const [createPunishmentTypeData, setCreatePunishmentTypeData] = useState<MutatePunishmentTypeType>({
+  const [createPunishmentTypeData, setCreatePunishmentTypeData] = useState<MutatePunishmentType>({
     ...baseCreatePunishmentTypeData,
   })
-  const [editPunishmentTypeData, setEditPunishmentTypeData] = useState<MutatePunishmentTypeType>({
+  const [editPunishmentTypeData, setEditPunishmentTypeData] = useState<MutatePunishmentType>({
     ...baseEditPunishmentTypeData,
   })
-  const [initialEditPunishmentTypeData, setInitialEditPunishmentTypeData] = useState<MutatePunishmentTypeType>({
+  const [initialEditPunishmentTypeData, setInitialEditPunishmentTypeData] = useState<MutatePunishmentType>({
     ...baseEditPunishmentTypeData,
   })
 
   const [currentPunishmentType, setCurrentPunishmentType] = useState<PunishmentType | undefined>(undefined)
 
   const [editGroupErrors, setEditGroupErrors] = useErrorControl(EditGroup)
-  const [mutatePunishmentTypeErrors, setMutatePunishmentTypeErrors] = useErrorControl(MutatePunishmentType)
-
-  const navigate = useNavigate()
+  const [mutatePunishmentTypeErrors, setMutatePunishmentTypeErrors] = useErrorControl(MutatePunishment)
 
   const { data: groupData, isLoading } = useQuery({
     onSuccess: (group) => {
@@ -168,7 +153,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   }
 
   const createPunishmentTypeClickHandler = () => {
-    const data = MutatePunishmentType.safeParse(createPunishmentTypeData)
+    const data = MutatePunishment.safeParse(createPunishmentTypeData)
     setMutatePunishmentTypeErrors(data)
 
     if (!data.success) return false
@@ -178,7 +163,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   }
 
   const editPunishmentTypeClickHandler = () => {
-    const data = MutatePunishmentType.safeParse(editPunishmentTypeData)
+    const data = MutatePunishment.safeParse(editPunishmentTypeData)
     setMutatePunishmentTypeErrors(data)
 
     if (!data.success) return false
@@ -193,94 +178,19 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
 
   // Mutations
 
-  const { mutate: editGroupMutate } = useMutation(
-    async () => await axios.patch(getPutGroupUrl(selectedGroupId), editGroupData),
-    {
-      onSuccess: () => {
-        myGroupsRefetch!().then(() => navigate(`/gruppe/${editGroupData.name_short}`))
-        setNotification({
-          type: "success",
-          title: "Suksess",
-          text: "Gruppen ble redigert",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke redigere gruppen",
-          text: e.response.data.detail,
-        })
-      },
-    }
-  )
+  const { mutate: editGroupMutate } = useMutation(putGroupMutation(selectedGroupId, editGroupData))
 
   const { mutate: createPunishmentTypeMutate } = useMutation(
-    () => axios.post(getPostPunishmentTypeUrl(selectedGroupId), createPunishmentTypeData),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroupId] })
-        setNotification({
-          type: "success",
-          title: "Suksess",
-          text: "Straffetypen ble opprettet",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke opprette straffetypen",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    postPunishmentTypeMutation(selectedGroupId, createPunishmentTypeData)
   )
 
   const { mutate: editPunishmentTypeMutate } = useMutation(
-    () =>
-      axios.patch(
-        getPutPunishmentTypeUrl(selectedGroupId, currentPunishmentType?.punishment_type_id ?? ""),
-        editPunishmentTypeData
-      ),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroupId] })
-        setNotification({
-          type: "success",
-          title: "Suksess",
-          text: "Straffetypen ble redigert",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke redigere straffetypen",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    putPunishmentTypeMutation(selectedGroupId, currentPunishmentType?.punishment_type_id ?? "", editPunishmentTypeData)
   )
 
   const { mutate: deletePunishmentTypeMutate } = useMutation(
-    () => axios.delete(getDeletePunishmentTypeUrl(selectedGroupId, currentPunishmentType?.punishment_type_id ?? "")),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroupId] })
-        setNotification({
-          type: "success",
-          title: "Suksess",
-          text: "Straffetypen ble slettet",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke slette straffetypen",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    deletePunishmentTypeMutation(selectedGroupId, currentPunishmentType?.punishment_type_id ?? "")
   )
-
   // Render
 
   const getPunishmentTypeTabContent = (mode: "CREATE" | "EDIT"): JSX.Element => {

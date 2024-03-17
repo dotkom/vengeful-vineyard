@@ -3,10 +3,10 @@ import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } f
 import { Listbox, ListboxOption } from "../../../components/listbox/Listbox"
 import {
   VengefulApiError,
-  getDeleteGroupMemberUrl,
-  getPatchGroupMemberPermissionsUrl,
-  getTransferGroupOwnershipUrl,
   groupLeaderboardQuery,
+  patchGroupMemberPermissionsMutation,
+  transferGroupOwnershipMutation,
+  deleteGroupMemberMutation,
 } from "../../../helpers/api"
 import { canGiveRole, usePermission } from "../../../helpers/permissions"
 
@@ -101,69 +101,15 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
   }, [currentUser, groupData])
 
   const { mutate: transferOwnershipMutate } = useMutation(
-    async () =>
-      await axios.post(getTransferGroupOwnershipUrl(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Lederskap ble overført",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Lederskap kunne ikke overføres",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    transferGroupOwnershipMutation(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")
   )
 
   const { mutate: removeMemberMutate } = useMutation(
-    async () =>
-      await axios.delete(getDeleteGroupMemberUrl(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Medlem ble fjernet",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Medlem kunne ikke fjernes",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    deleteGroupMemberMutation(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? "")
   )
 
   const { mutate: changeRoleMutate } = useMutation(
-    async () =>
-      await axios.patch(
-        getPatchGroupMemberPermissionsUrl(selectedGroup?.group_id ?? "", selectedPerson?.user_id ?? ""),
-        { privilege: currentRole }
-      ),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Rolle ble endret",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Rolle kunne ikke endres",
-          text: e.response.data.detail,
-        })
-      },
-    }
+    patchGroupMemberPermissionsMutation(selectedGroup?.group_id, selectedPerson?.user_id, currentRole)
   )
 
   return (

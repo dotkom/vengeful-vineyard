@@ -1,15 +1,13 @@
 import { Menu, Switch, Transition } from "@headlessui/react"
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import axios, { AxiosResponse } from "axios"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
 import { GroupUser } from "../../helpers/types"
 
-import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, groupLeaderboardQuery } from "../../helpers/api"
+import { groupLeaderboardQuery, postAllPunishmentsPaidForUserMutation } from "../../helpers/api"
 import { classNames } from "../../helpers/classNames"
 import { useCurrentUser } from "../../helpers/context/currentUserContext"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
-import { useNotification } from "../../helpers/context/notificationContext"
 import { useTogglePunishments } from "../../helpers/context/togglePunishmentsContext"
 import { PunishmentActionBarListItem } from "./PunishmentActionBarListItem"
 import { usePermission } from "../../helpers/permissions"
@@ -31,8 +29,6 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   let isToggled: boolean | undefined
   let setIsToggled: Dispatch<SetStateAction<boolean>> | undefined
 
-  const { setNotification } = useNotification()
-  const queryClient = useQueryClient()
   const { currentUser } = useCurrentUser()
 
   const { data: groupData } = useQuery(groupLeaderboardQuery(user.group_id))
@@ -45,33 +41,9 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   isToggled = newIsToggled
   setIsToggled = newSetIsToggled
 
-  const markAllPunishmentsAsPaidCall = async () => {
-    const groupUser = user as GroupUser
-
-    const POST_ALL_PUNISHMENTS_PAID_URL = getPostAllPunishmentsPaidForUserUrl(groupUser.group_id, user.user_id)
-    const res: AxiosResponse<string> = await axios.post(POST_ALL_PUNISHMENTS_PAID_URL)
-
-    return res.data
-  }
-
-  const { mutate: mutateMarkAllPunishmentsAsPaid } = useMutation(markAllPunishmentsAsPaidCall, {
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groupLeaderboard"] })
-      setNotification({
-        show: true,
-        type: "success",
-        title: "Betalinger registert",
-        text: `Alle straffer registrert som betalte`,
-      })
-    },
-    onError: (e: VengefulApiError) => {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke registrere betalingene",
-        text: e.response.data.detail,
-      })
-    },
-  })
+  const { mutate: mutateMarkAllPunishmentsAsPaid } = useMutation(
+    postAllPunishmentsPaidForUserMutation(user.group_id, user.user_id)
+  )
 
   const listItems: ActionBarItem[] = []
   const currentGroupUser = groupData?.members.find((groupUser) => groupUser.user_id === currentUser?.user_id)

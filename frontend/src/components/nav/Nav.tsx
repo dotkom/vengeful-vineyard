@@ -1,17 +1,15 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
-import { LEADERBOARD_URL, userQuery } from "../../helpers/api"
+import { leaderboardQuery, userQuery } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
 import BugIcon from "../../icons/BugIcon"
 import { Fragment } from "react"
-import { Leaderboard } from "../../helpers/types"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { NavLink } from "./NavLink"
 import OnlineLogo from "../../assets/online-logo-blue.png"
 import OnlineLogoWhite from "../../assets/online-logo-white.png"
-import axios from "axios"
 import { classNames } from "../../helpers/classNames"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useDarkMode } from "../../DarkModeContext"
@@ -35,15 +33,7 @@ export const Nav = ({ auth }: NavProps) => {
   const { data: user } = useQuery(userQuery())
   const isInAnyOWGroup = user?.groups.some((group) => group.ow_group_id !== null) ?? false
 
-  const prefetchWallOfShame = () => {
-    queryClient.prefetchInfiniteQuery(
-      ["leaderboard", { pageParam: LEADERBOARD_URL }],
-      ({ pageParam = LEADERBOARD_URL }) => axios.get(pageParam).then((res) => res.data),
-      {
-        getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
-      }
-    )
-  }
+  const prefetchWallOfShame = queryClient.prefetchInfiniteQuery(leaderboardQuery())
 
   const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
 
@@ -58,7 +48,7 @@ export const Nav = ({ auth }: NavProps) => {
       url: "/wall-of-shame",
       isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
       shouldShowPredicate: () => isInAnyOWGroup,
-      prefetch: prefetchWallOfShame,
+      prefetch: () => prefetchWallOfShame,
     },
     {
       label: "Statistikk",

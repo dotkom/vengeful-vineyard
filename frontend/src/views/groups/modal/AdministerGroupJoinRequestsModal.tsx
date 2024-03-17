@@ -1,17 +1,14 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Dispatch, FC, Fragment, SetStateAction, useRef } from "react"
 import {
-  VengefulApiError,
-  getPostAcceptGroupJoinRequestUrl,
-  getPostDenyGroupJoinRequestUrl,
   groupLeaderboardQuery,
+  postDenyGroupJoinRequestMutation,
+  postAcceptGroupJoinRequestMutation,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
-import axios from "axios"
 import { Modal } from "../../../components/modal"
-import { useNotification } from "../../../helpers/context/notificationContext"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 
 interface AdministerGroupJoinRequestsModalProps {
@@ -21,51 +18,12 @@ interface AdministerGroupJoinRequestsModalProps {
 
 export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsModalProps> = ({ open, setOpen }) => {
   const ref = useRef(null)
-  const { setNotification } = useNotification()
   const { selectedGroup } = useGroupNavigation()
-  const queryClient = useQueryClient()
 
   const { data: group } = useQuery(groupLeaderboardQuery(selectedGroup?.group_id))
 
-  const { mutate: acceptJoinRequestMutate } = useMutation(
-    async (userId: string) => await axios.post(getPostAcceptGroupJoinRequestUrl(selectedGroup?.group_id ?? "", userId)),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Brukeren ble lagt til i gruppen",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke godkjenne forespørselen",
-          text: e.response.data.detail,
-        })
-      },
-    }
-  )
-
-  const { mutate: denyJoinRequestMutate } = useMutation(
-    async (userId: string) => await axios.post(getPostDenyGroupJoinRequestUrl(selectedGroup?.group_id ?? "", userId)),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", selectedGroup?.group_id] })
-        setNotification({
-          type: "success",
-          text: "Forespørselen ble avslått",
-        })
-      },
-      onError: (e: VengefulApiError) => {
-        setNotification({
-          type: "error",
-          title: "Kunne ikke avslå forespørselen",
-          text: e.response.data.detail,
-        })
-      },
-    }
-  )
+  const { mutate: acceptJoinRequestMutate } = useMutation(postAcceptGroupJoinRequestMutation(selectedGroup?.group_id))
+  const { mutate: denyJoinRequestMutate } = useMutation(postDenyGroupJoinRequestMutation(selectedGroup?.group_id))
 
   return (
     <Transition.Root show={open} as={Fragment}>
