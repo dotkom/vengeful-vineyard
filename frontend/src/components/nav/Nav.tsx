@@ -33,8 +33,8 @@ export const Nav = ({ auth }: NavProps) => {
   const { data: user } = useQuery(userQuery())
   const isInAnyOWGroup = user?.groups.some((group) => group.ow_group_id !== null) ?? false
 
-  const prefetchWallOfShame = queryClient.prefetchInfiniteQuery(leaderboardQuery())
-  const prefetchStatistics = queryClient.prefetchQuery(committeesQuery())
+  const prefetchWallOfShame = () => queryClient.prefetchInfiniteQuery(leaderboardQuery())
+  const prefetchStatistics = () => queryClient.prefetchQuery(committeesQuery())
 
   const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
 
@@ -49,14 +49,14 @@ export const Nav = ({ auth }: NavProps) => {
       url: "/wall-of-shame",
       isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
       shouldShowPredicate: () => isInAnyOWGroup,
-      prefetch: () => prefetchWallOfShame,
+      prefetch: prefetchWallOfShame,
     },
     {
       label: "Statistikk",
       url: "/committees",
       isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
       shouldShowPredicate: () => isInAnyOWGroup,
-      prefetch: () => prefetchStatistics,
+      prefetch: prefetchStatistics,
     },
   ]
 
