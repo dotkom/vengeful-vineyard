@@ -7,7 +7,7 @@ import {
   getPostPunishmentsPaidUrl,
   getPostPunishmentsUnpaidUrl,
   removeReaction,
-  groupLeaderboardOptions,
+  groupLeaderboardQuery,
 } from "../../helpers/api"
 import { LeaderboardPunishment, Punishment, PunishmentType } from "../../helpers/types"
 
@@ -47,7 +47,7 @@ export const PunishmentItem = ({
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
   const { setNotification } = useNotification()
 
-  const { data: groupData } = useQuery(groupLeaderboardOptions(group_id))
+  const { data: groupData } = useQuery(groupLeaderboardQuery(group_id))
 
   let punishmentType = punishmentTypes ? punishmentTypes[punishment.punishment_type_id] : undefined
 

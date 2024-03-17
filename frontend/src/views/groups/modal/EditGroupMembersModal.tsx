@@ -6,7 +6,7 @@ import {
   getDeleteGroupMemberUrl,
   getPatchGroupMemberPermissionsUrl,
   getTransferGroupOwnershipUrl,
-  groupLeaderboardOptions,
+  groupLeaderboardQuery,
 } from "../../../helpers/api"
 import { canGiveRole, usePermission } from "../../../helpers/permissions"
 
@@ -60,7 +60,7 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
       const newSelectedPerson = newMembers.find((member) => member.user_id === selectedPerson?.user_id)
       setSelectedPerson(newSelectedPerson ? newSelectedPerson : newMembers[0])
     },
-    ...groupLeaderboardOptions(selectedGroup?.group_id),
+    ...groupLeaderboardQuery(selectedGroup?.group_id),
   })
 
   useEffect(() => {

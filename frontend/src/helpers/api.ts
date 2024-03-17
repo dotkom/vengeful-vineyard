@@ -84,7 +84,7 @@ export const getPostDenyGroupJoinRequestUrl = (groupId: string, userId: string) 
 export const getPatchGroupMemberPermissionsUrl = (groupId: string, userId: string) =>
   BASE_URL + `/groups/${groupId}/users/${userId}/permissions`
 
-export const groupLeaderboardOptions = (
+export const groupLeaderboardQuery = (
   groupId?: string
 ): UseQueryOptions<Group, unknown, Group, (string | undefined)[]> => ({
   queryKey: ["groupLeaderboard", groupId],
@@ -93,7 +93,7 @@ export const groupLeaderboardOptions = (
   enabled: groupId !== undefined,
 })
 
-export const publicGroupOptions = (groupNameShort?: string) => ({
+export const publicGroupQuery = (groupNameShort?: string) => ({
   queryKey: ["publicGroup", groupNameShort],
   queryFn: () =>
     axios.get(BASE_URL + `/groups/public_profiles/${groupNameShort}`).then((res) => PublicGroupSchema.parse(res.data)),

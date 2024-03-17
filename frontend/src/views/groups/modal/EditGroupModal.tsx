@@ -6,7 +6,7 @@ import {
   getPostPunishmentTypeUrl,
   getPutGroupUrl,
   getPutPunishmentTypeUrl,
-  groupLeaderboardOptions,
+  groupLeaderboardQuery,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
@@ -106,7 +106,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
       setEditPunishmentTypeData({ ...newEditPunishmentTypeData })
       setInitialEditPunishmentTypeData({ ...newEditPunishmentTypeData })
     },
-    ...groupLeaderboardOptions(selectedGroup?.group_id),
+    ...groupLeaderboardQuery(selectedGroup?.group_id),
   })
 
   const selectedGroupId = selectedGroup?.group_id ?? ""

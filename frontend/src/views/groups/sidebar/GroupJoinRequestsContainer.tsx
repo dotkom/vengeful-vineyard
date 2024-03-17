@@ -3,7 +3,7 @@ import { FC } from "react"
 import { useAdministerGroupJoinRequestsModal } from "../../../helpers/context/modal/administerGroupJoinRequestsModalContext"
 import { usePermission } from "../../../helpers/permissions"
 import { Group } from "../../../helpers/types"
-import { groupLeaderboardOptions } from "../../../helpers/api"
+import { groupLeaderboardQuery } from "../../../helpers/api"
 import { useQuery } from "@tanstack/react-query"
 
 interface GroupJoinRequestsContainerProps {
@@ -13,7 +13,7 @@ interface GroupJoinRequestsContainerProps {
 export const GroupJoinRequestsContainer: FC<GroupJoinRequestsContainerProps> = ({ groupData }) => {
   const { setOpen } = useAdministerGroupJoinRequestsModal()
 
-  const { data: group } = useQuery(groupLeaderboardOptions(groupData?.group_id))
+  const { data: group } = useQuery(groupLeaderboardQuery(groupData?.group_id))
 
   const canViewJoinRequests = usePermission("group.join_requests.view", groupData)
 

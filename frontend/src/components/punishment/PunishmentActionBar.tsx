@@ -5,7 +5,7 @@ import axios, { AxiosResponse } from "axios"
 import { Dispatch, Fragment, ReactNode, SetStateAction } from "react"
 import { GroupUser } from "../../helpers/types"
 
-import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, groupLeaderboardOptions } from "../../helpers/api"
+import { VengefulApiError, getPostAllPunishmentsPaidForUserUrl, groupLeaderboardQuery } from "../../helpers/api"
 import { classNames } from "../../helpers/classNames"
 import { useCurrentUser } from "../../helpers/context/currentUserContext"
 import { useGivePunishmentModal } from "../../helpers/context/modal/givePunishmentModalContext"
@@ -35,7 +35,7 @@ export const PunishmentActionBar = ({ user, label }: PunishmentActionBarProps) =
   const queryClient = useQueryClient()
   const { currentUser } = useCurrentUser()
 
-  const { data: groupData } = useQuery(groupLeaderboardOptions(user.group_id))
+  const { data: groupData } = useQuery(groupLeaderboardQuery(user.group_id))
 
   const { setOpen: newSetOpen, setPreferredSelectedPerson: newSetPreferredSelectedPerson } = useGivePunishmentModal()
   setOpen = newSetOpen

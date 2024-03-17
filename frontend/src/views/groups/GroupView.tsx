@@ -1,7 +1,7 @@
 import { Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { getPostGroupJoinRequestUrl, useUser, groupLeaderboardOptions, publicGroupOptions } from "../../helpers/api"
+import { getPostGroupJoinRequestUrl, useUser, groupLeaderboardQuery, publicGroupQuery } from "../../helpers/api"
 import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../helpers/sorting"
 
 // TODO: Remove some stuff for ow groups
@@ -90,7 +90,7 @@ export const GroupView = () => {
   )
 
   const { isLoading, data, refetch } = useQuery({
-    ...groupLeaderboardOptions(selectedGroup?.group_id),
+    ...groupLeaderboardQuery(selectedGroup?.group_id),
     onSuccess: (group) => {
       setToggledPunishmentTypesOptions(
         Object.entries(group.punishment_types)
@@ -105,7 +105,7 @@ export const GroupView = () => {
   })
 
   const { data: publicGroup } = useQuery({
-    ...publicGroupOptions(selectedGroupName?.toLowerCase()),
+    ...publicGroupQuery(selectedGroupName?.toLowerCase()),
     enabled: !!currentUser && !userIsLoading && !selectedGroup,
   })
 

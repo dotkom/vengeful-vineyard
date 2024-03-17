@@ -5,7 +5,7 @@ import {
   VengefulApiError,
   getPostAcceptGroupJoinRequestUrl,
   getPostDenyGroupJoinRequestUrl,
-  groupLeaderboardOptions,
+  groupLeaderboardQuery,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
@@ -25,7 +25,7 @@ export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsMod
   const { selectedGroup } = useGroupNavigation()
   const queryClient = useQueryClient()
 
-  const { data: group } = useQuery(groupLeaderboardOptions(selectedGroup?.group_id))
+  const { data: group } = useQuery(groupLeaderboardQuery(selectedGroup?.group_id))
 
   const { mutate: acceptJoinRequestMutate } = useMutation(
     async (userId: string) => await axios.post(getPostAcceptGroupJoinRequestUrl(selectedGroup?.group_id ?? "", userId)),
