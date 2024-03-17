@@ -84,50 +84,21 @@ export const getPostDenyGroupJoinRequestUrl = (groupId: string, userId: string) 
 export const getPatchGroupMemberPermissionsUrl = (groupId: string, userId: string) =>
   BASE_URL + `/groups/${groupId}/users/${userId}/permissions`
 
-export function groupLeaderboardOptions(
+export const groupLeaderboardOptions = (
   groupId?: string
-): UseQueryOptions<Group, unknown, Group, (string | undefined)[]> {
-  return {
-    queryKey: ["groupLeaderboard", groupId],
-    queryFn: () =>
-      axios.get(getGroupUrl(groupId ?? "")).then(async (res: AxiosResponse<Group>) => GroupSchema.parse(res.data)),
-    enabled: groupId !== undefined,
-  }
-}
+): UseQueryOptions<Group, unknown, Group, (string | undefined)[]> => ({
+  queryKey: ["groupLeaderboard", groupId],
+  queryFn: () =>
+    axios.get(getGroupUrl(groupId ?? "")).then(async (res: AxiosResponse<Group>) => GroupSchema.parse(res.data)),
+  enabled: groupId !== undefined,
+})
 
-const useGroupLeaderboard = (
-  groupId?: string,
-  cb?: (group: Group) => void,
-  options?: Omit<UseQueryOptions<Group, unknown, Group, (string | undefined)[]>, "initialData"> & {
-    initialData?: (() => undefined) | undefined
-  }
-) =>
-  useQuery({
-    queryKey: ["groupLeaderboard", groupId],
-    queryFn: () =>
-      axios.get(getGroupUrl(groupId ?? "")).then(async (res: AxiosResponse<Group>) => GroupSchema.parse(res.data)),
-    onSuccess: (group: Group) => {
-      if (cb) {
-        cb(group)
-      }
-    },
-    enabled: groupId !== undefined,
-    ...options,
-  })
-
-export const usePublicGroup = (
-  groupNameShort?: string,
-  options?: UseQueryOptions<PublicGroup, unknown, PublicGroup, [string, string]>
-) =>
-  useQuery(
-    ["publicGroup", groupNameShort === undefined ? "" : groupNameShort],
-    async () => {
-      const response = await axios.get(BASE_URL + `/groups/public_profiles/${groupNameShort}`)
-
-      return PublicGroupSchema.parse(response.data)
-    },
-    options
-  )
+export const publicGroupOptions = (groupNameShort?: string) => ({
+  queryKey: ["publicGroup", groupNameShort],
+  queryFn: () =>
+    axios.get(BASE_URL + `/groups/public_profiles/${groupNameShort}`).then((res) => PublicGroupSchema.parse(res.data)),
+  enabled: groupNameShort !== undefined,
+})
 
 export const useUser = (options?: UseQueryOptions<MeUser, unknown, MeUser>) =>
   useQuery<MeUser>({
