@@ -8,7 +8,7 @@ import {
   getTransferGroupOwnershipUrl,
   useGroupLeaderboard,
 } from "../../../helpers/api"
-import { canGiveRole, hasPermission } from "../../../helpers/permissions"
+import { canGiveRole, usePermission } from "../../../helpers/permissions"
 
 import { Transition } from "@headlessui/react"
 import axios from "axios"
@@ -229,7 +229,7 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
                 </div>
 
                 <div className="flex flex-col gap-y-3">
-                  {hasPermission(groupData.permissions, "group.ownership.transfer", currentUserRole) && (
+                  {usePermission("group.transfer_ownership", groupData) && (
                     <Button
                       variant="OUTLINE"
                       label="Overfør lederskap"
@@ -252,7 +252,7 @@ export const EditGroupMembersModal: FC<EditGroupMembersModalProps> = ({ open, se
                     />
                   )}
 
-                  {hasPermission(groupData.permissions, "group.members.remove", currentUserRole) && (
+                  {usePermission("group.members.remove", groupData) && (
                     <Button
                       variant="OUTLINE"
                       label="Fjern fra gruppa"
