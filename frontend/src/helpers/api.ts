@@ -545,8 +545,13 @@ export const addReactionMutation = (punishmentId: string): UseMutationOptions<vo
 }
 
 const removeReaction = async (punishmentId: string) => (await axios.delete(getAddReactionUrl(punishmentId))).data
-export const removeReactionMutation = (punishmentId: string): UseMutationOptions<void, unknown, void> => {
+export const removeReactionMutation = (
+  punishmentId: string,
+  groupId?: string
+): UseMutationOptions<void, unknown, void> => {
   const { setNotification } = useNotification()
+  const queryClient = useQueryClient()
+
   return {
     mutationFn: async () => {
       try {
@@ -558,6 +563,11 @@ export const removeReactionMutation = (punishmentId: string): UseMutationOptions
           text: e.response.data.detail,
         })
       }
+    },
+    onSuccess: async () => {
+      groupId
+        ? await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+        : await queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
     },
   }
 }
