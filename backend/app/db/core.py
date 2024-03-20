@@ -19,6 +19,7 @@ from .permissions import Permissions
 from .punishment_reactions import PunishmentReactions
 from .punishment_types import PunishmentTypes
 from .punishments import Punishments
+from .statistics import Statistics
 from .users import Users
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ class Database:
 
         self.users = Users(self)
         self.groups = Groups(self)
+        self.statistics = Statistics(self)
         self.permissions = Permissions(self)
         self.punishments = Punishments(self)
         self.punishment_types = PunishmentTypes(self)
@@ -135,23 +137,23 @@ class Database:
         def get_version_from_name(name: str) -> int:
             return int(name.split("_", 1)[0])
 
-        file_ = max(
+        files = sorted(
             (f for f in settings.migrations_directory.iterdir() if f.suffix == ".sql"),
             key=lambda f: get_version_from_name(f.name),
         )
 
         async with MaybeAcquire(conn, self.pool) as conn:
             schema_version = await self.get_migration_lock_version(conn)
-
             logger.debug("Schema version: %d", schema_version)
 
-            file_version = get_version_from_name(file_.name)
-            if file_version <= schema_version:
-                logger.debug("Skipping migration: %s", file_.name)
-                return
+            for file in files:
+                file_version = get_version_from_name(file.name)
+                if file_version <= schema_version:
+                    logger.debug("Skipping migration: %s", file.name)
+                    continue
 
-            sql_commands = read_sql_file(file_)
-            logger.info("Applying migration: %s", file_.name)
+                sql_commands = read_sql_file(file)
+                logger.info("Applying migration: %s", file.name)
 
-            await conn.execute(sql_commands)
-            await self.set_migration_lock_version(conn, file_version)
+                await conn.execute(sql_commands)
+                await self.set_migration_lock_version(conn, file_version)

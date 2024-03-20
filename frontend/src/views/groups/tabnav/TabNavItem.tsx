@@ -2,14 +2,23 @@ import { ComputerDesktopIcon, UserGroupIcon } from "@heroicons/react/24/outline"
 
 import { Group } from "../../../helpers/types"
 import { classNames } from "../../../helpers/classNames"
+import NoImage from "../../../assets/NoImage.png"
+import React from "react"
 
 interface TabNavItemProps extends React.HTMLAttributes<HTMLAnchorElement> {
   group: Group
   selectedGroup: Group | undefined
 }
 
+function getGroupIcon(image: string) {
+  function GroupIcon(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+    return <img src={image === "NoImage" ? (NoImage as string) : image} alt="" {...props} />
+  }
+  return GroupIcon
+}
+
 export const TabNavItem = ({ group, selectedGroup, ...props }: TabNavItemProps) => {
-  const GroupIcon = group.ow_group_id !== null ? ComputerDesktopIcon : UserGroupIcon
+  const GroupIcon = group.image !== "NoImage" && group.image ? getGroupIcon(group.image) : UserGroupIcon
 
   return (
     <a
@@ -27,7 +36,8 @@ export const TabNavItem = ({ group, selectedGroup, ...props }: TabNavItemProps) 
           group.name_short === selectedGroup?.name_short
             ? "text-gray-900 dark:text-gray-100"
             : "text-gray-500 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-gray-100",
-          "-mt-1 h-4 w-4 md:h-5 md:w-5"
+          "-mt-1 h-6 w-6 md:h-7 md:w-7",
+          group.image ? "grayscale dark:invert" : ""
         )}
         aria-hidden="true"
       />

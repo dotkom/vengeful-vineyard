@@ -1,7 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import axios, { AxiosResponse } from "axios"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
-import { VengefulApiError, getAddPunishmentUrl, useGroupLeaderboard } from "../../../helpers/api"
+import { groupLeaderboardQuery, addManyPunishmentsMutation } from "../../../helpers/api"
 import { Group, GroupUser } from "../../../helpers/types"
 
 import { Transition } from "@headlessui/react"
@@ -34,16 +33,14 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
   const { preferredSelectedPerson } = useGivePunishmentModal()
   const [selectedPerson, setSelectedPerson] = useState<GroupUser | undefined>(preferredSelectedPerson)
   const [newPunishmentData, setNewPunishmentData] = useState(CreatePunishment.parse({}))
-  const { setNotification } = useNotification()
   const [newPunishmentDataErrors, setNewPunishmentDataErrors] = useErrorControl(CreatePunishment)
-  const queryClient = useQueryClient()
   const { selectedGroup } = useGroupNavigation()
 
   const onGroupLeaderboardFetched = (group: Group) => {
     setSelectedPerson(preferredSelectedPerson ?? group.members[0])
     setNewPunishmentData({
       ...newPunishmentData,
-      punishment_type_id: group.punishment_types[0].punishment_type_id,
+      punishment_type_id: Object.keys(group.punishment_types)[0],
     })
   }
 
@@ -52,42 +49,15 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
       setSelectedPerson(preferredSelectedPerson)
   }, [preferredSelectedPerson])
 
-  const { data } = useGroupLeaderboard(selectedGroup?.group_id, onGroupLeaderboardFetched, {
-    enabled: !!selectedGroup,
+  const { data } = useQuery({
+    ...groupLeaderboardQuery(selectedGroup?.group_id),
+    onSuccess: onGroupLeaderboardFetched,
   })
   const sortedMembers = sortGroupUsersByName([...(data?.members ?? [])])
 
-  const createPunishmentCall = async () => {
-    if (selectedPerson) {
-      const ADD_PUNISHMENT_URL = getAddPunishmentUrl(selectedGroup?.group_id ?? "", selectedPerson.user_id)
-      const res: AxiosResponse<string> = await axios.post(ADD_PUNISHMENT_URL, [newPunishmentData])
-      return res.data
-    } else {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke registrere straff",
-        text: "Du må velge en person å gi straff til",
-      })
-    }
-  }
-
-  const { mutate } = useMutation(createPunishmentCall, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(["groupLeaderboard", selectedGroup?.group_id])
-      setNotification({
-        type: "success",
-        title: "Straff registrert!",
-        text: `Du ga en straff til ${selectedPerson?.first_name}`,
-      })
-    },
-    onError: (e: VengefulApiError) => {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke registrere straff",
-        text: e.response.data.detail,
-      })
-    },
-  })
+  const { mutate } = useMutation(
+    addManyPunishmentsMutation([newPunishmentData], selectedGroup?.group_id, selectedPerson?.user_id)
+  )
 
   const textInputHandler = (evt: ChangeEvent<HTMLInputElement>) =>
     setNewPunishmentData({ ...newPunishmentData, reason: evt.currentTarget.value })

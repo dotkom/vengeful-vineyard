@@ -138,7 +138,7 @@ class GroupMembers:
         conn: Optional[Pool] = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT gp.*, CONCAT(users.first_name, ' ', users.last_name) AS created_by_name, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
+            query = """SELECT gp.*, CONCAT(COALESCE(NULLIF(users.first_name, ''), users.email), ' ', users.last_name) AS created_by_name, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
                     FROM group_punishments gp
                     LEFT JOIN (
                         SELECT pr1.*
@@ -165,7 +165,7 @@ class GroupMembers:
         conn: Optional[Pool] = None,
     ) -> dict[UserId, list[dict[UserId, Any]]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT gp.*, CONCAT(users.first_name, ' ', users.last_name) AS created_by_name, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
+            query = """SELECT gp.*, CONCAT(COALESCE(NULLIF(users.first_name, ''), users.email), ' ', users.last_name) AS created_by_name, COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
                     FROM group_punishments gp
                     LEFT JOIN (
                         SELECT pr1.*

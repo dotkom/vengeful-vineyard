@@ -38,13 +38,22 @@ class GroupCreate(GroupBase):
         )
 
 
+class GroupPublic(GroupBase):
+    group_id: GroupId
+    name: str
+    name_short: str
+    image: str = ""
+    is_official: bool = False
+    is_member: bool = False
+
+
 class GroupSearchResult(GroupCreateMinified):
     group_id: GroupId
 
 
 class Group(GroupCreate):
     group_id: GroupId
-    punishment_types: list[PunishmentTypeRead] = []
+    punishment_types: dict[str, PunishmentTypeRead] = {}
     members: list[GroupUser] = []
     join_requests: list[User] = []
     roles: list[tuple[str, PermissionPrivilege]] = []

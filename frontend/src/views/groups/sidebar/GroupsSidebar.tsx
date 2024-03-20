@@ -80,6 +80,8 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
         />
       </SidebarSection>
 
+      {/*
+
       <SidebarSection title="Sorter etter">
         <Listbox value={sortingAlternative} onChange={setSortingAlternative} options={listboxOptions} />
       </SidebarSection>
@@ -97,6 +99,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
           isLoading={groupDataIsLoading}
         />
       </SidebarSection>
+      */}
     </div>
   )
 }

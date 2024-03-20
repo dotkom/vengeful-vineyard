@@ -5,7 +5,7 @@ import { MeUser } from "../types"
 
 type MyGroupsRefetchType = <TPageData>(
   options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-) => Promise<QueryObserverResult<MeUser, unknown>>
+) => Promise<QueryObserverResult<MeUser, MeUser>>
 
 interface MyGroupsRefetchContextProps {
   myGroupsRefetch: MyGroupsRefetchType | undefined

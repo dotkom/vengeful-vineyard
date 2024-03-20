@@ -20,12 +20,15 @@ class PunishmentTypes:
         self,
         group_id: GroupId,
         conn: Optional[Pool] = None,
-    ) -> list[PunishmentTypeRead]:
+    ) -> dict[PunishmentTypeId, PunishmentTypeRead]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = "SELECT * FROM punishment_types WHERE group_id = $1"
             punishment_types = await conn.fetch(query, group_id)
 
-        return [PunishmentTypeRead(**dict(x)) for x in punishment_types]
+        return {
+            PunishmentTypeId(x["punishment_type_id"]): PunishmentTypeRead(**dict(x))
+            for x in punishment_types
+        }
 
     async def insert(
         self,
@@ -62,7 +65,7 @@ class PunishmentTypes:
                     (
                         None,
                         group_id,
-                        x.name,
+                        x.name.strip(),
                         x.value,
                         x.emoji,
                         datetime.utcnow(),
@@ -96,7 +99,7 @@ class PunishmentTypes:
                 query,
                 group_id,
                 punishment_type_id,
-                punishment_type.name,
+                punishment_type.name.strip(),
                 punishment_type.value,
                 punishment_type.emoji,
                 datetime.utcnow(),

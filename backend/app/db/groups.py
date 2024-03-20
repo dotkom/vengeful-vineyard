@@ -11,10 +11,10 @@ from app.config import (
     ROLES,
 )
 from app.exceptions import DatabaseIntegrityException, NotFound
-from app.models.group import Group, GroupCreate, GroupSearchResult
+from app.models.group import Group, GroupCreate, GroupSearchResult, GroupPublic
 from app.models.group_member import GroupMember, GroupMemberCreate
 from app.models.punishment import TotalPunishmentValue
-from app.models.punishment_type import PunishmentTypeCreate
+from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
 from app.types import GroupId, InsertOrUpdateGroup, OWUserId, UserId
 from app.utils.db import MaybeAcquire
 
@@ -80,7 +80,7 @@ class Groups:
     ) -> bool:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """SELECT 1 FROM group_members gm
-                    INNER JOIN groups g ON g.group_id = gm.group_id AND g.ow_group_id IS NOT NULL
+                    INNER JOIN groups g ON g.group_id = gm.group_id AND g.ow_group_id IS NOT NULL or special
                     WHERE gm.user_id = $1
                     """
 
@@ -142,16 +142,44 @@ class Groups:
             else:
                 members = []
 
+            group = dict(group)
+
+            group["punishment_types"] = {
+                x["punishment_type_id"]: PunishmentTypeRead(**x)
+                for x in group["punishment_types"]
+            }
+
             is_ow_group = group["ow_group_id"] is not None
 
             return Group(
-                **dict(group),
+                **group,
                 members=members,
                 roles=OW_GROUP_ROLES if is_ow_group else ROLES,  # type: ignore
                 permissions=OW_GROUP_PERMISSIONS_AS_DICT
                 if is_ow_group
                 else PERMISSIONS_AS_DICT,
             )
+
+    async def get_public_group_profile(
+        self,
+        group_short_name: str,
+        user_id: Optional[UserId] = None,
+        conn: Optional[Pool] = None,
+    ) -> GroupPublic:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = "SELECT * FROM groups WHERE lower(name_short) = lower($1)"
+            group = await conn.fetchrow(query, group_short_name)
+
+            if group is None:
+                raise NotFound
+
+            if user_id is not None:
+                query = "SELECT 1 FROM group_members WHERE group_id = $1 AND user_id = $2"
+                is_member = bool(await conn.fetchval(query, group["group_id"], user_id))
+            else:
+                is_member = False
+
+            return GroupPublic(**group, is_official=group["ow_group_id"] is not None, is_member=is_member)
 
     async def get_total_punishment_value(
         self,
@@ -187,8 +215,8 @@ class Groups:
                 group_id = await conn.fetchval(
                     query,
                     group.ow_group_id,
-                    group.name,
-                    group.name_short,
+                    group.name.strip(),
+                    group.name_short.strip(),
                     group.rules,
                     group.image,
                 )
@@ -220,8 +248,8 @@ class Groups:
                     RETURNING group_id;"""
             ret_group_id = await conn.fetchval(
                 query,
-                group.name,
-                group.name_short,
+                group.name.strip(),
+                group.name_short.strip(),
                 group.rules,
                 group.image,
                 group_id if use_group_id else group.ow_group_id,

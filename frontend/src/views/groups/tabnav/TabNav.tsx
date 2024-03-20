@@ -1,13 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query"
 
-import axios from "axios"
 import { useEffect } from "react"
-import { getGroupUrl } from "../../../helpers/api"
 import { classNames } from "../../../helpers/classNames"
 import { Group } from "../../../helpers/types"
 import { AdditionalGroupNavItem } from "./AdditionalGroupNavItem"
 import { SkeletonTabNavItem } from "./SkeletonTabNavItem"
 import { TabNavItem } from "./TabNavItem"
+import { groupLeaderboardQuery } from "../../../helpers/api"
 
 interface TabNavProps {
   selectedGroup: Group | undefined
@@ -22,17 +21,7 @@ export const TabNav = ({ selectedGroup, setSelectedGroup, groups }: TabNavProps)
     if (selectedGroup === undefined && groups) setSelectedGroup(groups[0])
   }, [groups])
 
-  const prefetchGroup = async (group: Group) => {
-    queryClient.prefetchQuery(
-      ["groupLeaderboard", group.group_id],
-      () => {
-        return axios.get(getGroupUrl(group.group_id)).then((res) => res.data)
-      },
-      {
-        staleTime: 1000 * 60 * 5,
-      }
-    )
-  }
+  const prefetchGroup = (group: Group) => queryClient.prefetchQuery(groupLeaderboardQuery(group.group_id))
 
   return (
     <>

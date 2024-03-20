@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react"
 import { classNames } from "../../helpers/classNames"
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  label: string
+  label?: string
   variant?: "REGULAR" | "OUTLINE"
   color?: "BLUE" | "RED" | "GREEN" | "YELLOW"
   children?: ReactNode

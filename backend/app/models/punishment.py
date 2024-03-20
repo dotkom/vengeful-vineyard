@@ -16,6 +16,7 @@ class PunishmentBase(BaseModel):
     reason: str
     reason_hidden: bool
     amount: int
+    legacy: bool = False
 
 
 class PunishmentCreate(PunishmentBase):

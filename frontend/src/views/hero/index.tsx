@@ -1,3 +1,3 @@
-import { DefaultHero } from "./DefaultHero"
+import { LandingPage } from "./LandingPage"
 
-export { DefaultHero }
+export { LandingPage }

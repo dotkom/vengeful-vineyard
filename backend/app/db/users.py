@@ -32,12 +32,13 @@ class Users:
     ) -> int:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             res = await conn.fetchval(
-                """SELECT COUNT(DISTINCT users.user_id)
-                FROM users
-                INNER JOIN group_members ON group_members.user_id = users.user_id
-                INNER JOIN groups ON groups.group_id = group_members.group_id
-                INNER JOIN group_punishments ON group_punishments.user_id = users.user_id
-                WHERE groups.ow_group_id IS NOT NULL;
+                """SELECT
+                        count(DISTINCT(user_id))
+                    FROM
+                        group_members
+                        INNER JOIN GROUPS ON group_members.group_id = groups.group_id
+                    WHERE
+                        groups.ow_group_id IS NOT NULL OR groups.special;
                 """,
             )
             assert isinstance(res, int)
@@ -55,14 +56,14 @@ class Users:
                     WITH punishments_with_reactions AS (
                         SELECT
                             gp.*,
-                            u.first_name || ' ' || u.last_name as created_by_name,
+                            COALESCE(NULLIF(u.first_name, ''), u.email) || ' ' || u.last_name as created_by_name,
                             COALESCE(json_agg(json_build_object(
                                 'punishment_reaction_id', pr.punishment_reaction_id,
                                 'punishment_id', pr.punishment_id,
                                 'emoji', pr.emoji,
                                 'created_at', pr.created_at,
                                 'created_by', pr.created_by,
-                                'created_by_name', (SELECT first_name || ' ' || last_name FROM users WHERE user_id = pr.created_by)
+                                'created_by_name', (SELECT COALESCE(NULLIF(first_name, ''), email) || ' ' || last_name FROM users WHERE user_id = pr.created_by)
                             )) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
                         FROM group_punishments gp
                         LEFT JOIN punishment_reactions pr
@@ -71,7 +72,7 @@ class Users:
                             ON u.user_id = gp.created_by
                         LEFT JOIN groups g
                             ON g.group_id = gp.group_id
-                        WHERE g.ow_group_id IS NOT NULL
+                        WHERE g.ow_group_id IS NOT NULL OR special
                         GROUP BY gp.punishment_id, created_by_name
                     )
                     SELECT u.*,
@@ -109,7 +110,7 @@ class Users:
                     LEFT JOIN punishment_types pt
                         ON pt.punishment_type_id = pwr.punishment_type_id
                     INNER JOIN groups g
-                        ON g.group_id = pwr.group_id AND g.ow_group_id IS NOT NULL
+                        ON g.group_id = pwr.group_id AND g.ow_group_id IS NOT NULL OR special
                     GROUP BY u.user_id
                     ORDER BY total_value DESC, u.first_name ASC
                     OFFSET $1

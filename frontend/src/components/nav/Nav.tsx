@@ -1,17 +1,17 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
-import { LEADERBOARD_URL, useMyGroups } from "../../helpers/api"
+import { committeesQuery, leaderboardQuery, userQuery } from "../../helpers/api"
 
 import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
+import BugIcon from "../../icons/BugIcon"
 import { Fragment } from "react"
-import { Leaderboard } from "../../helpers/types"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { NavLink } from "./NavLink"
-import OnlineLogo from "../../assets/online.png"
-import axios from "axios"
+import OnlineLogo from "../../assets/online-logo-blue.png"
+import OnlineLogoWhite from "../../assets/online-logo-white.png"
 import { classNames } from "../../helpers/classNames"
-import { useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useDarkMode } from "../../DarkModeContext"
 
 interface NavItem {
@@ -30,27 +30,24 @@ export const Nav = ({ auth }: NavProps) => {
   const queryClient = useQueryClient()
   const location = useLocation()
 
-  const { data: groups } = useMyGroups({
-    enabled: auth.isAuthenticated,
-  })
-  const isInAnyOWGroup = groups?.groups.some((group) => group.ow_group_id !== null) ?? false
+  const { data: user } = useQuery(userQuery())
+  const isInAnyOWGroup = user?.groups.some((group) => group.ow_group_id !== null) ?? false
 
-  const prefetchWallOfShame = () => {
-    queryClient.prefetchInfiniteQuery(
-      ["leaderboard"],
-      ({ pageParam = LEADERBOARD_URL }) => axios.get(pageParam).then((res) => res.data),
-      {
-        getNextPageParam: (lastPage: Leaderboard, _) => lastPage.next,
-        staleTime: 1000 * 60 * 5,
-      }
-    )
+  const prefetchWallOfShame = () => queryClient.prefetchInfiniteQuery(leaderboardQuery())
+  const prefetchStatistics = () => queryClient.prefetchQuery(committeesQuery())
+
+  if (auth.isAuthenticated) {
+    prefetchStatistics()
+    prefetchWallOfShame()
   }
+
+  const homeLocation = user && user.groups.length > 0 ? `/gruppe/${user.groups[0].name_short.toLowerCase()}` : "/"
 
   const items: NavItem[] = [
     {
       label: "Hjem",
-      url: "/",
-      isActivePredicate: (_, currentLocation) => currentLocation.toLowerCase().startsWith("/komiteer/"),
+      url: homeLocation,
+      isActivePredicate: (_, currentLocation) => currentLocation.toLowerCase().startsWith("/gruppe/"),
     },
     {
       label: "Wall of Shame",
@@ -59,7 +56,16 @@ export const Nav = ({ auth }: NavProps) => {
       shouldShowPredicate: () => isInAnyOWGroup,
       prefetch: prefetchWallOfShame,
     },
+    {
+      label: "Statistikk",
+      url: "/committees",
+      isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
+      shouldShowPredicate: () => isInAnyOWGroup,
+      prefetch: prefetchStatistics,
+    },
   ]
+
+  const navigate = useNavigate()
 
   const { darkMode, setDarkMode } = useDarkMode()
 
@@ -82,7 +88,12 @@ export const Nav = ({ auth }: NavProps) => {
                 </div>
                 <div className="flex flex-shrink-0 items-center">
                   <Link to="/">
-                    <img className="h-8 w-auto cursor-pointer" src={OnlineLogo} alt="Online Logo" />
+                    <img className="h-8 w-auto cursor-pointer dark:hidden" src={OnlineLogo} alt="Online Logo" />
+                    <img
+                      className="h-8 w-auto cursor-pointer hidden dark:block"
+                      src={OnlineLogoWhite}
+                      alt="White Online Logo"
+                    />
                   </Link>
                 </div>
                 <div className="hidden md:ml-6 md:flex md:space-x-8">
@@ -98,6 +109,23 @@ export const Nav = ({ auth }: NavProps) => {
                         isActive={item.isActivePredicate(item, location.pathname)}
                       />
                     ))}
+                </div>
+              </div>
+              <div className="hidden md:flex flex-row justify-end w-full">
+                <div className="flex items-center">
+                  <Link
+                    to="https://github.com/dotkom/vengeful-vineyard/issues/new/choose"
+                    target="_blank"
+                    title="Rapporter bug"
+                    className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    <figure className="relative group">
+                      <BugIcon className="w-10 h-10 p-1 dark:grayscale dark:invert" />
+                      <figcaption className="absolute text-center top-[50px] left-[-40px] right-[-40px] py-2 text-xs text-gray-700 hidden group-hover:block bg-white p-1 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                        Rapporter bug
+                      </figcaption>
+                    </figure>
+                  </Link>
                 </div>
               </div>
               <div className="hidden md:ml-4 md:flex md:flex-shrink-0 md:items-center">
@@ -129,7 +157,11 @@ export const Nav = ({ auth }: NavProps) => {
                             </button>
                             {auth.isAuthenticated ? (
                               <button
-                                onClick={() => void auth.removeUser()}
+                                onClick={() => {
+                                  auth.removeUser().then(() => {
+                                    navigate("/")
+                                  })
+                                }}
                                 className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm")}
                               >
                                 Logg ut
@@ -171,6 +203,13 @@ export const Nav = ({ auth }: NavProps) => {
                 ))}
             </div>
             <div className="border-t border-gray-200">
+              <div className="space-y-1">
+                <Link to="mailto:dotkom@online.ntnu.no">
+                  <span className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
+                    Rapporter bug
+                  </span>
+                </Link>
+              </div>
               <div className="space-y-1">
                 <Disclosure.Button
                   as="a"

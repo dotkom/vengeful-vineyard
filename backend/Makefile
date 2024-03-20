@@ -28,7 +28,7 @@ testvv:
 	docker-compose -f docker-compose.test.yml -f docker-compose.testvv.yml up --abort-on-container-exit
 
 .prod-reqs:
-	poetry install --no-root --no-dev && touch .prod-reqs
+	poetry install --no-root --no-prod && touch .prod-reqs
 
 .dev-reqs: .prod-reqs
 	poetry install --no-root && poetry run pre-commit install && touch .dev-reqs
@@ -56,18 +56,32 @@ docs:
 	poetry run pdoc3 --html --force .
 
 docker-build:
-	docker build -f lambda.Dockerfile --platform linux/amd64 -t vengeful-vineyard:latest .
+	docker build -f Dockerfile --platform linux/amd64 -t vengeful-vineyard-server:latest .
 
-docker-push-dev:
-	docker tag vengeful-vineyard:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
+docker-push-prod:
+	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-prod:0.2.2 && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-prod:0.2.2
+
+docker-push-staging:
+	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-staging:0.2.2 && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-staging:0.2.2
 
 docker-login:
 	aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
 
-lambda-update-dev:
-	aws lambda update-function-code --function-name vengeful-vineyard-dev --image-uri 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard-dev:latest
+lightsail-redeploy-staging:
+	./lightsail-deploy-staging.sh
 
-deploy: docker-build docker-login docker-push-dev lambda-update-dev
+wait-for-lightsail-staging:
+	./wait-for-lightsail-deploy-staging.sh
+
+lightsail-redeploy-prod:
+	./lightsail-deploy-prod.sh
+
+wait-for-lightsail-prod:
+	./wait-for-lightsail-deploy-prod.sh
+
+deploy-prod: docker-build docker-login docker-push-prod lightsail-redeploy-prod wait-for-lightsail-prod
+
+deploy-staging: docker-build docker-login docker-push-staging lightsail-redeploy-staging wait-for-lightsail-staging
 
 help:
 	@echo "Makefile commands:"

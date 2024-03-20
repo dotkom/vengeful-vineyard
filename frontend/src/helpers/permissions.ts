@@ -1,10 +1,18 @@
-import { GroupPermissions, GroupRole } from "./types"
+import { Group, GroupPermissions, GroupRole } from "./types"
+import { useCurrentUser } from "./context/currentUserContext"
 
-export const hasPermission = (
-  permissions: GroupPermissions,
-  targetPermission: string,
-  currentPermission: string
-): boolean => {
+export function usePermission(permission: string, group?: Group): boolean {
+  const {
+    currentUser: { user_id: currentUserId },
+  } = useCurrentUser()
+  if (!group) return false
+  const currentUser = group.members.find((member) => member.user_id === currentUserId)
+  const currentUserRole = currentUser?.permissions[0] ?? ""
+
+  return hasPermission(group.permissions, permission, currentUserRole)
+}
+
+const hasPermission = (permissions: GroupPermissions, targetPermission: string, currentPermission: string): boolean => {
   if (targetPermission === "ALWAYS") {
     return true
   } else if (targetPermission === "NEVER") {

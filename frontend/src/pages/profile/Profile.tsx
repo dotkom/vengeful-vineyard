@@ -1,5 +1,5 @@
 import { useAuth } from "react-oidc-context"
-import { DefaultHero } from "../../views/hero"
+import { LandingPage } from "../../views/hero"
 import { AuthenticatedProfile } from "./AuthenticatedProfile"
 
 export const Profile = () => {
@@ -9,5 +9,5 @@ export const Profile = () => {
     return <AuthenticatedProfile />
   }
 
-  return <DefaultHero auth={auth} />
+  return <LandingPage />
 }

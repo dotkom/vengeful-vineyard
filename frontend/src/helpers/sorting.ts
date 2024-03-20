@@ -30,35 +30,38 @@ export function sortGroupUsersByName(users: GroupUser[]) {
 }
 
 export function getSortGroupUsersFunc(
-  punishmentMap: Map<string, PunishmentType>,
+  punishmentMap?: Record<string, PunishmentType>,
   sortAlternative?: GroupMembersSortAlternative
 ) {
   return (a: GroupUser, b: GroupUser): number => {
     sortAlternative = sortAlternative ?? "total_punishments"
 
-    if (sortAlternative === "total_punishments") {
-      const count_punishments = (user: GroupUser) =>
-        user.punishments.reduce((acc, curr) => (punishmentMap.has(curr.punishment_type_id) ? acc + curr.amount : 0), 0)
+    if (punishmentMap) {
+      if (sortAlternative === "total_punishments") {
+        const count_punishments = (user: GroupUser) =>
+          user.punishments
+            .filter((p) => !p.paid)
+            .reduce((acc, curr) => (punishmentMap[curr.punishment_type_id]?.value ? acc + 1 : acc), 0)
 
-      const a_punishments = count_punishments(a)
-      const b_punishments = count_punishments(b)
+        const a_punishments = count_punishments(a)
+        const b_punishments = count_punishments(b)
 
-      if (a_punishments !== b_punishments) {
-        return b_punishments - a_punishments
+        if (a_punishments !== b_punishments) {
+          return b_punishments - a_punishments
+        }
       }
-    }
 
-    const value_punishments = (user: GroupUser) =>
-      user.punishments.reduce(
-        (acc, curr) => acc + curr.amount * (punishmentMap.get(curr.punishment_type_id)?.value ?? 0),
-        0
-      )
+      const value_punishments = (user: GroupUser) =>
+        user.punishments
+          .filter((p) => !p.paid)
+          .reduce((acc, curr) => acc + curr.amount * (punishmentMap[curr.punishment_type_id]?.value ?? 0), 0)
 
-    const a_value = value_punishments(a)
-    const b_value = value_punishments(b)
+      const a_value = value_punishments(a)
+      const b_value = value_punishments(b)
 
-    if (a_value !== b_value) {
-      return b_value - a_value
+      if (a_value !== b_value) {
+        return b_value - a_value
+      }
     }
 
     if (a.first_name === b.first_name) {
@@ -68,7 +71,6 @@ export function getSortGroupUsersFunc(
   }
 }
 
-export function sortGroupUsers(members: GroupUser[], punishmentTypes: PunishmentType[]) {
-  const punishmentMap = new Map(punishmentTypes.map((pt) => [pt.punishment_type_id, pt]))
-  return members.sort(getSortGroupUsersFunc(punishmentMap))
+export function sortGroupUsers(members: GroupUser[], punishmentTypes: Record<string, PunishmentType>) {
+  return members.sort(getSortGroupUsersFunc(punishmentTypes))
 }

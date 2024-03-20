@@ -3,32 +3,18 @@ import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useRef, useState }
 import { Modal } from "../../../components/modal"
 import { TextInput } from "../../../components/input/TextInput"
 import { Transition } from "@headlessui/react"
-import axios from "axios"
-import { VengefulApiError, getPostGroupUrl } from "../../../helpers/api"
 import { useErrorControl } from "../../../helpers/form"
 import { useMutation } from "@tanstack/react-query"
-import { useMyGroupsRefetch } from "../../../helpers/context/myGroupsRefetchContext"
-import { useNotification } from "../../../helpers/context/notificationContext"
-import { z } from "zod"
-import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
+import { GroupCreate, GroupCreateType } from "../../../helpers/types"
+import { postGroupMutation } from "../../../helpers/api"
 
 interface CreateGroupModalProps {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
 
-const GroupCreate = z.object({
-  name: z.string().min(3, { message: "Navn må være minst tre tegn" }),
-  name_short: z.string().min(3, { message: "Kort navn må være minst tre tegn" }),
-})
-
-type GroupCreateType = z.infer<typeof GroupCreate>
-
 export const CreateGroupModal: FC<CreateGroupModalProps> = ({ open, setOpen }) => {
   const ref = useRef(null)
-  const { setNotification } = useNotification()
-  const { myGroupsRefetch } = useMyGroupsRefetch()
-  const { setPreferredGroupShortName } = useGroupNavigation()
 
   const [createGroupData, setCreateGroupData] = useState<GroupCreateType>({
     name: "",
@@ -51,34 +37,11 @@ export const CreateGroupModal: FC<CreateGroupModalProps> = ({ open, setOpen }) =
 
     if (!data.success) return false
 
-    createGroupMutate()
+    createGroupMutation()
     return true
   }
 
-  const { mutate: createGroupMutate } = useMutation(async () => await axios.post(getPostGroupUrl(), createGroupData), {
-    onSuccess: () => {
-      if (myGroupsRefetch) {
-        setPreferredGroupShortName(createGroupData.name_short)
-        myGroupsRefetch()
-      }
-      setCreateGroupData({
-        name: "",
-        name_short: "",
-      })
-      setNotification({
-        type: "success",
-        title: "Gruppe opprettet",
-        text: "Gruppen ble opprettet",
-      })
-    },
-    onError: (e: VengefulApiError) => {
-      setNotification({
-        type: "error",
-        title: "Kunne ikke opprette gruppen",
-        text: e.response.data.detail,
-      })
-    },
-  })
+  const { mutate: createGroupMutation } = useMutation(postGroupMutation(createGroupData))
 
   return (
     <Transition.Root show={open} as={Fragment}>

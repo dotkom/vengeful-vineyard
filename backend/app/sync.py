@@ -1,6 +1,7 @@
 """Contains methods for syncing users from OW."""
 
 import asyncio
+import sentry_sdk
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Optional, cast
 
@@ -78,35 +79,39 @@ class OWSync:
         user_id: UserId,
         wait_for_updates: bool = True,
     ) -> None:
-        groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
-        filtered_groups_data = [
-            g
-            for g in groups_data["results"]
-            if g["id"] not in IGNORE_OW_GROUPS
-            and g["group_type"] in ("committee", "node_committee")
-        ]
+        try:
+            groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
+            filtered_groups_data = [
+                g
+                for g in groups_data["results"]
+                if g["id"] not in IGNORE_OW_GROUPS
+                and g["group_type"] in ("committee", "node_committee")
+            ]
 
-        tasks = [
-            asyncio.create_task(self.sync_group_for_user(ow_user_id, g))
-            for g in filtered_groups_data
-        ]
+            tasks = [
+                asyncio.create_task(self.sync_group_for_user(ow_user_id, g))
+                for g in filtered_groups_data
+            ]
 
-        if wait_for_updates:
-            await asyncio.gather(*tasks)
-        else:
-            # Only wait for the tasks if the user needs to me added or removed from
-            # one or more groups.
-            db_groups_res = await self.app.db.users.get_groups(user_id)
-            db_groups = {g.ow_group_id: g for g in db_groups_res if g is not None}
-
-            sum_ow_groups = 0
-            for group in filtered_groups_data:
-                if group.id in db_groups:
-                    sum_ow_groups += 1
-
-            # Only wait for the tasks if we need to add or remove the user from one or more groups
-            if sum_ow_groups != len(filtered_groups_data):
+            if wait_for_updates:
                 await asyncio.gather(*tasks)
+            else:
+                # Only wait for the tasks if the user needs to me added or removed from
+                # one or more groups.
+                db_groups_res = await self.app.db.users.get_groups(user_id)
+                db_groups = {g.ow_group_id: g for g in db_groups_res if g is not None}
+
+                sum_ow_groups = 0
+                for group in filtered_groups_data:
+                    if group.id in db_groups:
+                        sum_ow_groups += 1
+
+                # Only wait for the tasks if we need to add or remove the user from one or more groups
+                if sum_ow_groups != len(filtered_groups_data):
+                    await asyncio.gather(*tasks)
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+            print("Error reported to Sentry")
 
     async def create_user_if_not_exists(
         self,
