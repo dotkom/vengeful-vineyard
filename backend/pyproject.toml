@@ -24,7 +24,7 @@ networkx = "^3.2.1"
 sentry-sdk = "^1.42.0"
 
 [tool.poetry.dev-dependencies]
-black = "^22.6.0"
+black = "^24.3.0"
 isort = "^5.10.1"
 mypy = "^0.961"
 pre-commit = "^2.20.0"
