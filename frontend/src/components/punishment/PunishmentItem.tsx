@@ -19,6 +19,7 @@ import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 import { useConfirmModal } from "../../helpers/context/modal/confirmModalContext"
 import { usePermission } from "../../helpers/permissions"
+import Tooltip from "../tooltip/Tooltip"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

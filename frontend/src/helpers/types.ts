@@ -23,6 +23,7 @@ export const PunishmentReactionSchema = z.object({
   punishment_id: z.string(),
   created_by: z.string(),
   created_at: z.string(),
+  created_by_name: z.string(),
   emoji: z.string(),
 })
 export type PunishmentReaction = z.infer<typeof PunishmentReactionSchema>
