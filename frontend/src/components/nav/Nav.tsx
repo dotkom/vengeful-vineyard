@@ -153,7 +153,7 @@ export const Nav = ({ auth }: NavProps) => {
                               onClick={() => setDarkMode(!darkMode)}
                               className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm")}
                             >
-                              {darkMode ? "Lightmode" : "Darkmode"}
+                              {darkMode ? "Light mode" : "Dark mode"}
                             </button>
                             {auth.isAuthenticated ? (
                               <button
