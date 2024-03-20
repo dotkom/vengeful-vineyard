@@ -1,20 +1,4 @@
 const { mauve, violet } = require("@radix-ui/colors")
-const brand = {}
-
-const slate = {
-  1: "#151718",
-  2: "#1a1d1e",
-  3: "#202425",
-  4: "#26292b",
-  5: "#2b2f31",
-  6: "#313538",
-  7: "#3a3f42",
-  8: "#4c5155",
-  9: "#697177",
-  10: "#787f85",
-  11: "#9ba1a6",
-  12: "#ecedee",
-}
 
 const blue = {
   1: "#0f1720",
@@ -29,51 +13,6 @@ const blue = {
   10: "#369eff",
   11: "#52a9ff",
   12: "#eaf6ff",
-}
-
-const amber = {
-  1: "#1f1300",
-  2: "#271700",
-  3: "#341c00",
-  4: "#3f2200",
-  5: "#4a2900",
-  6: "#573300",
-  7: "#693f05",
-  8: "#824e00",
-  9: "#ffb224",
-  10: "#ffcb47",
-  11: "#f1a10d",
-  12: "#fef3dd",
-}
-
-const green = {
-  1: "#0d1912",
-  2: "#0c1f17",
-  3: "#0f291e",
-  4: "#113123",
-  5: "#133929",
-  6: "#164430",
-  7: "#1b543a",
-  8: "#236e4a",
-  9: "#30a46c",
-  10: "#3cb179",
-  11: "#4cc38a",
-  12: "#e5fbeb",
-}
-
-const red = {
-  1: "#1d1412",
-  2: "#2a1410",
-  3: "#3b1813",
-  4: "#481a14",
-  5: "#541c15",
-  6: "#652016",
-  7: "#7f2315",
-  8: "#a42a12",
-  9: "#e54d2e",
-  10: "#ec5e41",
-  11: "#f16a50",
-  12: "#feefec",
 }
 
 /** @type {import('tailwindcss').Config} */
@@ -96,10 +35,16 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)", overflow: "visible" },
           to: { height: 0, overflow: "hidden" },
         },
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "20%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         slideDown: "slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1)",
         slideUp: "slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1)",
+        fadeIn: "fadeIn 800ms ease-out forwards",
       },
     },
   },
