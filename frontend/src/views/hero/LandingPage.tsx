@@ -31,13 +31,14 @@ export const LandingPage = () => {
       <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-8">
           <h1 className="md:mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl dark:text-gray-100">
-            Vengeful Vineyard
+            Vinstraff.no
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Vengeful Vineyard er en mystisk og hensynsløs vinmark kjent for å ha en uforklarlig historie med hevn og
-            ondskap. Folk sier at den eies av en gammel familie med dype røtter i vinsmaking, men at den også er
-            hjemsøkt av en ubarmhjertig kraft som straffer de som våger å stjele eller ødelegge avlingene. Ingenting kan
-            forberede deg på de overnaturlige konsekvensene som følger med å bryte lovene som styrer denne vingården.
+            Vinstraff.no er en mystisk og urokkelig vingård kjent for sin uforklarlige historie med rettferdighet og
+            straff. Det sies at den drives av en gammel familie med dype tradisjoner i vinproduksjon, men også at den
+            voktes av en nådeløs kraft som straffer dem som tør å stjele fra eller skade avlingene. Ingen forberedelser
+            kan skjerme deg fra de overnaturlige konsekvensene som oppstår ved å utfordre de strenge reglene som hersker
+            over denne vingården.
           </p>
           <div className="mt-4 flex items-center gap-x-2">
             {!auth.isAuthenticated ? (
