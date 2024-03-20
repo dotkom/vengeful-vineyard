@@ -24,22 +24,30 @@ Under development 🚧
 - [Tailwind](https://tailwindcss.com/)
 - [Vite](https://vitejs.dev/)
 
+### Doppler
+
+We use [Doppler](https://docs.doppler.com) to manage secrets. After installation, set up using:
+
+- `doppler login`
+- `doppler setup`
+  - (select vengeful-vineyard, dev)
+
 ### Installation and running locally
 
-* `cd frontend`
-* `pnpm i`
-* `pnpm dev`
-
+- `cd frontend`
+- `pnpm i`
+- `doppler run pnpm dev`
 
 ## Backend
 
 Created with [FastAPI](https://fastapi.tiangolo.com) and PostgreSQL.
 
-### (Recommended) Running locally with docker compose
-* Make sure you have docker and docker compose installed.
-* `cd backend`
-* Start server with: `make dev`
-* Go to: http://localhost:8000/docs for Swagger docs
+#### (Recommended) Running locally with docker compose
+
+- Make sure you have docker and docker compose installed.
+- `cd backend`
+- Start server with: `make dev`
+- Go to: http://localhost:8000/docs for Swagger docs
 
 ## Contributing
 
@@ -50,16 +58,23 @@ Before contributing, make sure to install pre-commit hooks with `pre-commit inst
 If you don't have `pre-commit` installed, you can install it with `pip install pre-commit` or `brew install pre-commit`
 
 ## Deploying changes
-* Install AWS CLI
-* `aws configure` - Get credentials from doppler: `monoweb/dev`
 
+- Install AWS CLI
+- `aws configure` - Get credentials from doppler: `monoweb/dev`
 
 ### Backend Deployment Instructions
-* `cd backend`
-* `make deploy`
+
+- `cd backend`
+- `make deploy`
 
 ### Frontend Deployment Instructions
-* `doppler login`
-* `doppler setup` - (select vengeful-vineyard, dev)
-* `cd frontend`
-* `pnpm build`
+
+- `doppler login`
+- `doppler setup` - (select vengeful-vineyard, dev)
+- `cd frontend`
+- `doppler run pnpm build`
+
+### Debugging Tips
+
+- Delete `/backend/postgres-data`
+- `docker-compose up --build`
