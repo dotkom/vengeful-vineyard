@@ -134,7 +134,4 @@ def init_api(**db_settings: str) -> FastAPI:
     return app
 
 
-print(os.environ)
-exit(69)
-
 asgi_app = init_api()
