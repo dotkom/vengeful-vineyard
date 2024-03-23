@@ -12,7 +12,16 @@ import {
 
 export const FeedbackSection = () => (
   <div className="text-slate-12 flex flex-col text-center font-medium">
-    <div>Feil på nettsiden?</div>
+    <div>
+      <span
+        onClick={() => {
+          throw new Error("Test error")
+        }}
+      >
+        Feil
+      </span>{" "}
+      på nettsiden?
+    </div>
     <div>
       Ta kontakt med{" "}
       <a className="text-red-600" href="mailto:dotkom@online.ntnu.no">
