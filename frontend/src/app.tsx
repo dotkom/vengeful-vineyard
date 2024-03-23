@@ -14,8 +14,6 @@ import { GroupNavigationProvider } from "./helpers/context/groupNavigationContex
 import { MyGroupsRefetchProvider } from "./helpers/context/myGroupsRefetchContext"
 import { ConfirmModalProvider } from "./helpers/context/modal/confirmModalContext"
 
-// envSchema.parse(import.meta.env)
-
 const queryClient = new QueryClient()
 
 const configuration: AuthProviderProps = {
