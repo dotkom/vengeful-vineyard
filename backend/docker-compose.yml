@@ -12,6 +12,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - SENTRY_DSN
+      - SENTRY_ENVIRONMENT
 
   db:
     image: postgres:15.6-alpine

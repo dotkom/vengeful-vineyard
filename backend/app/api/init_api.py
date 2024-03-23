@@ -5,8 +5,10 @@ Sets up the API (FastAPI)
     * Events
 """
 
-import logging
 import sentry_sdk
+import logging
+import os
+
 from timeit import default_timer as timer
 from typing import Any
 
@@ -25,10 +27,12 @@ from . import APIRoute, FastAPI, Request
 
 logging.basicConfig(level=logging.DEBUG if settings.debug else logging.INFO)
 
-sentry_sdk.init(
-    dsn="https://80cad5acf775f3d9222169585e83249f@o93837.ingest.us.sentry.io/4506824149237760",
-    enable_tracing=True
-)
+if "SENTRY_DSN" in os.environ:
+    sentry_sdk.init(
+        dsn=os.environ["SENTRY_DSN"],
+        enable_tracing=True,
+        environment=os.environ.get("SENTRY_ENVIRONMENT") or "DEFAULT"
+    )
 
 
 def init_middlewares(app: FastAPI) -> None:
@@ -129,5 +133,8 @@ def init_api(**db_settings: str) -> FastAPI:
     init_events(app, **db_settings)
     return app
 
+
+print(os.environ)
+exit(69)
 
 asgi_app = init_api()
