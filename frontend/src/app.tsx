@@ -15,27 +15,29 @@ import { ConfirmModalProvider } from "./helpers/context/modal/confirmModalContex
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom"
 import * as Sentry from "@sentry/react"
 
-Sentry.init({
-  dsn: import.meta.env.SENTRY_FRONTEND_DSN,
-  environment: import.meta.env.SENTRY_ENVIRONMENT,
-  integrations: [
-    Sentry.reactRouterV6BrowserTracingIntegration({
-      useEffect: React.useEffect,
-      useLocation,
-      useNavigationType,
-      createRoutesFromChildren,
-      matchRoutes,
-    }),
-    Sentry.replayIntegration(),
-  ],
+if (import.meta.env.SENTRY_FRONTEND_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.SENTRY_FRONTEND_DSN,
+    environment: import.meta.env.SENTRY_ENVIRONMENT,
+    integrations: [
+      Sentry.reactRouterV6BrowserTracingIntegration({
+        useEffect: React.useEffect,
+        useLocation,
+        useNavigationType,
+        createRoutesFromChildren,
+        matchRoutes,
+      }),
+      Sentry.replayIntegration(),
+    ],
 
-  tracesSampleRate: 1.0,
+    tracesSampleRate: 1.0,
 
-  tracePropagationTargets: ["localhost", "api.staging.vinstraff.no", "api.vinstraff.no"],
+    tracePropagationTargets: ["localhost", "api.staging.vinstraff.no", "api.vinstraff.no"],
 
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
-})
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  })
+}
 
 const queryClient = new QueryClient()
 
