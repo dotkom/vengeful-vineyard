@@ -315,8 +315,8 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
               />
               {groupData.ow_group_id === null && (
                 <TextInput
-                  label="Invitasjonslenke"
-                  placeholder="Invitasjonslenke er skrudd av"
+                  label="Invitasjonslink"
+                  placeholder="Invitasjonslink er skrudd av"
                   contentEditable={false}
                   value={editGroupData.invite_code ? getInviteLink() : ""}
                   disabled={true}
