@@ -314,6 +314,7 @@ class Groups:
                     FROM
                         unnest($1::group_members[]) as m
                     )
+                    ON CONFLICT (group_id, user_id) DO NOTHING
                     RETURNING *
                     """
 

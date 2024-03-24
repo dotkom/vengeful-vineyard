@@ -346,7 +346,7 @@ class Users:
 
             result = await conn.fetch(query, user_id)
             return [Group(**row) for row in result]
-        
+
     async def get_minified_leaderboard(
         self,
         offset: int,
@@ -355,11 +355,11 @@ class Users:
     ) -> list[MinifiedLeaderboardUser]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
-            SELECT 
-                DISTINCT u.user_id, 
-                u.first_name, 
-                u.last_name, 
-                u.email, 
+            SELECT
+                DISTINCT u.user_id,
+                u.first_name,
+                u.last_name,
+                u.email,
                 u.ow_user_id,
                 COALESCE(p.total_value, 0) AS total_value,
                 COALESCE(p.emojis, '') AS emojis,
@@ -367,7 +367,7 @@ class Users:
                 COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments
             FROM users u
             LEFT JOIN (
-                SELECT 
+                SELECT
                     p.user_id,
                     SUM(pt.value * p.amount) AS total_value,
                     STRING_AGG(REPEAT(pt.emoji, p.amount), '') AS emojis,
@@ -405,7 +405,7 @@ class Users:
     ) -> list[LeaderboardPunishmentRead]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
-            SELECT 
+            SELECT
                 gp.*,
                 CONCAT(COALESCE(NULLIF(users.first_name, ''), users.email), ' ', users.last_name) AS created_by_name,
                 COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions,
@@ -425,6 +425,7 @@ class Users:
                 SELECT pr1.*
                 FROM punishment_reactions pr1
                 JOIN group_members gm ON pr1.created_by = gm.user_id
+                GROUP BY pr1.punishment_reaction_id
             ) pr ON pr.punishment_id = gp.punishment_id
             LEFT JOIN users ON gp.created_by = users.user_id
             WHERE gp.user_id = $1
@@ -435,5 +436,5 @@ class Users:
                 query,
                 user_id,
             )
-        
+
         return [LeaderboardPunishmentRead(**r) for r in res]

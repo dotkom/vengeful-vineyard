@@ -580,7 +580,7 @@ export const groupLeaderboardQuery = (
   queryKey: ["groupLeaderboard", groupId],
   queryFn: () => axios.get(getGroupUrl(z.string().parse(groupId))).then((res) => GroupSchema.parse(res.data)),
   enabled: groupId !== undefined,
-  staleTime: 1000,
+  staleTime: 1000 * 60,
 })
 
 export const publicGroupQuery = (groupNameShort?: string) => ({
@@ -590,7 +590,7 @@ export const publicGroupQuery = (groupNameShort?: string) => ({
       .get(BASE_URL + `/groups/public_profiles/${z.string().parse(groupNameShort)}`)
       .then((res) => PublicGroupSchema.parse(res.data)),
   enabled: groupNameShort !== undefined,
-  staleTime: 1000,
+  staleTime: 1000 * 60,
 })
 
 export const userQuery = () => {
@@ -604,7 +604,7 @@ export const userQuery = () => {
       return MeUserSchema.parse(user)
     },
     enabled: auth.isAuthenticated,
-    staleTime: 1000,
+    staleTime: 1000 * 60,
   }
 }
 
@@ -614,7 +614,7 @@ export const committeesQuery = () => ({
     axios.get(GROUP_STATISTICS_URL).then((res: AxiosResponse<GroupStatistics[]>) => {
       return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
     }),
-  staletime: 1000,
+  staletime: 1000 * 60,
 })
 
 const getLeaderboard = async ({ pageParam = 0 }) =>
@@ -633,5 +633,5 @@ export const leaderboardQuery = (): UseInfiniteQueryOptions<
     const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
     return nextPage ? Number(nextPage) : undefined
   },
-  staleTime: 1000,
+  staleTime: 1000 * 60,
 })

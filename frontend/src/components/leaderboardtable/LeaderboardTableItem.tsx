@@ -23,7 +23,7 @@ export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, dat
   const { data: punishments, isLoading: isLoadingPunishments } = useQuery<LeaderboardPunishment[]>(
     ["leaderboardUserPunishments", leaderboardUser.user_id],
     () => axios.get(getLeaderboardUserPunishmentsUrl(leaderboardUser.user_id)).then((res) => res.data),
-    { enabled: isCurrentlyExpanded }
+    { enabled: isCurrentlyExpanded, staleTime: 1000 * 60 }
   )
 
   const countOfEachEmojiInString = (str: string) => {
