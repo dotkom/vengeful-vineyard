@@ -11,7 +11,7 @@ export const Menu: FC<MenuProps> = ({ icon, items }) => {
   return (
     <HeadlessUiMenu as="div" className="relative">
       <div>
-        <HeadlessUiMenu.Button className="flex rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-2">
+        <HeadlessUiMenu.Button className="flex rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-2">
           {icon}
         </HeadlessUiMenu.Button>
       </div>

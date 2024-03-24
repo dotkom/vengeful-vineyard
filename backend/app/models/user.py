@@ -41,3 +41,10 @@ class LeaderboardPunishmentOut(PunishmentOut):
 class LeaderboardUser(User):
     punishments: list[LeaderboardPunishmentOut]
     total_value: int
+
+  
+class MinifiedLeaderboardUser(User):
+    total_value: int
+    emojis: str
+    amount_punishments: int
+    amount_unique_punishments: int

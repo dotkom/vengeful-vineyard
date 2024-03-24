@@ -5,7 +5,8 @@ from asyncpg.exceptions import UniqueViolationError
 
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group
-from app.models.user import LeaderboardUser, User, UserCreate, UserUpdate
+from app.models.user import LeaderboardUser, MinifiedLeaderboardUser, User, UserCreate, UserUpdate
+from app.models.punishment import LeaderboardPunishmentRead
 from app.types import InsertOrUpdateUser, OWUserId, UserId
 from app.utils.db import MaybeAcquire
 
@@ -43,93 +44,6 @@ class Users:
             )
             assert isinstance(res, int)
             return res
-
-    async def get_leaderboard(
-        self,
-        offset: int,
-        limit: int,
-        force_include_reasons: bool = False,
-        conn: Optional[Pool] = None,
-    ) -> list[LeaderboardUser]:
-        async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """
-                    WITH punishments_with_reactions AS (
-                        SELECT
-                            gp.*,
-                            COALESCE(NULLIF(u.first_name, ''), u.email) || ' ' || u.last_name as created_by_name,
-                            COALESCE(json_agg(json_build_object(
-                                'punishment_reaction_id', pr.punishment_reaction_id,
-                                'punishment_id', pr.punishment_id,
-                                'emoji', pr.emoji,
-                                'created_at', pr.created_at,
-                                'created_by', pr.created_by,
-                                'created_by_name', (SELECT COALESCE(NULLIF(first_name, ''), email) || ' ' || last_name FROM users WHERE user_id = pr.created_by)
-                            )) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
-                        FROM group_punishments gp
-                        LEFT JOIN punishment_reactions pr
-                            ON pr.punishment_id = gp.punishment_id
-                        LEFT JOIN users u
-                            ON u.user_id = gp.created_by
-                        LEFT JOIN groups g
-                            ON g.group_id = gp.group_id
-                        WHERE g.ow_group_id IS NOT NULL OR special
-                        GROUP BY gp.punishment_id, created_by_name
-                    )
-                    SELECT u.*,
-                        COALESCE(json_agg(
-                            json_build_object(
-                                'punishment_id', pwr.punishment_id,
-                                'user_id', pwr.user_id,
-                                'punishment_type_id', pwr.punishment_type_id,
-                                'reason', pwr.reason,
-                                'reason_hidden', pwr.reason_hidden,
-                                'amount', pwr.amount,
-                                'created_by', pwr.created_by,
-                                'created_by_name', pwr.created_by_name,
-                                'created_at', pwr.created_at,
-                                'group_id', pwr.group_id,
-                                'paid', pwr.paid,
-                                'paid_at', pwr.paid_at,
-                                'marked_paid_by', pwr.marked_paid_by,
-                                'reactions', pwr.reactions,
-                                'punishment_type', (SELECT json_build_object(
-                                    'punishment_type_id', pt.punishment_type_id,
-                                    'name', pt.name,
-                                    'value', pt.value,
-                                    'emoji', pt.emoji,
-                                    'created_at', pt.created_at,
-                                    'created_by', pt.created_by,
-                                    'updated_at', pt.updated_at
-                                ) FROM punishment_types pt WHERE pt.punishment_type_id = pwr.punishment_type_id)
-                            )
-                        ) FILTER (WHERE pwr.punishment_id IS NOT NULL), '[]') AS punishments,
-                        COALESCE(SUM(pwr.amount * pt.value), 0) as total_value
-                    FROM users u
-                    LEFT JOIN punishments_with_reactions pwr
-                        ON pwr.user_id = u.user_id
-                    LEFT JOIN punishment_types pt
-                        ON pt.punishment_type_id = pwr.punishment_type_id
-                    INNER JOIN groups g
-                        ON g.group_id = pwr.group_id AND g.ow_group_id IS NOT NULL OR special
-                    GROUP BY u.user_id
-                    ORDER BY total_value DESC, u.first_name ASC
-                    OFFSET $1
-                    LIMIT $2"""
-            res = await conn.fetch(
-                query,
-                offset,
-                limit,
-            )
-
-            users = [LeaderboardUser(**r) for r in res]
-
-            if not force_include_reasons:
-                for user in users:
-                    for punishment in user.punishments:
-                        if punishment.reason_hidden:
-                            punishment.reason = ""
-
-            return users
 
     async def get_all_raw(
         self,
@@ -432,3 +346,95 @@ class Users:
 
             result = await conn.fetch(query, user_id)
             return [Group(**row) for row in result]
+
+    async def get_minified_leaderboard(
+        self,
+        offset: int,
+        limit: int,
+        conn: Optional[Pool] = None,
+    ) -> list[MinifiedLeaderboardUser]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """
+            SELECT
+                DISTINCT u.user_id,
+                u.first_name,
+                u.last_name,
+                u.email,
+                u.ow_user_id,
+                COALESCE(p.total_value, 0) AS total_value,
+                COALESCE(p.emojis, '') AS emojis,
+                COALESCE(p.amount_punishments, 0) AS amount_punishments,
+                COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments
+            FROM users u
+            LEFT JOIN (
+                SELECT
+                    p.user_id,
+                    SUM(pt.value * p.amount) AS total_value,
+                    STRING_AGG(REPEAT(pt.emoji, p.amount), '') AS emojis,
+                    SUM(p.amount) AS amount_punishments,
+                    COUNT(DISTINCT p.punishment_type_id) AS amount_unique_punishments
+                FROM group_punishments p
+                LEFT JOIN punishment_types pt
+                    ON pt.punishment_type_id = p.punishment_type_id
+                LEFT JOIN groups g
+                    ON g.group_id = p.group_id
+                WHERE g.ow_group_id IS NOT NULL
+                GROUP BY p.user_id
+            ) p ON p.user_id = u.user_id
+            LEFT JOIN group_members gm
+                ON gm.user_id = u.user_id
+            LEFT JOIN groups g
+                ON g.group_id = gm.group_id
+            WHERE g.ow_group_id IS NOT NULL OR g.special
+            ORDER BY total_value DESC, u.first_name ASC
+            OFFSET $1
+            LIMIT $2
+            """
+            res = await conn.fetch(
+                query,
+                offset,
+                limit,
+            )
+
+        return [MinifiedLeaderboardUser(**r) for r in res]
+
+    async def get_punishments_for_leaderboard_user(
+        self,
+        user_id: UserId,
+        conn: Optional[Pool] = None,
+    ) -> list[LeaderboardPunishmentRead]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """
+            SELECT
+                gp.*,
+                CONCAT(COALESCE(NULLIF(users.first_name, ''), users.email), ' ', users.last_name) AS created_by_name,
+                COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions,
+                json_build_object(
+                    'punishment_type_id', pt.punishment_type_id,
+                    'name', pt.name,
+                    'value', pt.value,
+                    'emoji', pt.emoji,
+                    'created_at', pt.created_at,
+                    'created_by', pt.created_by,
+                    'updated_at', pt.updated_at
+                ) AS punishment_type
+            FROM group_punishments gp
+            LEFT JOIN punishment_types pt
+                ON pt.punishment_type_id = gp.punishment_type_id
+            LEFT JOIN (
+                SELECT pr1.*
+                FROM punishment_reactions pr1
+                JOIN group_members gm ON pr1.created_by = gm.user_id
+                GROUP BY pr1.punishment_reaction_id
+            ) pr ON pr.punishment_id = gp.punishment_id
+            LEFT JOIN users ON gp.created_by = users.user_id
+            WHERE gp.user_id = $1
+            GROUP BY gp.punishment_id, created_by_name, pt.punishment_type_id
+            ORDER BY gp.created_at DESC
+            """
+            res = await conn.fetch(
+                query,
+                user_id,
+            )
+
+        return [LeaderboardPunishmentRead(**r) for r in res]

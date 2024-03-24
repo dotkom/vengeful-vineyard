@@ -4,6 +4,7 @@ import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanst
 import { Fragment } from "react"
 import { PunishmentActionBar } from "./PunishmentActionBar"
 import { PunishmentItem } from "./PunishmentItem"
+import { SkeletonPunishmentItem } from "./SkeletonPunishmentItem"
 
 interface PunishmentListProps {
   groupUser?: GroupUser
@@ -11,6 +12,7 @@ interface PunishmentListProps {
   groupId?: string
   punishments: Punishment[]
   punishmentTypes?: Record<string, PunishmentType>
+  isLoadingPunishments?: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
@@ -23,8 +25,13 @@ export const PunishmentList = ({
   groupId,
   punishments,
   punishmentTypes,
+  isLoadingPunishments = false,
   dataRefetch,
 }: PunishmentListProps) => {
+  if (isLoadingPunishments) {
+    return <SkeletonPunishmentItem />
+  }
+
   if (punishments.length === 0) {
     return <Fragment>{groupUser && <PunishmentActionBar label="Ingen straffer" user={groupUser} />}</Fragment>
   }

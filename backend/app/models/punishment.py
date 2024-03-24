@@ -5,6 +5,7 @@ Models for punishment data structures
 from datetime import datetime
 from typing import Optional
 
+from app.models.punishment_type import PunishmentTypeRead
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 from app.models.punishment_reaction import PunishmentReactionRead
@@ -40,6 +41,10 @@ class PunishmentOut(PunishmentCreate):
 class PunishmentRead(PunishmentOut):
     group_id: GroupId
     user_id: UserId
+
+
+class LeaderboardPunishmentRead(PunishmentRead):
+    punishment_type: PunishmentTypeRead
 
 
 class PunishmentStreaks(BaseModel):

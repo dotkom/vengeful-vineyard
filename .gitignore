@@ -50,3 +50,4 @@ dist-ssr
 
 tmpMock.ts
 .python-version
+.env

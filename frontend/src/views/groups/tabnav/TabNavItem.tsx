@@ -31,17 +31,18 @@ export const TabNavItem = ({ group, selectedGroup, ...props }: TabNavItemProps) 
       aria-current={group.group_id ? "page" : undefined}
       {...props}
     >
-      <GroupIcon
-        className={classNames(
-          group.name_short === selectedGroup?.name_short
-            ? "text-gray-900 dark:text-gray-100"
-            : "text-gray-500 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-gray-100",
-          "-mt-1 h-6 w-6 md:h-7 md:w-7",
-          group.image ? "grayscale dark:invert" : ""
-        )}
-        aria-hidden="true"
-      />
-      <span>{group.name_short}</span>
+      <div className="-mt-1 h-6 w-6 md:h-7 md:w-7">
+        <GroupIcon
+          className={classNames(
+            group.name_short === selectedGroup?.name_short
+              ? "text-gray-900 dark:text-gray-100"
+              : "text-gray-500 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-gray-100",
+            group.image !== "NoImage" && group.image ? "grayscale dark:invert" : ""
+          )}
+          aria-hidden="true"
+        />
+      </div>
+      <span className="whitespace-nowrap">{group.name_short}</span>
     </a>
   )
 }

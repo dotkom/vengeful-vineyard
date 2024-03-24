@@ -93,7 +93,9 @@ export type LeaderboardPunishment = z.infer<typeof LeaderboardPunishmentSchema>
 
 export const LeaderboardUserSchema = UserSchema.extend({
   total_value: z.number(),
-  punishments: z.array(LeaderboardPunishmentSchema),
+  emojis: z.string(),
+  amount_punishments: z.number(),
+  amount_unique_punishments: z.number(),
 })
 export type LeaderboardUser = z.infer<typeof LeaderboardUserSchema>
 

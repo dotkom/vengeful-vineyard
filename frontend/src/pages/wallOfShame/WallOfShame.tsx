@@ -1,7 +1,7 @@
-import { useAuth } from "react-oidc-context"
 import { LeaderboardTable } from "../../components/leaderboardtable"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { leaderboardQuery } from "../../helpers/api"
+import { Button } from "../../components/button/Button"
 
 export const WallOfShame = () => {
   const { isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(leaderboardQuery())
@@ -15,8 +15,10 @@ export const WallOfShame = () => {
         leaderboardUsers={leaderboardUsers}
         isFetching={isFetching}
         dataRefetch={refetch}
-        fetchNextPage={fetchNextPage}
       />
+      <Button variant="OUTLINE" onClick={() => fetchNextPage().then()} className="mx-auto mt-4">
+        Last inn mer
+      </Button>
     </section>
   )
 }

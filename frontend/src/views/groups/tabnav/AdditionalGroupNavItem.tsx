@@ -33,8 +33,8 @@ export const AdditionalGroupNavItem = () => {
     <div className="-ml-2 -mt-2">
       <Menu
         icon={
-          <span className="text-gray-700 opacity-70 hover:opacity-90">
-            <PlusIcon className="h-5 w-5 md:h-[1.6rem] md:w-[1.6rem]" />
+          <span className="text-gray-900/70 dark:text-gray-300/70 hover:opacity-90">
+            <PlusIcon className="h-6 w-6" />
           </span>
         }
         items={listItems}

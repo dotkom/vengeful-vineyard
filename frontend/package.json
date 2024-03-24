@@ -36,6 +36,7 @@
     "react-router-dom": "^6.15.0",
     "react-simple-oauth2-login": "^0.5.4",
     "react-table": "^7.8.0",
+    "tailwind-scrollbar-hide": "^1.1.7",
     "zod": "^3.22.4"
   },
   "devDependencies": {
