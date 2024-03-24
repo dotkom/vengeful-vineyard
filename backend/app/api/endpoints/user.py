@@ -2,13 +2,15 @@
 User endpoints
 """
 
+from app.models.punishment import LeaderboardPunishmentRead
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api import APIRoute, Request, oidc
 from app.exceptions import NotFound
 from app.models.group import UserWithGroups
-from app.models.user import LeaderboardUser
+from app.models.user import MinifiedLeaderboardUser
 from app.utils.pagination import Page, Pagination
+from app.types import UserId
 
 router = APIRouter(
     prefix="/users",
@@ -61,14 +63,14 @@ async def get_me(
 
 @router.get(
     "/leaderboard",
-    response_model=Page[LeaderboardUser],
+    response_model=Page[MinifiedLeaderboardUser],
     dependencies=[Depends(oidc)],
 )
 async def get_leadeboard(
     request: Request,
     page: int = Query(title="Page number", default=0, ge=0),
     page_size: int = Query(title="Page size", default=30, ge=1, le=50),
-) -> Page[LeaderboardUser]:
+) -> Page[MinifiedLeaderboardUser]:
     access_token = request.raise_if_missing_authorization()
 
     app = request.app
@@ -81,11 +83,29 @@ async def get_leadeboard(
                 status_code=403, detail="Du har ikke tilgang til denne ressursen"
             )
 
-        pagination = Pagination[LeaderboardUser](
+        pagination = Pagination[MinifiedLeaderboardUser](
             request=request,
             total_coro=app.db.users.get_leaderboard_count,
-            results_coro=app.db.users.get_leaderboard,
+            # results_coro=app.db.users.get_leaderboard,
+            results_coro=app.db.users.get_minified_leaderboard,
             page=page,
             page_size=page_size,
         )
         return await pagination.paginate(conn=conn)
+    
+@router.get(
+    "/leaderboard/punishments/{user_id}",
+    response_model=list[LeaderboardPunishmentRead],
+    dependencies=[Depends(oidc)],
+)
+async def get_user_punishments(
+    request: Request,
+    user_id: UserId,
+) -> list[LeaderboardPunishmentRead]:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    _, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        return await app.db.users.get_punishments_for_leaderboard_user(user_id, conn=conn)

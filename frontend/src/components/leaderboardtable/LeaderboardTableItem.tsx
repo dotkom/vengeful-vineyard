@@ -1,51 +1,43 @@
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query"
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQuery } from "@tanstack/react-query"
 import { LeaderboardPunishment, LeaderboardUser } from "../../helpers/types"
 import { AccordionContent, AccordionItem, AccordionTrigger } from "../accordion/Accordion"
 
 import { textToEmoji } from "../../helpers/emojies"
 import { PunishmentList } from "../punishment/PunishmentList"
-import { weeklyStreak } from "../../helpers/streaks"
+import axios from "axios"
+import { getLeaderboardUserPunishmentsUrl } from "../../helpers/api"
 
 interface TableItemProps {
   leaderboardUser: LeaderboardUser
+  isCurrentlyExpanded: boolean
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
   i?: number
 }
 
-export const LeaderboardTableItem = ({ leaderboardUser, dataRefetch, i }: TableItemProps) => {
-  const punishmentTypes = leaderboardUser.punishments.reduce((acc, punishment) => {
-    const oldValue = acc.get(punishment.punishment_type_id)
-    if (oldValue) {
-      acc.set(punishment.punishment_type_id, {
-        amount: oldValue.amount + punishment.amount,
-        punishment: punishment,
-      })
-    } else {
-      acc.set(punishment.punishment_type_id, { amount: punishment.amount, punishment: punishment })
-    }
-    return acc
-  }, new Map<string, { amount: number; punishment: LeaderboardPunishment }>())
+export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, dataRefetch, i }: TableItemProps) => {
+  const displayName = `${leaderboardUser.first_name} ${leaderboardUser.last_name}`
+  const { total_value: totalValue, emojis } = leaderboardUser
 
-  const totalPunishmentValue = leaderboardUser.punishments.reduce(
-    (acc, punishment) => acc + punishment.punishment_type.value * punishment.amount,
-    0
+  const { data: punishments, isLoading: isLoadingPunishments } = useQuery<LeaderboardPunishment[]>(
+    ["leaderboardUserPunishments", leaderboardUser.user_id],
+    () => axios.get(getLeaderboardUserPunishmentsUrl(leaderboardUser.user_id)).then((res) => res.data),
+    { enabled: isCurrentlyExpanded }
   )
 
-  // Punishment dates to number from most recent to oldest
-  const dateToNumber = leaderboardUser?.punishments
-    .map((punishment) => {
-      const date = punishment.created_at.slice(0, 10)
-      const [year, month, day] = date.split("-").map(Number)
-      return new Date(year, month - 1, day).getTime()
-    })
-    .reverse()
+  const countOfEachEmojiInString = (str: string) => {
+    const counts: Record<string, number> = {}
+    for (const char of str) {
+      counts[char] = counts[char] ? counts[char] + 1 : 1
+    }
+    return counts
+  }
 
-  const today = new Date().getTime()
-  const streak = weeklyStreak(today, dateToNumber)
-
-  const displayName = leaderboardUser.first_name && leaderboardUser.last_name ? `${leaderboardUser.first_name} ${leaderboardUser.last_name}` : leaderboardUser.email
+  const emojisCounts = countOfEachEmojiInString(emojis)
+  const sortedEmojis = Object.entries(emojisCounts)
+    .map(([emoji, count]) => ({ emoji, count }))
+    .sort((a, b) => b.count - a.count)
 
   return (
     <AccordionItem value={leaderboardUser.user_id}>
@@ -69,55 +61,28 @@ export const LeaderboardTableItem = ({ leaderboardUser, dataRefetch, i }: TableI
             >
               {displayName}
             </p>
-            <span className="text-gray-700 text-xs">{totalPunishmentValue}kr</span>
+            <span className="text-gray-700 text-xs">{totalValue}kr</span>
           </div>
         </div>
         <div className="flex items-center gap-x-4">
           <div className="flex flex-col items-end">
-            <p className="max-w-sm text-right hidden sm:block">
-              {leaderboardUser.punishments.map((punishment) =>
-                Array.from({ length: punishment.amount }, (_, i) => (
-                  <span
-                    key={`${punishment.punishment_id}/${i}`}
-                    className="text-lg"
-                    title={`${punishment.punishment_type.name} (${punishment.punishment_type.value}kr)`}
-                  >
-                    <span>{punishment.punishment_type.emoji}</span>
-                  </span>
-                ))
-              )}
-            </p>
-            <p className="max-w-sm text-center sm:hidden">
-              {Object.entries(punishmentTypes)
-                .sort(([, a], [, b]) => b.punishment.punishment_type.value - a.punishment.punishment_type.value)
-                .map(([_, { amount, punishment }], i) => [
-                  <span
-                    key={`${punishment.punishment_type_id}/${i}`}
-                    className="whitespace-nowrap"
-                    title={`${punishment.punishmentType.name} (${punishment.punishmentType.value}kr)`}
-                  >
-                    <span className="text-xs text-gray-800">{amount}x</span>
-                    <span className="text-lg">{punishment.punishmentType.emoji}</span>
-                  </span>,
-                ])}
+            <p className="max-w-sm text-center hidden sm:block">{emojis}</p>
+            <p className="max-w-sm text-center sm:hidden flex flex-row flex-wrap gap-x-2">
+              {sortedEmojis.map(({ emoji, count }) => (
+                <span key={emoji}>
+                  {emoji}
+                  {count}
+                </span>
+              ))}
             </p>
           </div>
         </div>
-        {streak > 2 && (
-          <div className="absolute right-12 cursor-default inline-block">
-            <span
-              className="text-lg"
-              title={`${displayName} har fått straffer ${streak} uker på rad`}
-            >
-              {streak} 🔥
-            </span>
-          </div>
-        )}
       </AccordionTrigger>
       <AccordionContent>
         <PunishmentList
           userId={leaderboardUser.user_id}
-          punishments={leaderboardUser.punishments}
+          punishments={punishments || []}
+          isLoadingPunishments={isLoadingPunishments}
           isGroupContext={false}
           dataRefetch={dataRefetch}
         />

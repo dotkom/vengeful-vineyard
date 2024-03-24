@@ -35,6 +35,8 @@ const LEADERBOARD_URL = BASE_URL + "/users/leaderboard"
 
 const getLeaderboardUrl = (page: number) => `${LEADERBOARD_URL}?page=${page}`
 
+export const getLeaderboardUserPunishmentsUrl = (userId: string) => `${LEADERBOARD_URL}/punishments/${userId}`
+
 const GROUPS_URL = BASE_URL + "/groups/me"
 
 const ME_URL = BASE_URL + "/users/me"

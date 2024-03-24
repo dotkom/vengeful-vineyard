@@ -28,7 +28,7 @@ __all__ = (
 
 
 oidc = OpenIdConnect(
-    openIdConnectUrl="https://old.online.ntnu.no/openid/.well-known/openid-configuration",
+    openIdConnectUrl="https://auth.online.ntnu.no/openid/.well-known/openid-configuration",
 )
 
 

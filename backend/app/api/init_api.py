@@ -111,7 +111,7 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
 
 def init_api(**db_settings: str) -> FastAPI:
     oauth = {
-        "clientId": "219919",
+        "clientId": os.environ["AUTH0_CLIENT_ID"],
         "appName": "Vengeful Vineyard Docs",
         "usePkceWithAuthorizationCodeGrant": True,
         "scopes": "openid email profile onlineweb4",
@@ -121,10 +121,6 @@ def init_api(**db_settings: str) -> FastAPI:
         swagger_ui_init_oauth=oauth,
         swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect",
     )
-
-    @app.get("/crash")
-    async def crash():
-        raise Exception("wow i crashed")
 
     app.openapi_version = "3.0.0"
     app.router.route_class = APIRoute
