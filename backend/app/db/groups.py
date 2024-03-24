@@ -247,10 +247,10 @@ class Groups:
 
         async with MaybeAcquire(conn, self.db.pool) as conn:
             where_clause = (
-                "WHERE group_id = $5" if use_group_id else "WHERE ow_group_id = $5"
+                "WHERE group_id = $6" if use_group_id else "WHERE ow_group_id = $6"
             )
             query = f"""UPDATE groups
-                    SET name = $1, name_short = $2, rules = $3, image = $4
+                    SET name = $1, name_short = $2, rules = $3, image = $4, invite_code = $5
                     {where_clause}
                     RETURNING group_id;"""
             ret_group_id = await conn.fetchval(
@@ -259,6 +259,7 @@ class Groups:
                 group.name_short.strip(),
                 group.rules,
                 group.image,
+                group.invite_code,
                 group_id if use_group_id else group.ow_group_id,
             )
 

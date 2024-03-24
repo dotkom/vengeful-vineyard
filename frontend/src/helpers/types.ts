@@ -150,6 +150,7 @@ export type GroupCreateType = z.infer<typeof GroupCreate>
 export const EditGroup = z.object({
   name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
   name_short: z.string().trim().min(3, { message: "Kort navn må være minst tre tegn" }),
+  invite_code: z.string().nullable(),
 })
 
 export type EditGroupType = z.infer<typeof EditGroup>
