@@ -61,6 +61,7 @@ export const GroupBaseSchema = z.object({
   image: z.string(),
   ow_group_id: z.number().nullable(),
   group_id: z.string(),
+  invite_code: z.string().nullable().optional(),
 })
 export type GroupBase = z.infer<typeof GroupBaseSchema>
 
@@ -70,6 +71,7 @@ export const PublicGroupSchema = z.object({
   image: z.string(),
   group_id: z.string(),
   is_official: z.boolean(),
+  invite_code: z.string().nullable(),
 })
 
 export type PublicGroup = z.infer<typeof PublicGroupSchema>
