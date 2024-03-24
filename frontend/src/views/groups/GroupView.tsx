@@ -140,13 +140,14 @@ export const GroupView = () => {
   const { mutate: requestToJoinGroupMutate } = useMutation(postGroupJoinRequestMutation(publicGroup?.group_id))
 
   const shouldShowMain = user && selectedGroup
-  const inviteCodeIsCorrect = !selectedGroup && inviteCode && publicGroup?.invite_code === inviteCode
 
   const {
     mutate: joinGroupMutate,
     isSuccess: joinGroupSuccess,
     isError: joinGroupError,
   } = useMutation(postJoinGroupMutation(publicGroup?.group_id, inviteCode, publicGroup?.name_short))
+
+  const inviteCodeIsCorrect = !selectedGroup && inviteCode && publicGroup?.invite_code === inviteCode && !joinGroupError
 
   useEffect(() => {
     if (inviteCodeIsCorrect) {

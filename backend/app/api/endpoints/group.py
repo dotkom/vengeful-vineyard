@@ -1421,6 +1421,12 @@ async def join_group(
                 status_code=403,
                 detail="Invitasjonskoden er ikke gyldig for denne gruppen",
             )
+        
+        if group.ow_group_id is not None:
+            raise HTTPException(
+                status_code=403,
+                detail="Du kan ikke automatisk bli medlem i en offentlig gruppe",
+            )
 
         await app.db.groups.insert_member(
             group_id,
