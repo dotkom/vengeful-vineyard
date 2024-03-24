@@ -55,3 +55,7 @@ class InsertOrUpdateUser(TypedDict):
 class InsertOrUpdateGroup(TypedDict):
     id: GroupId
     action: str
+
+
+class InviteCode(str):
+    pass

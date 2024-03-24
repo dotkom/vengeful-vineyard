@@ -29,6 +29,7 @@ from app.types import (
     PunishmentId,
     PunishmentTypeId,
     UserId,
+    InviteCode,
 )
 from app.utils.pagination import Page, Pagination
 
@@ -1397,6 +1398,36 @@ async def accept_group_join_request(
             conn=conn,
         )
 
+
+@router.post(
+    "/{group_id}/joinGroup/{invite_code}",
+    dependencies=[Depends(oidc)],
+)
+async def join_group(
+    request: Request,
+    group_id: GroupId,
+    invite_code: InviteCode,
+) -> None:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        group = await app.db.groups.get(group_id, invite_code=invite_code, include_members=False, conn=conn)
+
+        if not group:
+            raise HTTPException(
+                status_code=403,
+                detail="Invitasjonskoden er ikke gyldig for denne gruppen",
+            )
+
+        await app.db.groups.insert_member(
+            group_id,
+            GroupMemberCreate(user_id=requester_user_id, ow_group_user_id=None, active=True),
+            conn=conn,
+        )
+        
 
 @router.post(
     "/{group_id}/joinRequests/{user_id}/deny",

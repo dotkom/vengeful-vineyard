@@ -15,7 +15,7 @@ from app.models.group import Group, GroupCreate, GroupSearchResult, GroupPublic
 from app.models.group_member import GroupMember, GroupMemberCreate
 from app.models.punishment import TotalPunishmentValue
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
-from app.types import GroupId, InsertOrUpdateGroup, OWUserId, UserId
+from app.types import GroupId, InsertOrUpdateGroup, OWUserId, UserId, InviteCode
 from app.utils.db import MaybeAcquire
 
 if TYPE_CHECKING:
@@ -107,11 +107,18 @@ class Groups:
     async def get(
         self,
         group_id: GroupId,
+        invite_code: Optional[InviteCode] = None,
         include_members: bool = True,
         conn: Optional[Pool] = None,
     ) -> Group:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """
+            parameters = [group_id]
+            where_clause = "WHERE g.group_id = $1"
+            if invite_code is not None:
+                where_clause += " AND g.invite_code = $2"
+                parameters.append(invite_code)
+
+            query = f"""
                 WITH join_request_users AS (
                     SELECT gjr.group_id, u.*
                     FROM group_join_requests gjr
@@ -125,11 +132,11 @@ class Groups:
                 FROM groups g
                 LEFT JOIN punishment_types pt ON g.group_id = pt.group_id
                 LEFT JOIN join_request_users jru ON g.group_id = jru.group_id
-                WHERE g.group_id = $1
+                {where_clause}
                 GROUP BY g.group_id;
                 """
 
-            group = await conn.fetchrow(query, group_id)
+            group = await conn.fetchrow(query, *parameters)
 
             if group is None:
                 raise NotFound
