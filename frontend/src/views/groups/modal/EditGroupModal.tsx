@@ -14,6 +14,7 @@ import axios from "axios"
 import { Button } from "../../../components/button"
 import { NumberInput } from "../../../components/input/NumberInput"
 import { TextInput } from "../../../components/input/TextInput"
+import { Toggle } from "../../../components/input/Toggle"
 import { Listbox } from "../../../components/listbox/Listbox"
 import { Modal } from "../../../components/modal"
 import { Spinner } from "../../../components/spinner"
@@ -27,7 +28,7 @@ import {
   MutatePunishmentType,
   PunishmentType,
 } from "../../../helpers/types"
-import { areObjectsEqual } from "../../../helpers/utils"
+import { areObjectsEqual, generatePseudoRandomString } from "../../../helpers/utils"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 
 interface EditGroupModalProps {
@@ -38,6 +39,7 @@ interface EditGroupModalProps {
 const baseEditGroupData = {
   name: "",
   name_short: "",
+  invite_code: "",
 }
 
 const baseCreatePunishmentTypeData = {
@@ -59,7 +61,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   const ref = useRef(null)
 
   const [editGroupData, setEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
-  const [initialEditGropuData, setInitialEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
+  const [initialEditGroupData, setInitialEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
   const [createPunishmentTypeData, setCreatePunishmentTypeData] = useState<MutatePunishmentType>({
     ...baseCreatePunishmentTypeData,
   })
@@ -77,8 +79,12 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
 
   const { data: groupData, isLoading } = useQuery({
     onSuccess: (group) => {
-      setEditGroupData({ name: group.name, name_short: group.name_short })
-      setInitialEditGroupData({ name: group.name, name_short: group.name_short })
+      setEditGroupData({ name: group.name, name_short: group.name_short, invite_code: group.invite_code ?? null })
+      setInitialEditGroupData({
+        name: group.name,
+        name_short: group.name_short,
+        invite_code: group.invite_code ?? null,
+      })
 
       const punishmentType = group.punishment_types[Object.keys(group.punishment_types)[0]]
       setCurrentPunishmentType(punishmentType)
@@ -176,6 +182,13 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
     deletePunishmentTypeMutate()
   }
 
+  const inviteCodeToggleClickHandler = () => {
+    setEditGroupData({
+      ...editGroupData,
+      invite_code: editGroupData.invite_code ? null : initialEditGroupData.invite_code ?? generatePseudoRandomString(8),
+    })
+  }
+
   // Mutations
 
   const { mutate: editGroupMutate } = useMutation(putGroupMutation(selectedGroupId, editGroupData))
@@ -192,6 +205,10 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
     deletePunishmentTypeMutation(selectedGroupId, currentPunishmentType?.punishment_type_id ?? "")
   )
   // Render
+
+  function getInviteLink(): string {
+    return `${window.location.origin}/#/gruppe/${editGroupData.name_short}/${editGroupData.invite_code}`
+  }
 
   const getPunishmentTypeTabContent = (mode: "CREATE" | "EDIT"): JSX.Element => {
     return (
@@ -271,7 +288,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
         setOpen={setOpen}
         primaryButtonLabel="Rediger"
         primaryButtonAction={editButtonClickHandler}
-        primaryButtonDisabled={areObjectsEqual(editGroupData, initialEditGropuData)}
+        primaryButtonDisabled={areObjectsEqual(editGroupData, initialEditGroupData)}
       >
         <div className="mb-4 md:mt-2 flex flex-col gap-6 font-normal">
           {!groupData || isLoading ? (
@@ -296,7 +313,21 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
                 onChange={shortNameChangeHandler}
                 disabled={selectedGroup?.ow_group_id !== null}
               />
-
+              {groupData.ow_group_id === null && (
+                <TextInput
+                  label="Invitasjonslenke"
+                  placeholder="Invitasjonslenke er skrudd av"
+                  contentEditable={false}
+                  value={editGroupData.invite_code ? getInviteLink() : ""}
+                  disabled={true}
+                  className="w-[88%]"
+                  children={
+                    <div className="absolute right-0 top-0 flex items-center h-full">
+                      <Toggle value={!!editGroupData.invite_code} changeHandler={inviteCodeToggleClickHandler} />
+                    </div>
+                  }
+                />
+              )}
               <div className="flex flex-col gap-y-4">
                 <Tabs
                   label="Straffetyper"
