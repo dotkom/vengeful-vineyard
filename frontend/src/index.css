@@ -67,20 +67,45 @@
   }
 }
 
-/* For Webkit-based browsers (Chrome, Safari and Opera) */
-.scrollbar-hide::-webkit-scrollbar {
+/* .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-/* For IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+} */
+
+
 
 .with-horizontal-scroll-shadow {
   background-position: left center, right center, left center, right center;
   background-repeat: no-repeat;
   background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
   background-attachment: local, local, scroll, scroll;
+}
+
+.lowkey-scrollbar {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.lowkey-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 0.4rem;
+  height: 0.4rem;
+}
+
+.lowkey-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 5px;
+}
+
+.lowkey-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #666;
+}
+
+.lowkey-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
 }

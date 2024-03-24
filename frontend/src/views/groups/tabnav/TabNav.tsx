@@ -33,7 +33,7 @@ export const TabNav = ({ selectedGroup, setSelectedGroup, groups }: TabNavProps)
                 <>
                   <div
                     className={classNames(
-                      "flex flex-row gap-x-3 md:gap-x-8 items-center overflow-x-auto scrollbar-hide",
+                      "flex flex-row gap-x-3 md:gap-x-4 items-center overflow-x-auto lowkey-scrollbar [@media(max-width:767px)]:scrollbar-hide",
                       "with-horizontal-scroll-shadow"
                     )}
                   >
@@ -48,7 +48,7 @@ export const TabNav = ({ selectedGroup, setSelectedGroup, groups }: TabNavProps)
                       />
                     ))}
                   </div>
-                  <AdditionalGroupNavItem />
+                  {/* <AdditionalGroupNavItem /> */}
                 </>
               ) : (
                 <SkeletonTabNavItem />
