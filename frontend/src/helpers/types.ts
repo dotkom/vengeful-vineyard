@@ -61,7 +61,6 @@ export const GroupBaseSchema = z.object({
   image: z.string(),
   ow_group_id: z.number().nullable(),
   group_id: z.string(),
-  invite_code: z.string().nullable().optional(),
 })
 export type GroupBase = z.infer<typeof GroupBaseSchema>
 
@@ -82,6 +81,7 @@ export const GroupSchema = GroupBaseSchema.extend({
   join_requests: z.array(UserSchema),
   roles: z.array(z.tuple([z.string(), z.string()])),
   permissions: z.record(z.array(z.string())),
+  invite_code: z.string().nullable(),
 })
 
 export type GroupPermissions = Record<string, string[]>
@@ -150,7 +150,6 @@ export type GroupCreateType = z.infer<typeof GroupCreate>
 export const EditGroup = z.object({
   name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),
   name_short: z.string().trim().min(3, { message: "Kort navn må være minst tre tegn" }),
-  invite_code: z.string().nullable(),
 })
 
 export type EditGroupType = z.infer<typeof EditGroup>

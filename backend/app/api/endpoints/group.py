@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from app.api import APIRoute, Request, oidc
 from app.config import INDEXED_ROLES
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
-from app.models.group import Group, GroupPublic, GroupCreate, GroupCreateMinified, GroupSearchResult
+from app.models.group import Group, GroupPublic, GroupCreate, GroupCreateMinified, GroupSearchResult, InviteCodePatch
 from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_join_requests import GroupJoinRequest
 from app.models.group_member import GroupMemberCreate
@@ -352,6 +352,47 @@ async def patch_group(
 
         return {"id": data["id"]}
 
+@router.patch(
+    "/{group_id}/inviteCode",
+    dependencies=[Depends(oidc)],
+)
+async def patch_invite_code(
+    request: Request,
+    group_id: GroupId,
+    invite_code_patch: InviteCodePatch,
+) -> None:
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        try:
+            group = await app.db.groups.get(group_id, include_members=False, conn=conn)
+        except NotFound as exc:
+            raise HTTPException(
+                status_code=404, detail="Gruppen ble ikke funnet"
+            ) from exc
+
+        permission_manager = app.get_permission_manager(
+            is_ow_group=group.ow_group_id is not None
+        )
+        await permission_manager.raise_if_missing_permission(
+            group_id,
+            user_id,
+            "group.invite_code.edit",
+            conn=conn,
+        )
+
+        invite_code = invite_code_patch.invite_code
+
+        if invite_code == "" or invite_code is not None and invite_code.isspace():
+            raise HTTPException(
+                status_code=400,
+                detail="Invitasjonskoden kan ikke være tom"
+            )
+
+        await app.db.groups.update_invite_code(group_id, invite_code, conn=conn)
 
 @router.delete(
     "/{group_id}",

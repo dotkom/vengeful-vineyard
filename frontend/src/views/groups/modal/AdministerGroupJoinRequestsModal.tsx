@@ -1,15 +1,20 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { Dispatch, FC, Fragment, SetStateAction, useRef } from "react"
+import { Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
 import {
   groupLeaderboardQuery,
   postDenyGroupJoinRequestMutation,
   postAcceptGroupJoinRequestMutation,
+  patchInviteCodeMutation,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
 import { Modal } from "../../../components/modal"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
+import { generatePseudoRandomString } from "../../../helpers/utils"
+import { TextInput } from "../../../components/input/TextInput"
+import { Toggle } from "../../../components/input/Toggle"
+import { usePermission } from "../../../helpers/permissions"
 
 interface AdministerGroupJoinRequestsModalProps {
   open: boolean
@@ -20,11 +25,36 @@ export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsMod
   const ref = useRef(null)
   const { selectedGroup } = useGroupNavigation()
 
-  const { data: group } = useQuery(groupLeaderboardQuery(selectedGroup?.group_id))
-
   const { mutate: acceptJoinRequestMutate } = useMutation(postAcceptGroupJoinRequestMutation(selectedGroup?.group_id))
   const { mutate: denyJoinRequestMutate } = useMutation(postDenyGroupJoinRequestMutation(selectedGroup?.group_id))
+  const { mutate: patchInviteCodeMutate } = useMutation(patchInviteCodeMutation(selectedGroup?.group_id ?? ""))
 
+  const { data: group } = useQuery(groupLeaderboardQuery(selectedGroup?.group_id))
+
+  const canViewInviteCode = usePermission("group.invite_code.view", group)
+  const canEditInviteCode = usePermission("group.invite_code.edit", group)
+  
+  const [inviteCode, setInviteCode] = useState<string | null>("")
+
+  useEffect(() => {
+    setInviteCode(group?.invite_code ?? null)
+  }, [group])
+
+  const inviteCodeToggleClickHandler = () => {
+    const newInviteCode = inviteCode
+      ? null
+      : group?.invite_code?.trim()
+      ? group.invite_code
+      : generatePseudoRandomString(8)
+
+    setInviteCode(newInviteCode)
+    patchInviteCodeMutate(newInviteCode)
+  }
+
+  function getInviteLink(): string {
+    return `${window.location.origin}/#/gruppe/${group?.name_short}/${inviteCode}`
+  }
+  
   return (
     <Transition.Root show={open} as={Fragment}>
       <Modal
@@ -35,6 +65,24 @@ export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsMod
         includePrimaryButton={false}
       >
         <div className="md:mt-4 flex flex-col gap-6 font-normal relative group text-gray-800">
+          {group?.ow_group_id === null && canViewInviteCode && (
+            <div className="flex justify-between items-end">
+              <div className="flex-grow">
+                <TextInput
+                  label="Invitasjonslink"
+                  placeholder="Invitasjonslink er skrudd av"
+                  contentEditable={false}
+                  value={inviteCode ? getInviteLink() : ""}
+                  disabled={true}
+                />
+              </div>
+              {canEditInviteCode && (
+                <div className="transform -translate-y-1/4 ml-2">
+                  <Toggle value={!!inviteCode} changeHandler={inviteCodeToggleClickHandler} />
+                </div>
+              )}
+            </div>
+          )}
           {group?.join_requests.length === 0 ? (
             <p className="text-center mt-4">Ingen forespørsler</p>
           ) : (

@@ -16,7 +16,6 @@ from app.types import GroupId, InviteCode, PermissionPrivilege
 class GroupBase(BaseModel):
     name: str
     name_short: str
-    invite_code: Optional[InviteCode] = None
 
 
 class GroupCreateMinified(GroupBase):
@@ -33,7 +32,6 @@ class GroupCreate(GroupBase):
         return cls(
             name=group.name,
             name_short=group.name_short,
-            invite_code=group.invite_code,
             rules="",
             ow_group_id=None,
             image="",
@@ -47,7 +45,7 @@ class GroupPublic(GroupBase):
     image: str = ""
     is_official: bool = False
     is_member: bool = False
-
+    invite_code: Optional[InviteCode] = None
 
 class GroupSearchResult(GroupCreateMinified):
     group_id: GroupId
@@ -60,7 +58,12 @@ class Group(GroupCreate):
     join_requests: list[User] = []
     roles: list[tuple[str, PermissionPrivilege]] = []
     permissions: dict[PermissionPrivilege, list[PermissionPrivilege]] = {}
+    invite_code: Optional[InviteCode] = None
 
 
 class UserWithGroups(User):
     groups: list[Group]
+
+
+class InviteCodePatch(BaseModel):
+    invite_code: Optional[InviteCode] = None

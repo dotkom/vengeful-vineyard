@@ -44,6 +44,8 @@ PERMISSIONS = [
     ["group.join_requests.view", ["group.admin"]],
     ["group.join_requests.accept", ["group.admin"]],
     ["group.join_requests.deny", ["group.admin"]],
+    ["group.invite_code.view", ["group.admin"]],
+    ["group.invite_code.edit", ["group.admin"]],
 ]
 PERMISSIONS_AS_DICT: dict[PermissionPrivilege, list[PermissionPrivilege]] = dict(
     PERMISSIONS  # type: ignore
@@ -73,6 +75,8 @@ OW_GROUP_PERMISSIONS = [
     ["group.join_requests.view", [NEVER]],
     ["group.join_requests.accept", [NEVER]],
     ["group.join_requests.deny", [NEVER]],
+    ["group.invite_code.view", [NEVER]],
+    ["group.invite_code.edit", [NEVER]],
 ]
 OW_GROUP_PERMISSIONS_AS_DICT: dict[
     PermissionPrivilege, list[PermissionPrivilege]

@@ -606,6 +606,15 @@ export const removeReactionMutation = (
   }
 }
 
+const getPatchInviteCodeUrl = (groupId: string) => BASE_URL + `/groups/${groupId}/inviteCode`
+export const patchInviteCodeMutation = (groupId: string): UseMutationOptions<void, VengefulApiError, string | null> => {
+  return {
+    mutationFn: async (inviteCode: string | null) => {
+      await axios.patch(getPatchInviteCodeUrl(groupId), { invite_code: inviteCode })
+    },
+  }
+}
+
 export const groupLeaderboardQuery = (
   groupId?: string
 ): UseQueryOptions<Group, unknown, Group, (string | undefined)[]> => ({
