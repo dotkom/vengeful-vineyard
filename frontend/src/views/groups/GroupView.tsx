@@ -150,12 +150,6 @@ export const GroupView = () => {
   const inviteCodeIsCorrect = !selectedGroup && inviteCode && publicGroup?.invite_code === inviteCode && !joinGroupError
 
   useEffect(() => {
-    if (inviteCodeIsCorrect) {
-      joinGroupMutate()
-    }
-  }, [inviteCodeIsCorrect])
-
-  useEffect(() => {
     if (joinGroupSuccess) {
       myGroupsRefetch()
     }
@@ -180,7 +174,7 @@ export const GroupView = () => {
         </section>
       )}
       {currentUser && !userIsLoading && !selectedGroup && !selectedGroupName && <LandingPage />}
-      {currentUser && !userIsLoading && !selectedGroup && selectedGroupName && !inviteCodeIsCorrect && (
+      {currentUser && !userIsLoading && !selectedGroup && selectedGroupName && (
         <section className="flex flex-col gap-y-6 items-center w-full text-gray-800 mt-16">
           {publicGroup && (
             <div className="flex flex-col gap-y-4 items-center text-center">
@@ -189,6 +183,8 @@ export const GroupView = () => {
                   ? `${publicGroup.name_short}`
                   : inviteCodeIsWrong
                   ? `Ugyldig kode`
+                  : inviteCodeIsCorrect
+                  ? `Du er invitert til å bli medlem av ${publicGroup.name_short}!`
                   : `Bli medlem av ${publicGroup.name_short}!`}
               </h1>
               {publicGroup.image && <img className="w-60" src={publicGroup.image} alt={publicGroup.name} />}
@@ -221,9 +217,13 @@ export const GroupView = () => {
                 )}
               </h3>
               <div className="flex flex-row gap-x-4 items-center">
-                {!publicGroup.is_official && (
-                  <Button onClick={() => requestToJoinGroupMutate(publicGroup?.group_id)}>Send forespørsel</Button>
-                )}
+                {!publicGroup.is_official &&
+                  (inviteCodeIsCorrect ? (
+                    <Button onClick={() => joinGroupMutate()}>Godta invitasjon</Button>
+                  ) : (
+                    <Button onClick={() => requestToJoinGroupMutate(publicGroup?.group_id)}>Send forespørsel</Button>
+                  ))}
+
                 <Button
                   onClick={async () => {
                     await auth.removeUser()
