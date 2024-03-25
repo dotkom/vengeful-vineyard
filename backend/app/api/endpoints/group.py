@@ -1474,7 +1474,15 @@ async def join_group(
             GroupMemberCreate(user_id=requester_user_id, ow_group_user_id=None, active=True),
             conn=conn,
         )
-        
+
+        try:
+            await app.db.group_join_requests.delete(
+                group_id,
+                requester_user_id,
+                conn=conn,
+            )
+        except NotFound:
+            pass
 
 @router.post(
     "/{group_id}/joinRequests/{user_id}/deny",
