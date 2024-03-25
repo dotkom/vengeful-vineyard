@@ -21,3 +21,7 @@ export function generatePseudoRandomString(length: number): string {
     .map(() => characters.charAt(Math.floor(Math.random() * characters.length)))
     .join("");
 }
+
+export async function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text)
+}
