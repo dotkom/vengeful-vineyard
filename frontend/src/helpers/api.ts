@@ -440,6 +440,40 @@ export const postAcceptGroupJoinRequestMutation = (groupId?: string) => {
   }
 }
 
+const getPostJoinGroupUrl = (groupId: string, inviteCode: string) =>
+  BASE_URL + `/groups/${groupId}/joinGroup/${inviteCode}`
+export const postJoinGroupMutation = (
+  groupId?: string,
+  inviteCode?: string,
+  groupShortName?: string
+): UseMutationOptions<unknown, VengefulApiError, void> => {
+  const { setNotification } = useNotification()
+  const queryClient = useQueryClient()
+
+  return {
+    mutationFn: async () => {
+      if (!groupId || !inviteCode) throw new Error("groupId and inviteCode are required")
+      await axios.post(getPostJoinGroupUrl(groupId, inviteCode))
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["user", groupId] })
+      await queryClient.invalidateQueries({ queryKey: ["leaderboard", groupId] })
+      setNotification({
+        type: "success",
+        title: "Du ble lagt til i gruppen",
+        text: `Du er nå medlem av gruppen ${groupShortName ?? ""}`,
+      })
+    },
+    onError: (e: VengefulApiError) => {
+      setNotification({
+        type: "error",
+        title: `Kunne ikke legges til i gruppen ${groupShortName ?? ""}`,
+        text: e.response.data.detail,
+      })
+    },
+  }
+}
+
 const getPostDenyGroupJoinRequestUrl = (groupId: string, userId: string) =>
   BASE_URL + `/groups/${groupId}/joinRequests/${userId}/deny`
 export const postDenyGroupJoinRequestMutation = (groupId?: string) => {
@@ -570,6 +604,15 @@ export const removeReactionMutation = (
       groupId
         ? await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
         : await queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
+    },
+  }
+}
+
+const getPatchInviteCodeUrl = (groupId: string) => BASE_URL + `/groups/${groupId}/inviteCode`
+export const patchInviteCodeMutation = (groupId: string): UseMutationOptions<void, VengefulApiError, string | null> => {
+  return {
+    mutationFn: async (inviteCode: string | null) => {
+      await axios.patch(getPatchInviteCodeUrl(groupId), { invite_code: inviteCode })
     },
   }
 }

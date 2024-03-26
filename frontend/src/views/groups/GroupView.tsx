@@ -1,7 +1,13 @@
 import { Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { groupLeaderboardQuery, postGroupJoinRequestMutation, publicGroupQuery, userQuery } from "../../helpers/api"
+import {
+  groupLeaderboardQuery,
+  postGroupJoinRequestMutation,
+  publicGroupQuery,
+  userQuery,
+  postJoinGroupMutation,
+} from "../../helpers/api"
 import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../helpers/sorting"
 
 // TODO: Remove some stuff for ow groups
@@ -49,8 +55,9 @@ export const GroupView = () => {
   const auth = useAuth()
   const location = useLocation()
 
-  const params = useParams<{ groupName?: string }>()
+  const params = useParams<{ groupName?: string; inviteCode?: string }>()
   const selectedGroupName = params.groupName
+  const inviteCode = params.inviteCode
 
   const [searchTerm, setSearchTerm] = useState("")
   const [toggledPunishmentTypesOptions, setToggledPunishmentTypesOptions] = useState<ToggleOption<string>[]>([])
@@ -87,6 +94,12 @@ export const GroupView = () => {
   const selectedGroup = user?.groups.find(
     (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
   )
+
+  useEffect(() => {
+    if (selectedGroup && inviteCode) {
+      navigate(`/gruppe/${selectedGroup.name_short.toLowerCase()}`)
+    }
+  })
 
   const { isLoading, data, refetch } = useQuery({
     ...groupLeaderboardQuery(selectedGroup?.group_id),
@@ -129,6 +142,22 @@ export const GroupView = () => {
 
   const shouldShowMain = user && selectedGroup
 
+  const {
+    mutate: joinGroupMutate,
+    isSuccess: joinGroupSuccess,
+    isError: joinGroupError,
+  } = useMutation(postJoinGroupMutation(publicGroup?.group_id, inviteCode, publicGroup?.name_short))
+
+  const inviteCodeIsCorrect = !selectedGroup && inviteCode && publicGroup?.invite_code === inviteCode && !joinGroupError
+
+  useEffect(() => {
+    if (joinGroupSuccess) {
+      myGroupsRefetch()
+    }
+  }, [joinGroupSuccess])
+
+  const inviteCodeIsWrong = joinGroupError || inviteCodeIsCorrect === false
+
   return (
     <>
       <GivePunishmentModal open={givePunishmentModalOpen} setOpen={setGivePunishmentModalOpen} />
@@ -151,7 +180,13 @@ export const GroupView = () => {
           {publicGroup && (
             <div className="flex flex-col gap-y-4 items-center text-center">
               <h1 className="text-4xl font-bold">
-                {publicGroup.is_official ? `${publicGroup.name_short}` : `Bli medlem av ${publicGroup.name_short}!`}
+                {publicGroup.is_official
+                  ? `${publicGroup.name_short}`
+                  : inviteCodeIsWrong
+                  ? `Ugyldig kode`
+                  : inviteCodeIsCorrect
+                  ? `Du er invitert til å bli medlem av ${publicGroup.name_short}!`
+                  : `Bli medlem av ${publicGroup.name_short}!`}
               </h1>
               {publicGroup.image && <img className="w-60" src={publicGroup.image} alt={publicGroup.name} />}
               <h3>
@@ -168,15 +203,28 @@ export const GroupView = () => {
                   </>
                 ) : (
                   <>
-                    Du er ikke et medlem av gruppen {publicGroup.name_short}.<br />
-                    Trykk på knappen under for å bli medlem
+                    {inviteCodeIsWrong ? (
+                      <>
+                        Du er ikke et medlem av gruppen {publicGroup.name_short}.<br />
+                        Be om en ny kode eller trykk på knappen under for å bli medlem
+                      </>
+                    ) : (
+                      <>
+                        Du er ikke et medlem av gruppen {publicGroup.name_short}.<br />
+                        Trykk på knappen under for å bli medlem
+                      </>
+                    )}
                   </>
                 )}
               </h3>
               <div className="flex flex-row gap-x-4 items-center">
-                {!publicGroup.is_official && (
-                  <Button onClick={() => requestToJoinGroupMutate(publicGroup?.group_id)}>Send forespørsel</Button>
-                )}
+                {!publicGroup.is_official &&
+                  (inviteCodeIsCorrect ? (
+                    <Button onClick={() => joinGroupMutate()}>Godta invitasjon</Button>
+                  ) : (
+                    <Button onClick={() => requestToJoinGroupMutate(publicGroup?.group_id)}>Send forespørsel</Button>
+                  ))}
+
                 <Button
                   onClick={async () => {
                     await auth.removeUser()

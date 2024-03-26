@@ -54,12 +54,10 @@ const baseEditPunishmentTypeData = {
 
 export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   const { selectedGroup } = useGroupNavigation()
-  const { setNotification } = useNotification()
-  const queryClient = useQueryClient()
   const ref = useRef(null)
 
   const [editGroupData, setEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
-  const [initialEditGropuData, setInitialEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
+  const [initialEditGroupData, setInitialEditGroupData] = useState<EditGroupType>({ ...baseEditGroupData })
   const [createPunishmentTypeData, setCreatePunishmentTypeData] = useState<MutatePunishmentType>({
     ...baseCreatePunishmentTypeData,
   })
@@ -78,7 +76,10 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
   const { data: groupData, isLoading } = useQuery({
     onSuccess: (group) => {
       setEditGroupData({ name: group.name, name_short: group.name_short })
-      setInitialEditGroupData({ name: group.name, name_short: group.name_short })
+      setInitialEditGroupData({
+        name: group.name,
+        name_short: group.name_short,
+      })
 
       const punishmentType = group.punishment_types[Object.keys(group.punishment_types)[0]]
       setCurrentPunishmentType(punishmentType)
@@ -271,7 +272,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
         setOpen={setOpen}
         primaryButtonLabel="Rediger"
         primaryButtonAction={editButtonClickHandler}
-        primaryButtonDisabled={areObjectsEqual(editGroupData, initialEditGropuData)}
+        primaryButtonDisabled={areObjectsEqual(editGroupData, initialEditGroupData)}
       >
         <div className="mb-4 md:mt-2 flex flex-col gap-6 font-normal">
           {!groupData || isLoading ? (
@@ -296,7 +297,6 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
                 onChange={shortNameChangeHandler}
                 disabled={selectedGroup?.ow_group_id !== null}
               />
-
               <div className="flex flex-col gap-y-4">
                 <Tabs
                   label="Straffetyper"

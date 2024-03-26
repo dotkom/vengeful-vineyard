@@ -7,10 +7,11 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string
   isLoading?: boolean
   children?: React.ReactNode
+  className?: string
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ label, value, error, disabled, isLoading = false, children, ...rest }, ref) => {
+  ({ label, value, error, disabled, isLoading = false, className = "", children, ...rest }, ref) => {
     const randomId = Math.random().toString(36).substring(7)
 
     return (
@@ -28,6 +29,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             id={randomId}
             disabled={disabled}
             className={classNames(
+              className,
               "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm bg-white text-black dark:placeholder-gray-400",
               disabled ? "text-gray-500 bg-gray-100" : ""
             )}

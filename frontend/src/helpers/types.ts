@@ -70,6 +70,7 @@ export const PublicGroupSchema = z.object({
   image: z.string(),
   group_id: z.string(),
   is_official: z.boolean(),
+  invite_code: z.string().nullable(),
 })
 
 export type PublicGroup = z.infer<typeof PublicGroupSchema>
@@ -80,6 +81,7 @@ export const GroupSchema = GroupBaseSchema.extend({
   join_requests: z.array(UserSchema),
   roles: z.array(z.tuple([z.string(), z.string()])),
   permissions: z.record(z.array(z.string())),
+  invite_code: z.string().nullable(),
 })
 
 export type GroupPermissions = Record<string, string[]>
