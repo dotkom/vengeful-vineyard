@@ -422,14 +422,17 @@ class Users:
             LEFT JOIN punishment_types pt
                 ON pt.punishment_type_id = gp.punishment_type_id
             LEFT JOIN (
-                SELECT pr1.*
+                SELECT 
+                pr1.*,
+                CONCAT(COALESCE(NULLIF(u1.first_name, ''), u1.email), ' ', u1.last_name) AS created_by_name
                 FROM punishment_reactions pr1
                 JOIN group_members gm ON pr1.created_by = gm.user_id
-                GROUP BY pr1.punishment_reaction_id
+                LEFT JOIN users u1 on pr1.created_by = u1.user_id
+                GROUP BY pr1.punishment_reaction_id, u1.first_name, u1.email, u1.last_name
             ) pr ON pr.punishment_id = gp.punishment_id
             LEFT JOIN users ON gp.created_by = users.user_id
             WHERE gp.user_id = $1
-            GROUP BY gp.punishment_id, created_by_name, pt.punishment_type_id
+            GROUP BY gp.punishment_id, users.first_name, users.email, users.last_name, pt.punishment_type_id
             ORDER BY gp.created_at DESC
             """
             res = await conn.fetch(
