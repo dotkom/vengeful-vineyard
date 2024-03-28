@@ -603,7 +603,7 @@ export const removeReactionMutation = (
     onSuccess: async () => {
       groupId
         ? await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
-        : await queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
+        : await queryClient.invalidateQueries({ queryKey: ["leaderboardUserPunishments"] })
     },
   }
 }

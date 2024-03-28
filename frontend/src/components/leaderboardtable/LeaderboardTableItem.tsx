@@ -20,7 +20,12 @@ export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, dat
   const displayName = `${leaderboardUser.first_name} ${leaderboardUser.last_name}`
   const { total_value: totalValue, emojis } = leaderboardUser
 
-  const { data: punishments, isLoading: isLoadingPunishments } = useQuery<LeaderboardPunishment[]>(
+
+  const {
+    data: punishments,
+    isLoading: isLoadingPunishments,
+    refetch: punishmentsRefetch,
+  } = useQuery<LeaderboardPunishment[]>(
     ["leaderboardUserPunishments", leaderboardUser.user_id],
     () => axios.get(getLeaderboardUserPunishmentsUrl(leaderboardUser.user_id)).then((res) => res.data),
     { enabled: isCurrentlyExpanded, staleTime: 1000 * 60 }
@@ -84,7 +89,7 @@ export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, dat
           punishments={punishments || []}
           isLoadingPunishments={isLoadingPunishments}
           isGroupContext={false}
-          dataRefetch={dataRefetch}
+          dataRefetch={punishmentsRefetch}
         />
       </AccordionContent>
     </AccordionItem>
