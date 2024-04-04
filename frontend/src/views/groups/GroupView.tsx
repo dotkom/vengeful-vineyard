@@ -65,7 +65,7 @@ export const GroupView = () => {
     groupMembersSortAlternatives[1]
   )
 
-  const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading } = useQuery(userQuery())
+  const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading, error } = useQuery(userQuery())
 
   useEffect(() => {
     setMyGroupsRefetch(() => myGroupsRefetch as any)
@@ -169,16 +169,22 @@ export const GroupView = () => {
         open={administerGroupJoinRequestsModalOpen}
         setOpen={setAdministerGroupJoinRequestsModalOpen}
       />
-      {userIsLoading && !selectedGroup && (
-        <section className="w-full mt-16 flex items-center justify-center">
+      {error && (
+        <div className="w-full p-40 text-center">
+          <p>Noe gikk galt 😭</p>
+          <pre>{error.toString()}</pre>
+        </div>
+      )}
+      {!error && userIsLoading && !selectedGroup && (
+        <section className="mt-16 flex w-full items-center justify-center">
           <Spinner />
         </section>
       )}
       {currentUser && !userIsLoading && !selectedGroup && !selectedGroupName && <LandingPage />}
       {currentUser && !userIsLoading && !selectedGroup && selectedGroupName && (
-        <section className="flex flex-col gap-y-6 items-center w-full text-gray-800 mt-16">
+        <section className="mt-16 flex w-full flex-col items-center gap-y-6 text-gray-800">
           {publicGroup && (
-            <div className="flex flex-col gap-y-4 items-center text-center">
+            <div className="flex flex-col items-center gap-y-4 text-center">
               <h1 className="text-4xl font-bold">
                 {publicGroup.is_official
                   ? `${publicGroup.name_short}`
@@ -217,7 +223,7 @@ export const GroupView = () => {
                   </>
                 )}
               </h3>
-              <div className="flex flex-row gap-x-4 items-center">
+              <div className="flex flex-row items-center gap-x-4">
                 {!publicGroup.is_official &&
                   (inviteCodeIsCorrect ? (
                     <Button onClick={() => joinGroupMutate()}>Godta invitasjon</Button>
@@ -240,10 +246,10 @@ export const GroupView = () => {
         </section>
       )}
       {shouldShowMain && (
-        <section className="md:grid gap-x-6 md:grid-cols-[20rem_minmax(26rem,_1fr)] max-w-screen-xl w-[90%] mx-auto">
-          <div className="md:mt-[5.5rem] hidden md:block">{sidebarElement}</div>
-          <div className="mt-8 md:mt-12 w-full mx-auto md:mx-0">
-            <div className="flex flex-row justify-between items-center w-full gap-x-1 mb-px">
+        <section className="mx-auto w-[90%] max-w-screen-xl gap-x-6 md:grid md:grid-cols-[20rem_minmax(26rem,_1fr)]">
+          <div className="hidden md:mt-[5.5rem] md:block">{sidebarElement}</div>
+          <div className="mx-auto mt-8 w-full md:mx-0 md:mt-12">
+            <div className="mb-px flex w-full flex-row items-center justify-between gap-x-1">
               <TabNav
                 selectedGroup={selectedGroup}
                 setSelectedGroup={(group: Group) => group && navigate(`/gruppe/${group.name_short.toLowerCase()}`)}
@@ -276,7 +282,7 @@ export const GroupView = () => {
                         leaveFrom="opacity-100 translate-y-0"
                         leaveTo="opacity-0 translate-y-1"
                       >
-                        <Popover.Panel className="absolute z-10 mt-3 -right-10 shadow-2xl rounded-xl w-screen max-w-sm transform sm:px-0 lg:max-w-3xl">
+                        <Popover.Panel className="absolute -right-10 z-10 mt-3 w-screen max-w-sm transform rounded-xl shadow-2xl sm:px-0 lg:max-w-3xl">
                           {sidebarElement}
                         </Popover.Panel>
                       </Transition>

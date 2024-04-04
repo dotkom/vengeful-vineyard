@@ -81,7 +81,7 @@ export const GroupSchema = GroupBaseSchema.extend({
   join_requests: z.array(UserSchema),
   roles: z.array(z.tuple([z.string(), z.string()])),
   permissions: z.record(z.array(z.string())),
-  invite_code: z.string().nullable(),
+  invite_code: z.string().nullable().optional(),
 })
 
 export type GroupPermissions = Record<string, string[]>

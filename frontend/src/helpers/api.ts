@@ -636,7 +636,7 @@ export const publicGroupQuery = (groupNameShort?: string) => ({
   staleTime: 1000 * 60,
 })
 
-export const userQuery = () => {
+export const userQuery = (): UseQueryOptions<MeUser, unknown, MeUser> => {
   const auth = useAuth()
   return {
     queryKey: ["user"],
@@ -648,6 +648,7 @@ export const userQuery = () => {
     },
     enabled: auth.isAuthenticated,
     staleTime: 1000 * 60,
+    retry: 1,
   }
 }
 
