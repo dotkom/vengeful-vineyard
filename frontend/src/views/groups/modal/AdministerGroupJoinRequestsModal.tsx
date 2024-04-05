@@ -61,7 +61,7 @@ export const AdministerGroupJoinRequestsModal: FC<AdministerGroupJoinRequestsMod
   }
 
   function getInviteLink(): string {
-    return `${window.location.origin}/#/gruppe/${group?.name_short}/${inviteCode}`
+    return `${window.location.origin}/gruppe/${group?.name_short}/${inviteCode}`
   }
 
   return (
