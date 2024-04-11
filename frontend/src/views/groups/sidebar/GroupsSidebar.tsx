@@ -9,6 +9,7 @@ import { GroupSettings } from "./GroupSettings"
 import { Listbox } from "../../../components/listbox/Listbox"
 import { SidebarSection } from "./SidebarSection"
 import { TextInput } from "../../../components/input/TextInput"
+import { LogElement } from "./LogElement"
 
 interface GroupsSidebarProps {
   searchTerm: string
@@ -48,6 +49,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
   }))
 
   return (
+    <>
     <div className="min-h-32 max-w-[90%] md:max-w-none h-fit bg-white ring-1 ring-gray-900/5 rounded-xl flex flex-col gap-y-6 px-4 py-6">
       <div className="-mb-2 flex flex-row justify-between items-center">
         {!groupDataIsLoading ? (
@@ -101,5 +103,14 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
       </SidebarSection>
       */}
     </div>
+
+    <div className="min-h-32 max-w-[90%] md:max-w-none h-fit bg-white ring-1 ring-gray-900/5 rounded-xl flex flex-col gap-y-6 px-4 py-6 mt-3">
+      <p className="dark:text-white ml-1">Siste hendelser:</p>
+      {/* Skal vise de siste 3 hendelsene. Eksempeldata: */}
+      <LogElement fromName="Nora Langli" toName="Henrik Skog" punishmentType="ølstraff" punishmentValue={1} reason="skogstraff 🌲🌲🌲🌲" />
+      <LogElement fromName="Nora Langli" toName="Jo Gramnæs Tjernshaugen" punishmentType="ølstraff" punishmentValue={1} />
+      <LogElement fromName="Sondre Alfnes" punishmentType="vinstraff" punishmentValue={2} paid={true}/>
+    </div>
+    </>
   )
 }
