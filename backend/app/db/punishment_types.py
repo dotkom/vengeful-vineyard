@@ -22,7 +22,7 @@ class PunishmentTypes:
         conn: Optional[Pool] = None,
     ) -> dict[PunishmentTypeId, PunishmentTypeRead]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = "SELECT * FROM punishment_types WHERE group_id = $1"
+            query = "SELECT *, text(punishment_type_id) as punishment_type_id FROM punishment_types WHERE group_id = $1"
             punishment_types = await conn.fetch(query, group_id)
 
         return {

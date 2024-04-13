@@ -885,12 +885,18 @@ async def add_punishment(
                 detail="Brukeren er ikke et medlem av gruppen",
             )
 
-        # Check that no punishment have too high amount
+        group_punishment_types = await app.db.punishment_types.get_all(group_id)
+        # Check that no punishment have too high amount or is not part of group
         for punishment in punishments:
             if punishment.amount > 9:
                 raise HTTPException(
                     status_code=400,
                     detail="Du kan ikke gi så mange straffer på en gang",
+                )
+            if punishment.punishment_type_id not in group_punishment_types:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Ugyldig straff, last inn siden på nytt"
                 )
 
         try:
@@ -1462,7 +1468,7 @@ async def join_group(
                 status_code=403,
                 detail="Invitasjonskoden er ikke gyldig for denne gruppen",
             )
-        
+
         if group.ow_group_id is not None:
             raise HTTPException(
                 status_code=403,
