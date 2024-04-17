@@ -15,6 +15,7 @@ import { useGivePunishmentModal } from "../../../helpers/context/modal/givePunis
 import { useNotification } from "../../../helpers/context/notificationContext"
 import { useErrorControl } from "../../../helpers/form"
 import { sortGroupUsersByName } from "../../../helpers/sorting"
+import AlcoholGame from "../../../components/alcoholGame"
 
 interface GivePunishmentModalProps {
   open: boolean
@@ -81,11 +82,12 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
     })
 
   const handlePrimaryActionClick = (): boolean => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent)
+    // TODO: Remove: || true
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent) || true
     const isAfter10PM = new Date().getHours() >= 22 || true
 
+    setShowAlcoholTest(!showAlcoholTest)
     if (isMobile && !showAlcoholTest && isAfter10PM) {
-      setShowAlcoholTest(!showAlcoholTest)
       return false
     }
 
@@ -94,14 +96,20 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
 
     if (!data.success) return false
 
+    setOpen(false)
     mutate()
     return true
+  }
+
+  const quitModal = () => {
+    setShowAlcoholTest(false)
+    setOpen(false)
   }
 
   return (
     <>
       {showAlcoholTest ? (
-        <AlchoholGame />
+        <AlcoholGame next={handlePrimaryActionClick} quit={quitModal} />
       ) : (
         <Transition.Root show={open} as={Fragment}>
           <Modal
@@ -154,13 +162,5 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
         </Transition.Root>
       )}
     </>
-  )
-}
-
-const AlchoholGame = () => {
-  return (
-    <div className="w-full h-full mt-[-65px] bg-black fixed z-10 opacity-50">
-      <h1 className="text-white md:hidden">YOYO</h1>
-    </div>
   )
 }
