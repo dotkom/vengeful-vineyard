@@ -27,12 +27,14 @@ OW_GROUP_ROLES = {
     1065: "treasurer",
     1069: "chief_editor",
     1079: "board_member",
+    1071: "wine_penalty_manager",
 }
 
 
 OW_GROUP_ROLES_TO_PERMISSIONS: dict[int, tuple[str, ...]] = {
     1063: ("group.owner",),
     1064: ("group.admin",),
+    1071: ("group.moderator",),
 }
 
 
