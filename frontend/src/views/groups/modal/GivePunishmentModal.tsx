@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
 import { groupLeaderboardQuery, addManyPunishmentsMutation } from "../../../helpers/api"
 import { Group, GroupUser } from "../../../helpers/types"
@@ -12,7 +12,6 @@ import { Toggle } from "../../../components/input/Toggle"
 import { Modal } from "../../../components/modal/Modal"
 import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 import { useGivePunishmentModal } from "../../../helpers/context/modal/givePunishmentModalContext"
-import { useNotification } from "../../../helpers/context/notificationContext"
 import { useErrorControl } from "../../../helpers/form"
 import { sortGroupUsersByName } from "../../../helpers/sorting"
 import AlcoholGame from "../../../components/alcoholGame"
@@ -82,9 +81,8 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
     })
 
   const handlePrimaryActionClick = (): boolean => {
-    // TODO: Remove: || true
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent) || true
-    const isAfter10PM = new Date().getHours() >= 22 || true
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent)
+    const isAfter10PM = new Date().getHours() >= 22
 
     setShowAlcoholTest(!showAlcoholTest)
     if (isMobile && !showAlcoholTest && isAfter10PM) {
