@@ -1,24 +1,45 @@
-import { useState } from "react"
-const AlcoholGame = ({ quit, next }: { quit: any; next: any }) => {
+import { Dialog, Transition } from "@headlessui/react"
+import { Fragment, forwardRef, useState } from "react"
+
+interface AlcoholGameProps {
+  quit: any
+  next: any
+}
+
+const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }, ref) => {
   const [reactionTime, setReactionTime] = useState<number | null>(null)
   const [startTime, setStartTime] = useState<number | null>(null)
   const [isTestRunning, setIsTestRunning] = useState(false)
   const [isTestFinished, setIsTestFinished] = useState(false)
-  const [isWaiting, setIsWaiting] = useState(false) // new state variable
+  const [isWaiting, setIsWaiting] = useState(false)
 
-  //   Is the random time used for the delay in the test, from 1 second to X
   const randomTime = 3
+  const [timeoutHandle, setTimeoutHandle] = useState<ReturnType<typeof setTimeout> | null>(null)
 
   const startTest = () => {
-    setIsWaiting(true) // set waiting state to true
+    setIsWaiting(true)
     setIsTestFinished(false)
     setReactionTime(null)
-    const delay = Math.random() * randomTime * 1000 + 1000 // generates a random delay between 1-5 seconds
+    const delay = Math.random() * randomTime * 1000 + 1000
+    setTimeoutHandle(
+      setTimeout(() => {
+        showClick()
+      }, delay)
+    )
+  }
+
+  const cancelWaiting = () => {
+    clearTimeout(timeoutHandle as ReturnType<typeof setTimeout>)
+    endTest()
     setTimeout(() => {
-      setIsWaiting(false) // set waiting state to false
-      setIsTestRunning(true)
-      setStartTime(Date.now())
-    }, delay)
+      setReactionTime(null)
+    }, 50)
+  }
+
+  const showClick = () => {
+    setIsWaiting(false)
+    setIsTestRunning(true)
+    setStartTime(Date.now())
   }
 
   const endTest = () => {
@@ -29,51 +50,87 @@ const AlcoholGame = ({ quit, next }: { quit: any; next: any }) => {
     setIsTestFinished(true)
   }
 
-  //   TODO USE MODAL INSTEAD:
-  // TODO Tips, Modal.tsx
-  // TODO use dialog
+  const [open, setOpen] = useState(true)
+  const onClose = () => {
+    quit()
+    setOpen(false)
+  }
 
   return (
-    <div className="w-full h-full fixed flex flex-col justify-center items-center text-center">
-      <div className="w-full h-full bg-black fixed z-10 opacity-50"></div>
-      <div
-        className={`w-full h-full fixed z-[30] flex flex-col justify-center items-center p-4 ${
-          isTestRunning ? "bg-red-500" : "bg-green-500"
-        }`}
+    <Transition.Root show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={() => {
+          if (onClose) onClose()
+          setOpen(false)
+        }}
+        ref={ref}
       >
-        <div
-          className={`flex flex-col justify-center items-center text-white cursor-pointer ${
-            isTestRunning ? "bg-red-500" : "bg-green-500"
-          }`}
-          onClick={isTestRunning ? endTest : startTest}
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-100"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
-          {isTestRunning ? (
-            <p className="text-2xl font-bold">Click anywhere now!</p>
-          ) : isTestFinished ? (
-            <>
-              <p className="text-lg">Your reaction time was: {reactionTime}ms</p>
-              <button onClick={quit} className="py-2 px-4 bg-gray-700 text-white rounded-lg mt-4">
-                Quit
-              </button>
-              <button onClick={startTest} className="py-2 px-4 bg-blue-500 text-white rounded-lg mt-4">
-                Try Again
-              </button>
-              {reactionTime && reactionTime > 500 ? (
-                <p className="text-red-500 mt-4">Sorry, you are too drunk</p>
-              ) : (
-                <button className="py-2 px-4 bg-yellow-500 text-white rounded-lg mt-4" onClick={next}>
-                  Give penalty
-                </button>
-              )}
-            </>
-          ) : isWaiting ? (
-            <p className="text-xl">Wait...</p>
-          ) : (
-            <p className="text-xl">Click anywhere to start the test</p>
-          )}
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </Transition.Child>
+        <div className="fixed inset-0 z-10 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-100"
+              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enterTo="opacity-100 translate-y-0 sm:scale-100"
+              leave="ease-in duration-100"
+              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+              <Dialog.Panel className="relative transform bg-gray-50 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div
+                  className={`flex h-[600px] flex-col justify-center items-center text-white ${
+                    isTestRunning ? "bg-red-500" : "bg-green-500"
+                  }${!isTestFinished ? " cursor-pointer" : ""}`}
+                  onClick={
+                    !isTestFinished ? (isTestRunning ? endTest : isWaiting ? cancelWaiting : startTest) : () => {}
+                  }
+                >
+                  {isTestRunning ? (
+                    <p className="text-2xl font-bold">Click anywhere now!</p>
+                  ) : isTestFinished ? (
+                    <>
+                      <p className="text-lg">Your reaction time was: {reactionTime}ms</p>
+                      <button onClick={() => onClose()} className="py-2 px-4 bg-gray-700 text-white rounded-lg mt-4">
+                        Quit
+                      </button>
+                      <button onClick={startTest} className="py-2 px-4 bg-blue-500 text-white rounded-lg mt-4">
+                        Try Again
+                      </button>
+                      {reactionTime && reactionTime < 500 ? (
+                        <button className="py-2 px-4 bg-yellow-500 text-white rounded-lg mt-4" onClick={next}>
+                          Give penalty
+                        </button>
+                      ) : (
+                        <p className="text-red-500 mt-4">
+                          {reactionTime ? "Sorry, you are too drunk" : "Sorry, but you are to quick"}
+                        </p>
+                      )}
+                    </>
+                  ) : isWaiting ? (
+                    <p className="text-xl">Wait...</p>
+                  ) : (
+                    <p className="text-xl">Click anywhere to start the test</p>
+                  )}
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
         </div>
-      </div>
-    </div>
+      </Dialog>
+    </Transition.Root>
   )
-}
+})
 export default AlcoholGame
