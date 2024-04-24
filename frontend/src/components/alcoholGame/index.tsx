@@ -1,5 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
-import { Fragment, forwardRef, useState } from "react"
+import { Fragment, forwardRef, useState, useEffect } from "react"
+import Cookies from "js-cookie"
 
 interface AlcoholGameProps {
   quit: any
@@ -12,11 +13,27 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
   const [isTestRunning, setIsTestRunning] = useState(false)
   const [isTestFinished, setIsTestFinished] = useState(false)
   const [isWaiting, setIsWaiting] = useState(false)
+  const [failCount, setFailCount] = useState<number>(0)
+  const [blocked, setBlocked] = useState<boolean>(false)
 
   const randomTime = 3
   const [timeoutHandle, setTimeoutHandle] = useState<ReturnType<typeof setTimeout> | null>(null)
 
+  useEffect(() => {
+    const timestamp = Cookies.get("blockedTime")
+    if (timestamp) {
+      const diff = Date.now() - parseInt(timestamp)
+      if (diff < 3600000 * 2) {
+        setBlocked(true)
+      } else {
+        Cookies.remove("blockedTime")
+        setBlocked(false)
+      }
+    }
+  }, [])
+
   const startTest = () => {
+    if (blocked) return
     setIsWaiting(true)
     setIsTestFinished(false)
     setReactionTime(null)
@@ -45,7 +62,16 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
   const endTest = () => {
     setIsTestRunning(false)
     if (startTime) {
-      setReactionTime(Date.now() - startTime)
+      const newReactionTime = Date.now() - startTime
+      setReactionTime(newReactionTime)
+      if (newReactionTime >= 500) {
+        const newFailCount = failCount + 1
+        setFailCount(newFailCount)
+        if (newFailCount >= 3) {
+          Cookies.set("blockedTime", Date.now().toString())
+          setBlocked(true)
+        }
+      }
     }
     setIsTestFinished(true)
   }
@@ -98,11 +124,21 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
                     !isTestFinished ? (isTestRunning ? endTest : isWaiting ? cancelWaiting : startTest) : () => {}
                   }
                 >
-                  {isTestRunning ? (
-                    <p className="text-2xl font-bold">Click anywhere now!</p>
-                  ) : isTestFinished ? (
+                  {blocked ? (
                     <>
-                      <p className="text-lg">Your reaction time was: {reactionTime}ms</p>
+                      <p className="text-xl">You have failed too many times, YOU ARE DRUNK</p>
+                      <p className="text-xl"> Play again when sober :)</p>
+                      <button onClick={() => onClose()} className="py-2 px-4 bg-gray-700 text-white rounded-lg mt-4">
+                        Quit
+                      </button>
+                    </>
+                  ) : isTestRunning ? (
+                    <p className="text-2xl font-bold">Click anywhere now!</p>
+                  ) : isTestFinished || blocked ? (
+                    <>
+                      <p className="text-lg">
+                        {reactionTime ? `Your reaction time was: ${reactionTime}ms` : "Sorry, but you are too quick"}
+                      </p>
                       <button onClick={() => onClose()} className="py-2 px-4 bg-gray-700 text-white rounded-lg mt-4">
                         Quit
                       </button>
@@ -114,9 +150,7 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
                           Give penalty
                         </button>
                       ) : (
-                        <p className="text-red-500 mt-4">
-                          {reactionTime ? "Sorry, you are too drunk" : "Sorry, but you are to quick"}
-                        </p>
+                        <p className="text-red-500 mt-4">{reactionTime && "Sorry, you are too drunk"}</p>
                       )}
                     </>
                   ) : isWaiting ? (
