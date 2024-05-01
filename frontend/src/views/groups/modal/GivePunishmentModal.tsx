@@ -82,10 +82,10 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
 
   const handlePrimaryActionClick = (): boolean => {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent)
-    const isAfter10PM = new Date().getHours() >= 22
+    const isAfter8PM = new Date().getHours() >= 20
 
     setShowAlcoholTest(!showAlcoholTest)
-    if (isMobile && !showAlcoholTest && isAfter10PM) {
+    if (isMobile && !showAlcoholTest && isAfter8PM) {
       return false
     }
 
