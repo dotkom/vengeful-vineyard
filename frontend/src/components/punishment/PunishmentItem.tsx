@@ -57,7 +57,10 @@ export const PunishmentItem = ({
     onSuccess: () => dataRefetch(),
   })
 
-  const { mutate: removeReaction } = useMutation(removeReactionMutation(punishment.punishment_id, group_id))
+  const { mutate: removeReaction } = useMutation({
+    ...removeReactionMutation(punishment.punishment_id, group_id),
+    onSuccess: () => dataRefetch(),
+  })
 
   const { mutate: markPunishmentAsPaid } = useMutation(
     postPunishmentsPaidMutation(punishment.group_id!, [punishment.punishment_id])
