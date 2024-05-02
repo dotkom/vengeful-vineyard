@@ -66,7 +66,7 @@ Do deploy changes to the aws. You will need to have the AWS CLI installed and se
 First ask dotkom for credentials so that they can create a IAM user for you. Then do the following steps:
 
 - Install AWS CLI
-- Th`aws configure'
+- Then run `aws configure' in the terminal
   - Optional: Set up a new profile for the project
   - Instead run `aws configure --profile dotkom`
 
