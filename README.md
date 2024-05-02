@@ -14,7 +14,7 @@ The old and outdated version can be found here: [RedWine](https://online.ntnu.no
 ## Project Status
 
 The project is is finished🎉
-It is currently being maintained by [Online](https://online.ntnu.no/).
+It is currently being maintained by [Dotkom from the Online student association](https://online.ntnu.no/).
 
 The link to the page is: [Vengeful Vineyard](https://vinstraff.no/)
 
