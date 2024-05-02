@@ -13,11 +13,11 @@ export default function Tooltip({ names }: TooltipProps) {
   }
   return (
     <div className="relative hidden group-hover:inline-block animate-fadeIn z-50">
-      <div className="absolute -left-12 top-7">
-        <div className="absolute min-w-[120px] text-center text-white bg-black opacity-90 p-2 rounded-md z-10 text-sm font-medium">
+      <div className="absolute -left-12 top-7 opacity-90">
+        <div className="absolute min-w-[120px] text-center text-white bg-black p-2 rounded-md z-10 text-sm font-medium">
           {tooltipText}
         </div>
-        <div className="absolute -bottom-1 left-5 w-5 h-5 bg-black opacity-90 transform rotate-45 origin-bottom-left" />
+        <div className="absolute -bottom-1 left-5 w-5 h-5 bg-black transform rotate-45 origin-bottom-left" />
       </div>
     </div>
   )

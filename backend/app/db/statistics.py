@@ -8,7 +8,9 @@ class Statistics:
     def __init__(self, db: "Database") -> None:
         self.db = db
 
-    async def get_all_group_statistics(self, conn: Optional[Pool] = None) -> dict[str, int]:
+    async def get_all_group_statistics(
+        self, conn: Optional[Pool] = None
+    ) -> dict[str, int]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
            SELECT
@@ -31,6 +33,8 @@ class Statistics:
             ORDER BY total_value DESC
                     """
             res = await conn.fetch(query)
+            if not res:
+                return []
             return [dict(row) for row in res]
 
     async def get_group_statistics(self, group_id: str, conn: Optional[Pool] = None):
@@ -59,6 +63,8 @@ class Statistics:
             GROUP BY u.user_id, u.first_name, u.last_name, u.email
             """
             res = await conn.fetchrow(query, group_id)
+            if not res:
+                return []
             return dict(res)
 
     async def get_user_statistics(self, user_id: str, conn: Optional[Pool] = None):
@@ -79,4 +85,6 @@ class Statistics:
             WHERE u.user_id = $1
             """
             res = await conn.fetchrow(query, user_id)
+            if not res:
+                return []
             return dict(res)
