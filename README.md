@@ -72,6 +72,8 @@ First ask dotkom for credentials so that they can create a IAM user for you. The
 
 ### Backend Deployment Instructions
 
+Note: You will need to have jq installed.
+
 - `cd backend`
 - `make deploy-prod`
   - Optionally if you are having profiles set up, you can run `make deploy-prod PROFILE=dotkom`
