@@ -44,7 +44,7 @@ const queryClient = new QueryClient()
 const configuration: AuthProviderProps = {
   client_id: import.meta.env.AUTH0_CLIENT_ID,
   redirect_uri: import.meta.env.VITE_REDIRECT_URI,
-  scope: "openid profile email",
+  scope: "openid profile email offline_access",
   authority: import.meta.env.AUTH0_ISSUER,
   metadataUrl: `${import.meta.env.AUTH0_ISSUER}/.well-known/openid-configuration`,
   automaticSilentRenew: true,
