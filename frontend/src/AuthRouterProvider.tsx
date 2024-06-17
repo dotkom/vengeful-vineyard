@@ -12,7 +12,7 @@ const authenticatedRouter = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route path="/" element={<GroupView />} />
-      <Route path="/gruppe/:groupName/:inviteCode?" element={<GroupView />} />
+      <Route path="/gruppe/:groupName/" element={<GroupView />} />
       <Route path="/profil" element={<Profile />} />
       <Route path="/wall-of-shame" element={<WallOfShame />} />
       <Route path="/committees" element={<Committees />} />
@@ -24,7 +24,7 @@ const unauthenticatedRouter = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/gruppe/:groupName/:inviteCode?" element={<LoginRegisterPromptPage />} />
+      <Route path="/gruppe/:groupName/" element={<LoginRegisterPromptPage />} />
       <Route path="/profil" element={<Navigate to="/" />} />
       <Route path="/wall-of-shame" element={<Navigate to="/" />} />
       <Route path="/committees" element={<Navigate to="/" />} />

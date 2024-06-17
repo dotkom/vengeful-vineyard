@@ -57,7 +57,7 @@ export const GroupView = () => {
 
   const params = useParams<{ groupName?: string; inviteCode?: string }>()
   const selectedGroupName = params.groupName
-  const inviteCode = params.inviteCode
+  const inviteCode = window.location.hash.substring(1)
 
   const [searchTerm, setSearchTerm] = useState("")
   const [toggledPunishmentTypesOptions, setToggledPunishmentTypesOptions] = useState<ToggleOption<string>[]>([])
