@@ -13,7 +13,10 @@ The old and outdated version can be found here: [RedWine](https://online.ntnu.no
 
 ## Project Status
 
-Under development 🚧
+The project is is finished🎉
+It is currently being maintained by [Dotkom from the Online student association](https://online.ntnu.no/).
+
+The link to the page is: [Vengeful Vineyard](https://vinstraff.no/)
 
 ## Frontend
 
@@ -59,20 +62,30 @@ If you don't have `pre-commit` installed, you can install it with `pip install p
 
 ## Deploying changes
 
+Do deploy changes to the aws. You will need to have the AWS CLI installed and set up.
+First ask dotkom for credentials so that they can create a IAM user for you. Then do the following steps:
+
 - Install AWS CLI
-- `aws configure` - Get credentials from doppler: `monoweb/dev`
+- Then run `aws configure' in the terminal
+  - Optional: Set up a new profile for the project
+  - Instead run `aws configure --profile dotkom`
 
 ### Backend Deployment Instructions
 
+Note: You will need to have jq installed.
+
 - `cd backend`
-- `make deploy`
+- `make deploy-prod`
+  - Optionally if you are having profiles set up, you can run `make deploy-prod PROFILE=dotkom`
 
 ### Frontend Deployment Instructions
+Note: You will need to have the Doppler CLI installed and set up.
 
 - `doppler login`
 - `doppler setup` - (select vengeful-vineyard, dev)
 - `cd frontend`
-- `doppler run pnpm build`
+- `npm run deploy:prod`
+  - Optionallly if you are having profiles set up, you can run `npm run deploy:prd -- --profile dotkom`
 
 ### Debugging Tips
 

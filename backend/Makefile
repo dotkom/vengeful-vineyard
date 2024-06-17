@@ -1,6 +1,8 @@
 export SHELL:=/bin/bash
 export SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)pipefail:errexit
 
+PROFILE ?= default
+
 .ONESHELL:
 .PHONY: prod dev dev-memory test testv testvv mypy pylint clean help hooks docs
 
@@ -65,19 +67,19 @@ docker-push-staging:
 	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-staging:0.2.2 && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-staging:0.2.2
 
 docker-login:
-	aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
+	aws ecr get-login-password --region eu-north-1 --profile $(PROFILE) | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
 
 lightsail-redeploy-staging:
-	./lightsail-deploy-staging.sh
+	./lightsail-deploy-staging.sh $(PROFILE)
 
 wait-for-lightsail-staging:
-	./wait-for-lightsail-deploy-staging.sh
+	./wait-for-lightsail-deploy-staging.sh $(PROFILE)
 
 lightsail-redeploy-prod:
-	./lightsail-deploy-prod.sh
+	./lightsail-deploy-prod.sh $(PROFILE)
 
 wait-for-lightsail-prod:
-	./wait-for-lightsail-deploy-prod.sh
+	./wait-for-lightsail-deploy-prod.sh $(PROFILE)
 
 deploy-prod: docker-build docker-login docker-push-prod lightsail-redeploy-prod wait-for-lightsail-prod
 
