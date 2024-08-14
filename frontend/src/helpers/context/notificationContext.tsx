@@ -68,7 +68,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       ...newNotification,
     })
 
-    currentTimeout = setTimeout(() => {
+    currentTimeout = window.setTimeout(() => {
       setNotification((prevState) => ({
         ...prevState,
         show: false,
