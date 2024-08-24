@@ -24,7 +24,7 @@ interface GivePunishmentModalProps {
 const CreatePunishment = z.object({
   punishment_type_id: z.string().default(""),
   reason: z.string().default(""),
-  reason_hidden: z.boolean().default(true),
+  reason_hidden: z.boolean().default(false),
   amount: z.number().min(1, { message: "Straffemengde må være minst 1" }).default(1),
 })
 
