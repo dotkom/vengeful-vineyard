@@ -61,29 +61,17 @@ docker-build:
 	docker build -f Dockerfile --platform linux/amd64 -t vengeful-vineyard-server:latest .
 
 docker-push-prod:
-	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-prod:0.2.2 && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-prod:0.2.2
+	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard/prod/server:latest && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard/prod/server:latest
 
 docker-push-staging:
-	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-staging:0.2.2 && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-server-staging:0.2.2
+	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard/staging/server:latest && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard/staging/server:latest
 
 docker-login:
 	aws ecr get-login-password --region eu-north-1 --profile $(PROFILE) | docker login --username AWS --password-stdin 891459268445.dkr.ecr.eu-north-1.amazonaws.com
 
-lightsail-redeploy-staging:
-	./lightsail-deploy-staging.sh $(PROFILE)
+deploy-prod: docker-build docker-login docker-push-prod
 
-wait-for-lightsail-staging:
-	./wait-for-lightsail-deploy-staging.sh $(PROFILE)
-
-lightsail-redeploy-prod:
-	./lightsail-deploy-prod.sh $(PROFILE)
-
-wait-for-lightsail-prod:
-	./wait-for-lightsail-deploy-prod.sh $(PROFILE)
-
-deploy-prod: docker-build docker-login docker-push-prod lightsail-redeploy-prod wait-for-lightsail-prod
-
-deploy-staging: docker-build docker-login docker-push-staging lightsail-redeploy-staging wait-for-lightsail-staging
+deploy-staging: docker-build docker-login docker-push-staging
 
 help:
 	@echo "Makefile commands:"
