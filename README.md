@@ -72,11 +72,10 @@ First ask dotkom for credentials so that they can create a IAM user for you. The
 
 ### Backend Deployment Instructions
 
-Note: You will need to have jq installed.
-
 - `cd backend`
 - `make deploy-prod`
   - Optionally if you are having profiles set up, you can run `make deploy-prod PROFILE=dotkom`
+- Go to the Terraform monorepo and run `doppler run terraform apply` inside the `staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory
 
 ### Frontend Deployment Instructions
 Note: You will need to have the Doppler CLI installed and set up.
