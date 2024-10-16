@@ -11,11 +11,11 @@ prod: .prod-reqs
 	# PROD NOT FOR USE
 
 devv:
-	docker-compose up
+	docker compose up
 
 dev:
-	docker-compose rm -f
-	docker-compose up
+	docker compose rm -f
+	docker compose up
 
 test:
 	docker-compose rm -f

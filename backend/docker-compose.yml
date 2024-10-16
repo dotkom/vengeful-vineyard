@@ -22,7 +22,7 @@ services:
       - SENTRY_ENVIRONMENT
 
   db:
-    image: postgres:15.6-alpine
+    image: postgres:15.8
     restart: unless-stopped
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
