@@ -63,16 +63,29 @@ class Users:
         conn: Optional[Pool] = None,
     ) -> User:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            if not is_ow_user_id:
-                query = "SELECT * FROM users WHERE user_id = $1"
-            else:
-                query = "SELECT * FROM users WHERE ow_user_id = $1"
+            print("tttttt  tt")
+            query = "SELECT * FROM users WHERE ow_user_id = $1"
 
-            db_user = await conn.fetchrow(query, user_id)
+            print("eeeeeee")
+            db_user = await conn.fetchrow(query, 123)
 
             if db_user is None:
-                raise NotFound
-
+                query = """INSERT INTO users(ow_user_id, first_name, last_name, email)
+                    VALUES ($1, $2, $3, $4)
+                    ON CONFLICT (ow_user_id)
+                    DO UPDATE SET first_name = $2, last_name = $3, email = $4
+                    RETURNING user_id"""
+                user_id = await conn.fetchval(
+                    query,
+                    123,
+                    "sondre",
+                    "alfnes",
+                    "test@mail.com"
+                )
+                db_user = await conn.fetchrow(query, 123)
+                # raise NotFound
+            print("finalllll")
+            print(User(**db_user))
             return User(**db_user)
 
     async def upsert(

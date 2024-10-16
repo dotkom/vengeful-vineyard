@@ -77,11 +77,11 @@ async def get_leadeboard(
     user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        is_in_any_ow_group = await app.db.groups.is_in_any_ow_group(user_id, conn=conn)
-        if not is_in_any_ow_group:
-            raise HTTPException(
-                status_code=403, detail="Du har ikke tilgang til denne ressursen"
-            )
+        # is_in_any_ow_group = await app.db.groups.is_in_any_ow_group(user_id, conn=conn)
+        # if not is_in_any_ow_group:
+        #     raise HTTPException(
+        #         status_code=403, detail="Du har ikke tilgang til denne ressursen"
+        #     )
 
         pagination = Pagination[MinifiedLeaderboardUser](
             request=request,

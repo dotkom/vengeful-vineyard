@@ -33,7 +33,7 @@ class GroupCreate(GroupBase):
             name=group.name,
             name_short=group.name_short,
             rules="",
-            ow_group_id=None,
+            ow_group_id=len(group.name),
             image="",
         )
 

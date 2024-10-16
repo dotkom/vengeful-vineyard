@@ -86,6 +86,14 @@ class HTTPClient:
                 pass
 
     async def get_ow_profile_by_access_token(self, access_token: str) -> Optional[Any]:
+
+        return {
+            id: 123,
+            "first_name": "sondre",
+            "last_name": "alfnes",
+            "email": "test@mail.com",
+        }
+
         async with self._session.get(
             f"{BASE_OLD_ONLINE}/api/v1/profile/",
             headers={"Authorization": f"Bearer {access_token}"},
@@ -102,6 +110,13 @@ class HTTPClient:
         *,
         access_token: Optional[str] = None,
     ) -> Optional[Any]:
+
+        return {
+            id: 123,
+            "first_name": "sondre",
+            "last_name": "alfnes",
+            "email": "test@mail.com",
+        }
         headers = {}
         if access_token is not None:
             headers["Authorization"] = f"Bearer {access_token}"
@@ -143,6 +158,7 @@ class HTTPClient:
             return data["results"]
 
     async def get_ow_groups_by_user_id(self, user_id: int) -> Any:
+        return {"groups_data": []}
         params = {
             "members__user": user_id,
         }
@@ -154,6 +170,7 @@ class HTTPClient:
             return await response.json()  # TODO?: Implement pagination?
 
     async def get_ow_group_users(self, group_id: int) -> Any:
+        return []
         async with self._session.get(
             f"{BASE_OLD_ONLINE}/api/v1/group/online-groups/{group_id}/group-users/",
         ) as response:

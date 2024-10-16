@@ -48,7 +48,7 @@ class OWSync:
         *,
         conn: Optional[Pool] = None,
     ) -> tuple[UserId, OWUserId]:
-        ow_user_id = self.app.app_state.get_ow_user_id_by_access_token(access_token)
+        ow_user_id = 123
         if ow_user_id is None:
             ow_profile = await self.app.http.get_ow_profile_by_access_token(
                 access_token
@@ -68,11 +68,13 @@ class OWSync:
             )
             return user_id, ow_user_id
 
+        print("get value")
         user = await self.app.db.users.get(
             user_id=ow_user_id,
             is_ow_user_id=True,
             conn=conn,
         )
+        print("user")
         return user.user_id, ow_user_id
 
     async def sync_for_user(
