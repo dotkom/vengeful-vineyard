@@ -84,7 +84,7 @@ Note: You will need to have the Doppler CLI installed and set up.
 - `doppler setup` - (select vengeful-vineyard, dev)
 - `cd frontend`
 - `npm run deploy:prod`
-  - Optionallly if you are having profiles set up, you can run `npm run deploy:prd -- --profile dotkom`
+  - Optionallly if you are having profiles set up, you can run `npm run deploy:prod -- --profile=dotkom`
 
 ### Debugging Tips
 
