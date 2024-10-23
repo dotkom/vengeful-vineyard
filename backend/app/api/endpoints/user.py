@@ -71,7 +71,7 @@ async def get_leadeboard(
     request: Request,
     page: int = Query(title="Page number", default=0, ge=0),
     page_size: int = Query(title="Page size", default=30, ge=1, le=50),
-    this_year: bool = Query(title="Only show users from this year", default=False),
+    this_year: bool = Query(title="Only show users from this year", default=True),
 ) -> Page[MinifiedLeaderboardUser]:
     access_token = request.raise_if_missing_authorization()
 
