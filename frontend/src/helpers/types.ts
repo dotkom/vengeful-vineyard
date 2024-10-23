@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { postPunishmentTypeMutation } from "./api"
 
 export const UserSchema = z.object({
   ow_user_id: z.number(),
@@ -98,6 +97,10 @@ export const LeaderboardUserSchema = UserSchema.extend({
   emojis: z.string(),
   amount_punishments: z.number(),
   amount_unique_punishments: z.number(),
+  total_value_this_year: z.number(),
+  emojis_this_year: z.string(),
+  amount_punishments_this_year: z.number(),
+  amount_unique_punishments_this_year: z.number(),
 })
 export type LeaderboardUser = z.infer<typeof LeaderboardUserSchema>
 
