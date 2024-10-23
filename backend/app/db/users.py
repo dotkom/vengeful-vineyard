@@ -354,6 +354,7 @@ class Users:
 
     async def get_minified_leaderboard(
         self,
+        this_year: bool,
         offset: int,
         limit: int,
         conn: Optional[Pool] = None,
@@ -399,10 +400,14 @@ class Users:
             LEFT JOIN groups g
                 ON g.group_id = gm.group_id
             WHERE g.ow_group_id IS NOT NULL OR g.special
-            ORDER BY total_value DESC, u.first_name ASC
-            OFFSET $1
-            LIMIT $2
             """
+
+            if this_year:
+                query += "ORDER BY total_value_this_year DESC, u.first_name ASC "
+            else:
+                query += "ORDER BY total_value DESC, u.first_name ASC "
+            query += "OFFSET $1 LIMIT $2"
+
             res = await conn.fetch(
                 query,
                 offset,

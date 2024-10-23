@@ -3,7 +3,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { leaderboardQuery, userQuery } from "../../helpers/api"
 import { Button } from "../../components/button/Button"
 import { useCurrentUser } from "../../helpers/context/currentUserContext"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export const WallOfShame = () => {
   const { setCurrentUser } = useCurrentUser()
@@ -18,7 +18,11 @@ export const WallOfShame = () => {
     },
   })
 
-  const { isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(leaderboardQuery())
+  const { isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(leaderboardQuery(filter === "year"))
+
+  useEffect(() => {
+    refetch()
+  }, [filter, refetch])
 
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)
 
