@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from asyncpg import Pool
 from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
