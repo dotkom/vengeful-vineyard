@@ -5,7 +5,12 @@ from asyncpg.exceptions import UniqueViolationError
 
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group
-from app.models.user import LeaderboardUser, MinifiedLeaderboardUser, User, UserCreate, UserUpdate
+from app.models.user import (
+    MinifiedLeaderboardUser,
+    User,
+    UserCreate,
+    UserUpdate,
+)
 from app.models.punishment import LeaderboardPunishmentRead
 from app.types import InsertOrUpdateUser, OWUserId, UserId
 from app.utils.db import MaybeAcquire
@@ -364,7 +369,11 @@ class Users:
                 COALESCE(p.total_value, 0) AS total_value,
                 COALESCE(p.emojis, '') AS emojis,
                 COALESCE(p.amount_punishments, 0) AS amount_punishments,
-                COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments
+                COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments,
+                COALESCE(p.total_value_this_year, 0) AS total_value_this_year,
+                COALESCE(p.emojis_this_year, '') AS emojis_this_year,
+                COALESCE(p.amount_punishments_this_year, 0) AS amount_punishments_this_year,
+                COALESCE(p.amount_unique_punishments_this_year, 0) AS amount_unique_punishments_this_year
             FROM users u
             LEFT JOIN (
                 SELECT
@@ -372,7 +381,11 @@ class Users:
                     SUM(pt.value * p.amount) AS total_value,
                     STRING_AGG(REPEAT(pt.emoji, p.amount), '') AS emojis,
                     SUM(p.amount) AS amount_punishments,
-                    COUNT(DISTINCT p.punishment_type_id) AS amount_unique_punishments
+                    COUNT(DISTINCT p.punishment_type_id) AS amount_unique_punishments,
+                    SUM(CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN pt.value * p.amount ELSE 0 END) AS total_value_this_year,
+                    STRING_AGG(CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN REPEAT(pt.emoji, p.amount) ELSE '' END, '') AS emojis_this_year,
+                    SUM(CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN p.amount ELSE 0 END) AS amount_punishments_this_year,
+                    COUNT(DISTINCT CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN p.punishment_type_id ELSE NULL END) AS amount_unique_punishments_this_year
                 FROM group_punishments p
                 LEFT JOIN punishment_types pt
                     ON pt.punishment_type_id = p.punishment_type_id
