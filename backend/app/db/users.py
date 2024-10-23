@@ -5,7 +5,12 @@ from asyncpg.exceptions import UniqueViolationError
 
 from app.exceptions import DatabaseIntegrityException, NotFound
 from app.models.group import Group
-from app.models.user import LeaderboardUser, MinifiedLeaderboardUser, User, UserCreate, UserUpdate
+from app.models.user import (
+    MinifiedLeaderboardUser,
+    User,
+    UserCreate,
+    UserUpdate,
+)
 from app.models.punishment import LeaderboardPunishmentRead
 from app.types import InsertOrUpdateUser, OWUserId, UserId
 from app.utils.db import MaybeAcquire
@@ -403,9 +408,6 @@ class Users:
                 offset,
                 limit,
             )
-            
-            print("------test")
-            print([MinifiedLeaderboardUser(**r) for r in res])
 
         return [MinifiedLeaderboardUser(**r) for r in res]
 
