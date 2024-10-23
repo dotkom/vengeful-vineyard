@@ -359,11 +359,6 @@ class Users:
         limit: int,
         conn: Optional[Pool] = None,
     ) -> list[MinifiedLeaderboardUser]:
-        print(conn)
-
-        print("---------------------------")
-        print(offset)
-        print(limit)
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """
             SELECT
