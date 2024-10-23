@@ -69,7 +69,7 @@ async def get_me(
 async def get_leadeboard(
     request: Request,
     page: int = Query(title="Page number", default=0, ge=0),
-    page_size: int = Query(title="Page size", default=30, ge=1, le=50),
+    page_size: int = Query(title="Page size", default=30, ge=1, le=50)
 ) -> Page[MinifiedLeaderboardUser]:
     access_token = request.raise_if_missing_authorization()
 
@@ -89,7 +89,7 @@ async def get_leadeboard(
             # results_coro=app.db.users.get_leaderboard,
             results_coro=app.db.users.get_minified_leaderboard,
             page=page,
-            page_size=page_size,
+            page_size=page_size
         )
         return await pagination.paginate(conn=conn)
     
