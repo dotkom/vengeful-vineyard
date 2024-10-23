@@ -43,16 +43,16 @@ export const WallOfShame = () => {
         <div className="absolute left-0 flex space-x-2 text-sm mt-1">
           <button
             onClick={() => setFilter("year")}
-            className={`w-24 border border-gray-200 py-1 rounded-lg bg-white ${
-              filter === "year" ? "bg-slate-100" : ""
+            className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400 ${
+              filter === "year" ? "bg-slate-100 dark:bg-slate-800" : ""
             }`}
           >
             {year}
           </button>
           <button
             onClick={() => setFilter("alltime")}
-            className={`w-24 border border-gray-200 py-1 rounded-lg bg-white ${
-              filter === "alltime" ? "bg-slate-100" : ""
+            className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400  ${
+              filter === "alltime" ? "bg-slate-100 dark:bg-slate-800" : ""
             }`}
           >
             All time
