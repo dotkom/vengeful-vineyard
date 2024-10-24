@@ -665,7 +665,7 @@ const getLeaderboard = async ({ pageParam = 0, this_year = true }) =>
 export const leaderboardQuery = (
   this_year: boolean = true
 ): UseInfiniteQueryOptions<Leaderboard, unknown, Leaderboard, Leaderboard, string[]> => ({
-  queryKey: ["leaderboard"],
+  queryKey: ["leaderboard", this_year.toString()],
   queryFn: ({ pageParam = 0 }) => getLeaderboard({ pageParam, this_year }),
   getNextPageParam: (lastPage: Leaderboard) => {
     const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
