@@ -2,6 +2,7 @@
 User endpoints
 """
 
+from functools import partial
 from app.models.punishment import LeaderboardPunishmentRead
 from fastapi import APIRouter, Depends, HTTPException, Query
 
@@ -69,7 +70,8 @@ async def get_me(
 async def get_leadeboard(
     request: Request,
     page: int = Query(title="Page number", default=0, ge=0),
-    page_size: int = Query(title="Page size", default=30, ge=1, le=50)
+    page_size: int = Query(title="Page size", default=30, ge=1, le=50),
+    this_year: bool = Query(title="Only show users from this year", default=True),
 ) -> Page[MinifiedLeaderboardUser]:
     access_token = request.raise_if_missing_authorization()
 
@@ -87,12 +89,13 @@ async def get_leadeboard(
             request=request,
             total_coro=app.db.users.get_leaderboard_count,
             # results_coro=app.db.users.get_leaderboard,
-            results_coro=app.db.users.get_minified_leaderboard,
+            results_coro=partial(app.db.users.get_minified_leaderboard, this_year),
             page=page,
             page_size=page_size
         )
         return await pagination.paginate(conn=conn)
-    
+
+
 @router.get(
     "/leaderboard/punishments/{user_id}",
     response_model=list[LeaderboardPunishmentRead],
@@ -108,4 +111,6 @@ async def get_user_punishments(
     _, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        return await app.db.users.get_punishments_for_leaderboard_user(user_id, conn=conn)
+        return await app.db.users.get_punishments_for_leaderboard_user(
+            user_id, conn=conn
+        )

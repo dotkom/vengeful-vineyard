@@ -75,7 +75,9 @@ First ask dotkom for credentials so that they can create a IAM user for you. The
 - `cd backend`
 - `make deploy-prod`
   - Optionally if you are having profiles set up, you can run `make deploy-prod PROFILE=dotkom`
-- Go to the Terraform monorepo and run `doppler run terraform apply` inside the `staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory
+- Go to the Terraform monorepo and get into correct stage, `staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory
+  - Run `terraform init` or optionally `AWS_PROFILE=dotkom terraform init`
+  - Then apply the changes with `doppler run terraform apply` or optionally `AWS_PROFILE=dotkom doppler run terraform apply`
 
 ### Frontend Deployment Instructions
 Note: You will need to have the Doppler CLI installed and set up.

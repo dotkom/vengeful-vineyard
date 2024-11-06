@@ -1,6 +1,7 @@
 """
 Group endpoints
 """
+
 import time
 from functools import partial
 
@@ -10,7 +11,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from app.api import APIRoute, Request, oidc
 from app.config import INDEXED_ROLES
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
-from app.models.group import Group, GroupPublic, GroupCreate, GroupCreateMinified, GroupSearchResult, InviteCodePatch
+from app.models.group import (
+    Group,
+    GroupPublic,
+    GroupCreate,
+    GroupCreateMinified,
+    GroupSearchResult,
+    InviteCodePatch,
+)
 from app.models.group_event import GroupEvent, GroupEventCreate
 from app.models.group_join_requests import GroupJoinRequest
 from app.models.group_member import GroupMemberCreate
@@ -253,10 +261,11 @@ async def get_public_group(request: Request, group_name_short: str) -> GroupPubl
     else:
         user_id = None
 
-
     async with app.db.pool.acquire() as conn:
         try:
-            return await app.db.groups.get_public_group_profile(group_name_short, user_id, conn=conn)
+            return await app.db.groups.get_public_group_profile(
+                group_name_short, user_id, conn=conn
+            )
         except NotFound as exc:
             raise HTTPException(
                 status_code=404, detail="Gruppen ble ikke funnet"
@@ -352,6 +361,7 @@ async def patch_group(
 
         return {"id": data["id"]}
 
+
 @router.patch(
     "/{group_id}/inviteCode",
     dependencies=[Depends(oidc)],
@@ -388,11 +398,11 @@ async def patch_invite_code(
 
         if invite_code == "" or invite_code is not None and invite_code.isspace():
             raise HTTPException(
-                status_code=400,
-                detail="Invitasjonskoden kan ikke være tom"
+                status_code=400, detail="Invitasjonskoden kan ikke være tom"
             )
 
         await app.db.groups.update_invite_code(group_id, invite_code, conn=conn)
+
 
 @router.delete(
     "/{group_id}",
@@ -895,8 +905,7 @@ async def add_punishment(
                 )
             if punishment.punishment_type_id not in group_punishment_types:
                 raise HTTPException(
-                    status_code=400,
-                    detail="Ugyldig straff, last inn siden på nytt"
+                    status_code=400, detail="Ugyldig straff, last inn siden på nytt"
                 )
 
         try:
@@ -1461,7 +1470,9 @@ async def join_group(
     requester_user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
 
     async with app.db.pool.acquire() as conn:
-        group = await app.db.groups.get(group_id, invite_code=invite_code, include_members=False, conn=conn)
+        group = await app.db.groups.get(
+            group_id, invite_code=invite_code, include_members=False, conn=conn
+        )
 
         if not group:
             raise HTTPException(
@@ -1477,7 +1488,9 @@ async def join_group(
 
         await app.db.groups.insert_member(
             group_id,
-            GroupMemberCreate(user_id=requester_user_id, ow_group_user_id=None, active=True),
+            GroupMemberCreate(
+                user_id=requester_user_id, ow_group_user_id=None, active=True
+            ),
             conn=conn,
         )
 
@@ -1489,6 +1502,7 @@ async def join_group(
             )
         except NotFound:
             pass
+
 
 @router.post(
     "/{group_id}/joinRequests/{user_id}/deny",
