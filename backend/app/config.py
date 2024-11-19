@@ -30,7 +30,7 @@ PERMISSIONS = [
     # Permissions
     ["group.ownership.transfer", ["group.owner"]],
     ["group.delete", ["group.owner"]],
-    ["group.edit", ["group.admin"]],
+    ["group.edit", ["group.moderator"]],
     ["group.punishment_types.add", ["group.edit"]],
     ["group.punishment_types.delete", ["group.edit"]],
     ["group.punishment_types.edit", ["group.edit"]],
@@ -61,7 +61,7 @@ OW_GROUP_PERMISSIONS = [
     # Permissions
     ["group.ownership.transfer", [NEVER]],
     ["group.delete", [NEVER]],
-    ["group.edit", ["group.admin"]],
+    ["group.edit", ["group.moderator"]],
     ["group.punishment_types.add", ["group.edit"]],
     ["group.punishment_types.delete", ["group.edit"]],
     ["group.punishment_types.edit", ["group.edit"]],
