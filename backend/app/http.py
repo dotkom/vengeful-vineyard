@@ -12,7 +12,7 @@ from app.config import (
 
 from .exceptions import NotAuthorizedException
 
-BASE_OLD_ONLINE = os.environ.get("OW4_BASE_URL", "https://dev.online.ntnu.no")
+BASE_OLD_ONLINE = settings.ow4_base_url
 
 
 def create_aiohttp_closed_event(session: ClientSession) -> asyncio.Event:

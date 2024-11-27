@@ -1,21 +1,28 @@
 import {
-  Group,
-  Leaderboard,
-  MeUser,
-  PunishmentCreate,
-  GroupStatistics,
+  type Group,
+  type Leaderboard,
+  type MeUser,
+  type PunishmentCreate,
+  type GroupStatistics,
   GroupStatisticsSchema,
   LeaderboardSchema,
   MeUserSchema,
   GroupSchema,
   PublicGroupSchema,
-  GroupBase,
-  GroupCreateType,
-  EditGroupType,
-  MutatePunishmentType,
+  type GroupBase,
+  type GroupCreateType,
+  type EditGroupType,
+  type MutatePunishmentType,
+  PunishmentsLogSchema,
+  type PunishmentsLog,
 } from "./types"
-import { UseInfiniteQueryOptions, UseMutationOptions, useQueryClient, UseQueryOptions } from "@tanstack/react-query"
-import axios, { AxiosResponse } from "axios"
+import {
+  type UseInfiniteQueryOptions,
+  type UseMutationOptions,
+  useQueryClient,
+  type UseQueryOptions,
+} from "@tanstack/react-query"
+import axios, { type AxiosResponse } from "axios"
 import { sortGroupUsers, sortGroups } from "./sorting"
 
 import { z } from "zod"
@@ -35,6 +42,8 @@ const LEADERBOARD_URL = BASE_URL + "/users/leaderboard"
 
 const getLeaderboardUrl = (page: number, this_year: boolean) => `${LEADERBOARD_URL}?page=${page}&this_year=${this_year}`
 
+const getPunishmentsLogUrl = (page: number) => `${BASE_URL}/punishments/log?page=${page}`
+
 export const getLeaderboardUserPunishmentsUrl = (userId: string) => `${LEADERBOARD_URL}/punishments/${userId}`
 
 const ME_URL = BASE_URL + "/users/me"
@@ -43,9 +52,9 @@ const getGroupUrl = (groupId: string) => BASE_URL + `/groups/${groupId}`
 
 const GROUP_STATISTICS_URL = BASE_URL + "/statistics/groups"
 
-const getGroupsSearchUrl = (query: string, includeOwGroups: boolean = false, limit: number = 5) =>
+const getGroupsSearchUrl = (query: string, includeOwGroups = false, limit = 5) =>
   BASE_URL + `/groups/search?query=${query}&include_ow_groups=${includeOwGroups}&limit=${limit}`
-export const groupsSearchQuery = (query: string, includeOwGroups: boolean = false) => ({
+export const groupsSearchQuery = (query: string, includeOwGroups = false) => ({
   queryKey: ["groupsSearch", query],
   queryFn: () => axios.get<GroupBase[]>(getGroupsSearchUrl(query, includeOwGroups)).then((res) => res.data),
   enabled: query.length > 0,
@@ -147,7 +156,9 @@ export const deleteGroupMemberMutation = (groupId?: string, userId?: string) => 
       await axios.delete(getDeleteGroupMemberUrl(groupId, userId))
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         text: isSelf ? "Du forlot gruppen" : "Medlem ble fjernet",
@@ -172,7 +183,9 @@ export const transferGroupOwnershipMutation = (groupId: string, userId: string) 
   return {
     mutationFn: async () => await axios.post(getTransferGroupOwnershipUrl(groupId, userId)),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         text: "Lederskap ble overført",
@@ -199,7 +212,9 @@ export const postPunishmentTypeMutation = (groupId: string, createPunishmentType
   return {
     mutationFn: () => axios.post(getPostPunishmentTypeUrl(groupId), createPunishmentTypeData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         title: "Suksess",
@@ -229,7 +244,9 @@ export const putPunishmentTypeMutation = (
   return {
     mutationFn: () => axios.patch(getPutPunishmentTypeUrl(groupId, punishmentTypeId), editPunishmentTypeData),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         title: "Suksess",
@@ -255,7 +272,9 @@ export const deletePunishmentTypeMutation = (groupId: string, punishmentTypeId: 
   return {
     mutationFn: () => axios.delete(getDeletePunishmentTypeUrl(groupId, punishmentTypeId)).then((res) => res.data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         title: "Suksess",
@@ -280,7 +299,9 @@ export const postPunishmentsPaidMutation = (groupId: string, punishmentIds: stri
   return {
     mutationFn: async () => (await axios.post(getPostPunishmentsPaidUrl(groupId), punishmentIds)).data,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         title: "Betaling registrert",
@@ -305,7 +326,9 @@ export const postPunishmentsUnpaidMutation = (groupId: string, punishmentId: str
   return {
     mutationFn: async () => (await axios.post(getPostPunishmentsUnpaidUrl(groupId), punishmentId)).data,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         title: "Betaling registrert",
@@ -336,7 +359,9 @@ export const deletePunishmentMutation = (groupId: string, punishmentId: string) 
         })
       ).data,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         title: "Straff slettet",
@@ -362,7 +387,9 @@ export const postAllPunishmentsPaidForUserMutation = (groupId: string, userId: s
   return {
     mutationFn: async () => (await axios.post(getPostAllPunishmentsPaidForUserUrl(groupId, userId))).data,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         show: true,
         type: "success",
@@ -422,7 +449,9 @@ export const postAcceptGroupJoinRequestMutation = (groupId?: string) => {
       await axios.post(getPostAcceptGroupJoinRequestUrl(groupId, userId))
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         text: "Brukeren ble lagt til i gruppen",
@@ -455,7 +484,9 @@ export const postJoinGroupMutation = (
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user", groupId] })
-      await queryClient.invalidateQueries({ queryKey: ["leaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["leaderboard", groupId],
+      })
       setNotification({
         type: "success",
         title: "Du ble lagt til i gruppen",
@@ -484,7 +515,9 @@ export const postDenyGroupJoinRequestMutation = (groupId?: string) => {
       await axios.post(getPostDenyGroupJoinRequestUrl(groupId, userId))
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+      await queryClient.invalidateQueries({
+        queryKey: ["groupLeaderboard", groupId],
+      })
       setNotification({
         type: "success",
         text: "Forespørselen ble avslått",
@@ -516,7 +549,9 @@ export const patchGroupMemberPermissionsMutation = (
         await axios.patch(getPatchGroupMemberPermissionsUrl(groupId, userId), {
           privilege: role,
         })
-        await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+        await queryClient.invalidateQueries({
+          queryKey: ["groupLeaderboard", groupId],
+        })
 
         setNotification({
           type: "success",
@@ -545,7 +580,9 @@ export const addManyPunishmentsMutation = (punishments: PunishmentCreate[], grou
       if (!groupId || !userId) throw new Error("groupId and userId are required")
       try {
         await addManyPunishments(groupId, userId, punishments)
-        await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
+        await queryClient.invalidateQueries({
+          queryKey: ["groupLeaderboard", groupId],
+        })
         await queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
         await queryClient.invalidateQueries({ queryKey: ["committeesData"] })
       } catch (e: any) {
@@ -600,8 +637,12 @@ export const removeReactionMutation = (
     },
     onSuccess: async () => {
       groupId
-        ? await queryClient.invalidateQueries({ queryKey: ["groupLeaderboard", groupId] })
-        : await queryClient.invalidateQueries({ queryKey: ["leaderboardUserPunishments"] })
+        ? await queryClient.invalidateQueries({
+            queryKey: ["groupLeaderboard", groupId],
+          })
+        : await queryClient.invalidateQueries({
+            queryKey: ["leaderboardUserPunishments"],
+          })
     },
   }
 }
@@ -610,7 +651,9 @@ const getPatchInviteCodeUrl = (groupId: string) => BASE_URL + `/groups/${groupId
 export const patchInviteCodeMutation = (groupId: string): UseMutationOptions<void, VengefulApiError, string | null> => {
   return {
     mutationFn: async (inviteCode: string | null) => {
-      await axios.patch(getPatchInviteCodeUrl(groupId), { invite_code: inviteCode })
+      await axios.patch(getPatchInviteCodeUrl(groupId), {
+        invite_code: inviteCode,
+      })
     },
   }
 }
@@ -663,11 +706,30 @@ const getLeaderboard = async ({ pageParam = 0, this_year = true }) =>
   LeaderboardSchema.parse(await axios.get(getLeaderboardUrl(pageParam, this_year)).then((res) => res.data))
 
 export const leaderboardQuery = (
-  this_year: boolean = true
+  this_year = true
 ): UseInfiniteQueryOptions<Leaderboard, unknown, Leaderboard, Leaderboard, string[]> => ({
   queryKey: ["leaderboard", this_year.toString()],
   queryFn: ({ pageParam = 0 }) => getLeaderboard({ pageParam, this_year }),
   getNextPageParam: (lastPage: Leaderboard) => {
+    const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
+    return nextPage ? Number(nextPage) : undefined
+  },
+  staleTime: 1000 * 60,
+})
+
+const getPunishmentsLog = async ({ pageParam = 0 }) =>
+  PunishmentsLogSchema.parse(await axios.get(getPunishmentsLogUrl(pageParam)).then((res) => res.data))
+
+export const punishmentsQuery = (): UseInfiniteQueryOptions<
+  PunishmentsLog,
+  unknown,
+  PunishmentsLog,
+  PunishmentsLog,
+  string[]
+> => ({
+  queryKey: ["punishmentsLog"],
+  queryFn: getPunishmentsLog,
+  getNextPageParam: (lastPage: PunishmentsLog) => {
     const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
     return nextPage ? Number(nextPage) : undefined
   },

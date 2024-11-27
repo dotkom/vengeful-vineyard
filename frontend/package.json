@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "doppler setup -c dev -p vengeful-vineyard && doppler run vite",
+    "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint --max-warnings 0 --ext .js,.jsx,.ts,.tsx .",

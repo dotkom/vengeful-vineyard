@@ -7,6 +7,7 @@ import { useAuth } from "react-oidc-context"
 import { LandingPage } from "./views/hero"
 import { GroupView } from "./views/groups"
 import LoginRegisterPromptPage from "./views/LoginRegisterPromptPage"
+import PunishmentsLogPage from "./pages/PunishmentsLogPage"
 
 const authenticatedRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -16,6 +17,7 @@ const authenticatedRouter = createBrowserRouter(
       <Route path="/profil" element={<Profile />} />
       <Route path="/wall-of-shame" element={<WallOfShame />} />
       <Route path="/committees" element={<Committees />} />
+      <Route path="/recent-punishments" element={<PunishmentsLogPage />} />
     </Route>
   )
 )
@@ -28,6 +30,7 @@ const unauthenticatedRouter = createBrowserRouter(
       <Route path="/profil" element={<Navigate to="/" />} />
       <Route path="/wall-of-shame" element={<Navigate to="/" />} />
       <Route path="/committees" element={<Navigate to="/" />} />
+      <Route path="/recent-punishments" element={<Navigate to="/" />} />
     </Route>
   )
 )

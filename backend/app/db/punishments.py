@@ -6,6 +6,7 @@ from asyncpg import Pool
 from app.exceptions import NotFound
 from app.models.punishment import PunishmentCreate, PunishmentRead
 from app.models.punishment_reaction import PunishmentReactionRead
+from app.models.user import LogPunishmentOut
 from app.types import GroupId, PunishmentId, UserId
 from app.utils.db import MaybeAcquire
 
@@ -62,6 +63,95 @@ class Punishments:
                 raise NotFound
 
         return PunishmentRead(**res)
+
+    async def get_all(
+        self,
+        offset: int,
+        limit: int,
+        group_id: Optional[GroupId] = None,
+        conn: Optional[Pool] = None,
+    ) -> list[LogPunishmentOut]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            where_clause = (
+                "WHERE g.ow_group_id IS NOT NULL OR g.special"
+                if group_id is None
+                else "WHERE g.group_id = $1"
+            )
+
+            query = f"""
+            SELECT
+                gp.*,
+                CONCAT(COALESCE(NULLIF(created_by_user.first_name, ''), created_by_user.email), ' ', created_by_user.last_name) AS created_by_name,
+                COALESCE(json_agg(pr) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions,
+                json_build_object(
+                    'punishment_type_id', pt.punishment_type_id,
+                    'name', pt.name,
+                    'value', pt.value,
+                    'emoji', pt.emoji,
+                    'created_at', pt.created_at,
+                    'created_by', pt.created_by,
+                    'updated_at', pt.updated_at
+                ) AS punishment_type,
+                json_build_object(
+                    'user_id', given_to_user.user_id,
+                    'first_name', given_to_user.first_name,
+                    'last_name', given_to_user.last_name,
+                    'email', given_to_user.email,
+                    'ow_user_id', given_to_user.ow_user_id
+                ) AS user,
+                g.name_short as group_name
+            FROM group_punishments gp
+            LEFT JOIN punishment_types pt
+                ON pt.punishment_type_id = gp.punishment_type_id
+            LEFT JOIN (
+                SELECT 
+                pr1.*,
+                CONCAT(COALESCE(NULLIF(u1.first_name, ''), u1.email), ' ', u1.last_name) AS created_by_name
+                FROM punishment_reactions pr1
+                JOIN group_members gm ON pr1.created_by = gm.user_id
+                LEFT JOIN users u1 on pr1.created_by = u1.user_id
+                GROUP BY pr1.punishment_reaction_id, u1.first_name, u1.email, u1.last_name
+            ) pr ON pr.punishment_id = gp.punishment_id
+            LEFT JOIN groups g ON gp.group_id = g.group_id
+            LEFT JOIN users created_by_user ON gp.created_by = created_by_user.user_id
+            LEFT JOIN users given_to_user ON gp.user_id = given_to_user.user_id 
+            {where_clause}
+            GROUP BY gp.punishment_id, created_by_user.first_name, created_by_user.email, created_by_user.last_name, pt.punishment_type_id, given_to_user.user_id, g.name_short
+            ORDER BY gp.created_at DESC
+            OFFSET $1
+            LIMIT $2
+            """
+
+            if group_id is None:
+                res = await conn.fetch(query, offset, limit)
+            else:
+                res = await conn.fetch(query, offset, limit, group_id)
+
+        return [LogPunishmentOut(**r) for r in res]
+
+    async def get_all_count(
+        self,
+        group_id: Optional[GroupId] = None,
+        conn: Optional[Pool] = None,
+    ) -> int:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            where_clause = (
+                "WHERE g.ow_group_id IS NOT NULL OR g.special"
+                if group_id is None
+                else "WHERE g.group_id = $1"
+            )
+            query = f"""
+                SELECT COUNT(*) FROM group_punishments gp
+                LEFT JOIN groups g ON gp.group_id = g.group_id
+                {where_clause}
+                """
+
+            if group_id is None:
+                res = await conn.fetchval(query)
+            else:
+                res = await conn.fetchval(query, group_id)
+
+        return res
 
     async def insert_multiple(
         self,

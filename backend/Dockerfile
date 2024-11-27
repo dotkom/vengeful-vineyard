@@ -14,4 +14,4 @@ COPY . /app
 
 EXPOSE 8000
 
-ENTRYPOINT poetry run uvicorn app.api.init_api:asgi_app --host 0.0.0.0
+ENTRYPOINT poetry run uvicorn --reload --reload-dir app app.api.init_api:asgi_app --host 0.0.0.0
