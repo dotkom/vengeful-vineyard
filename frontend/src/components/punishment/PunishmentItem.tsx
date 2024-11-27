@@ -114,7 +114,7 @@ export const PunishmentItem = ({
       )}
     >
       {user && (
-        <div className="flex flex-row gap-px items-center border-b border-gray-800 pb-3">
+        <div className="flex flex-row gap-px items-center border-b dark:border-gray-800 border-gray-200 pb-3">
           <span className="h-10 w-10 bg-indigo-100 dark:bg-gray-800 flex items-center justify-center rounded-full text-2xl">
             {textToEmoji(user.first_name + user.last_name)}
           </span>
