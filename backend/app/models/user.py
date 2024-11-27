@@ -6,9 +6,9 @@ from typing import Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-from app.models.punishment import PunishmentOut
+from app.models.punishment import PunishmentOut, PunishmentRead
 from app.models.punishment_type import PunishmentTypeRead
-from app.types import OWUserId, UserId
+from app.types import OWUserId, UserId, GroupId
 
 
 class UserBase(BaseModel):
@@ -52,3 +52,9 @@ class MinifiedLeaderboardUser(User):
     emojis_this_year: str
     amount_punishments_this_year: int
     amount_unique_punishments_this_year: int
+
+
+class LogPunishmentOut(PunishmentOut):
+    punishment_type: PunishmentTypeRead
+    user: User
+    group_name: str

@@ -14,6 +14,7 @@ from fastapi.security import OpenIdConnect
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import HTMLResponse
 
+from app.config import settings
 from app.db.core import Database
 from app.http import HTTPClient
 from app.state import State
@@ -28,7 +29,7 @@ __all__ = (
 
 
 oidc = OpenIdConnect(
-    openIdConnectUrl="https://auth.online.ntnu.no/openid/.well-known/openid-configuration",
+    openIdConnectUrl=f"{settings.auth0_issuer}/openid/.well-known/openid-configuration",
 )
 
 

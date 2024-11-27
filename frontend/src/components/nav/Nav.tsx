@@ -17,6 +17,8 @@ import { useDarkMode } from "../../DarkModeContext"
 interface NavItem {
   label: string
   url: string
+  badgeText?: string
+  badgeExpiresAt?: Date
   isActivePredicate: (item: NavItem, currentPathname: string) => boolean
   shouldShowPredicate?: (item: NavItem, currentPathname: string) => boolean
   prefetch?: () => void
@@ -63,6 +65,15 @@ export const Nav = ({ auth }: NavProps) => {
       shouldShowPredicate: () => isInAnyOWGroup,
       prefetch: prefetchStatistics,
     },
+    {
+      label: "Siste straffer",
+      url: "/recent-punishments",
+      badgeText: "Ny",
+      badgeExpiresAt: new Date(2025, 1, 1),
+      isActivePredicate: (item, currentLocation) => currentLocation.toLowerCase().startsWith(`${item.url}`),
+      shouldShowPredicate: () => isInAnyOWGroup,
+      prefetch: prefetchStatistics,
+    },
   ]
 
   const navigate = useNavigate()
@@ -104,6 +115,8 @@ export const Nav = ({ auth }: NavProps) => {
                         key={item.url}
                         label={item.label}
                         url={item.url}
+                        badgeText={item.badgeText}
+                        badgeExpiresAt={item.badgeExpiresAt}
                         onMouseEnter={item.prefetch}
                         onFocus={item.prefetch}
                         isActive={item.isActivePredicate(item, location.pathname)}

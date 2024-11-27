@@ -1,5 +1,11 @@
 import { z } from "zod"
 
+export const PaginatedResponseSchemaBase = z.object({
+  total: z.number(),
+  next: z.string().nullable(),
+  previous: z.string().nullable(),
+})
+
 export const UserSchema = z.object({
   ow_user_id: z.number(),
   user_id: z.string(),
@@ -109,13 +115,22 @@ export const MeUserSchema = UserSchema.extend({
 })
 export type MeUser = z.infer<typeof MeUserSchema>
 
-export const LeaderboardSchema = z.object({
-  total: z.number(),
-  next: z.string().nullable(),
-  previous: z.string().nullable(),
+export const LeaderboardSchema = PaginatedResponseSchemaBase.extend({
   results: z.array(LeaderboardUserSchema),
 })
 export type Leaderboard = z.infer<typeof LeaderboardSchema>
+
+export const LogPunishmentSchema = PunishmentSchema.extend({
+  punishment_type: PunishmentTypeSchema,
+  user: UserSchema,
+  group_name: z.string(),
+})
+export type LogPunishment = z.infer<typeof LogPunishmentSchema>
+
+export const PunishmentsLogSchema = PaginatedResponseSchemaBase.extend({
+  results: z.array(LogPunishmentSchema),
+})
+export type PunishmentsLog = z.infer<typeof PunishmentsLogSchema>
 
 export const PunishmentCreateSchema = z.object({
   punishment_type_id: z.string(),

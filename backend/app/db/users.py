@@ -449,7 +449,8 @@ class Users:
                 GROUP BY pr1.punishment_reaction_id, u1.first_name, u1.email, u1.last_name
             ) pr ON pr.punishment_id = gp.punishment_id
             LEFT JOIN users ON gp.created_by = users.user_id
-            WHERE gp.user_id = $1
+            LEFT JOIN groups g ON gp.group_id = g.group_id
+            WHERE gp.user_id = $1 AND (g.ow_group_id IS NOT NULL OR g.special)
             GROUP BY gp.punishment_id, users.first_name, users.email, users.last_name, pt.punishment_type_id
             ORDER BY gp.created_at DESC
             """

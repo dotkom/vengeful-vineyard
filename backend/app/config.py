@@ -99,6 +99,10 @@ class Settings(BaseSettings):
     migrations_directory: Path = Path("app/migrations")
     client_origin: str = "http://localhost:3000"
     debug: bool = True
+    ow4_base_url: str = "https://dev.online.ntnu.no"
+    auth0_issuer: str = "https://auth.dev.online.ntnu.no"
+    auth0_client_id: str = ""
+    
 
 
 settings = Settings()
