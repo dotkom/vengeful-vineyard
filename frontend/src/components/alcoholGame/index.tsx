@@ -15,6 +15,12 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
   const [isWaiting, setIsWaiting] = useState(false)
   const [failCount, setFailCount] = useState<number>(0)
   const [blocked, setBlocked] = useState<boolean>(false)
+  const [benchmarkTime, setBenchmarkTime] = useState<number>(0)
+
+  const failedAttempts = 3
+  const reactionTimeThreshold = 500
+  const offsetForSlowPhones = 400
+  const benchmarkTimeThreshold = 50
 
   const randomTime = 3
   const [timeoutHandle, setTimeoutHandle] = useState<ReturnType<typeof setTimeout> | null>(null)
@@ -30,6 +36,14 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
         setBlocked(false)
       }
     }
+
+    // Benchmark the loop
+    const startBenchmark = performance.now()
+    for (let i = 1; i <= 1000000; i++) {
+      Math.sqrt(i)
+    }
+    const endBenchmark = performance.now()
+    setBenchmarkTime(endBenchmark - startBenchmark)
   }, [])
 
   const startTest = () => {
@@ -62,12 +76,13 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
   const endTest = () => {
     setIsTestRunning(false)
     if (startTime) {
-      const newReactionTime = Date.now() - startTime
+      const newReactionTime =
+        Date.now() - startTime - (benchmarkTimeThreshold < benchmarkTime ? offsetForSlowPhones : 0)
       setReactionTime(newReactionTime)
-      if (newReactionTime >= 500) {
+      if (newReactionTime >= reactionTimeThreshold) {
         const newFailCount = failCount + 1
         setFailCount(newFailCount)
-        if (newFailCount >= 3) {
+        if (newFailCount >= failedAttempts) {
           Cookies.set("blockedTime", Date.now().toString())
           setBlocked(true)
         }
@@ -117,13 +132,14 @@ const AlcoholGame = forwardRef<HTMLDivElement, AlcoholGameProps>(({ quit, next }
             >
               <Dialog.Panel className="relative transform bg-gray-50 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                 <div
-                  className={`flex h-[600px] flex-col justify-center items-center text-white ${
+                  className={`flex h-[600px] flex-col min-w-[50vw] justify-center items-center text-white ${
                     isTestRunning ? "bg-red-500" : "bg-green-500"
                   }${!isTestFinished ? " cursor-pointer" : ""}`}
                   onClick={
                     !isTestFinished ? (isTestRunning ? endTest : isWaiting ? cancelWaiting : startTest) : () => {}
                   }
                 >
+                  <h1>{benchmarkTime}</h1>
                   {blocked ? (
                     <>
                       <p className="text-xl">You have failed too many times, YOU ARE DRUNK</p>
