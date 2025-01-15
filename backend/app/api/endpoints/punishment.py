@@ -3,7 +3,7 @@ Punishment endpoints
 """
 
 from emoji import is_emoji
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api import APIRoute, Request, oidc
 from app.exceptions import NotFound
@@ -11,6 +11,8 @@ from app.models.punishment_reaction import (
     PunishmentReactionCreate,
     PunishmentReactionRead,
 )
+from app.models.user import LogPunishmentOut
+from app.utils.pagination import Page, Pagination
 from app.types import PunishmentId
 
 router = APIRouter(
@@ -18,6 +20,41 @@ router = APIRouter(
     tags=["Punishments"],
     route_class=APIRoute,
 )
+
+
+@router.get(
+    "/log",
+    tags=["Punishment"],
+    dependencies=[Depends(oidc)],
+)
+async def get_punishments_log(
+    request: Request,
+    page: int = Query(title="Page number", default=0, ge=0),
+    page_size: int = Query(title="Page size", default=30, ge=1, le=50),
+) -> Page[LogPunishmentOut]:
+    """
+    Endpoint to get all punishments.
+    """
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        is_in_any_ow_group = await app.db.groups.is_in_any_ow_group(user_id, conn=conn)
+        if not is_in_any_ow_group:
+            raise HTTPException(
+                status_code=403, detail="Du har ikke tilgang til denne ressursen"
+            )
+
+        pagination = Pagination[LogPunishmentOut](
+            request=request,
+            total_coro=app.db.punishments.get_all_count,  # use partial with group_id if you want to filter by group
+            results_coro=app.db.punishments.get_all,  # use partial with group_id if you want to filter by group
+            page=page,
+            page_size=page_size,
+        )
+        return await pagination.paginate(conn=conn)
 
 
 @router.post(

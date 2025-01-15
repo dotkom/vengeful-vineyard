@@ -112,10 +112,10 @@ def init_events(app: FastAPI, **db_settings: str) -> None:
 
 def init_api(**db_settings: str) -> FastAPI:
     oauth = {
-        "clientId": "5rOMfB8Ztegz",
+        "clientId": settings.auth0_client_id,
         "appName": "Vengeful Vineyard Docs",
         "usePkceWithAuthorizationCodeGrant": True,
-        "scopes": "openid email profile onlineweb4",
+        "scopes": "openid profile email offline_access",
     }
 
     app = FastAPI(

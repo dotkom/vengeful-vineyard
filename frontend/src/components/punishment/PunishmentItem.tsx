@@ -1,4 +1,10 @@
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from "@tanstack/react-query"
+import {
+  type QueryObserverResult,
+  type RefetchOptions,
+  type RefetchQueryFilters,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query"
 import {
   groupLeaderboardQuery,
   addReactionMutation,
@@ -7,7 +13,7 @@ import {
   postPunishmentsUnpaidMutation,
   postPunishmentsPaidMutation,
 } from "../../helpers/api"
-import { LeaderboardPunishment, Punishment, PunishmentType } from "../../helpers/types"
+import type { LeaderboardPunishment, Punishment, PunishmentType, User } from "../../helpers/types"
 
 import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
@@ -19,6 +25,7 @@ import { EmojiPicker } from "./emojies/EmojiPicker"
 import { ReactionsDisplay } from "./emojies/ReactionDisplay"
 import { useConfirmModal } from "../../helpers/context/modal/confirmModalContext"
 import { usePermission } from "../../helpers/permissions"
+import { textToEmoji } from "../../helpers/emojies"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -29,6 +36,8 @@ interface PunishmentItemProps {
   punishment: Punishment | LeaderboardPunishment
   punishmentTypes?: Record<string, PunishmentType>
   isGroupContext?: boolean
+  user?: User
+  groupName?: string;
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any>>
@@ -39,6 +48,8 @@ export const PunishmentItem = ({
   punishment,
   punishmentTypes,
   isGroupContext = false,
+  user,
+  groupName,
   dataRefetch,
 }: PunishmentItemProps) => {
   const [_selectedEmoji, setSelectedEmoji] = useState("👍")
@@ -98,10 +109,21 @@ export const PunishmentItem = ({
   return (
     <div
       className={classNames(
-        "flex flex-col justify-between border-l-4 md:border-l-[6px] px-4 pt-4 pb-4 min-h-[7rem] bg-white",
+        "flex flex-col justify-between border-l-4 md:border-l-[6px] px-4 pt-4 pb-4 min-h-[7rem] bg-white gap-y-3",
         !punishment.paid ? "border-l-indigo-600" : "border-l-indigo-400"
       )}
     >
+      {user && (
+        <div className="flex flex-row gap-px items-center border-b dark:border-gray-800 border-gray-200 pb-3">
+          <span className="h-10 w-10 bg-indigo-100 dark:bg-gray-800 flex items-center justify-center rounded-full text-2xl">
+            {textToEmoji(user.first_name + user.last_name)}
+          </span>
+          <p className="text-base md:text-lg text-gray-500 font-medium ml-2">
+            {user.first_name} {user.last_name}
+          </p>
+          <span className="text-black text-base md:text-lg font-regular ml-auto">{groupName}</span>
+        </div>
+      )}
       <div className="flex flex-row justify-between gap-x-2 text-black">
         <div className="text-left font-light">
           <p>
@@ -114,7 +136,7 @@ export const PunishmentItem = ({
                 <span className="italic">Ingen årsak</span>
               )}
             </span>
-            <span className="block text-gray-500 text-sm whitespace-nowrap md:text-base w-40 md:w-48 overflow-hidden text-ellipsis">
+            <span className="block text-gray-500 text-xs whitespace-nowrap md:text-sm w-40 md:w-48 overflow-hidden text-ellipsis">
               - Gitt av {punishment.created_by_name}
             </span>
           </p>
@@ -137,7 +159,7 @@ export const PunishmentItem = ({
           {formattedDate}
         </div>
       </div>
-      <div className="flex flex-row">
+      <div className="flex flex-row items-center">
         <div className="flex flex-row gap-x-2 items-end">
           <EmojiPicker mutate={mutateAddReaction} setSelectedEmoji={setSelectedEmoji} />
           <ReactionsDisplay

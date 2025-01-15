@@ -103,7 +103,6 @@ class Database:
         for _ in range(10):  # Try for 10*0.5 seconds
             try:
                 logger.info("Connecting to postgres database.")
-
                 self._db_name = db_settings.get("database", settings.postgres_db)
                 self._pool = await create_pool(
                     host=db_settings.get("host", settings.postgres_host),
