@@ -20,7 +20,7 @@ export default function PunishmentsLogPage() {
       {punishments.length > 0 && (
         <ul className="flex flex-col gap-y-3 dark:border-gray-700">
           {punishments.map((punishment) => (
-            <li key={punishment.punishment_id} className="rounded-lg overflow-hidden">
+            <li key={punishment.punishment_id} className="rounded-lg">
               <PunishmentItem
                 user_id={punishment.user.user_id}
                 user={punishment.user}
