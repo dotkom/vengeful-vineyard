@@ -59,7 +59,7 @@ export const ContactInfoSection = () => {
         </>,
         <>
           <MobileIcon key="mobile" />
-          454 61 372
+          986 69 907
         </>,
       ],
     },
