@@ -19,7 +19,7 @@ export const NavLink = ({ label, url, isActive, badgeText, badgeExpiresAt, ...pr
             : isActive
             ? "border-indigo-500 text-gray-900 dark:text-gray-100"
             : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-500"
-        } px-1 pt-1 text-sm font-medium `
+        } px-1 pt-1 text-sm font-medium whitespace-nowrap`
       }
       to={url}
       end

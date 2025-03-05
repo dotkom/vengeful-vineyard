@@ -8,6 +8,7 @@ import { LandingPage } from "./views/hero"
 import { GroupView } from "./views/groups"
 import LoginRegisterPromptPage from "./views/LoginRegisterPromptPage"
 import PunishmentsLogPage from "./pages/PunishmentsLogPage"
+import BettingPage from "./pages/BettingPage"
 
 const authenticatedRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -18,6 +19,7 @@ const authenticatedRouter = createBrowserRouter(
       <Route path="/wall-of-shame" element={<WallOfShame />} />
       <Route path="/committees" element={<Committees />} />
       <Route path="/recent-punishments" element={<PunishmentsLogPage />} />
+      <Route path="/betting" element={<BettingPage />} />
     </Route>
   )
 )
@@ -31,6 +33,7 @@ const unauthenticatedRouter = createBrowserRouter(
       <Route path="/wall-of-shame" element={<Navigate to="/" />} />
       <Route path="/committees" element={<Navigate to="/" />} />
       <Route path="/recent-punishments" element={<Navigate to="/" />} />
+      <Route path="/betting" element={<Navigate to="/" />} />
     </Route>
   )
 )

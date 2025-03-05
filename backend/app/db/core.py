@@ -10,6 +10,7 @@ from asyncpg.exceptions import CannotConnectNowError
 from app.config import settings
 from app.utils.db import MaybeAcquire
 
+from .betting import Betting
 from .group_events import GroupEvents
 from .group_join_requests import GroupJoinRequests
 from .group_members import GroupMembers
@@ -58,6 +59,7 @@ class Database:
         self.group_users = GroupUsers(self)
         self.group_events = GroupEvents(self)
         self.group_join_requests = GroupJoinRequests(self)
+        self.betting = Betting(self)
 
     async def get_migration_lock_version(self, conn: Optional[Pool]) -> int:
         assert conn is not None

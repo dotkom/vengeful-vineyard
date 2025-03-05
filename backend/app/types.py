@@ -43,6 +43,10 @@ class PunishmentReactionId(UUID):
     pass
 
 
+class VersusBetId(UUID):
+    pass
+
+
 class PermissionPrivilege(str):
     pass
 

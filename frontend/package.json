@@ -24,6 +24,8 @@
     "@tanstack/react-query": "^4.24.4",
     "D": "^1.0.0",
     "axios": "^1.6.0",
+    "clsx": "^2.1.1",
+    "cva": "1.0.0-beta.3",
     "dayjs": "^1.11.7",
     "eslint-plugin-prettier": "^5.0.1",
     "js-cookie": "^3.0.5",
@@ -37,6 +39,7 @@
     "react-router-dom": "^6.15.0",
     "react-simple-oauth2-login": "^0.5.4",
     "react-table": "^7.8.0",
+    "tailwind-merge": "^2.6.0",
     "tailwind-scrollbar-hide": "^1.1.7",
     "zod": "^3.22.4"
   },
