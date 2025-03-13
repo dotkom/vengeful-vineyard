@@ -10,6 +10,9 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
     env:
       DOPPLER_IDENTITY_ID: f895761a-732a-4788-bf1a-177eb4d09b06 # ID from service account identity in Doppler
     steps:
@@ -17,18 +20,9 @@ jobs:
         with:
           aws-region: eu-north-1
           role-to-assume: arn:aws:iam::891459268445:role/VengefulProdDeploymentRole
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9.15.7
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22.14.0
-          cache: 'pnpm'
           
       - name: Get OIDC Token
         uses: actions/github-script@v6
@@ -46,8 +40,14 @@ jobs:
             --scope=. \
             --identity=${{ env.DOPPLER_IDENTITY_ID }} \
             --token=${{ steps.get-oidc-token.outputs.oidc_token }}
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: 'pnpm'
       - name: Install dependencies
-        working-directory: apps/kvittering-frontend
         run: pnpm install
       - name: Deploy to S3
         run: |
