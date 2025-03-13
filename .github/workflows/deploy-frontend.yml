@@ -47,6 +47,7 @@ jobs:
         with:
           node-version: 22.14.0
           cache: 'pnpm'
+          cache-dependency-path: 'frontend/pnpm-lock.yaml'
       - name: Install dependencies
         run: pnpm install
       - name: Deploy to S3
