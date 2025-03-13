@@ -2,7 +2,10 @@ name: Deploy frontend
 on:
   push:
     branches:
-      - 03-13-deploy_frontend_on_push_to_main
+      - master
+    paths:
+      - 'frontend/**'
+
 permissions:
   id-token: write   
   contents: read
@@ -58,5 +61,6 @@ jobs:
           FRONTEND_S3_BUCKET=$(doppler run --command 'echo $FRONTEND_S3_BUCKET')
           CLOUDFRONT_DISTRIBUTION_ID=$(doppler run --command 'echo $CLOUDFRONT_DISTRIBUTION_ID')
   
+          aws s3 rm $FRONTEND_S3_BUCKET --recursive
           aws s3 cp dist $FRONTEND_S3_BUCKET --recursive
           aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths  '/*'
