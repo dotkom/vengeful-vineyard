@@ -174,8 +174,8 @@ export const Nav = ({ auth }: NavProps) => {
                             {auth.isAuthenticated ? (
                               <button
                                 onClick={() => {
-                                  auth.removeUser().then(() => {
-                                    navigate("/")
+                                  auth.removeUser().then(async () => {
+                                    await auth.signoutRedirect({ id_token_hint: auth.user?.id_token })
                                   })
                                 }}
                                 className={classNames(
