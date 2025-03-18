@@ -1,0 +1,64 @@
+name: Deploy frontend
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write   
+  contents: read
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      DOPPLER_IDENTITY_ID: f895761a-732a-4788-bf1a-177eb4d09b06 # ID from service account identity in Doppler
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-north-1
+          role-to-assume: arn:aws:iam::891459268445:role/VengefulProdDeploymentRole
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          
+      - name: Get OIDC Token
+        uses: actions/github-script@v6
+        id: get-oidc-token
+        with:
+          script: |
+            const id_token = await core.getIDToken()
+            core.setOutput('oidc_token', id_token)
+      - uses: dopplerhq/cli-action@v2
+      # Identity comes from the configured doppler account identity 
+      # (see last step https://docs.doppler.com/docs/service-account-identities#configure-the-identity)
+      - run: |
+          doppler oidc login \
+            --api-host https://api.doppler.com \
+            --scope=. \
+            --identity=${{ env.DOPPLER_IDENTITY_ID }} \
+            --token=${{ steps.get-oidc-token.outputs.oidc_token }}
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: 'pnpm'
+          cache-dependency-path: 'frontend/pnpm-lock.yaml'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Deploy to S3
+        run: |
+          doppler setup -p vengeful-vineyard -c prd
+          doppler run pnpm build
+
+          FRONTEND_S3_BUCKET=$(doppler run --command 'echo $FRONTEND_S3_BUCKET')
+          CLOUDFRONT_DISTRIBUTION_ID=$(doppler run --command 'echo $CLOUDFRONT_DISTRIBUTION_ID')
+  
+          aws s3 rm $FRONTEND_S3_BUCKET --recursive
+          aws s3 cp dist $FRONTEND_S3_BUCKET --recursive
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths  '/*'
