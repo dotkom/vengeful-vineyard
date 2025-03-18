@@ -114,11 +114,11 @@ class GroupMembers:
     ) -> list[dict[str, Union[GroupId, UserId]]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """UPDATE group_members
-                    SET active = m.active
+                    SET active = m.active, ow_group_user_id = m.ow_group_user_id
                     FROM
                         unnest($1::group_members[]) as m
                     WHERE
-                        group_members.ow_group_user_id = m.ow_group_user_id
+                        group_members.group_id = m.group_id AND group_members.user_id = m.user_id
                     RETURNING m.group_id, m.user_id;
                     """
 

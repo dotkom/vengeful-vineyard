@@ -342,12 +342,12 @@ class Users:
             if not is_ow_user_id:
                 query = """SELECT groups.* FROM groups
                         INNER JOIN group_members ON groups.group_id = group_members.group_id
-                        WHERE group_members.user_id = $1"""
+                        WHERE group_members.user_id = $1 AND group_members.active = TRUE"""
             else:
                 query = """SELECT groups.* FROM groups
                         INNER JOIN group_members ON groups.group_id = group_members.group_id
                         INNER JOIN users ON users.user_id = group_members.user_id
-                        WHERE users.ow_user_id = $1"""
+                        WHERE users.ow_user_id = $1 AND group_members.active = TRUE"""
 
             result = await conn.fetch(query, user_id)
             return [Group(**row) for row in result]

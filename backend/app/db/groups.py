@@ -43,12 +43,12 @@ class Groups:
     ) -> bool:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             if not is_ow_user_id:
-                query = """SELECT 1 FROM group_members
-                        WHERE group_id = $1 AND user_id = $2"""
+                query = """SELECT 1 FROM group_members gm
+                        WHERE group_id = $1 AND user_id = $2 AND gm.active = TRUE"""
             else:
-                query = """SELECT 1 FROM group_members
+                query = """SELECT 1 FROM group_members gm
                         INNER JOIN users ON users.user_id = group_members.user_id
-                        WHERE group_id = $1 AND users.ow_user_id = $2"""
+                        WHERE group_id = $1 AND users.ow_user_id = $2 AND gm.active = TRUE"""
 
             res = await conn.fetchval(query, group_id, user_id)
             return res is not None
@@ -63,7 +63,7 @@ class Groups:
             query = """
                     SELECT
                         g.ow_group_id IS NOT NULL AS is_ow_group,
-                        COALESCE((SELECT true FROM group_members WHERE group_id = $1 AND user_id = $2), false) AS is_group_member
+                        COALESCE((SELECT true FROM group_members WHERE group_id = $1 AND user_id = $2 AND active = TRUE), false) AS is_group_member
                     FROM groups AS g
                     WHERE g.group_id = $1
                     """
@@ -81,7 +81,7 @@ class Groups:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """SELECT 1 FROM group_members gm
                     INNER JOIN groups g ON g.group_id = gm.group_id AND g.ow_group_id IS NOT NULL or special
-                    WHERE gm.user_id = $1
+                    WHERE gm.user_id = $1 AND gm.active = TRUE
                     """
 
             res = await conn.fetchval(query, user_id)

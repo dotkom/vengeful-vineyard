@@ -82,26 +82,45 @@ class OWSync:
         wait_for_updates: bool = True,
     ) -> None:
         try:
-            groups_data = await self.app.http.get_ow_groups_by_user_id(ow_user_id)
+            ow_groups_data, groups_data = await asyncio.gather(
+                self.app.http.get_ow_groups_by_user_id(ow_user_id),
+                self.app.db.users.get_groups(user_id),
+            )
             filtered_groups_data = [
                 g
-                for g in groups_data["results"]
+                for g in ow_groups_data
                 if g["id"] not in IGNORE_OW_GROUPS
                 and g["group_type"] in ("committee", "node_committee")
             ]
+            # print(json.dumps(filtered_groups_data, indent=4))
+            ow_group_ids = set(g["id"] for g in filtered_groups_data)
+            group_ids_not_in_ow_group_anymore = [
+                g.group_id
+                for g in groups_data
+                if g.ow_group_id is not None and g.ow_group_id not in ow_group_ids
+            ]
 
-            tasks = [
+            regular_sync_tasks = [
                 asyncio.create_task(self.sync_group_for_user(ow_user_id, g))
                 for g in filtered_groups_data
             ]
 
+            not_in_ow_group_tasks = []
+            if group_ids_not_in_ow_group_anymore:
+                not_in_ow_group_tasks.append(
+                    asyncio.create_task(
+                        self.set_inactive_in_groups(
+                            user_id, group_ids_not_in_ow_group_anymore
+                        )
+                    )
+                )
+
             if wait_for_updates:
-                await asyncio.gather(*tasks)
+                await asyncio.gather(*regular_sync_tasks, *not_in_ow_group_tasks)
             else:
                 # Only wait for the tasks if the user needs to me added or removed from
                 # one or more groups.
-                db_groups_res = await self.app.db.users.get_groups(user_id)
-                db_groups = {g.ow_group_id: g for g in db_groups_res if g is not None}
+                db_groups = {g.ow_group_id: g for g in groups_data if g is not None}
 
                 sum_ow_groups = 0
                 for group in filtered_groups_data:
@@ -110,7 +129,7 @@ class OWSync:
 
                 # Only wait for the tasks if we need to add or remove the user from one or more groups
                 if sum_ow_groups != len(filtered_groups_data):
-                    await asyncio.gather(*tasks)
+                    await asyncio.gather(*regular_sync_tasks, *not_in_ow_group_tasks)
         except Exception as e:
             sentry_sdk.capture_exception(e)
             print("Error reported to Sentry")
@@ -241,10 +260,10 @@ class OWSync:
             id_map = {m["ow_group_user_id"]: m["user_id"] for m in group_members}
 
             to_add = [u for u in group_users if u["id"] not in id_map]
-            to_remove = [
-                m["user_id"]
+            to_soft_delete = [
+                (m["user_id"], m["ow_group_user_id"])
                 for m in group_members
-                if m["ow_group_user_id"] not in member_ids
+                if m["ow_group_user_id"] not in member_ids and m["active"]
             ]
 
             added_members = []
@@ -255,14 +274,22 @@ class OWSync:
                     conn=conn,
                 )
 
-            if to_remove:
-                await self.app.db.group_members.delete_multiple(
+            if to_soft_delete:
+                member_updates = [
+                    GroupMemberUpdate(
+                        user_id=user_id,
+                        ow_group_user_id=ow_group_user_id,
+                        active=False,
+                    )
+                    for user_id, ow_group_user_id in to_soft_delete
+                ]
+                await self.app.db.group_members.update_multiple(
                     group_id,
-                    to_remove,
+                    member_updates,
                     conn=conn,
                 )
 
-            updated_id_map = {k: v for k, v in id_map.items() if v not in to_remove}
+            updated_id_map = dict(id_map)
             updated_id_map.update(
                 {m.ow_group_user_id: m.user_id for m in added_members}
             )
@@ -310,6 +337,18 @@ class OWSync:
                     conn=conn,
                 )
 
+    async def set_inactive_in_groups(
+        self,
+        ow_user_id: OWUserId,
+        group_ids: list[GroupId],
+    ) -> None:
+        """This method is used to update groups that the user is not longer a part of in OW"""
+
+        # Update all group members tied to the user id to be inactive
+        async with self.app.db.pool.acquire() as conn:
+            query = "UPDATE group_members SET active = FALSE WHERE user_id = $1 AND group_id = ANY($2)"
+            await conn.execute(query, ow_user_id, group_ids)
+
     async def sync_group_for_user(
         self,
         ow_user_id: OWUserId,
@@ -323,9 +362,9 @@ class OWSync:
             name=group_data["name_long"],
             name_short=group_data["name_short"],
             rules="No rules",
-            image=image_data["sm"]
-            if image_data
-            else "NoImage",  # TODO?: Maybe change to something default??
+            image=(
+                image_data["sm"] if image_data else "NoImage"
+            ),  # TODO?: Maybe change to something default??
         )
 
         ow_group_user_id = None
