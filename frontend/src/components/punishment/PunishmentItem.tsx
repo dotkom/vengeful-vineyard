@@ -91,8 +91,7 @@ export const PunishmentItem = ({
 
   const date = dayjs.utc(punishment.created_at).tz("Europe/Oslo")
 
-  const formattedDate = date.format("DD. MMM HH:mm")
-  const formattedLongerDate = date.format("DD. MMM YYYY HH:mm")
+  const formattedDate = date.format("kl. HH:mm, DD. MMM YYYY")
 
   const isWallOfShame = !isGroupContext
 
@@ -152,10 +151,7 @@ export const PunishmentItem = ({
             </span>
           ))}
         </div>
-        <div
-          className="text-gray-500 font-normal flex-end ml-auto whitespace-nowrap text-sm md:text-base"
-          title={formattedLongerDate}
-        >
+        <div className="text-gray-500 font-normal flex-end ml-auto whitespace-nowrap text-sm md:text-base">
           {formattedDate}
         </div>
       </div>
