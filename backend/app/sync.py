@@ -92,7 +92,6 @@ class OWSync:
                 if g["id"] not in IGNORE_OW_GROUPS
                 and g["group_type"] in ("committee", "node_committee")
             ]
-            # print(json.dumps(filtered_groups_data, indent=4))
             ow_group_ids = set(g["id"] for g in filtered_groups_data)
             group_ids_not_in_ow_group_anymore = [
                 g.group_id
