@@ -142,16 +142,26 @@ class HTTPClient:
             data = await response.json()
             return data["results"]
 
-    async def get_ow_groups_by_user_id(self, user_id: int) -> Any:
+    async def get_ow_groups_by_user_id(
+        self, user_id: int, page: Optional[int] = 1
+    ) -> Any:
         params = {
             "members__user": user_id,
+            "page": page,
         }
 
         async with self._session.get(
             f"{BASE_OLD_ONLINE}/api/v1/group/online-groups/",
             params=params,
         ) as response:
-            return await response.json()  # TODO?: Implement pagination?
+            data = await response.json()
+            results = data["results"]
+
+            if data["next"] is not None:
+                next_page_data = await self.get_ow_groups_by_user_id(user_id, page + 1)
+                results.extend(next_page_data)
+            
+            return results
 
     async def get_ow_group_users(self, group_id: int) -> Any:
         async with self._session.get(
