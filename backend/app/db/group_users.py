@@ -105,19 +105,23 @@ class GroupUsers:
                             'marked_paid_by', pwr.marked_paid_by,
                             'reactions', pwr.reactions
                        )) FILTER (WHERE pwr.punishment_id IS NOT NULL), '[]') as punishments,
-                       COALESCE(json_agg(gmp.privilege) FILTER (WHERE gmp.privilege IS NOT NULL), '[]') as permissions
+                       COALESCE(MAX(gmp.permissions::text)::json, '[]') as permissions
                     FROM group_members gm
                 LEFT JOIN users u
                     ON gm.user_id = u.user_id
                 LEFT JOIN punishments_with_reactions pwr
                     ON gm.user_id = pwr.user_id AND gm.group_id = pwr.group_id AND true = $2
-                LEFT JOIN group_member_permissions gmp
-                    ON gm.user_id = gmp.user_id AND gm.group_id = gmp.group_id
+                LEFT JOIN (
+                    SELECT user_id, group_id, json_agg(privilege) AS permissions
+                    FROM group_member_permissions
+                    GROUP BY user_id, group_id
+                ) gmp ON gm.user_id = gmp.user_id AND gm.group_id = gmp.group_id
                 WHERE gm.group_id = $1 {extra}
                 GROUP BY gm.active, gm.ow_group_user_id, u.user_id
                 """
 
             db_group_users = await conn.fetch(query, *args)
+            
             return [
                 GroupUser(**db_group_user, group_id=group_id)
                 for db_group_user in db_group_users
