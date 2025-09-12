@@ -7,7 +7,7 @@ export const PaginatedResponseSchemaBase = z.object({
 })
 
 export const UserSchema = z.object({
-  ow_user_id: z.number(),
+  ow_user_id: z.string(),
   user_id: z.string(),
   first_name: z.string(),
   last_name: z.string(),
@@ -52,7 +52,7 @@ export type Punishment = z.infer<typeof PunishmentSchema>
 
 export const GroupUserSchema = UserSchema.extend({
   group_id: z.string(),
-  ow_group_user_id: z.number().nullable(),
+  ow_group_user_id: z.string().nullable(),
   punishments: z.array(PunishmentSchema),
   active: z.boolean(),
   permissions: z.array(z.string()),
@@ -64,7 +64,7 @@ export const GroupBaseSchema = z.object({
   name_short: z.string(),
   rules: z.string(),
   image: z.string(),
-  ow_group_id: z.number().nullable(),
+  ow_group_id: z.string().nullable(),
   group_id: z.string(),
 })
 export type GroupBase = z.infer<typeof GroupBaseSchema>
