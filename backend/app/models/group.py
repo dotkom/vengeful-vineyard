@@ -24,7 +24,7 @@ class GroupCreateMinified(GroupBase):
 
 class GroupCreate(GroupBase):
     rules: str = ""
-    ow_group_id: Optional[int] = None
+    ow_group_id: Optional[str] = None
     image: str = ""
 
     @classmethod

@@ -2,16 +2,17 @@
 Some newtype definitions for extra type safety
 """
 
-
 from typing import TypedDict
 from uuid import UUID
 
+from pydantic import BaseModel
 
-class OWUserId(int):
+
+class OWUserId(str):
     pass
 
 
-class OWGroupUserId(int):
+class OWGroupUserId(str):
     pass
 
 
@@ -59,3 +60,23 @@ class InsertOrUpdateGroup(TypedDict):
 
 class InviteCode(str):
     pass
+
+
+class OWSyncUser(BaseModel):
+    id: str
+    first_name: str
+    last_name: str
+    email: str
+
+
+class OWSyncGroupMember(OWSyncUser):
+    roles: list[str]
+    has_active_membership: bool
+
+
+class OWSyncGroup(BaseModel):
+    slug: str
+    name: str
+    type: str
+    abbreviation: str
+    imageUrl: str

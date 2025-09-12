@@ -11,30 +11,24 @@ from .exceptions import DatabaseIntegrityException, NotFound
 from .models.group import GroupCreate
 from .models.group_member import GroupMember, GroupMemberCreate, GroupMemberUpdate
 from .models.user import UserCreate, UserUpdate
-from .types import GroupId, OWUserId, PermissionPrivilege, UserId
+from .types import (
+    GroupId,
+    OWSyncGroup,
+    OWSyncGroupMember,
+    OWUserId,
+    PermissionPrivilege,
+    UserId,
+)
 from .utils.db import MaybeAcquire
 
 if TYPE_CHECKING:
     from .api import FastAPI
 
 
-IGNORE_OW_GROUPS = (12,)  # "Komiteer"
-
-
-OW_GROUP_ROLES = {
-    1063: "leader",
-    1064: "deputy_leader",
-    1065: "treasurer",
-    1069: "chief_editor",
-    1079: "board_member",
-    1071: "wine_penalty_manager",
-}
-
-
-OW_GROUP_ROLES_TO_PERMISSIONS: dict[int, tuple[str, ...]] = {
-    1063: ("group.owner",),
-    1064: ("group.admin",),
-    1071: ("group.moderator",),
+OW_GROUP_ROLES_TO_PERMISSIONS: dict[str, tuple[str, ...]] = {
+    "LEADER": ("group.owner",),
+    "DEPUTY_LEADER": ("group.admin",),
+    "PUNISHER": ("group.moderator",),
 }
 
 
@@ -56,14 +50,14 @@ class OWSync:
             if ow_profile is None:
                 raise NotFound
 
-            ow_user_id = cast(OWUserId, ow_profile["id"])
+            ow_user_id = cast(OWUserId, ow_profile.id)
             self.app.app_state.add_access_token(access_token, ow_user_id)
 
             user_id = await self.create_user_if_not_exists(
                 ow_user_id=ow_user_id,
-                first_name=ow_profile["first_name"],
-                last_name=ow_profile["last_name"],
-                email=ow_profile["email"],
+                first_name=ow_profile.first_name,
+                last_name=ow_profile.last_name,
+                email=ow_profile.email,
                 conn=conn,
             )
             return user_id, ow_user_id
@@ -87,12 +81,9 @@ class OWSync:
                 self.app.db.users.get_groups(user_id),
             )
             filtered_groups_data = [
-                g
-                for g in ow_groups_data
-                if g["id"] not in IGNORE_OW_GROUPS
-                and g["group_type"] in ("committee", "node_committee")
+                g for g in ow_groups_data if g.type in ("COMMITTEE", "NODE_COMMITTEE")
             ]
-            ow_group_ids = set(g["id"] for g in filtered_groups_data)
+            ow_group_ids = set(g.slug for g in filtered_groups_data)
             group_ids_not_in_ow_group_anymore = [
                 g.group_id
                 for g in groups_data
@@ -152,47 +143,19 @@ class OWSync:
             res = await self.app.db.users.upsert(user_create, conn=conn)
             return res["id"]
 
-    async def add_user_to_group(
-        self,
-        group_id: GroupId,
-        user_data: dict[str, Any],
-        conn: Optional[Pool] = None,
-    ) -> None:
-        user_create = UserCreate(
-            ow_user_id=user_data["user"]["id"],
-            first_name=user_data["user"]["first_name"],
-            last_name=user_data["user"]["last_name"],
-            email=user_data["user"]["email"],
-        )
-
-        res = await self.app.db.users.upsert(user_create, conn=conn)
-        user_id = res["id"]
-
-        try:
-            await self.app.db.groups.insert_member(
-                group_id,
-                GroupMemberCreate(
-                    user_id=user_id,
-                    ow_group_user_id=user_data["id"],
-                ),
-                conn=conn,
-            )
-        except DatabaseIntegrityException:
-            pass
-
     async def add_users_to_group(
         self,
         group_id: GroupId,
-        users_data: list[dict[str, Any]],
+        users_data: list[OWSyncGroupMember],
         conn: Optional[Pool] = None,
     ) -> list[GroupMember]:
         user_creates = {}
         for user_data in users_data:
-            user_creates[user_data["user"]["id"]] = UserCreate(
-                ow_user_id=user_data["user"]["id"],
-                first_name=user_data["user"]["first_name"],
-                last_name=user_data["user"]["last_name"],
-                email=user_data["user"]["email"],
+            user_creates[user_data.id] = UserCreate(
+                ow_user_id=user_data.id,
+                first_name=user_data.first_name,
+                last_name=user_data.last_name,
+                email=user_data.email,
             )
 
         res = await self.app.db.users.upsert_multiple(
@@ -201,11 +164,11 @@ class OWSync:
 
         group_member_creates = []
         for user_data in users_data:
-            user_id = res[user_data["user"]["id"]]
+            user_id = res[user_data.id]
             group_member_creates.append(
                 GroupMemberCreate(
                     user_id=user_id,
-                    ow_group_user_id=user_data["id"],
+                    ow_group_user_id=user_data.id,
                 )
             )
 
@@ -213,7 +176,7 @@ class OWSync:
             group_id, group_member_creates, conn=conn
         )
 
-    def map_roles(self, roles: list[int]) -> list[PermissionPrivilege]:
+    def map_roles(self, roles: list[str]) -> list[PermissionPrivilege]:
         _roles = []
         for role in roles:
             mapped = OW_GROUP_ROLES_TO_PERMISSIONS.get(role)
@@ -227,15 +190,15 @@ class OWSync:
         self,
         group_id: GroupId,
         members: list[GroupMember],
-        group_users: list[dict[str, Any]],
+        group_users: list[OWSyncGroupMember],
         conn: Optional[Pool] = None,
     ) -> None:
         ids_map = {m.ow_group_user_id: m.user_id for m in members}
         privileges = []
         for u in group_users:
-            user_id = ids_map.get(u["id"])
+            user_id = ids_map.get(u.id)
             if user_id is not None:
-                for role in self.map_roles(u["roles"]):
+                for role in self.map_roles(u.roles):
                     privileges.append((user_id, role))
 
         if privileges:
@@ -248,8 +211,7 @@ class OWSync:
     async def handle_group_update(
         self,
         group_id: GroupId,
-        group_users: list[dict[str, Any]],
-        member_ids: list[int],
+        group_users: list[OWSyncGroupMember],
         conn: Optional[Pool] = None,
     ) -> None:
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
@@ -258,11 +220,16 @@ class OWSync:
             )
             id_map = {m["ow_group_user_id"]: m["user_id"] for m in group_members}
 
-            to_add = [u for u in group_users if u["id"] not in id_map]
+            to_add = [u for u in group_users if u.id not in id_map]
+
+            active_ow_group_members = [
+                item for item in group_users if item.has_active_membership
+            ]
+
             to_soft_delete = [
                 (m["user_id"], m["ow_group_user_id"])
                 for m in group_members
-                if m["ow_group_user_id"] not in member_ids and m["active"]
+                if m["ow_group_user_id"] not in active_ow_group_members and m["active"]
             ]
 
             added_members = []
@@ -294,9 +261,9 @@ class OWSync:
             )
 
             privileges = {
-                updated_id_map[u["id"]]: self.map_roles(u["roles"])
+                updated_id_map[u.id]: self.map_roles(u.roles)
                 for u in group_users
-                if u["id"] in updated_id_map
+                if u.id in updated_id_map
             }
 
             db_permissions = (
@@ -351,25 +318,25 @@ class OWSync:
     async def sync_group_for_user(
         self,
         ow_user_id: OWUserId,
-        group_data: dict[str, Any],
+        group_data: OWSyncGroup,
     ) -> None:
-        group_users = await self.app.http.get_ow_group_users(group_data["id"])
+        ow_group_users = await self.app.http.get_ow_group_users(group_data.slug)
 
-        image_data = group_data["image"]
+        image_data = group_data.imageUrl
         group_create = GroupCreate(
-            ow_group_id=group_data["id"],
-            name=group_data["name_long"],
-            name_short=group_data["name_short"],
+            ow_group_id=group_data.slug,
+            name=group_data.name,
+            name_short=group_data.abbreviation,
             rules="No rules",
             image=(
-                image_data["sm"] if image_data else "NoImage"
+                image_data if image_data else "NoImage"
             ),  # TODO?: Maybe change to something default??
         )
 
         ow_group_user_id = None
-        for group_user in group_users:
-            if group_user["user"]["id"] == ow_user_id:
-                ow_group_user_id = group_user["id"]
+        for ow_group_user in ow_group_users:
+            if ow_group_user.id == ow_user_id:
+                ow_group_user_id = ow_group_user.id
                 break
 
         assert ow_group_user_id is not None
@@ -386,27 +353,26 @@ class OWSync:
             if action == "CREATE":
                 members = await self.add_users_to_group(
                     group_id,
-                    [u for u in group_users if u["user"]["id"] != ow_group_user_id],
+                    [u for u in ow_group_users if u.id != ow_group_user_id],
                     conn=conn,
                 )
                 await self.handle_initial_group_permissions(
                     group_id,
                     members,
-                    group_users,
+                    ow_group_users,
                     conn=conn,
                 )
 
             elif action == "UPDATE":
                 await self.handle_group_update(
                     group_id=group_id,
-                    group_users=group_users,
-                    member_ids=group_data["members"],
+                    group_users=ow_group_users,
                     conn=conn,
                 )
 
                 await self.update_multiple(
                     group_id=group_id,
-                    group_users=group_users,
+                    group_users=ow_group_users,
                     conn=conn,
                 )
 
@@ -433,7 +399,7 @@ class OWSync:
     async def update_multiple(
         self,
         group_id: GroupId,
-        group_users: list[dict[str, Any]],
+        group_users: list[OWSyncGroupMember],
         conn: Optional[Pool] = None,
     ) -> None:
         async with MaybeAcquire(conn, self.app.db.pool) as conn:
@@ -445,32 +411,31 @@ class OWSync:
 
             users_to_update = []
             group_members_to_update = []
-            for group_user_data in group_users:
-                group_user = group_user_data["user"]
-                db_user = mapped.get(group_user["id"])
+            for group_user in group_users:
+                db_user = mapped.get(group_user.id)
                 if db_user is None:
                     continue
 
                 keys = ("first_name", "last_name", "email")
-                if any(group_user[key] != db_user[key] for key in keys):
+                if any(getattr(group_user, key) != db_user[key] for key in keys):
                     users_to_update.append(
                         UserUpdate(
                             user_id=db_user["user_id"],
-                            ow_user_id=group_user["id"],
-                            first_name=group_user["first_name"],
-                            last_name=group_user["last_name"],
-                            email=group_user["email"],
+                            ow_user_id=group_user.id,
+                            first_name=group_user.first_name,
+                            last_name=group_user.last_name,
+                            email=group_user.email,
                         )
                     )
 
                 if (
-                    group_user_data["is_retired"] == db_user["active"]
+                    group_user.has_active_membership != db_user["active"]
                 ):  # They are opposite, so update if they match
                     group_members_to_update.append(
                         GroupMemberUpdate(
                             user_id=db_user["user_id"],
-                            ow_group_user_id=group_user_data["id"],
-                            active=not group_user_data["is_retired"],
+                            ow_group_user_id=group_user.id,
+                            active=group_user.has_active_membership,
                         )
                     )
 
