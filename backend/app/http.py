@@ -171,7 +171,8 @@ class HTTPClient:
                     role["type"]
                     for membership in user["groupMemberships"]
                     for role in membership["roles"]
-                    if membership["end"] is None
+                    if (membership["end"] is None)
+                    or (parse_naive_datetime(membership["end"]) > now)
                 ]
 
                 has_active_group_membership = any(

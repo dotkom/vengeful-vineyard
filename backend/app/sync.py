@@ -24,6 +24,7 @@ from .utils.db import MaybeAcquire
 if TYPE_CHECKING:
     from .api import FastAPI
 
+IGNORE_OW_GROUPS = "komiteledere"
 
 OW_GROUP_ROLES_TO_PERMISSIONS: dict[str, tuple[str, ...]] = {
     "LEADER": ("group.owner",),
@@ -87,7 +88,9 @@ class OWSync:
             group_ids_not_in_ow_group_anymore = [
                 g.group_id
                 for g in groups_data
-                if g.ow_group_id is not None and g.ow_group_id not in ow_group_ids
+                if g.ow_group_id is not None
+                and g.ow_group_id not in IGNORE_OW_GROUPS
+                and g.ow_group_id not in ow_group_ids
             ]
 
             regular_sync_tasks = [
