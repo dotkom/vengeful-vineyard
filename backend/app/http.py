@@ -180,18 +180,6 @@ class HTTPClient:
                     for gm in user["groupMemberships"]
                 )
 
-                # We allow a 1 month grace period after ending an ow membership to keep the user active while changing from bachelor to master etc
-                grace = datetime.timedelta(days=30)
-
-                has_active_membership = any(
-                    (m["end"] is None) or (parse_naive_datetime(m["end"]) + grace > now)
-                    for m in user["memberships"]
-                )
-
-                has_active_membership = (
-                    has_active_group_membership and has_active_membership
-                )
-
                 parts = user.get("name", "").split()
                 first_name = " ".join(parts[:-1]) if parts else ""
                 last_name = parts[-1] if len(parts) > 1 else ""
@@ -202,7 +190,7 @@ class HTTPClient:
                     first_name=first_name,
                     last_name=last_name,
                     roles=roles,
-                    has_active_membership=has_active_membership,
+                    has_active_membership=has_active_group_membership,
                 )
 
                 ow_users.append(ow_user)
