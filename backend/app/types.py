@@ -2,7 +2,7 @@
 Some newtype definitions for extra type safety
 """
 
-from typing import TypedDict
+from typing import Optional, TypedDict
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -79,4 +79,4 @@ class OWSyncGroup(BaseModel):
     name: str
     type: str
     abbreviation: str
-    imageUrl: str
+    imageUrl: Optional[str]

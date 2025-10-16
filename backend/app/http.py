@@ -139,7 +139,11 @@ class HTTPClient:
             return [
                 OWSyncGroup(
                     slug=item["slug"],
-                    name=item["name"],
+                    name=(
+                        item["name"]
+                        if item["name"] is not None
+                        else item["abbreviation"]
+                    ),
                     type=item["type"],
                     imageUrl=item["imageUrl"],
                     abbreviation=item["abbreviation"],
