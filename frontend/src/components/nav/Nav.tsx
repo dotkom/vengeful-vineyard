@@ -1,18 +1,18 @@
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { committeesQuery, leaderboardQuery, userQuery } from "../../helpers/api"
 
-import { AuthContextProps } from "react-oidc-context"
 import { AvatarIcon } from "@radix-ui/react-icons"
-import BugIcon from "../../icons/BugIcon"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Fragment } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { NavLink } from "./NavLink"
+import { AuthContextProps } from "react-oidc-context"
+import { Link, useLocation } from "react-router-dom"
 import OnlineLogo from "../../assets/online-logo-blue.png"
 import OnlineLogoWhite from "../../assets/online-logo-white.png"
-import { classNames } from "../../helpers/classNames"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useDarkMode } from "../../DarkModeContext"
+import { classNames } from "../../helpers/classNames"
+import BugIcon from "../../icons/BugIcon"
+import { NavLink } from "./NavLink"
 
 interface NavItem {
   label: string
@@ -76,8 +76,6 @@ export const Nav = ({ auth }: NavProps) => {
     },
   ]
 
-  const navigate = useNavigate()
-
   const { darkMode, setDarkMode } = useDarkMode()
 
   return (
@@ -124,7 +122,7 @@ export const Nav = ({ auth }: NavProps) => {
                     ))}
                 </div>
               </div>
-              <div className="hidden md:flex flex-row justify-end w-full">
+              <div className="hidden md:flex flex-row justify-end">
                 <div className="flex items-center">
                   <Link
                     to="https://github.com/dotkom/vengeful-vineyard/issues/new/choose"
@@ -133,7 +131,7 @@ export const Nav = ({ auth }: NavProps) => {
                     className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >
                     <figure className="relative group">
-                      <BugIcon className="w-10 h-10 p-1 dark:grayscale dark:invert" />
+                      <BugIcon className="w-10 h-10 text-black" />
                       <figcaption className="absolute text-center top-[50px] left-[-40px] right-[-40px] py-2 text-xs text-gray-700 hidden group-hover:block bg-white p-1 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
                         Rapporter bug
                       </figcaption>
@@ -225,6 +223,14 @@ export const Nav = ({ auth }: NavProps) => {
                 ))}
             </div>
             <div className="border-t border-gray-200">
+              <div className="space-y-1">
+                <button
+                  className="w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6"
+                  onClick={() => setDarkMode(!darkMode)}
+                >
+                  {darkMode ? "Light mode" : "Dark mode"}
+                </button>
+              </div>
               <div className="space-y-1">
                 <Link to="mailto:dotkom@online.ntnu.no">
                   <span className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
