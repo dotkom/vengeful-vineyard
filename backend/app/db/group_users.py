@@ -78,10 +78,8 @@ class GroupUsers:
                             'created_by_name', (SELECT COALESCE(NULLIF(first_name, ''), email) || ' ' || last_name FROM users WHERE user_id = pr.created_by)
                         )) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
                     FROM group_punishments gp
-                    LEFT JOIN group_members gm
-                        ON gm.group_id = gp.group_id
                     LEFT JOIN punishment_reactions pr
-                        ON pr.punishment_id = gp.punishment_id AND pr.created_by = gm.user_id
+                        ON pr.punishment_id = gp.punishment_id
                     LEFT JOIN users u
                         ON u.user_id = gp.created_by
                     GROUP BY gp.punishment_id, created_by_name
@@ -110,7 +108,7 @@ class GroupUsers:
                 LEFT JOIN users u
                     ON gm.user_id = u.user_id
                 LEFT JOIN punishments_with_reactions pwr
-                    ON gm.user_id = pwr.user_id AND gm.group_id = pwr.group_id AND true = $2
+                    ON gm.user_id = pwr.user_id AND true = $2
                 LEFT JOIN (
                     SELECT user_id, group_id, json_agg(privilege) AS permissions
                     FROM group_member_permissions
@@ -121,7 +119,7 @@ class GroupUsers:
                 """
 
             db_group_users = await conn.fetch(query, *args)
-            
+
             return [
                 GroupUser(**db_group_user, group_id=group_id)
                 for db_group_user in db_group_users
