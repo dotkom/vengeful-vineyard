@@ -80,7 +80,9 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
   const punishments = groupUser.punishments.filter((punishment) => !punishment.paid || isToggled)
 
   const displayName =
-    groupUser.first_name && groupUser.last_name ? `${groupUser.first_name} ${groupUser.last_name}` : groupUser.email
+    groupUser.first_name || groupUser.last_name
+      ? `${groupUser.first_name} ${groupUser.last_name}`.trim()
+      : groupUser.email
 
   return (
     <AccordionItem value={groupUser.user_id}>

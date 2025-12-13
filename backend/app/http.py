@@ -25,6 +25,19 @@ def create_trpc_input(value: str) -> str:
     return json.dumps(payload)
 
 
+def split_full_name(full_name: str) -> tuple[str, str]:
+    first_name = full_name
+    last_name = ""
+
+    parts = full_name.split()
+
+    if len(parts) > 1:
+        first_name = " ".join(parts[:-1])
+        last_name = parts[-1]
+
+    return first_name, last_name
+
+
 def create_aiohttp_closed_event(session: ClientSession) -> asyncio.Event:
     """Work around aiohttp issue that doesn't properly close transports on exit.
     See https://github.com/aio-libs/aiohttp/issues/1925#issuecomment-639080209
@@ -112,9 +125,8 @@ class HTTPClient:
             if raw is None:
                 return None
 
-            parts = raw.get("name", "").split()
-            first_name = " ".join(parts[:-1]) if parts else ""
-            last_name = parts[-1] if len(parts) > 1 else ""
+            full_name = raw.get("name", "")
+            first_name, last_name = split_full_name(full_name)
 
             return OWSyncUser(
                 id=raw["id"],
@@ -184,9 +196,8 @@ class HTTPClient:
                     for gm in user["groupMemberships"]
                 )
 
-                parts = user.get("name", "").split()
-                first_name = " ".join(parts[:-1]) if parts else ""
-                last_name = parts[-1] if len(parts) > 1 else ""
+                full_name = user.get("name", "")
+                first_name, last_name = split_full_name(full_name)
 
                 ow_user = OWSyncGroupMember(
                     id=user["id"],
@@ -222,9 +233,8 @@ class HTTPClient:
             ow_users: list[OWSyncUser] = []
 
             for data in raw:
-                parts = data.get("name", "").split()
-                first_name = " ".join(parts[:-1]) if parts else ""
-                last_name = parts[-1] if len(parts) > 1 else ""
+                full_name = data.get("name", "")
+                first_name, last_name = split_full_name(full_name)
 
                 ow_user = OWSyncUser(
                     id=data["id"],
