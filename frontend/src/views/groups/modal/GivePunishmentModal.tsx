@@ -1,10 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useEffect, useRef, useState } from "react"
-import { groupLeaderboardQuery, addManyPunishmentsMutation } from "../../../helpers/api"
+import { addManyPunishmentsMutation, groupLeaderboardQuery } from "../../../helpers/api"
 import { Group, GroupUser } from "../../../helpers/types"
 
 import { Transition } from "@headlessui/react"
 import { z } from "zod"
+import AlcoholGame from "../../../components/alcoholGame"
 import { AlcoholInput } from "../../../components/input/AlcoholInput"
 import { PersonSelect } from "../../../components/input/PersonSelect"
 import { TextInput } from "../../../components/input/TextInput"
@@ -14,7 +15,6 @@ import { useGroupNavigation } from "../../../helpers/context/groupNavigationCont
 import { useGivePunishmentModal } from "../../../helpers/context/modal/givePunishmentModalContext"
 import { useErrorControl } from "../../../helpers/form"
 import { sortGroupUsersByName } from "../../../helpers/sorting"
-import AlcoholGame from "../../../components/alcoholGame"
 
 interface GivePunishmentModalProps {
   open: boolean
@@ -25,7 +25,11 @@ const CreatePunishment = z.object({
   punishment_type_id: z.string().default(""),
   reason: z.string().default(""),
   reason_hidden: z.boolean().default(false),
-  amount: z.number().min(1, { message: "Straffemengde må være minst 1" }).default(1),
+  amount: z
+    .number()
+    .min(1, { message: "Straffemengde må være minst 1" })
+    .max(9, { message: "Straffemengde må være maks 9" })
+    .default(1),
 })
 
 export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpen }) => {

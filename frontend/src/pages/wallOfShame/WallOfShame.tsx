@@ -1,9 +1,9 @@
-import { LeaderboardTable } from "../../components/leaderboardtable"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
-import { leaderboardQuery, userQuery } from "../../helpers/api"
-import { Button } from "../../components/button/Button"
-import { useCurrentUser } from "../../helpers/context/currentUserContext"
 import { useEffect, useState } from "react"
+import { Button } from "../../components/button/Button"
+import { LeaderboardTable } from "../../components/leaderboardtable"
+import { leaderboardQuery, userQuery } from "../../helpers/api"
+import { useCurrentUser } from "../../helpers/context/currentUserContext"
 
 export const WallOfShame = () => {
   const { setCurrentUser } = useCurrentUser()
@@ -43,31 +43,49 @@ export const WallOfShame = () => {
 
   return (
     <section className="mt-8 md:mt-16 max-w-5xl w-[90%] mx-auto">
-      <div className="relative flex justify-center items-center mb-4">
-        <div className="absolute left-0 flex space-x-2 text-sm mt-1">
-          <button
-            onClick={() => setFilter("year")}
-            className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400 ${
-              filter === "year" ? "bg-slate-100 dark:bg-slate-800" : ""
-            }`}
-          >
-            {year}
-          </button>
-          <button
-            onClick={() => setFilter("alltime")}
-            className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400  ${
-              filter === "alltime" ? "bg-slate-100 dark:bg-slate-800" : ""
-            }`}
-          >
-            All time
-          </button>
+      <div className="relative flex justify-center items-center mb-12 md:mb-4">
+        <div>
+          <FilterTabs filter={filter} setFilter={setFilter} year={year} className="hidden md:flex mt-1.5" />
+          <h1 className="text-center md:text-3xl font-medium text-black">Wall of Shame</h1>
+          <FilterTabs filter={filter} setFilter={setFilter} year={year} className="md:hidden mt-2" />
         </div>
-        <h1 className="text-center md:text-3xl font-medium text-black">Wall of Shame</h1>
       </div>
+
       <LeaderboardTable leaderboardUsers={filteredLeaderboardUsers} isFetching={isFetching} dataRefetch={refetch} />
+
       <Button variant="OUTLINE" onClick={() => fetchNextPage().then()} className="mx-auto mt-4">
         Last inn mer
       </Button>
     </section>
+  )
+}
+
+interface FilterTabsProps {
+  filter: "year" | "alltime"
+  setFilter: React.Dispatch<React.SetStateAction<"year" | "alltime">>
+  year: number
+  className?: string
+}
+
+const FilterTabs = ({ filter, setFilter, year, className }: FilterTabsProps) => {
+  return (
+    <div className={`absolute left-0 flex space-x-2 text-sm ${className}`}>
+      <button
+        onClick={() => setFilter("year")}
+        className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400 ${
+          filter === "year" ? "bg-slate-100 dark:bg-slate-800" : ""
+        }`}
+      >
+        {year}
+      </button>
+      <button
+        onClick={() => setFilter("alltime")}
+        className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400  ${
+          filter === "alltime" ? "bg-slate-100 dark:bg-slate-800" : ""
+        }`}
+      >
+        All time
+      </button>
+    </div>
   )
 }

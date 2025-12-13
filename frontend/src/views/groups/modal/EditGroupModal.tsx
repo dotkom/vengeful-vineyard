@@ -1,16 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { ChangeEvent, Dispatch, FC, Fragment, SetStateAction, useRef, useState } from "react"
 import {
-  VengefulApiError,
-  groupLeaderboardQuery,
-  putGroupMutation,
-  postPunishmentTypeMutation,
-  putPunishmentTypeMutation,
   deletePunishmentTypeMutation,
+  groupLeaderboardQuery,
+  postPunishmentTypeMutation,
+  putGroupMutation,
+  putPunishmentTypeMutation,
 } from "../../../helpers/api"
 
 import { Transition } from "@headlessui/react"
-import axios from "axios"
 import { Button } from "../../../components/button"
 import { NumberInput } from "../../../components/input/NumberInput"
 import { TextInput } from "../../../components/input/TextInput"
@@ -18,7 +16,7 @@ import { Listbox } from "../../../components/listbox/Listbox"
 import { Modal } from "../../../components/modal"
 import { Spinner } from "../../../components/spinner"
 import { Tabs } from "../../../components/tabs/Tabs"
-import { useNotification } from "../../../helpers/context/notificationContext"
+import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 import { useErrorControl } from "../../../helpers/form"
 import {
   EditGroup,
@@ -28,7 +26,6 @@ import {
   PunishmentType,
 } from "../../../helpers/types"
 import { areObjectsEqual } from "../../../helpers/utils"
-import { useGroupNavigation } from "../../../helpers/context/groupNavigationContext"
 
 interface EditGroupModalProps {
   open: boolean
@@ -201,7 +198,7 @@ export const EditGroupModal: FC<EditGroupModalProps> = ({ open, setOpen }) => {
           <Listbox
             label="Velg straffetype"
             options={punishmentTypeOptions ?? []}
-            value={currentPunishmentType?.punishment_type_id ?? ""}
+            value={currentPunishmentType?.punishment_type_id ?? punishmentTypeOptions?.[0].value ?? ""}
             onChange={currentPunishmentTypeChangeHandler}
           />
         )}

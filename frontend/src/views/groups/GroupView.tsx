@@ -170,7 +170,7 @@ export const GroupView = () => {
         setOpen={setAdministerGroupJoinRequestsModalOpen}
       />
       {error && (
-        <div className="w-full p-40 text-center">
+        <div className="w-full p-40 text-center text-black">
           <p>Noe gikk galt 😭</p>
           <pre>{error.toString()}</pre>
         </div>
