@@ -40,7 +40,7 @@ export const PersonSelect = ({ label, members, selectedPerson, setSelectedPerson
               )}
               <Combobox.Input
                 className="w-full border-none text-sm leading-5 text-gray-900 focus:ring-0 h-full bg-white"
-                displayValue={(person: GroupUser) => `${person.first_name} ${person.last_name}`}
+                displayValue={(person: GroupUser) => `${person.first_name} ${person.last_name}`.trim()}
                 onChange={(event) => setQuery(event.target.value)}
               />
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center justify-end pr-2 w-12">
