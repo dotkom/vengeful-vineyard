@@ -34,7 +34,7 @@ export const CommitteeList = () => {
           ))
       )}
 
-      {isLoading && !groupsStatistics && [...Array(4)].map((e, i) => <SkeletonCommitteeCard key={i} />)}
+      {isLoading && !groupsStatistics && [...Array(8)].map((e, i) => <SkeletonCommitteeCard key={i} />)}
     </div>
   )
 }
