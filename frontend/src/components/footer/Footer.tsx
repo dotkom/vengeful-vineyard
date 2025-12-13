@@ -108,9 +108,9 @@ export const SoMeSection = () => {
   ]
 
   return (
-    <ul className="mx-8 mb-4 flex justify-center flex-wrap">
+    <ul className="mx-8 mb-4 flex justify-center flex-wrap gap-4">
       {links.map((link) => (
-        <li key={link.icon.key} className="mx-4 w-16 cursor-pointer">
+        <li key={link.icon.key} className="w-16">
           <a href={link.url}>{link.icon}</a>
         </li>
       ))}
