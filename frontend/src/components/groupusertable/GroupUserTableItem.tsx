@@ -6,10 +6,10 @@ import { Group, GroupUser, Punishment, PunishmentType } from "../../helpers/type
 import { AccordionContent, AccordionItem, AccordionTrigger } from "../accordion/Accordion"
 
 import { IconType } from "react-icons"
-import { textToEmoji } from "../../helpers/emojies"
-import { PunishmentList } from "../punishment/PunishmentList"
 import { useTogglePunishments } from "../../helpers/context/togglePunishmentsContext"
+import { textToEmoji } from "../../helpers/emojies"
 import { weeklyStreak } from "../../helpers/streaks"
+import { PunishmentList } from "../punishment/PunishmentList"
 // import { useTogglePunishments } from "../../helpers/context/togglePunishmentsContext"
 
 interface TableItemProps {
@@ -43,17 +43,7 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
   const unpaidPunishmentsValue = getUnpaidPunishmentsValue(groupUser.punishments, punishmentTypes)
   const punishmentTypeCounts = getPunishmentTypeCounts(groupUser.punishments.filter((p) => !p.paid))
 
-  const dateToNumber = groupUser.punishments
-    .map((punishment) => {
-      const date = punishment.created_at.slice(0, 10)
-      const [year, month, day] = date.split("-").map(Number)
-      return new Date(year, month - 1, day).getTime()
-    })
-    .sort((a, b) => a - b)
-    .reverse()
-
-  const today = new Date().getTime()
-  const streak = weeklyStreak(today, dateToNumber)
+  const streak = weeklyStreak(groupUser.punishments.map((p) => new Date(p.created_at)))
 
   let RoleIcon: IconType | undefined
   switch (groupUser?.permissions.at(0) ?? "") {
@@ -103,7 +93,12 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
             >
               {displayName}
             </p>
-            <span className="text-gray-700 text-xs">{unpaidPunishmentsValue}kr</span>
+            <span className="text-gray-700 text-xs flex gap-2">
+              <span>{unpaidPunishmentsValue}kr</span>
+              {streak > 1 && (
+                <span title={`${displayName} har fått straffer ${streak} uker på rad`}>{`${streak}🔥`}</span>
+              )}
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-x-4">
@@ -141,13 +136,6 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
             </p>
           </div>
         </div>
-        {streak > 1 && (
-          <div className="absolute right-12 cursor-default inline-block">
-            <span className="text-lg dark:text-white" title={`${displayName} har fått straffer ${streak} uker på rad`}>
-              {streak} 🔥
-            </span>
-          </div>
-        )}
       </AccordionTrigger>
       <AccordionContent>
         <PunishmentList
