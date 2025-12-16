@@ -79,9 +79,9 @@ class GroupUsers:
                         )) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
                     FROM group_punishments gp
                     LEFT JOIN punishment_reactions pr
-                        ON pr.punishment_id = gp.punishment_id
+                    ON pr.punishment_id = gp.punishment_id
                     LEFT JOIN users u
-                        ON u.user_id = gp.created_by
+                    ON u.user_id = gp.created_by
                     GROUP BY gp.punishment_id, created_by_name
                 )
                 SELECT gm.active,
@@ -108,7 +108,7 @@ class GroupUsers:
                 LEFT JOIN users u
                     ON gm.user_id = u.user_id
                 LEFT JOIN punishments_with_reactions pwr
-                    ON gm.user_id = pwr.user_id AND true = $2
+                    ON gm.user_id = pwr.user_id AND gm.group_id = pwr.group_id AND true = $2
                 LEFT JOIN (
                     SELECT user_id, group_id, json_agg(privilege) AS permissions
                     FROM group_member_permissions
