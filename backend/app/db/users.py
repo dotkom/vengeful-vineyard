@@ -100,6 +100,34 @@ class Users:
                     user.email,
                 )
             except UniqueViolationError as exc:
+                # Email conflict: user exists with same email but different ow_user_id
+                # This happens when OW returns different IDs from group sync vs direct login
+                # Update the existing user's ow_user_id to match what OW provides
+                if "users_email_key" in str(exc):
+                    # Get the old ow_user_id before updating
+                    old_ow_user_id = await conn.fetchval(
+                        "SELECT ow_user_id FROM users WHERE email = $1",
+                        user.email,
+                    )
+                    update_query = """UPDATE users
+                            SET ow_user_id = $1, first_name = $2, last_name = $3
+                            WHERE email = $4
+                            RETURNING user_id"""
+                    user_id = await conn.fetchval(
+                        update_query,
+                        user.ow_user_id,
+                        user.first_name,
+                        user.last_name,
+                        user.email,
+                    )
+                    # Also update ow_group_user_id in group_members to keep memberships linked
+                    if old_ow_user_id:
+                        await conn.execute(
+                            "UPDATE group_members SET ow_group_user_id = $1 WHERE ow_group_user_id = $2",
+                            user.ow_user_id,
+                            old_ow_user_id,
+                        )
+                    return {"id": user_id, "action": "UPDATE"}
                 raise DatabaseIntegrityException(detail=str(exc)) from exc
 
         return {"id": user_id, "action": "CREATE"}

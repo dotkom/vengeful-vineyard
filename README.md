@@ -13,82 +13,167 @@ The old and outdated version can be found here: [RedWine](https://online.ntnu.no
 
 ## Project Status
 
-The project is is finished🎉
+The project is finished :tada:
+
 It is currently being maintained by [Dotkom from the Online student association](https://online.ntnu.no/).
 
 The link to the page is: [Vengeful Vineyard](https://vinstraff.no/)
 
-## Frontend
+## Tech Stack
 
-### Built with
-
-- [Typescript](https://www.typescriptlang.org/)
+### Frontend
+- [TypeScript](https://www.typescriptlang.org/)
 - [React](https://reactjs.org/)
-- [Tailwind](https://tailwindcss.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
 - [Vite](https://vitejs.dev/)
 
-### Doppler
+### Backend
+- [FastAPI](https://fastapi.tiangolo.com)
+- PostgreSQL
 
-We use [Doppler](https://docs.doppler.com) to manage secrets. After installation, set up using:
+---
 
-- `doppler login`
-- `doppler setup`
-  - (select vengeful-vineyard, dev)
+## Getting Started (Local Development)
 
-### Installation and running locally
+> **Note:** Running locally requires all three services: **Online Web (monoweb)**, **Backend**, and **Frontend**. The frontend authenticates users through Online Web, and requires the backend API to function.
 
-- `cd frontend`
-- `pnpm i`
-- `doppler run pnpm dev`
+### Prerequisites
 
-## Backend
+Make sure you have the following installed:
+- [Docker](https://www.docker.com/) and Docker Compose
+- [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/)
+- [Doppler CLI](https://docs.doppler.com/docs/install-cli)
 
-Created with [FastAPI](https://fastapi.tiangolo.com) and PostgreSQL.
+### Step 1: Set up Doppler
 
-#### (Recommended) Running locally with docker compose
+We use [Doppler](https://docs.doppler.com) to manage secrets.
 
-- Make sure you have docker and docker compose installed.
-- `cd backend`
-- Start server with: `make dev`
-- Go to: http://localhost:8000/docs for Swagger docs
+```bash
+doppler login
+doppler setup
+# Select: vengeful-vineyard, dev
+```
+
+### Step 2: Set up Online Web (Authentication)
+
+The frontend uses [Online Web (monoweb)](https://github.com/dotkom/monoweb) for user authentication. You need to run it locally.
+
+1. Clone and set up monoweb by following the instructions at: https://github.com/dotkom/monoweb
+
+2. To get started quickly with test data, run:
+   ```bash
+   pnpm migrate:dev-with-fixtures
+   ```
+
+3. **Important:** After monoweb is running, go to the dashboard and add yourself as a member of **Dotkom**. This gives you the necessary permissions to see all features in the Vengeful Vineyard frontend.
+
+### Step 3: Start the Backend
+
+The backend must be running before starting the frontend.
+
+```bash
+cd backend
+make dev
+```
+
+This starts the FastAPI server with PostgreSQL using Docker Compose.
+
+- API docs available at: http://localhost:8000/docs
+
+#### Syncing Production Data (Optional)
+
+If you have Doppler access to production, you can sync the production database to your local environment:
+
+```bash
+make db-sync
+```
+
+### Step 4: Start the Frontend
+
+```bash
+cd frontend
+pnpm install
+doppler run pnpm dev
+```
+
+The frontend will be available at: http://localhost:5173 (or similar)
+
+---
 
 ## Contributing
 
 Please take a look at our issues if you want to contribute to this project. Pull requests are welcome!
 
-Before contributing, make sure to install pre-commit hooks with `pre-commit install`.
+Before contributing, make sure to install pre-commit hooks:
 
-If you don't have `pre-commit` installed, you can install it with `pip install pre-commit` or `brew install pre-commit`
+```bash
+# Install pre-commit if you don't have it
+pip install pre-commit
+# or
+brew install pre-commit
 
-## Deploying changes
+# Install the hooks
+pre-commit install
+```
 
-Do deploy changes to the aws. You will need to have the AWS CLI installed and set up.
-First ask dotkom for credentials so that they can create a IAM user for you. Then do the following steps:
+---
 
-- Install AWS CLI
-- Then run `aws configure' in the terminal
-  - Optional: Set up a new profile for the project
-  - Instead run `aws configure --profile dotkom`
+## Deployment
 
-### Backend Deployment Instructions
+To deploy changes to AWS, you need the AWS CLI installed and configured. Ask Dotkom for credentials to create an IAM user for you.
 
-- `cd backend`
-- `make deploy-prod`
-  - Optionally if you are having profiles set up, you can run `make deploy-prod PROFILE=dotkom`
-- Go to the Terraform monorepo and get into correct stage, `staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory
-  - Run `terraform init` or optionally `AWS_PROFILE=dotkom terraform init`
-  - Then apply the changes with `doppler run terraform apply` or optionally `AWS_PROFILE=dotkom doppler run terraform apply`
+### AWS Setup
 
-### Frontend Deployment Instructions
-Note: You will need to have the Doppler CLI installed and set up.
+```bash
+# Install AWS CLI, then configure
+aws configure --profile dotkom
+```
 
-- `doppler login`
-- `doppler setup` - (select vengeful-vineyard, dev)
-- `cd frontend`
-- `npm run deploy:prod`
-  - Optionallly if you are having profiles set up, you can run `npm run deploy:prod -- --profile=dotkom`
+### Backend Deployment
 
-### Debugging Tips
+```bash
+cd backend
+make deploy-prod
+# Or with profile:
+make deploy-prod PROFILE=dotkom
+```
 
-- Delete `/backend/postgres-data`
-- `docker-compose up --build`
+Then go to the Terraform monorepo (`staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory):
+
+```bash
+terraform init
+# Or: AWS_PROFILE=dotkom terraform init
+
+doppler run terraform apply
+# Or: AWS_PROFILE=dotkom doppler run terraform apply
+```
+
+### Frontend Deployment
+
+```bash
+doppler login
+doppler setup  # Select vengeful-vineyard, dev
+
+cd frontend
+npm run deploy:prod
+# Or with profile:
+npm run deploy:prod -- --profile=dotkom
+```
+
+---
+
+## Troubleshooting
+
+### Database Issues
+
+If you encounter database issues, try resetting the local database:
+
+```bash
+cd backend
+rm -rf postgres-data
+docker-compose up --build
+```
+
+### Authentication Issues
+
+Make sure Online Web (monoweb) is running on the expected port and that you're logged in there first before accessing Vengeful Vineyard.
