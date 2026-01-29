@@ -4,7 +4,7 @@ export SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)pipefail:errexit
 PROFILE ?= default
 
 .ONESHELL:
-.PHONY: prod dev dev-memory test testv testvv mypy pylint clean help hooks docs
+.PHONY: prod dev dev-memory test testv testvv mypy pylint clean help hooks docs db-sync
 
 prod: .prod-reqs
 	VENGEFUL_DATABASE="vengeful_vineyard.db" poetry run uvicorn app.api.init_api:asgi_app --host 0.0.0.0
@@ -73,6 +73,22 @@ deploy-prod: docker-build docker-login docker-push-prod
 
 deploy-staging: docker-build docker-login docker-push-staging
 
+db-sync:
+	@echo "Syncing production database to local..."
+	@echo "Step 1: Dumping production database..."
+	doppler run --config prd -- sh -c 'PGPASSWORD="$$POSTGRES_PASSWORD" pg_dump -h "$$POSTGRES_HOST" -p "$$POSTGRES_PORT" -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" --no-owner --no-acl' > /tmp/prod_dump.sql
+	@echo "Step 2: Stopping app container..."
+	docker compose stop app
+	@echo "Step 3: Dropping and recreating local database..."
+	docker compose exec db psql -U postgres -c "DROP DATABASE IF EXISTS dev;"
+	docker compose exec db psql -U postgres -c "CREATE DATABASE dev;"
+	@echo "Step 4: Loading production data into local database..."
+	docker compose exec -T db psql -U postgres -d dev < /tmp/prod_dump.sql
+	@echo "Step 5: Restarting containers..."
+	docker compose up -d
+	@echo "Done! Local database now contains production data."
+	rm /tmp/prod_dump.sql
+
 help:
 	@echo "Makefile commands:"
 	@echo "help:         Show this help."
@@ -87,8 +103,9 @@ help:
 	@echo "pylint:       Python linter to check for common mistakes"
 	@echo "mypy:         Typecheck Python code"
 	@echo "hooks:        Run all commit hooks"
-	@echo "docker-build: Build docker image for AWS Lambda
-	@echo "docker-login: Log in to Amazon ECR
-	@echo "docker-push-: Push the docker image to the specified environment (dev,stg,prd)
+	@echo "docker-build: Build docker image for AWS Lambda"
+	@echo "docker-login: Log in to Amazon ECR"
+	@echo "docker-push-: Push the docker image to the specified environment (dev,stg,prd)"
 	@echo ""
-	@echo "clean:   Clean up Python environment"
+	@echo "db-sync:      Sync production database to local (requires Doppler access)"
+	@echo "clean:        Clean up Python environment"

@@ -9,6 +9,7 @@ RUN apk add --no-cache gcc libffi-dev musl-dev postgresql-dev
 RUN pip3 install poetry virtualenv
 RUN poetry config virtualenvs.create false
 RUN poetry install -n --no-ansi --no-root
+RUN pip3 install "packaging>=24.0"
 
 COPY . /app
 
