@@ -20,6 +20,7 @@ class BaseGroupMember(BaseModel):
 class GroupMember(BaseGroupMember):
     group_id: GroupId
     added_at: datetime.datetime
+    inactive_at: Optional[datetime.datetime] = None
 
 
 class GroupMemberCreate(BaseGroupMember):
@@ -27,4 +28,4 @@ class GroupMemberCreate(BaseGroupMember):
 
 
 class GroupMemberUpdate(BaseGroupMember):
-    pass
+    inactive_at: Optional[datetime.datetime] = None

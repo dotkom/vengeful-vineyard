@@ -55,6 +55,7 @@ export const GroupUserSchema = UserSchema.extend({
   ow_group_user_id: z.string().nullable(),
   punishments: z.array(PunishmentSchema),
   active: z.boolean(),
+  inactive_at: z.string().nullable(),
   permissions: z.array(z.string()),
 })
 export type GroupUser = z.infer<typeof GroupUserSchema>

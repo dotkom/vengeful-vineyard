@@ -196,6 +196,17 @@ class HTTPClient:
                     for gm in user["groupMemberships"]
                 )
 
+                # Get the most recent membership end date for inactive members
+                membership_end: Optional[datetime.datetime] = None
+                if not has_active_group_membership:
+                    end_dates = [
+                        parse_naive_datetime(gm["end"])
+                        for gm in user["groupMemberships"]
+                        if gm["end"] is not None
+                    ]
+                    if end_dates:
+                        membership_end = max(end_dates)
+
                 full_name = user.get("name", "")
                 first_name, last_name = split_full_name(full_name)
 
@@ -206,6 +217,7 @@ class HTTPClient:
                     last_name=last_name,
                     roles=roles,
                     has_active_membership=has_active_group_membership,
+                    membership_end=membership_end,
                 )
 
                 ow_users.append(ow_user)

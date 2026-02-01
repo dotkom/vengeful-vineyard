@@ -2,6 +2,7 @@
 Some newtype definitions for extra type safety
 """
 
+import datetime
 from typing import Optional, TypedDict
 from uuid import UUID
 
@@ -72,6 +73,7 @@ class OWSyncUser(BaseModel):
 class OWSyncGroupMember(OWSyncUser):
     roles: list[str]
     has_active_membership: bool
+    membership_end: Optional[datetime.datetime] = None
 
 
 class OWSyncGroup(BaseModel):
