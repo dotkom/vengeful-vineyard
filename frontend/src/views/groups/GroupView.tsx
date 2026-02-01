@@ -67,16 +67,23 @@ export const GroupView = () => {
 
   const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading, error } = useQuery(userQuery())
 
+  const isLocalhost = window.location.hostname === 'localhost'
+
   useEffect(() => {
     setMyGroupsRefetch(() => myGroupsRefetch as any)
   }, [myGroupsRefetch])
+
+  const selectedGroup = user?.groups.find(
+    (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
+  )
 
   useEffect(() => {
     if (!user) return
 
     setCurrentUser({ user_id: user.user_id })
 
-    if (selectedGroupName === undefined && user.groups.length > 0) {
+    // Don't redirect when on localhost - allow viewing any group
+    if (selectedGroupName === undefined && user.groups.length > 0 && !isLocalhost) {
       navigate(`/gruppe/${user.groups[0].name_short.toLowerCase()}`)
     }
 
@@ -89,11 +96,12 @@ export const GroupView = () => {
         setSelectedGroup(targetGroup)
       }
     }
-  }, [user, selectedGroupName])
+  }, [user, selectedGroupName, isLocalhost])
 
-  const selectedGroup = user?.groups.find(
-    (group) => group.name_short.toLowerCase() === selectedGroupName?.toLowerCase()
-  )
+  const { data: publicGroup } = useQuery({
+    ...publicGroupQuery(selectedGroupName?.toLowerCase()),
+    enabled: !!currentUser && !userIsLoading && !selectedGroup,
+  })
 
   useEffect(() => {
     if (selectedGroup && inviteCode) {
@@ -101,8 +109,10 @@ export const GroupView = () => {
     }
   })
 
+  const effectiveGroupId = selectedGroup?.group_id ?? (isLocalhost ? publicGroup?.group_id : undefined)
+
   const { isLoading, data, refetch } = useQuery({
-    ...groupLeaderboardQuery(selectedGroup?.group_id),
+    ...groupLeaderboardQuery(effectiveGroupId),
     onSuccess: (group) => {
       setToggledPunishmentTypesOptions(
         Object.entries(group.punishment_types)
@@ -114,11 +124,6 @@ export const GroupView = () => {
           .sort((a, b) => b.text.localeCompare(a.text))
       )
     },
-  })
-
-  const { data: publicGroup } = useQuery({
-    ...publicGroupQuery(selectedGroupName?.toLowerCase()),
-    enabled: !!currentUser && !userIsLoading && !selectedGroup,
   })
 
   useEffect(() => {
@@ -140,7 +145,7 @@ export const GroupView = () => {
 
   const { mutate: requestToJoinGroupMutate } = useMutation(postGroupJoinRequestMutation(publicGroup?.group_id))
 
-  const shouldShowMain = user && selectedGroup
+  const shouldShowMain = user && (selectedGroup || (isLocalhost && publicGroup))
 
   const {
     mutate: joinGroupMutate,
@@ -181,7 +186,7 @@ export const GroupView = () => {
         </section>
       )}
       {currentUser && !userIsLoading && !selectedGroup && !selectedGroupName && <LandingPage />}
-      {currentUser && !userIsLoading && !selectedGroup && selectedGroupName && (
+      {currentUser && !userIsLoading && !selectedGroup && selectedGroupName && !isLocalhost && (
         <section className="mt-16 flex w-full flex-col items-center gap-y-6 text-gray-800">
           {publicGroup && (
             <div className="flex flex-col items-center gap-y-4 text-center">
@@ -254,6 +259,7 @@ export const GroupView = () => {
                 selectedGroup={selectedGroup}
                 setSelectedGroup={(group: Group) => group && navigate(`/gruppe/${group.name_short.toLowerCase()}`)}
                 groups={user ? user.groups : undefined}
+                disableAutoNavigate={isLocalhost}
               />
               <div className="flex flex-row items-center px-2">
                 <AdditionalGroupNavItem />

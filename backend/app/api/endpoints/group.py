@@ -9,7 +9,7 @@ from emoji import is_emoji
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api import APIRoute, Request, oidc
-from app.config import INDEXED_ROLES
+from app.config import INDEXED_ROLES, settings
 from app.exceptions import DatabaseIntegrityException, NotFound, PunishmentTypeNotExists
 from app.models.group import (
     Group,
@@ -232,7 +232,8 @@ async def get_group(request: Request, group_id: GroupId) -> Group:
             group_id,
             conn=conn,
         )
-        if not res:
+        # Allow viewing any group in debug mode (localhost development)
+        if not res and not settings.debug:
             raise HTTPException(
                 status_code=403, detail="Du er ikke et medlem av gruppen"
             )
