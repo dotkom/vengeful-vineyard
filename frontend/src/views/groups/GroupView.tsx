@@ -134,7 +134,8 @@ export const GroupView = () => {
       sortingAlternative={sortingAlternative}
       setSortingAlternative={setSortingAlternative}
       groupDataIsLoading={isLoading}
-      groupData={selectedGroup}
+      groupData={data}
+      members={data?.members}
     />
   )
 

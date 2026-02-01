@@ -3,10 +3,11 @@ import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../..
 import { MultipleToggle, ToggleOption } from "../../../components/toggle/MultipleToggle"
 
 import { CheckBadgeIcon } from "@heroicons/react/20/solid"
-import { Group } from "../../../helpers/types"
+import { Group, GroupUser } from "../../../helpers/types"
 import { GroupJoinRequestsContainer } from "./GroupJoinRequestsContainer"
 import { GroupSettings } from "./GroupSettings"
 import { Listbox } from "../../../components/listbox/Listbox"
+import { PlayModeSection } from "./PlayModeSection"
 import { SidebarSection } from "./SidebarSection"
 import { TextInput } from "../../../components/input/TextInput"
 
@@ -19,6 +20,7 @@ interface GroupsSidebarProps {
   setSortingAlternative: Dispatch<SetStateAction<GroupMembersSortAlternative>>
   groupDataIsLoading?: boolean
   groupData: Group | undefined
+  members?: GroupUser[]
 }
 
 export const GroupsSidebar: FC<GroupsSidebarProps> = ({
@@ -30,6 +32,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
   setSortingAlternative,
   groupDataIsLoading = false,
   groupData,
+  members = [],
 }) => {
   const getReadableSortingAlternative = (keyword: GroupMembersSortAlternative) => {
     switch (keyword) {
@@ -79,6 +82,8 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
           value={searchTerm}
         />
       </SidebarSection>
+
+      <PlayModeSection members={members} groupData={groupData} />
 
       {/*
 
