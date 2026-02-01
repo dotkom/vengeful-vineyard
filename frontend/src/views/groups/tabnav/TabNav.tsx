@@ -12,14 +12,15 @@ interface TabNavProps {
   selectedGroup: Group | undefined
   setSelectedGroup: (group: Group) => void
   groups?: Group[]
+  disableAutoNavigate?: boolean
 }
 
-export const TabNav = ({ selectedGroup, setSelectedGroup, groups }: TabNavProps) => {
+export const TabNav = ({ selectedGroup, setSelectedGroup, groups, disableAutoNavigate }: TabNavProps) => {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (selectedGroup === undefined && groups) setSelectedGroup(groups[0])
-  }, [groups])
+    if (selectedGroup === undefined && groups && !disableAutoNavigate) setSelectedGroup(groups[0])
+  }, [groups, disableAutoNavigate])
 
   const prefetchGroup = (group: Group) => queryClient.prefetchQuery(groupLeaderboardQuery(group.group_id))
 
