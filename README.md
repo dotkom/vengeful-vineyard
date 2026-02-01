@@ -62,10 +62,14 @@ The frontend uses [Online Web (monoweb)](https://github.com/dotkom/monoweb) for 
 
 2. To get started quickly with test data, run:
    ```bash
-   pnpm migrate:dev-with-fixtures
+   doppler login
+   doppler setup
+   docker compose up -d
+   pnpm install
+   pnpm migrate:dev 
+   pnpm vinstraff:user-db-sync
+   pnpm dev
    ```
-
-3. **Important:** After monoweb is running, go to the dashboard and add yourself as a member of **Dotkom**. This gives you the necessary permissions to see all features in the Vengeful Vineyard frontend.
 
 ### Step 3: Start the Backend
 
@@ -82,9 +86,10 @@ This starts the FastAPI server with PostgreSQL using Docker Compose.
 
 #### Syncing Production Data (Optional)
 
-If you have Doppler access to production, you can sync the production database to your local environment:
+If you have Doppler access to production, you can sync the production database to your local environment (while backend is running):
 
 ```bash
+cd backend
 make db-sync
 ```
 
