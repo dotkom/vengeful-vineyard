@@ -50,18 +50,19 @@ export const GroupUserTable = ({
         collapsible
         className="divide-y divide-gray-100 dark:divide-gray-700 bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg md:rounded-xl"
       >
-        {activeMembers
-          .filter(filterUsers)
-          .sort(getSortGroupUsersFunc(groupData?.punishment_types, sortingAlternative))
-          .map((user) => (
-            <GroupUserTableItem
-              key={user.user_id}
-              groupUser={user}
-              groupData={groupData!}
-              punishmentTypes={groupData!.punishment_types}
-              dataRefetch={dataRefetch}
-            />
-          ))}
+        {groupData &&
+          activeMembers
+            .filter(filterUsers)
+            .sort(getSortGroupUsersFunc(groupData.punishment_types, sortingAlternative))
+            .map((user) => (
+              <GroupUserTableItem
+                key={user.user_id}
+                groupUser={user}
+                groupData={groupData}
+                punishmentTypes={groupData.punishment_types}
+                dataRefetch={dataRefetch}
+              />
+            ))}
 
         {groupData && activeMembers.length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center p-4">
@@ -80,19 +81,20 @@ export const GroupUserTable = ({
             collapsible
             className="divide-y divide-gray-100 dark:divide-gray-700 bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg md:rounded-xl"
           >
-            {inactiveMembers
-              .filter(filterUsers)
-              .sort(sortInactiveByYear)
-              .map((user) => (
-                <GroupUserTableItem
-                  key={user.user_id}
-                  groupUser={user}
-                  groupData={groupData!}
-                  punishmentTypes={groupData!.punishment_types}
-                  dataRefetch={dataRefetch}
-                  isInactive
-                />
-              ))}
+            {groupData &&
+              inactiveMembers
+                .filter(filterUsers)
+                .sort(sortInactiveByYear)
+                .map((user) => (
+                  <GroupUserTableItem
+                    key={user.user_id}
+                    groupUser={user}
+                    groupData={groupData}
+                    punishmentTypes={groupData.punishment_types}
+                    dataRefetch={dataRefetch}
+                    isInactive
+                  />
+                ))}
           </Accordion.Root>
         </>
       )}
