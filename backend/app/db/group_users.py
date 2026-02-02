@@ -39,7 +39,7 @@ class GroupUsers:
         conn: Optional[Pool] = None,
     ) -> list[dict[str, Any]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT m.active, m.ow_group_user_id, users.*
+            query = """SELECT m.active, m.ow_group_user_id, m.inactive_at, users.*
                     FROM users
                     INNER JOIN group_members as m
                     ON users.user_id = m.user_id
@@ -86,6 +86,7 @@ class GroupUsers:
                 )
                 SELECT gm.active,
                        gm.ow_group_user_id,
+                       gm.inactive_at,
                        u.*,
                        COALESCE(json_agg(json_build_object(
                             'punishment_id', pwr.punishment_id,
@@ -115,7 +116,7 @@ class GroupUsers:
                     GROUP BY user_id, group_id
                 ) gmp ON gm.user_id = gmp.user_id AND gm.group_id = gmp.group_id
                 WHERE gm.group_id = $1 {extra}
-                GROUP BY gm.active, gm.ow_group_user_id, u.user_id
+                GROUP BY gm.active, gm.ow_group_user_id, gm.inactive_at, u.user_id
                 """
 
             db_group_users = await conn.fetch(query, *args)

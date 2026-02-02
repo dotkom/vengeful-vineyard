@@ -1,0 +1,1 @@
+ALTER TABLE group_members ADD COLUMN inactive_at TIMESTAMP WITHOUT TIME ZONE;

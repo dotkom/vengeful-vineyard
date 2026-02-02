@@ -20,6 +20,7 @@ interface TableItemProps {
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
   i?: number
+  isInactive?: boolean
 }
 
 function getUnpaidPunishmentsValue(punishments: Punishment[], punishmentTypes: Record<string, PunishmentType>): number {
@@ -39,9 +40,11 @@ function getPunishmentTypeCounts(punishments: Punishment[]): Map<string, number>
   }, new Map<string, number>())
 }
 
-export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, dataRefetch }: TableItemProps) => {
+export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, dataRefetch, isInactive = false }: TableItemProps) => {
   const unpaidPunishmentsValue = getUnpaidPunishmentsValue(groupUser.punishments, punishmentTypes)
   const punishmentTypeCounts = getPunishmentTypeCounts(groupUser.punishments.filter((p) => !p.paid))
+
+  const inactiveYear = isInactive && groupUser.inactive_at ? new Date(groupUser.inactive_at).getFullYear() : null
 
   const streak = weeklyStreak(groupUser.punishments.map((p) => new Date(p.created_at)))
 
@@ -76,9 +79,9 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
 
   return (
     <AccordionItem value={groupUser.user_id}>
-      <AccordionTrigger className="relative flex cursor-pointer justify-between gap-x-6 py-5 rounded-lg md:rounded-xl hover:bg-gray-50">
+      <AccordionTrigger className={`relative flex cursor-pointer justify-between gap-x-6 py-5 rounded-lg md:rounded-xl hover:bg-gray-50 ${isInactive ? "opacity-60" : ""}`}>
         <div className="flex items-center gap-x-2">
-          <span className="flex h-8 w-8 md:h-12 md:w-12 items-center justify-center rounded-full bg-indigo-100 dark:bg-gray-800 text-lg md:text-3xl text-[#4C4C51] relative">
+          <span className={`flex h-8 w-8 md:h-12 md:w-12 items-center justify-center rounded-full ${isInactive ? "bg-gray-200 dark:bg-gray-900" : "bg-indigo-100 dark:bg-gray-800"} text-lg md:text-3xl text-[#4C4C51] relative`}>
             {textToEmoji(groupUser.first_name + groupUser.last_name)}
             {RoleIcon && (
               <div className="absolute -top-2 -right-0.5">
@@ -93,12 +96,16 @@ export const GroupUserTableItem = ({ groupUser, groupData, punishmentTypes, data
             >
               {displayName}
             </p>
-            <span className="text-gray-700 text-xs flex gap-2">
-              <span>{unpaidPunishmentsValue}kr</span>
-              {streak > 1 && (
-                <span title={`${displayName} har fått straffer ${streak} uker på rad`}>{`${streak}🔥`}</span>
-              )}
-            </span>
+            {isInactive && inactiveYear ? (
+              <span className="text-gray-500 text-xs">Medlem t.o.m. {inactiveYear}</span>
+            ) : (
+              <span className="text-gray-700 text-xs flex gap-2">
+                <span>{unpaidPunishmentsValue}kr</span>
+                {streak > 1 && (
+                  <span title={`${displayName} har fått straffer ${streak} uker på rad`}>{`${streak}🔥`}</span>
+                )}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-x-4">
