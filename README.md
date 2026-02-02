@@ -131,7 +131,7 @@ To deploy changes to AWS, you need the AWS CLI installed and configured. Ask Dot
 
 ```bash
 # Install AWS CLI, then configure
-aws configure --profile dotkom
+aws sso login --profile dotkom
 ```
 
 ### Backend Deployment
@@ -160,9 +160,9 @@ doppler login
 doppler setup  # Select vengeful-vineyard, dev
 
 cd frontend
-npm run deploy:prod
+pnpm run deploy:prod
 # Or with profile:
-npm run deploy:prod -- --profile=dotkom
+pnpm run deploy:prod -- --profile=dotkom
 ```
 
 ---
