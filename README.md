@@ -143,14 +143,17 @@ make deploy-prod
 make deploy-prod PROFILE=dotkom
 ```
 
-Then go to the Terraform monorepo (`staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory):
+Then go to the [Terraform monorepo](https://github.com/dotkom/infra) (`staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory):
+
+You will also need the `DOPPLER_TOKEN_ALL` token from [here](https://dashboard.doppler.com/workplace/7254af9f3ef6f40984fe/projects/terraform/configs/prod#TF_VAR_DOPPLER_TOKEN_ALL)
 
 ```bash
 terraform init
 # Or: AWS_PROFILE=dotkom terraform init
 
-doppler run terraform apply
-# Or: AWS_PROFILE=dotkom doppler run terraform apply
+doppler run --project vengeful-vineyard --config prd -- terraform apply
+# Or: AWS_PROFILE=dotkom doppler run --project vengeful-vineyard --config prd -- terraform apply
+
 ```
 
 ### Frontend Deployment
