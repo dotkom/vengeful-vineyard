@@ -35,6 +35,13 @@ export interface CasinoSpinResult {
   applied: boolean
 }
 
+export interface WinnerAssignment {
+  fromWinner: PlayerBetEntry
+  targetPlayer: GroupUser
+  punishmentType: PunishmentTypeInfo
+  amount: number
+}
+
 interface PlayModeContextProps {
   isPlayModeEnabled: boolean
   setIsPlayModeEnabled: Dispatch<SetStateAction<boolean>>

@@ -6,7 +6,7 @@ import { CustomWheel, WheelSegment, generateDefaultSegments } from "./CustomWhee
 import { PersonWheel } from "./PersonWheel"
 import { SegmentEditorModal } from "./SegmentEditorModal"
 import { Group, GroupUser, PunishmentCreate } from "../../helpers/types"
-import { PlayerResult, PunishmentTypeInfo } from "../../helpers/context/playModeContext"
+import { PlayerResult, PunishmentTypeInfo, WinnerAssignment } from "../../helpers/context/playModeContext"
 import { useNotification } from "../../helpers/context/notificationContext"
 
 type WheelMode = "casino" | "custom"
@@ -44,7 +44,7 @@ export const RouletteWidget = ({ members = [], groupData }: RouletteWidgetProps)
     }
   }, [punishmentTypes, segments.length])
 
-  const handleApplyPunishments = async (losers: PlayerResult[]) => {
+  const handleApplyPunishments = async (losers: PlayerResult[], winnerAssignments: WinnerAssignment[] = []) => {
     if (!groupData?.group_id) return
 
     try {
@@ -63,16 +63,36 @@ export const RouletteWidget = ({ members = [], groupData }: RouletteWidgetProps)
         )
       }
 
+      // Apply punishments from winner assignments
+      for (const assignment of winnerAssignments) {
+        const punishmentData: PunishmentCreate = {
+          punishment_type_id: assignment.punishmentType.punishment_type_id,
+          reason: `Roulette fra ${assignment.fromWinner.player.first_name} 🎰`,
+          reason_hidden: false,
+          amount: assignment.amount,
+        }
+
+        await axios.post(
+          `${BASE_URL}/groups/${groupData.group_id}/users/${assignment.targetPlayer.user_id}/punishments`,
+          [punishmentData]
+        )
+      }
+
       // Invalidate queries to refresh the UI
       await queryClient.invalidateQueries({
         queryKey: ["groupLeaderboard", groupData.group_id],
       })
       await queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
 
-      // Build summary of punishments applied
-      const summary = losers.reduce((acc, r) => {
-        const key = `${r.entry.punishmentType.name} ${r.entry.punishmentType.emoji}`
-        acc[key] = (acc[key] || 0) + r.entry.amount
+      // Build summary of punishments applied (losers + winner assignments)
+      const allPunishments = [
+        ...losers.map(r => ({ amount: r.entry.amount, punishmentType: r.entry.punishmentType })),
+        ...winnerAssignments.map(a => ({ amount: a.amount, punishmentType: a.punishmentType })),
+      ]
+
+      const summary = allPunishments.reduce((acc, p) => {
+        const key = `${p.punishmentType.name} ${p.punishmentType.emoji}`
+        acc[key] = (acc[key] || 0) + p.amount
         return acc
       }, {} as Record<string, number>)
 
@@ -80,10 +100,15 @@ export const RouletteWidget = ({ members = [], groupData }: RouletteWidgetProps)
         .map(([type, count]) => `${count} ${type}`)
         .join(", ")
 
+      const totalRecipients = new Set([
+        ...losers.map(l => l.entry.player.user_id),
+        ...winnerAssignments.map(a => a.targetPlayer.user_id),
+      ]).size
+
       setNotification({
         type: "success",
         title: "Straff lagt til",
-        text: `${losers.length} ${losers.length === 1 ? "person" : "personer"} fikk straff: ${summaryText}`,
+        text: `${totalRecipients} ${totalRecipients === 1 ? "person" : "personer"} fikk straff: ${summaryText}`,
       })
     } catch (error: any) {
       setNotification({

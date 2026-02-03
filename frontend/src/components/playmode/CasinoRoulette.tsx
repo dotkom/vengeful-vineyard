@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Button } from "../button"
-import { usePlayMode, PlayerBetEntry, PlayerResult, PunishmentTypeInfo } from "../../helpers/context/playModeContext"
+import { usePlayMode, PlayerBetEntry, PlayerResult, PunishmentTypeInfo, WinnerAssignment } from "../../helpers/context/playModeContext"
 import { BettingModal, BetType, getNumberColor } from "./BettingModal"
 import { ResultsModal } from "./ResultsModal"
 import { Group, GroupUser } from "../../helpers/types"
@@ -41,7 +41,7 @@ const getBetLabel = (bet: BetType): string => {
 interface CasinoRouletteProps {
   members?: GroupUser[]
   groupData?: Group
-  onApplyPunishments?: (losers: PlayerResult[]) => void
+  onApplyPunishments?: (losers: PlayerResult[], winnerAssignments: WinnerAssignment[]) => void
 }
 
 export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments }: CasinoRouletteProps) => {
@@ -192,8 +192,8 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments }: 
     }, 4000)
   }
 
-  const handleApplyPunishments = (losers: PlayerResult[]) => {
-    onApplyPunishments?.(losers)
+  const handleApplyPunishments = (losers: PlayerResult[], winnerAssignments: WinnerAssignment[]) => {
+    onApplyPunishments?.(losers, winnerAssignments)
     // Mark as applied
     if (lastCasinoSpin) {
       setLastCasinoSpin({ ...lastCasinoSpin, applied: true })
@@ -432,6 +432,7 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments }: 
         onApplyPunishments={handleApplyPunishments}
         onClose={handleCloseResults}
         alreadyApplied={lastCasinoSpin?.applied}
+        members={members}
       />
     </div>
   )
