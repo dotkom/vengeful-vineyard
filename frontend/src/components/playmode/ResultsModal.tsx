@@ -4,7 +4,7 @@ import { XMarkIcon, CheckIcon, ExclamationTriangleIcon, CheckCircleIcon, GiftIco
 import { Button } from "../button"
 import { PlayerResult, WinnerAssignment } from "../../helpers/context/playModeContext"
 import { GroupUser } from "../../helpers/types"
-import { getNumberColor, BetType } from "./BettingModal"
+import { getNumberColor, BetType, calculateWinnings } from "./BettingModal"
 import { WinnerAssignmentModal } from "./WinnerAssignmentModal"
 
 interface ResultsModalProps {
@@ -185,6 +185,7 @@ export const ResultsModal = ({
                               {winners.map((r) => {
                                 const assigned = hasWinnerAssigned(r.entry.id)
                                 const assignments = getWinnerAssignments(r.entry.id)
+                                const winnings = calculateWinnings(r.entry.bet, r.entry.amount)
                                 return (
                                   <div
                                     key={r.entry.id}
@@ -195,8 +196,8 @@ export const ResultsModal = ({
                                         <span className="font-medium text-gray-900 dark:text-gray-100">
                                           {r.entry.player.first_name} {r.entry.player.last_name}
                                         </span>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                                          {r.entry.amount} {r.entry.punishmentType.name} {r.entry.punishmentType.emoji}
+                                        <p className="text-xs text-green-600 dark:text-green-400">
+                                          Vant {winnings} {r.entry.punishmentType.name} {r.entry.punishmentType.emoji}
                                         </p>
                                       </div>
                                       <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">

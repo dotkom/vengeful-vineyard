@@ -4,6 +4,7 @@ import { XMarkIcon, MagnifyingGlassIcon, PlusIcon, MinusIcon } from "@heroicons/
 import { Button } from "../button"
 import { PlayerResult, WinnerAssignment, PunishmentTypeInfo } from "../../helpers/context/playModeContext"
 import { GroupUser } from "../../helpers/types"
+import { calculateWinnings } from "./BettingModal"
 
 interface TargetAssignment {
   id: string
@@ -30,10 +31,11 @@ export const WinnerAssignmentModal = ({
   const [showMemberSelect, setShowMemberSelect] = useState(false)
   const [memberSearch, setMemberSearch] = useState("")
 
-  const totalStake = winner.entry.amount
+  const stake = winner.entry.amount
   const punishmentType = winner.entry.punishmentType
+  const totalWinnings = calculateWinnings(winner.entry.bet, stake)
   const assignedAmount = targets.reduce((sum, t) => sum + t.amount, 0)
-  const remainingAmount = totalStake - assignedAmount
+  const remainingAmount = totalWinnings - assignedAmount
 
   // Reset state when modal opens
   useEffect(() => {
@@ -78,7 +80,7 @@ export const WinnerAssignmentModal = ({
     const otherTargetsTotal = targets
       .filter((t) => t.id !== targetId)
       .reduce((sum, t) => sum + t.amount, 0)
-    const maxForThis = totalStake - otherTargetsTotal
+    const maxForThis = totalWinnings - otherTargetsTotal
     const clampedAmount = Math.max(1, Math.min(newAmount, maxForThis))
 
     setTargets(
@@ -97,7 +99,7 @@ export const WinnerAssignmentModal = ({
     setOpen(false)
   }
 
-  const canConfirm = targets.length > 0 && assignedAmount === totalStake
+  const canConfirm = targets.length > 0 && assignedAmount === totalWinnings
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -138,7 +140,7 @@ export const WinnerAssignmentModal = ({
                     {winner.entry.player.first_name} vant!
                   </Dialog.Title>
                   <p className="text-sm text-white/80">
-                    Fordel {totalStake} {punishmentType.name} {punishmentType.emoji}
+                    Fordel {totalWinnings} {punishmentType.name} {punishmentType.emoji}
                   </p>
                 </div>
 
@@ -255,7 +257,7 @@ export const WinnerAssignmentModal = ({
                           <span className="font-bold text-gray-900 dark:text-gray-100">
                             {remainingAmount}
                           </span>{" "}
-                          av {totalStake} {punishmentType.emoji}
+                          av {totalWinnings} {punishmentType.emoji}
                         </>
                       )}
                     </p>

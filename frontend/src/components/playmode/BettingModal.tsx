@@ -18,6 +18,22 @@ const getNumberColor = (num: number): "red" | "black" | "green" => {
   return RED_NUMBERS.includes(num) ? "red" : "black"
 }
 
+// Get payout multiplier for a bet type (excluding the original stake)
+const getPayoutMultiplier = (bet: BetType): number => {
+  switch (bet.type) {
+    case "number": return 35 // 35:1
+    case "color": return 1   // 1:1
+    case "evenOdd": return 1 // 1:1
+    case "highLow": return 1 // 1:1
+    case "dozen": return 2   // 2:1
+  }
+}
+
+// Calculate total winnings (stake * multiplier)
+const calculateWinnings = (bet: BetType, stake: number): number => {
+  return stake * getPayoutMultiplier(bet)
+}
+
 interface BettingModalProps {
   open: boolean
   setOpen: (open: boolean) => void
@@ -298,4 +314,4 @@ export const BettingModal = ({
   )
 }
 
-export { getNumberColor }
+export { getNumberColor, getPayoutMultiplier, calculateWinnings }
