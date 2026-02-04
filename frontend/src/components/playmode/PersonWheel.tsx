@@ -183,7 +183,7 @@ export const PersonWheel = ({
   )
 
   const controls = (
-    <div className={`flex flex-col gap-y-3 ${fullscreen ? "w-full" : ""}`}>
+    <div className="flex flex-col gap-y-3 w-full">
       {/* Result Display */}
       {selectedMember && (
         <div className="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-3">

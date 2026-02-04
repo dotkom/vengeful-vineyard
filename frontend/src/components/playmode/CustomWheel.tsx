@@ -203,7 +203,7 @@ export const CustomWheel = ({
   )
 
   const controls = (
-    <div className={`flex flex-col gap-y-3 ${fullscreen ? "w-full" : ""}`}>
+    <div className="flex flex-col gap-y-3 w-full">
       {/* Player Queue */}
       {playerQueue.length > 0 && !lastSpinResult && (
         <div className="w-full space-y-2">

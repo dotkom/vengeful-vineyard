@@ -295,7 +295,7 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fu
   )
 
   const controls = (
-    <div className={`flex flex-col gap-y-4 ${fullscreen ? "w-full" : ""}`}>
+    <div className="flex flex-col gap-y-4 w-full">
       {/* Player Entries List */}
       {playerEntries.length > 0 && (
         <div className="w-full space-y-2">
