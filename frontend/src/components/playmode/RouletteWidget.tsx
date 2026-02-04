@@ -8,6 +8,7 @@ import { SegmentEditorModal } from "./SegmentEditorModal"
 import { Group, GroupUser, PunishmentCreate } from "../../helpers/types"
 import { PlayerResult, PunishmentTypeInfo, WinnerAssignment } from "../../helpers/context/playModeContext"
 import { useNotification } from "../../helpers/context/notificationContext"
+import { usePunishmentTypes } from "./hooks"
 
 type WheelMode = "casino" | "custom"
 type LykkehjulMode = "straff" | "person"
@@ -27,16 +28,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
   const [showEditor, setShowEditor] = useState(false)
   const queryClient = useQueryClient()
   const { setNotification } = useNotification()
-
-  // Get punishment types from group data
-  const punishmentTypes: PunishmentTypeInfo[] = groupData?.punishment_types
-    ? Object.values(groupData.punishment_types).map((pt) => ({
-        punishment_type_id: pt.punishment_type_id,
-        name: pt.name,
-        emoji: pt.emoji,
-        value: pt.value,
-      }))
-    : []
+  const { punishmentTypes } = usePunishmentTypes(groupData)
 
 
   const handleApplyPunishments = async (losers: PlayerResult[], winnerAssignments: WinnerAssignment[] = []) => {

@@ -39,11 +39,8 @@ export const FullscreenPlayMode = ({ members = [], groupData }: FullscreenPlayMo
             leaveTo="opacity-0 scale-95"
           >
             <Dialog.Panel className="h-full w-full">
-              {/* Header */}
               <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 z-10">
-                <Dialog.Title className="text-2xl font-bold text-white">
-                  Lekemodus
-                </Dialog.Title>
+                <Dialog.Title className="text-2xl font-bold text-white">Lekemodus</Dialog.Title>
                 <button
                   onClick={() => setIsFullscreen(false)}
                   className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20 transition-colors"
@@ -52,8 +49,6 @@ export const FullscreenPlayMode = ({ members = [], groupData }: FullscreenPlayMo
                   Minimer
                 </button>
               </div>
-
-              {/* Content */}
               <div className="h-full pt-16 pb-4 px-4">
                 <RouletteWidget members={members} groupData={groupData} fullscreen />
               </div>
