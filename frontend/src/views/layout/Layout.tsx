@@ -33,7 +33,9 @@ const LayoutFields = () => {
       return <div>Signing you out...</div>
   }
 
-  useEffect(() => { setTimeout(() => checkSigninRedirect(navigate), 100) }, [])
+  useEffect(() => {
+    setTimeout(() => checkSigninRedirect(navigate), 100)
+  }, [])
 
   if (auth.isLoading) {
     return (

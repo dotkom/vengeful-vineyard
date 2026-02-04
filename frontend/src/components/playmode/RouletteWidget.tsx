@@ -30,7 +30,6 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
   const { setNotification } = useNotification()
   const { punishmentTypes } = usePunishmentTypes(groupData)
 
-
   const handleApplyPunishments = async (losers: PlayerResult[], winnerAssignments: WinnerAssignment[] = []) => {
     if (!groupData?.group_id) return
 
@@ -44,10 +43,9 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
           amount: loser.entry.amount,
         }
 
-        await axios.post(
-          `${BASE_URL}/groups/${groupData.group_id}/users/${loser.entry.player.user_id}/punishments`,
-          [punishmentData]
-        )
+        await axios.post(`${BASE_URL}/groups/${groupData.group_id}/users/${loser.entry.player.user_id}/punishments`, [
+          punishmentData,
+        ])
       }
 
       // Apply punishments from winner assignments
@@ -73,23 +71,26 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
 
       // Build summary of punishments applied (losers + winner assignments)
       const allPunishments = [
-        ...losers.map(r => ({ amount: r.entry.amount, punishmentType: r.entry.punishmentType })),
-        ...winnerAssignments.map(a => ({ amount: a.amount, punishmentType: a.punishmentType })),
+        ...losers.map((r) => ({ amount: r.entry.amount, punishmentType: r.entry.punishmentType })),
+        ...winnerAssignments.map((a) => ({ amount: a.amount, punishmentType: a.punishmentType })),
       ]
 
-      const summary = allPunishments.reduce((acc, p) => {
-        const key = `${p.punishmentType.name} ${p.punishmentType.emoji}`
-        acc[key] = (acc[key] || 0) + p.amount
-        return acc
-      }, {} as Record<string, number>)
+      const summary = allPunishments.reduce(
+        (acc, p) => {
+          const key = `${p.punishmentType.name} ${p.punishmentType.emoji}`
+          acc[key] = (acc[key] || 0) + p.amount
+          return acc
+        },
+        {} as Record<string, number>
+      )
 
       const summaryText = Object.entries(summary)
         .map(([type, count]) => `${count} ${type}`)
         .join(", ")
 
       const totalRecipients = new Set([
-        ...losers.map(l => l.entry.player.user_id),
-        ...winnerAssignments.map(a => a.targetPlayer.user_id),
+        ...losers.map((l) => l.entry.player.user_id),
+        ...winnerAssignments.map((a) => a.targetPlayer.user_id),
       ]).size
 
       setNotification({
@@ -117,10 +118,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
         amount,
       }
 
-      await axios.post(
-        `${BASE_URL}/groups/${groupData.group_id}/users/${player.user_id}/punishments`,
-        [punishmentData]
-      )
+      await axios.post(`${BASE_URL}/groups/${groupData.group_id}/users/${player.user_id}/punishments`, [punishmentData])
 
       await queryClient.invalidateQueries({
         queryKey: ["groupLeaderboard", groupData.group_id],
@@ -151,8 +149,8 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
               ? "bg-white/20 text-white shadow-sm"
               : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
             : fullscreen
-              ? "text-white/60 hover:text-white"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+            ? "text-white/60 hover:text-white"
+            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
         }`}
       >
         Casino
@@ -165,8 +163,8 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
               ? "bg-white/20 text-white shadow-sm"
               : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
             : fullscreen
-              ? "text-white/60 hover:text-white"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+            ? "text-white/60 hover:text-white"
+            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
         }`}
       >
         Lykkehjul
@@ -184,8 +182,8 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
               ? "bg-white/20 text-white"
               : "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
             : fullscreen
-              ? "text-white/60 hover:text-white"
-              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            ? "text-white/60 hover:text-white"
+            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         }`}
       >
         Straffe hjul
@@ -198,8 +196,8 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
               ? "bg-white/20 text-white"
               : "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
             : fullscreen
-              ? "text-white/60 hover:text-white"
-              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            ? "text-white/60 hover:text-white"
+            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         }`}
       >
         Person hjul
@@ -207,25 +205,31 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
     </div>
   )
 
-  const wheelContent = mode === "casino" ? (
-    <CasinoRoulette members={members} groupData={groupData} onApplyPunishments={handleApplyPunishments} fullscreen={fullscreen} />
-  ) : lykkehjulMode === "straff" ? (
-    <CustomWheel
-      segments={segments.length > 0 ? segments : undefined}
-      onEditSegments={() => setShowEditor(true)}
-      members={members}
-      groupData={groupData}
-      onApplyPunishment={handleApplySinglePunishment}
-      fullscreen={fullscreen}
-    />
-  ) : (
-    <PersonWheel
-      members={members}
-      groupData={groupData}
-      onApplyPunishment={handleApplySinglePunishment}
-      fullscreen={fullscreen}
-    />
-  )
+  const wheelContent =
+    mode === "casino" ? (
+      <CasinoRoulette
+        members={members}
+        groupData={groupData}
+        onApplyPunishments={handleApplyPunishments}
+        fullscreen={fullscreen}
+      />
+    ) : lykkehjulMode === "straff" ? (
+      <CustomWheel
+        segments={segments.length > 0 ? segments : undefined}
+        onEditSegments={() => setShowEditor(true)}
+        members={members}
+        groupData={groupData}
+        onApplyPunishment={handleApplySinglePunishment}
+        fullscreen={fullscreen}
+      />
+    ) : (
+      <PersonWheel
+        members={members}
+        groupData={groupData}
+        onApplyPunishment={handleApplySinglePunishment}
+        fullscreen={fullscreen}
+      />
+    )
 
   return (
     <>
@@ -238,9 +242,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
               {modeSwitcher}
               {lykkehjulSubModeSwitcher}
             </div>
-            <div className="flex-1">
-              {wheelContent}
-            </div>
+            <div className="flex-1">{wheelContent}</div>
           </div>
         ) : (
           <>

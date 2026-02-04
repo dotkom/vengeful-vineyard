@@ -23,13 +23,38 @@ interface SpinResult {
 }
 
 export const DEFAULT_SEGMENTS: WheelSegment[] = [
-  { option: "1 Ølstraff", style: { backgroundColor: "#f59e0b", textColor: "white" }, punishmentAmount: 1, punishmentTypeName: "Ølstraff" },
+  {
+    option: "1 Ølstraff",
+    style: { backgroundColor: "#f59e0b", textColor: "white" },
+    punishmentAmount: 1,
+    punishmentTypeName: "Ølstraff",
+  },
   { option: "Ingen!", style: { backgroundColor: "#22c55e", textColor: "white" }, punishmentAmount: 0 },
-  { option: "1 Vinstraff", style: { backgroundColor: "#7c3aed", textColor: "white" }, punishmentAmount: 1, punishmentTypeName: "Vinstraff" },
-  { option: "2 Ølstraff", style: { backgroundColor: "#d97706", textColor: "white" }, punishmentAmount: 2, punishmentTypeName: "Ølstraff" },
+  {
+    option: "1 Vinstraff",
+    style: { backgroundColor: "#7c3aed", textColor: "white" },
+    punishmentAmount: 1,
+    punishmentTypeName: "Vinstraff",
+  },
+  {
+    option: "2 Ølstraff",
+    style: { backgroundColor: "#d97706", textColor: "white" },
+    punishmentAmount: 2,
+    punishmentTypeName: "Ølstraff",
+  },
   { option: "Ingen!", style: { backgroundColor: "#10b981", textColor: "white" }, punishmentAmount: 0 },
-  { option: "2 Vinstraff", style: { backgroundColor: "#6366f1", textColor: "white" }, punishmentAmount: 2, punishmentTypeName: "Vinstraff" },
-  { option: "3 Ølstraff", style: { backgroundColor: "#b45309", textColor: "white" }, punishmentAmount: 3, punishmentTypeName: "Ølstraff" },
+  {
+    option: "2 Vinstraff",
+    style: { backgroundColor: "#6366f1", textColor: "white" },
+    punishmentAmount: 2,
+    punishmentTypeName: "Vinstraff",
+  },
+  {
+    option: "3 Ølstraff",
+    style: { backgroundColor: "#b45309", textColor: "white" },
+    punishmentAmount: 3,
+    punishmentTypeName: "Ølstraff",
+  },
   { option: "Ingen!", style: { backgroundColor: "#059669", textColor: "white" }, punishmentAmount: 0 },
 ]
 
@@ -42,7 +67,14 @@ interface CustomWheelProps {
   fullscreen?: boolean
 }
 
-export const CustomWheel = ({ onEditSegments, segments = DEFAULT_SEGMENTS, members = [], groupData, onApplyPunishment, fullscreen = false }: CustomWheelProps) => {
+export const CustomWheel = ({
+  onEditSegments,
+  segments = DEFAULT_SEGMENTS,
+  members = [],
+  groupData,
+  onApplyPunishment,
+  fullscreen = false,
+}: CustomWheelProps) => {
   const { isSpinning, setIsSpinning, setLastResult } = usePlayMode()
   const [mustSpin, setMustSpin] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
@@ -74,13 +106,18 @@ export const CustomWheel = ({ onEditSegments, segments = DEFAULT_SEGMENTS, membe
     setMustSpin(false)
     setIsSpinning(false)
     const segment = segments[prizeNumber]
-    setLastResult({ segmentIndex: prizeNumber, segmentLabel: segment.option, punishmentAmount: segment.punishmentAmount })
+    setLastResult({
+      segmentIndex: prizeNumber,
+      segmentLabel: segment.option,
+      punishmentAmount: segment.punishmentAmount,
+    })
 
     let punishmentType: PunishmentTypeInfo | null = null
     if (segment.punishmentTypeId) {
       punishmentType = punishmentTypes.find((pt) => pt.punishment_type_id === segment.punishmentTypeId) || null
     } else if (segment.punishmentTypeName) {
-      punishmentType = punishmentTypes.find((pt) => pt.name.toLowerCase() === segment.punishmentTypeName?.toLowerCase()) || null
+      punishmentType =
+        punishmentTypes.find((pt) => pt.name.toLowerCase() === segment.punishmentTypeName?.toLowerCase()) || null
     }
     if (!punishmentType && segment.punishmentAmount > 0) punishmentType = defaultType
 
@@ -88,7 +125,13 @@ export const CustomWheel = ({ onEditSegments, segments = DEFAULT_SEGMENTS, membe
   }
 
   const handleApplyPunishment = () => {
-    if (!lastSpinResult || lastSpinResult.applied || lastSpinResult.segment.punishmentAmount <= 0 || !lastSpinResult.punishmentType) return
+    if (
+      !lastSpinResult ||
+      lastSpinResult.applied ||
+      lastSpinResult.segment.punishmentAmount <= 0 ||
+      !lastSpinResult.punishmentType
+    )
+      return
     onApplyPunishment?.(lastSpinResult.player, lastSpinResult.punishmentType, lastSpinResult.segment.punishmentAmount)
     setLastSpinResult({ ...lastSpinResult, applied: true })
   }
@@ -99,7 +142,9 @@ export const CustomWheel = ({ onEditSegments, segments = DEFAULT_SEGMENTS, membe
     else setCurrentPlayerIndex(0)
   }
 
-  const wheelScale = fullscreen ? { transform: "scale(1.3)", transformOrigin: "center center" } : { transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }
+  const wheelScale = fullscreen
+    ? { transform: "scale(1.3)", transformOrigin: "center center" }
+    : { transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }
 
   const wheel = (
     <div className="relative" style={wheelScale}>
@@ -128,17 +173,54 @@ export const CustomWheel = ({ onEditSegments, segments = DEFAULT_SEGMENTS, membe
       {playerQueue.length > 0 && !lastSpinResult && (
         <div className="w-full space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Spillere ({currentPlayerIndex + 1}/{playerQueue.length})</p>
-            {playerQueue.length > 1 && <button onClick={() => { setPlayerQueue([]); setCurrentPlayerIndex(0); setLastSpinResult(null) }} className="text-xs text-red-500 hover:text-red-600" disabled={isSpinning}>Fjern alle</button>}
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              Spillere ({currentPlayerIndex + 1}/{playerQueue.length})
+            </p>
+            {playerQueue.length > 1 && (
+              <button
+                onClick={() => {
+                  setPlayerQueue([])
+                  setCurrentPlayerIndex(0)
+                  setLastSpinResult(null)
+                }}
+                className="text-xs text-red-500 hover:text-red-600"
+                disabled={isSpinning}
+              >
+                Fjern alle
+              </button>
+            )}
           </div>
           {playerQueue.map((player, index) => (
-            <div key={player.user_id} className={`flex items-center justify-between rounded-lg border px-3 py-2 ${index === currentPlayerIndex ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20" : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800"}`}>
+            <div
+              key={player.user_id}
+              className={`flex items-center justify-between rounded-lg border px-3 py-2 ${
+                index === currentPlayerIndex
+                  ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
+                  : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800"
+              }`}
+            >
               <div className="flex items-center gap-2">
                 <UserIcon className={`h-4 w-4 ${index === currentPlayerIndex ? "text-indigo-500" : "text-gray-400"}`} />
-                <span className={`text-sm font-medium ${index === currentPlayerIndex ? "text-indigo-700 dark:text-indigo-300" : "text-gray-900 dark:text-gray-100"}`}>{player.first_name} {player.last_name}</span>
-                {index === currentPlayerIndex && <span className="text-xs text-indigo-500 dark:text-indigo-400">(neste)</span>}
+                <span
+                  className={`text-sm font-medium ${
+                    index === currentPlayerIndex
+                      ? "text-indigo-700 dark:text-indigo-300"
+                      : "text-gray-900 dark:text-gray-100"
+                  }`}
+                >
+                  {player.first_name} {player.last_name}
+                </span>
+                {index === currentPlayerIndex && (
+                  <span className="text-xs text-indigo-500 dark:text-indigo-400">(neste)</span>
+                )}
               </div>
-              <button onClick={() => removePlayer(player.user_id)} className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500" disabled={isSpinning}><XMarkIcon className="h-4 w-4" /></button>
+              <button
+                onClick={() => removePlayer(player.user_id)}
+                className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500"
+                disabled={isSpinning}
+              >
+                <XMarkIcon className="h-4 w-4" />
+              </button>
             </div>
           ))}
         </div>
@@ -158,14 +240,25 @@ export const CustomWheel = ({ onEditSegments, segments = DEFAULT_SEGMENTS, membe
       )}
 
       {!lastSpinResult && members.length > 0 && availableMembers.length > 0 && (
-        <PlayerSearchDropdown members={availableMembers} onSelect={addPlayer} disabled={isSpinning} placeholder="Legg til spiller" />
+        <PlayerSearchDropdown
+          members={availableMembers}
+          onSelect={addPlayer}
+          disabled={isSpinning}
+          placeholder="Legg til spiller"
+        />
       )}
 
       <div className="flex flex-row gap-x-2 w-full">
         <Button onClick={handleSpinClick} disabled={isSpinning || playerQueue.length === 0} className="flex-1">
           {isSpinning ? "Spinner..." : playerQueue.length === 0 ? "Legg til spillere" : "Spin!"}
         </Button>
-        <button onClick={onEditSegments} className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700" title="Rediger hjulet"><PencilIcon className="h-5 w-5" /></button>
+        <button
+          onClick={onEditSegments}
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+          title="Rediger hjulet"
+        >
+          <PencilIcon className="h-5 w-5" />
+        </button>
       </div>
     </div>
   )

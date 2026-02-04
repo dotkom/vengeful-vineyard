@@ -37,7 +37,7 @@ interface PunishmentItemProps {
   punishmentTypes?: Record<string, PunishmentType>
   isGroupContext?: boolean
   user?: User
-  groupName?: string;
+  groupName?: string
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any>>

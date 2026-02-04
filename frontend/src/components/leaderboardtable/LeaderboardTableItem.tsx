@@ -20,7 +20,6 @@ export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, dat
   const displayName = `${leaderboardUser.first_name} ${leaderboardUser.last_name}`
   const { total_value: totalValue, emojis } = leaderboardUser
 
-
   const {
     data: punishments,
     isLoading: isLoadingPunishments,

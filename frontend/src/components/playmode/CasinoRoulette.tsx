@@ -1,6 +1,12 @@
 import { useState } from "react"
 import { Button } from "../button"
-import { usePlayMode, PlayerBetEntry, PlayerResult, WinnerAssignment, PunishmentTypeInfo } from "../../helpers/context/playModeContext"
+import {
+  usePlayMode,
+  PlayerBetEntry,
+  PlayerResult,
+  WinnerAssignment,
+  PunishmentTypeInfo,
+} from "../../helpers/context/playModeContext"
 import { BettingModal, BetType } from "./BettingModal"
 import { ResultsModal } from "./ResultsModal"
 import { Group, GroupUser } from "../../helpers/types"
@@ -16,8 +22,14 @@ interface CasinoRouletteProps {
   fullscreen?: boolean
 }
 
-export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fullscreen = false }: CasinoRouletteProps) => {
-  const { isSpinning, setIsSpinning, playerEntries, setPlayerEntries, lastCasinoSpin, setLastCasinoSpin } = usePlayMode()
+export const CasinoRoulette = ({
+  members = [],
+  groupData,
+  onApplyPunishments,
+  fullscreen = false,
+}: CasinoRouletteProps) => {
+  const { isSpinning, setIsSpinning, playerEntries, setPlayerEntries, lastCasinoSpin, setLastCasinoSpin } =
+    usePlayMode()
   const [result, setResult] = useState<number | null>(null)
   const [wheelRotation, setWheelRotation] = useState(0)
   const [showBettingModal, setShowBettingModal] = useState(false)
@@ -70,9 +82,7 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fu
     } else if (editingEntryId) {
       setPlayerEntries(
         playerEntries.map((e) =>
-          e.id === editingEntryId
-            ? { ...e, bet, punishmentType: selectedPunishmentType, amount: selectedAmount }
-            : e
+          e.id === editingEntryId ? { ...e, bet, punishmentType: selectedPunishmentType, amount: selectedAmount } : e
         )
       )
     }
@@ -151,9 +161,20 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fu
                 <div
                   key={i}
                   className="absolute flex items-center justify-center"
-                  style={{ left: `${x}%`, top: `${y}%`, width: "20px", height: "20px", transform: `translate(-50%, -50%) rotate(${angle}deg)` }}
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    width: "20px",
+                    height: "20px",
+                    transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                  }}
                 >
-                  <span className={`${numberFontSize} font-bold text-white`} style={{ textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}>{num}</span>
+                  <span
+                    className={`${numberFontSize} font-bold text-white`}
+                    style={{ textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}
+                  >
+                    {num}
+                  </span>
                 </div>
               )
             })}
@@ -169,7 +190,12 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fu
       <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-10">
         <div
           className="bg-gradient-to-b from-amber-300 to-amber-500 shadow-lg"
-          style={{ width: pointerSize, height: pointerSize, clipPath: "polygon(50% 100%, 0% 30%, 50% 0%, 100% 30%)", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))" }}
+          style={{
+            width: pointerSize,
+            height: pointerSize,
+            clipPath: "polygon(50% 100%, 0% 30%, 50% 0%, 100% 30%)",
+            filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))",
+          }}
         />
       </div>
     </div>
@@ -181,19 +207,34 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fu
         <div className="w-full space-y-2">
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Spillere</p>
           {playerEntries.map((entry) => (
-            <div key={entry.id} className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2">
+            <div
+              key={entry.id}
+              className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2"
+            >
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <UserIcon className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{entry.player.first_name} {entry.player.last_name}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {entry.player.first_name} {entry.player.last_name}
+                  </span>
                 </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400 ml-6">Innsats: {entry.amount} {entry.punishmentType.name} {entry.punishmentType.emoji}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 ml-6">
+                  Innsats: {entry.amount} {entry.punishmentType.name} {entry.punishmentType.emoji}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => editEntry(entry)} className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50" disabled={isSpinning}>
+                <button
+                  onClick={() => editEntry(entry)}
+                  className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50"
+                  disabled={isSpinning}
+                >
                   {getBetLabel(entry.bet)}
                 </button>
-                <button onClick={() => removeEntry(entry.id)} className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500" disabled={isSpinning}>
+                <button
+                  onClick={() => removeEntry(entry.id)}
+                  className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500"
+                  disabled={isSpinning}
+                >
                   <XMarkIcon className="h-4 w-4" />
                 </button>
               </div>
@@ -203,7 +244,12 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fu
       )}
 
       {members.length > 0 && availableMembers.length > 0 && (
-        <PlayerSearchDropdown members={availableMembers} onSelect={startAddPlayer} disabled={isSpinning} placeholder="Legg til spiller" />
+        <PlayerSearchDropdown
+          members={availableMembers}
+          onSelect={startAddPlayer}
+          disabled={isSpinning}
+          placeholder="Legg til spiller"
+        />
       )}
 
       <div className="w-full flex flex-col gap-2">
@@ -211,20 +257,39 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fu
           {isSpinning ? "Spinner..." : playerEntries.length === 0 ? "Legg til spillere først" : "Spin!"}
         </Button>
         {lastCasinoSpin && !isSpinning && (
-          <button onClick={reopenResults} className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+          <button
+            onClick={reopenResults}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
             <EyeIcon className="h-4 w-4" />
             Se siste resultater
-            {!lastCasinoSpin.applied && <span className="rounded-full bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">Ikke behandlet</span>}
+            {!lastCasinoSpin.applied && (
+              <span className="rounded-full bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                Ikke behandlet
+              </span>
+            )}
           </button>
         )}
       </div>
 
       <BettingModal
         open={showBettingModal}
-        setOpen={(open) => { setShowBettingModal(open); if (!open) { setEditingEntryId(null); setPendingPlayer(null) } }}
+        setOpen={(open) => {
+          setShowBettingModal(open)
+          if (!open) {
+            setEditingEntryId(null)
+            setPendingPlayer(null)
+          }
+        }}
         currentBet={currentEditingEntry?.bet ?? null}
         onPlaceBet={handleBetConfirm}
-        playerName={pendingPlayer ? `${pendingPlayer.first_name} ${pendingPlayer.last_name}` : currentEditingEntry ? `${currentEditingEntry.player.first_name} ${currentEditingEntry.player.last_name}` : undefined}
+        playerName={
+          pendingPlayer
+            ? `${pendingPlayer.first_name} ${pendingPlayer.last_name}`
+            : currentEditingEntry
+            ? `${currentEditingEntry.player.first_name} ${currentEditingEntry.player.last_name}`
+            : undefined
+        }
         punishmentTypes={punishmentTypes}
         selectedPunishmentType={selectedPunishmentType}
         onPunishmentTypeChange={setSelectedPunishmentType}

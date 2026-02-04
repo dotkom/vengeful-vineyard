@@ -83,7 +83,9 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
     return <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">Ingen medlemmer i gruppen</div>
   }
 
-  const wheelScale = fullscreen ? { transform: "scale(1.3)", transformOrigin: "center center" } : { transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }
+  const wheelScale = fullscreen
+    ? { transform: "scale(1.3)", transformOrigin: "center center" }
+    : { transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }
 
   const wheel = (
     <div className="relative" style={wheelScale}>
@@ -106,8 +108,19 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
           spinDuration={0.6}
         />
       ) : (
-        <div className={`rounded-full border-4 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center ${fullscreen ? "" : "mb-12 mt-4"}`} style={{ width: fullscreen ? 400 : 300, height: fullscreen ? 400 : 300 }}>
-          <p className={`text-gray-400 dark:text-gray-500 text-center px-8 ${fullscreen ? "text-base text-white/60" : "text-sm"}`}>Legg til minst 2 personer for å spinne</p>
+        <div
+          className={`rounded-full border-4 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center ${
+            fullscreen ? "" : "mb-12 mt-4"
+          }`}
+          style={{ width: fullscreen ? 400 : 300, height: fullscreen ? 400 : 300 }}
+        >
+          <p
+            className={`text-gray-400 dark:text-gray-500 text-center px-8 ${
+              fullscreen ? "text-base text-white/60" : "text-sm"
+            }`}
+          >
+            Legg til minst 2 personer for å spinne
+          </p>
         </div>
       )}
     </div>
@@ -128,7 +141,13 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
       ) : (
         <>
           <div className="w-full">
-            <p className={`text-xs font-medium mb-2 ${fullscreen ? "text-white/60" : "text-gray-500 dark:text-gray-400"}`}>Straff</p>
+            <p
+              className={`text-xs font-medium mb-2 ${
+                fullscreen ? "text-white/60" : "text-gray-500 dark:text-gray-400"
+              }`}
+            >
+              Straff
+            </p>
             <div className="flex gap-1.5 flex-wrap">
               {punishmentTypes.map((pt) => (
                 <button
@@ -137,8 +156,12 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
                   disabled={isSpinning}
                   className={`rounded-lg border px-2 py-1 text-xs font-medium transition-all ${
                     selectedPunishmentType?.punishment_type_id === pt.punishment_type_id
-                      ? fullscreen ? "border-indigo-400 bg-indigo-500/30 text-white" : "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
-                      : fullscreen ? "border-white/20 bg-white/10 text-white/80 hover:border-white/40" : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
+                      ? fullscreen
+                        ? "border-indigo-400 bg-indigo-500/30 text-white"
+                        : "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                      : fullscreen
+                      ? "border-white/20 bg-white/10 text-white/80 hover:border-white/40"
+                      : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
                   }`}
                 >
                   {pt.emoji} {pt.name}
@@ -148,23 +171,58 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
           </div>
 
           <div className="w-full">
-            <p className={`text-xs font-medium mb-2 ${fullscreen ? "text-white/60" : "text-gray-500 dark:text-gray-400"}`}>Antall</p>
-            <AmountSelector value={punishmentAmount} onChange={setPunishmentAmount} disabled={isSpinning} fullscreen={fullscreen} />
+            <p
+              className={`text-xs font-medium mb-2 ${
+                fullscreen ? "text-white/60" : "text-gray-500 dark:text-gray-400"
+              }`}
+            >
+              Antall
+            </p>
+            <AmountSelector
+              value={punishmentAmount}
+              onChange={setPunishmentAmount}
+              disabled={isSpinning}
+              fullscreen={fullscreen}
+            />
           </div>
 
           {wheelMembers.length > 0 && (
             <div className="w-full space-y-1.5">
               <div className="flex items-center justify-between">
-                <p className={`text-xs font-medium ${fullscreen ? "text-white/60" : "text-gray-500 dark:text-gray-400"}`}>Personer i hjulet ({wheelMembers.length})</p>
+                <p
+                  className={`text-xs font-medium ${fullscreen ? "text-white/60" : "text-gray-500 dark:text-gray-400"}`}
+                >
+                  Personer i hjulet ({wheelMembers.length})
+                </p>
                 {wheelMembers.length > 1 && (
-                  <button onClick={() => { setWheelMembers([]); setSelectedMember(null); setApplied(false) }} className="text-xs text-red-500 hover:text-red-600" disabled={isSpinning}>Fjern alle</button>
+                  <button
+                    onClick={() => {
+                      setWheelMembers([])
+                      setSelectedMember(null)
+                      setApplied(false)
+                    }}
+                    className="text-xs text-red-500 hover:text-red-600"
+                    disabled={isSpinning}
+                  >
+                    Fjern alle
+                  </button>
                 )}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {wheelMembers.map((player, index) => (
-                  <div key={player.user_id} className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-white" style={{ backgroundColor: SEGMENT_COLORS[index % SEGMENT_COLORS.length] }}>
+                  <div
+                    key={player.user_id}
+                    className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-white"
+                    style={{ backgroundColor: SEGMENT_COLORS[index % SEGMENT_COLORS.length] }}
+                  >
                     <span>{player.first_name}</span>
-                    <button onClick={() => removePlayer(player.user_id)} className="rounded-full hover:bg-white/20" disabled={isSpinning}><XMarkIcon className="h-3 w-3" /></button>
+                    <button
+                      onClick={() => removePlayer(player.user_id)}
+                      className="rounded-full hover:bg-white/20"
+                      disabled={isSpinning}
+                    >
+                      <XMarkIcon className="h-3 w-3" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -172,7 +230,14 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
           )}
 
           {availableMembers.length > 0 && (
-            <PlayerSearchDropdown members={availableMembers} onSelect={addPlayer} disabled={isSpinning} placeholder="Legg til person" buttonIcon="userPlus" fullscreen={fullscreen} />
+            <PlayerSearchDropdown
+              members={availableMembers}
+              onSelect={addPlayer}
+              disabled={isSpinning}
+              placeholder="Legg til person"
+              buttonIcon="userPlus"
+              fullscreen={fullscreen}
+            />
           )}
         </>
       )}

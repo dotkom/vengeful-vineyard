@@ -70,9 +70,7 @@ export const ModalWrapper = ({
                       <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                         {title}
                       </Dialog.Title>
-                      {subtitle && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>
-                      )}
+                      {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
                     </div>
                     {showCloseButton && (
                       <button

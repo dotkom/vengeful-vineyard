@@ -5,21 +5,42 @@ export const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 3
 
 // European roulette numbers in wheel order
 export const WHEEL_NUMBERS = [
-  0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5,
-  24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26,
+  0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7,
+  28, 12, 35, 3, 26,
 ]
 
 // Preset colors for wheel segments
 export const PRESET_COLORS = [
-  "#4f46e5", "#7c3aed", "#8b5cf6", "#6366f1", "#22c55e",
-  "#10b981", "#ef4444", "#dc2626", "#f59e0b", "#3b82f6",
+  "#4f46e5",
+  "#7c3aed",
+  "#8b5cf6",
+  "#6366f1",
+  "#22c55e",
+  "#10b981",
+  "#ef4444",
+  "#dc2626",
+  "#f59e0b",
+  "#3b82f6",
 ]
 
 // Segment colors for person wheel
 export const SEGMENT_COLORS = [
-  "#4f46e5", "#7c3aed", "#6366f1", "#8b5cf6", "#2563eb", "#3b82f6",
-  "#0891b2", "#06b6d4", "#059669", "#10b981", "#d97706", "#f59e0b",
-  "#dc2626", "#ef4444", "#db2777", "#ec4899",
+  "#4f46e5",
+  "#7c3aed",
+  "#6366f1",
+  "#8b5cf6",
+  "#2563eb",
+  "#3b82f6",
+  "#0891b2",
+  "#06b6d4",
+  "#059669",
+  "#10b981",
+  "#d97706",
+  "#f59e0b",
+  "#dc2626",
+  "#ef4444",
+  "#db2777",
+  "#ec4899",
 ]
 
 export const getNumberColor = (num: number): "red" | "black" | "green" => {
@@ -29,21 +50,31 @@ export const getNumberColor = (num: number): "red" | "black" | "green" => {
 
 export const getBetLabel = (bet: BetType): string => {
   switch (bet.type) {
-    case "number": return `#${bet.value}`
-    case "color": return bet.value === "red" ? "Rød" : "Svart"
-    case "evenOdd": return bet.value === "even" ? "Partall" : "Oddetall"
-    case "highLow": return bet.value === "low" ? "1-18" : "19-36"
-    case "dozen": return `Dusin ${bet.value}`
+    case "number":
+      return `#${bet.value}`
+    case "color":
+      return bet.value === "red" ? "Rød" : "Svart"
+    case "evenOdd":
+      return bet.value === "even" ? "Partall" : "Oddetall"
+    case "highLow":
+      return bet.value === "low" ? "1-18" : "19-36"
+    case "dozen":
+      return `Dusin ${bet.value}`
   }
 }
 
 export const getPayoutMultiplier = (bet: BetType): number => {
   switch (bet.type) {
-    case "number": return 35
-    case "color": return 1
-    case "evenOdd": return 1
-    case "highLow": return 1
-    case "dozen": return 2
+    case "number":
+      return 35
+    case "color":
+      return 1
+    case "evenOdd":
+      return 1
+    case "highLow":
+      return 1
+    case "dozen":
+      return 2
   }
 }
 
