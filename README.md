@@ -62,10 +62,14 @@ The frontend uses [Online Web (monoweb)](https://github.com/dotkom/monoweb) for 
 
 2. To get started quickly with test data, run:
    ```bash
-   pnpm migrate:dev-with-fixtures
+   doppler login
+   doppler setup
+   docker compose up -d
+   pnpm install
+   pnpm migrate:dev 
+   pnpm vinstraff:user-db-sync
+   pnpm dev
    ```
-
-3. **Important:** After monoweb is running, go to the dashboard and add yourself as a member of **Dotkom**. This gives you the necessary permissions to see all features in the Vengeful Vineyard frontend.
 
 ### Step 3: Start the Backend
 
@@ -82,9 +86,10 @@ This starts the FastAPI server with PostgreSQL using Docker Compose.
 
 #### Syncing Production Data (Optional)
 
-If you have Doppler access to production, you can sync the production database to your local environment:
+If you have Doppler access to production, you can sync the production database to your local environment (while backend is running):
 
 ```bash
+cd backend
 make db-sync
 ```
 
@@ -126,7 +131,7 @@ To deploy changes to AWS, you need the AWS CLI installed and configured. Ask Dot
 
 ```bash
 # Install AWS CLI, then configure
-aws configure --profile dotkom
+aws sso login --profile dotkom
 ```
 
 ### Backend Deployment
@@ -138,14 +143,17 @@ make deploy-prod
 make deploy-prod PROFILE=dotkom
 ```
 
-Then go to the Terraform monorepo (`staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory):
+Then go to the [Terraform monorepo](https://github.com/dotkom/infra) (`staging/vengeful-vineyard` or `prod/vengeful-vineyard` directory):
+
+You will also need the `DOPPLER_TOKEN_ALL` token from [here](https://dashboard.doppler.com/workplace/7254af9f3ef6f40984fe/projects/terraform/configs/prod#TF_VAR_DOPPLER_TOKEN_ALL)
 
 ```bash
 terraform init
 # Or: AWS_PROFILE=dotkom terraform init
 
-doppler run terraform apply
-# Or: AWS_PROFILE=dotkom doppler run terraform apply
+doppler run --project vengeful-vineyard --config prd -- terraform apply
+# Or: AWS_PROFILE=dotkom doppler run --project vengeful-vineyard --config prd -- terraform apply
+
 ```
 
 ### Frontend Deployment
@@ -155,9 +163,9 @@ doppler login
 doppler setup  # Select vengeful-vineyard, dev
 
 cd frontend
-npm run deploy:prod
+pnpm run deploy:prod
 # Or with profile:
-npm run deploy:prod -- --profile=dotkom
+pnpm run deploy:prod -- --profile=dotkom
 ```
 
 ---

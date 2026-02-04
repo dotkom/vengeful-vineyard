@@ -114,7 +114,9 @@ class GroupMembers:
     ) -> list[dict[str, Union[GroupId, UserId]]]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
             query = """UPDATE group_members
-                    SET active = m.active, ow_group_user_id = m.ow_group_user_id
+                    SET active = m.active,
+                        ow_group_user_id = m.ow_group_user_id,
+                        inactive_at = COALESCE(m.inactive_at, group_members.inactive_at)
                     FROM
                         unnest($1::group_members[]) as m
                     WHERE
@@ -125,7 +127,7 @@ class GroupMembers:
             res = await conn.fetch(
                 query,
                 [
-                    (group_id, x.user_id, x.ow_group_user_id, x.active, None)
+                    (group_id, x.user_id, x.ow_group_user_id, x.active, None, x.inactive_at)
                     for x in members
                 ],
             )

@@ -1,6 +1,7 @@
 """Contains methods for syncing users from OW."""
 
 import asyncio
+import datetime
 import sentry_sdk
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Optional, cast
@@ -225,14 +226,17 @@ class OWSync:
 
             to_add = [u for u in group_users if u.id not in id_map]
 
-            active_ow_group_members = [
-                item for item in group_users if item.has_active_membership
-            ]
+            active_ow_group_member_ids = {
+                item.id for item in group_users if item.has_active_membership
+            }
+
+            # Map ow_group_user_id to OWSyncGroupMember for getting membership_end
+            ow_user_map = {u.id: u for u in group_users}
 
             to_soft_delete = [
                 (m["user_id"], m["ow_group_user_id"])
                 for m in group_members
-                if m["ow_group_user_id"] not in active_ow_group_members and m["active"]
+                if m["ow_group_user_id"] not in active_ow_group_member_ids and m["active"]
             ]
 
             added_members = []
@@ -244,14 +248,18 @@ class OWSync:
                 )
 
             if to_soft_delete:
-                member_updates = [
-                    GroupMemberUpdate(
-                        user_id=user_id,
-                        ow_group_user_id=ow_group_user_id,
-                        active=False,
+                member_updates = []
+                for user_id, ow_group_user_id in to_soft_delete:
+                    ow_user = ow_user_map.get(ow_group_user_id)
+                    inactive_at = ow_user.membership_end if ow_user and ow_user.membership_end else datetime.datetime.utcnow()
+                    member_updates.append(
+                        GroupMemberUpdate(
+                            user_id=user_id,
+                            ow_group_user_id=ow_group_user_id,
+                            active=False,
+                            inactive_at=inactive_at,
+                        )
                     )
-                    for user_id, ow_group_user_id in to_soft_delete
-                ]
                 await self.app.db.group_members.update_multiple(
                     group_id,
                     member_updates,
@@ -315,7 +323,9 @@ class OWSync:
 
         # Update all group members tied to the user id to be inactive
         async with self.app.db.pool.acquire() as conn:
-            query = "UPDATE group_members SET active = FALSE WHERE user_id = $1 AND group_id = ANY($2)"
+            query = """UPDATE group_members
+                       SET active = FALSE, inactive_at = COALESCE(inactive_at, now() at time zone 'utc')
+                       WHERE user_id = $1 AND group_id = ANY($2)"""
             await conn.execute(query, ow_user_id, group_ids)
 
     async def sync_group_for_user(
@@ -434,11 +444,16 @@ class OWSync:
                 if (
                     group_user.has_active_membership != db_user["active"]
                 ):  # They are opposite, so update if they match
+                    # Use membership_end from OW if available, otherwise use current time
+                    inactive_at = None
+                    if not group_user.has_active_membership:
+                        inactive_at = group_user.membership_end or datetime.datetime.utcnow()
                     group_members_to_update.append(
                         GroupMemberUpdate(
                             user_id=db_user["user_id"],
                             ow_group_user_id=group_user.id,
                             active=group_user.has_active_membership,
+                            inactive_at=inactive_at,
                         )
                     )
 
