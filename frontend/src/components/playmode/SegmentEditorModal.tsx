@@ -35,12 +35,22 @@ export const SegmentEditorModal = ({
 }: SegmentEditorModalProps) => {
   const [editingSegments, setEditingSegments] = useState<WheelSegment[]>(segments)
 
-  // Reset editing segments when modal opens
+  // Reset editing segments when modal opens, converting punishmentTypeName to punishmentTypeId
   useEffect(() => {
     if (open) {
-      setEditingSegments(segments)
+      // Convert segments with punishmentTypeName to use punishmentTypeId for editing
+      const convertedSegments = segments.map((seg) => {
+        if (seg.punishmentTypeName && !seg.punishmentTypeId) {
+          const pt = punishmentTypes.find((p) => p.name.toLowerCase() === seg.punishmentTypeName?.toLowerCase())
+          if (pt) {
+            return { ...seg, punishmentTypeId: pt.punishment_type_id }
+          }
+        }
+        return seg
+      })
+      setEditingSegments(convertedSegments)
     }
-  }, [open, segments])
+  }, [open, segments, punishmentTypes])
 
   const updateSegment = (index: number, updates: Partial<WheelSegment>) => {
     setEditingSegments((prev) =>

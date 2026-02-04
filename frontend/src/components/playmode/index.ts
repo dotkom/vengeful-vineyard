@@ -1,6 +1,6 @@
 export { RouletteWidget } from "./RouletteWidget"
 export { CasinoRoulette } from "./CasinoRoulette"
-export { CustomWheel, generateDefaultSegments } from "./CustomWheel"
+export { CustomWheel, DEFAULT_SEGMENTS } from "./CustomWheel"
 export { PersonWheel } from "./PersonWheel"
 export { SegmentEditorModal } from "./SegmentEditorModal"
 export { BettingModal } from "./BettingModal"

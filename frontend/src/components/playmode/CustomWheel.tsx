@@ -10,6 +10,7 @@ export interface WheelSegment {
   style: { backgroundColor: string; textColor: string }
   punishmentAmount: number
   punishmentTypeId?: string // Optional - if set, uses this specific type
+  punishmentTypeName?: string // Optional - matches by name (used for defaults that work across groups)
 }
 
 interface SpinResult {
@@ -19,56 +20,17 @@ interface SpinResult {
   applied: boolean
 }
 
+// Default segments using ølstraff, vinstraff, and ingen - works for all committees
 const DEFAULT_SEGMENTS: WheelSegment[] = [
-  { option: "1 straff", style: { backgroundColor: "#4f46e5", textColor: "white" }, punishmentAmount: 1 },
+  { option: "1 Ølstraff", style: { backgroundColor: "#f59e0b", textColor: "white" }, punishmentAmount: 1, punishmentTypeName: "Ølstraff" },
   { option: "Ingen!", style: { backgroundColor: "#22c55e", textColor: "white" }, punishmentAmount: 0 },
-  { option: "2 straff", style: { backgroundColor: "#7c3aed", textColor: "white" }, punishmentAmount: 2 },
-  { option: "Dobbel!", style: { backgroundColor: "#ef4444", textColor: "white" }, punishmentAmount: -1 },
-  { option: "3 straff", style: { backgroundColor: "#6366f1", textColor: "white" }, punishmentAmount: 3 },
-  { option: "1 straff", style: { backgroundColor: "#8b5cf6", textColor: "white" }, punishmentAmount: 1 },
+  { option: "1 Vinstraff", style: { backgroundColor: "#7c3aed", textColor: "white" }, punishmentAmount: 1, punishmentTypeName: "Vinstraff" },
+  { option: "2 Ølstraff", style: { backgroundColor: "#d97706", textColor: "white" }, punishmentAmount: 2, punishmentTypeName: "Ølstraff" },
   { option: "Ingen!", style: { backgroundColor: "#10b981", textColor: "white" }, punishmentAmount: 0 },
-  { option: "5 straff", style: { backgroundColor: "#dc2626", textColor: "white" }, punishmentAmount: 5 },
+  { option: "2 Vinstraff", style: { backgroundColor: "#6366f1", textColor: "white" }, punishmentAmount: 2, punishmentTypeName: "Vinstraff" },
+  { option: "3 Ølstraff", style: { backgroundColor: "#b45309", textColor: "white" }, punishmentAmount: 3, punishmentTypeName: "Ølstraff" },
+  { option: "Ingen!", style: { backgroundColor: "#059669", textColor: "white" }, punishmentAmount: 0 },
 ]
-
-// Generate default segments from group punishment types
-export const generateDefaultSegments = (punishmentTypes: PunishmentTypeInfo[]): WheelSegment[] => {
-  if (punishmentTypes.length === 0) return DEFAULT_SEGMENTS
-
-  const colors = ["#4f46e5", "#7c3aed", "#6366f1", "#8b5cf6", "#22c55e", "#10b981", "#ef4444", "#dc2626"]
-  const segments: WheelSegment[] = []
-
-  // Add segments for each punishment type with varying amounts
-  punishmentTypes.forEach((pt, ptIndex) => {
-    // 1x punishment
-    segments.push({
-      option: `1 ${pt.name}`,
-      style: { backgroundColor: colors[ptIndex % colors.length], textColor: "white" },
-      punishmentAmount: 1,
-      punishmentTypeId: pt.punishment_type_id,
-    })
-    // 2x punishment
-    segments.push({
-      option: `2 ${pt.name}`,
-      style: { backgroundColor: colors[(ptIndex + 2) % colors.length], textColor: "white" },
-      punishmentAmount: 2,
-      punishmentTypeId: pt.punishment_type_id,
-    })
-  })
-
-  // Add some "free" segments
-  segments.push({
-    option: "Ingen!",
-    style: { backgroundColor: "#22c55e", textColor: "white" },
-    punishmentAmount: 0,
-  })
-  segments.push({
-    option: "Ingen!",
-    style: { backgroundColor: "#10b981", textColor: "white" },
-    punishmentAmount: 0,
-  })
-
-  return segments
-}
 
 interface CustomWheelProps {
   onEditSegments: () => void
@@ -161,9 +123,15 @@ export const CustomWheel = ({
     // Find the punishment type for this segment
     let punishmentType: PunishmentTypeInfo | null = null
     if (segment.punishmentTypeId) {
+      // Match by ID first
       punishmentType = punishmentTypes.find((pt) => pt.punishment_type_id === segment.punishmentTypeId) || null
-    } else if (segment.punishmentAmount > 0) {
-      // Use default punishment type if segment doesn't specify one
+    } else if (segment.punishmentTypeName) {
+      // Match by name (case-insensitive) - used for defaults that work across groups
+      punishmentType = punishmentTypes.find((pt) => pt.name.toLowerCase() === segment.punishmentTypeName?.toLowerCase()) || null
+    }
+
+    // Fallback to default punishment type if segment has a punishment but no match found
+    if (!punishmentType && segment.punishmentAmount > 0) {
       punishmentType = defaultPunishmentType
     }
 

@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
 import { CasinoRoulette } from "./CasinoRoulette"
-import { CustomWheel, WheelSegment, generateDefaultSegments } from "./CustomWheel"
+import { CustomWheel, WheelSegment, DEFAULT_SEGMENTS } from "./CustomWheel"
 import { PersonWheel } from "./PersonWheel"
 import { SegmentEditorModal } from "./SegmentEditorModal"
 import { Group, GroupUser, PunishmentCreate } from "../../helpers/types"
@@ -38,12 +38,6 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
       }))
     : []
 
-  // Generate default segments when punishment types are available
-  useEffect(() => {
-    if (punishmentTypes.length > 0 && segments.length === 0) {
-      setSegments(generateDefaultSegments(punishmentTypes))
-    }
-  }, [punishmentTypes, segments.length])
 
   const handleApplyPunishments = async (losers: PlayerResult[], winnerAssignments: WinnerAssignment[] = []) => {
     if (!groupData?.group_id) return
@@ -269,7 +263,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
       <SegmentEditorModal
         open={showEditor}
         setOpen={setShowEditor}
-        segments={segments.length > 0 ? segments : generateDefaultSegments(punishmentTypes)}
+        segments={segments.length > 0 ? segments : DEFAULT_SEGMENTS}
         onSave={setSegments}
         punishmentTypes={punishmentTypes}
       />
