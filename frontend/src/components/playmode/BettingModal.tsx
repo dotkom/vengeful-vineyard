@@ -312,15 +312,50 @@ export const BettingModal = ({
 
                 {/* Selected Bet Display */}
                 {selectedBet && (
-                  <div className="mb-4 rounded-lg bg-gray-950/50 p-3 text-center border border-gray-700">
-                    <p className="text-sm text-gray-400">Din innsats:</p>
-                    <p className="text-lg font-bold text-amber-400">
+                  <div className="mb-4 rounded-lg bg-gray-950/50 p-4 border border-gray-700">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm text-gray-400">Din innsats:</p>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded bg-amber-900/50 text-amber-400 border border-amber-700">
+                        Odds: {getPayoutMultiplier(selectedBet)}:1
+                      </span>
+                    </div>
+                    <p className="text-lg font-bold text-amber-400 text-center mb-3">
                       {selectedBet.type === "number" && `Nummer ${selectedBet.value}`}
                       {selectedBet.type === "color" && (selectedBet.value === "red" ? "Rød" : "Svart")}
                       {selectedBet.type === "evenOdd" && (selectedBet.value === "even" ? "Partall" : "Oddetall")}
                       {selectedBet.type === "highLow" && (selectedBet.value === "low" ? "Lav (1-18)" : "Høy (19-36)")}
                       {selectedBet.type === "dozen" && `Dusin ${selectedBet.value} (${(selectedBet.value - 1) * 12 + 1}-${selectedBet.value * 12})`}
                     </p>
+
+                    {/* Win/Lose breakdown */}
+                    {selectedPunishmentType && (
+                      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-700">
+                        {/* If you lose */}
+                        <div className="rounded-lg bg-red-950/30 border border-red-900/50 p-2.5">
+                          <p className="text-xs text-red-400 font-medium mb-1">Ved tap</p>
+                          <p className="text-sm text-red-300">
+                            Du får {amount} {selectedPunishmentType.name} {selectedPunishmentType.emoji}
+                          </p>
+                          {selectedPunishmentType.value > 0 && (
+                            <p className="text-xs text-red-400/70 mt-0.5">
+                              = {amount * selectedPunishmentType.value} kr
+                            </p>
+                          )}
+                        </div>
+                        {/* If you win */}
+                        <div className="rounded-lg bg-green-950/30 border border-green-900/50 p-2.5">
+                          <p className="text-xs text-green-400 font-medium mb-1">Ved seier</p>
+                          <p className="text-sm text-green-300">
+                            Gi {calculateWinnings(selectedBet, amount)} {selectedPunishmentType.name} {selectedPunishmentType.emoji}
+                          </p>
+                          {selectedPunishmentType.value > 0 && (
+                            <p className="text-xs text-green-400/70 mt-0.5">
+                              = {calculateWinnings(selectedBet, amount) * selectedPunishmentType.value} kr
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
