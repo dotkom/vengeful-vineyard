@@ -45,6 +45,8 @@ export interface WinnerAssignment {
 interface PlayModeContextProps {
   isPlayModeEnabled: boolean
   setIsPlayModeEnabled: Dispatch<SetStateAction<boolean>>
+  isFullscreen: boolean
+  setIsFullscreen: Dispatch<SetStateAction<boolean>>
   isSpinning: boolean
   setIsSpinning: Dispatch<SetStateAction<boolean>>
   lastResult: RouletteResult | null
@@ -74,6 +76,7 @@ interface PlayModeProviderProps {
 
 export function PlayModeProvider({ children }: PlayModeProviderProps) {
   const [isPlayModeEnabled, setIsPlayModeEnabled] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const [isSpinning, setIsSpinning] = useState(false)
   const [lastResult, setLastResult] = useState<RouletteResult | null>(null)
   const [playerEntries, setPlayerEntries] = useState<PlayerBetEntry[]>([])
@@ -85,6 +88,8 @@ export function PlayModeProvider({ children }: PlayModeProviderProps) {
       value={{
         isPlayModeEnabled,
         setIsPlayModeEnabled,
+        isFullscreen,
+        setIsFullscreen,
         isSpinning,
         setIsSpinning,
         lastResult,

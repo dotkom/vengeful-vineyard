@@ -9,6 +9,7 @@ interface PersonWheelProps {
   members?: GroupUser[]
   groupData?: Group
   onApplyPunishment?: (player: GroupUser, punishmentType: PunishmentTypeInfo, amount: number) => void
+  fullscreen?: boolean
 }
 
 interface PersonSegment {
@@ -29,6 +30,7 @@ export const PersonWheel = ({
   members = [],
   groupData,
   onApplyPunishment,
+  fullscreen = false,
 }: PersonWheelProps) => {
   const { isSpinning, setIsSpinning } = usePlayMode()
   const [mustSpin, setMustSpin] = useState(false)
@@ -141,37 +143,47 @@ export const PersonWheel = ({
     )
   }
 
-  return (
-    <div className="flex flex-col items-center gap-y-3">
-      {/* Wheel - show placeholder or actual wheel */}
-      <div className="relative" style={{ transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }}>
-        {segments.length >= 2 ? (
-          <Wheel
-            mustStartSpinning={mustSpin}
-            prizeNumber={prizeNumber}
-            data={segments}
-            onStopSpinning={handleSpinComplete}
-            backgroundColors={SEGMENT_COLORS}
-            textColors={["white"]}
-            outerBorderColor="#374151"
-            outerBorderWidth={4}
-            innerRadius={15}
-            innerBorderColor="#1f2937"
-            innerBorderWidth={8}
-            radiusLineColor="#374151"
-            radiusLineWidth={1}
-            fontSize={12}
-            spinDuration={0.6}
-          />
-        ) : (
-          <div className="w-[300px] h-[300px] rounded-full border-4 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center mb-12 mt-4">
-            <p className="text-sm text-gray-400 dark:text-gray-500 text-center px-8">
-              Legg til minst 2 personer for å spinne
-            </p>
-          </div>
-        )}
-      </div>
+  const wheel = (
+    <div
+      className="relative"
+      style={fullscreen
+        ? { transform: "scale(1.3)", transformOrigin: "center center" }
+        : { transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }
+      }
+    >
+      {segments.length >= 2 ? (
+        <Wheel
+          mustStartSpinning={mustSpin}
+          prizeNumber={prizeNumber}
+          data={segments}
+          onStopSpinning={handleSpinComplete}
+          backgroundColors={SEGMENT_COLORS}
+          textColors={["white"]}
+          outerBorderColor="#374151"
+          outerBorderWidth={4}
+          innerRadius={15}
+          innerBorderColor="#1f2937"
+          innerBorderWidth={8}
+          radiusLineColor="#374151"
+          radiusLineWidth={1}
+          fontSize={fullscreen ? 16 : 12}
+          spinDuration={0.6}
+        />
+      ) : (
+        <div
+          className={`rounded-full border-4 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center ${fullscreen ? "" : "mb-12 mt-4"}`}
+          style={{ width: fullscreen ? 400 : 300, height: fullscreen ? 400 : 300 }}
+        >
+          <p className={`text-gray-400 dark:text-gray-500 text-center px-8 ${fullscreen ? "text-base text-white/60" : "text-sm"}`}>
+            Legg til minst 2 personer for å spinne
+          </p>
+        </div>
+      )}
+    </div>
+  )
 
+  const controls = (
+    <div className={`flex flex-col gap-y-3 ${fullscreen ? "w-full" : ""}`}>
       {/* Result Display */}
       {selectedMember && (
         <div className="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-3">
@@ -355,6 +367,29 @@ export const PersonWheel = ({
           {isSpinning ? "Spinner..." : !canSpin ? "Legg til minst 2 personer" : "Spin!"}
         </Button>
       )}
+    </div>
+  )
+
+  if (fullscreen) {
+    return (
+      <div className="h-full flex gap-8 items-center">
+        {/* Left side - Big wheel */}
+        <div className="flex-1 flex items-center justify-center">
+          {wheel}
+        </div>
+        {/* Right side - Controls */}
+        <div className="w-80 h-full flex flex-col gap-y-4 bg-white/10 rounded-2xl p-6 overflow-y-auto">
+          <h3 className="text-lg font-semibold text-white">Innstillinger</h3>
+          {controls}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-y-3">
+      {wheel}
+      {controls}
     </div>
   )
 }

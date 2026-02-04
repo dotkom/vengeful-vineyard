@@ -42,9 +42,10 @@ interface CasinoRouletteProps {
   members?: GroupUser[]
   groupData?: Group
   onApplyPunishments?: (losers: PlayerResult[], winnerAssignments: WinnerAssignment[]) => void
+  fullscreen?: boolean
 }
 
-export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments }: CasinoRouletteProps) => {
+export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments, fullscreen = false }: CasinoRouletteProps) => {
   const { isSpinning, setIsSpinning, playerEntries, setPlayerEntries, lastCasinoSpin, setLastCasinoSpin } = usePlayMode()
   const [result, setResult] = useState<number | null>(null)
   const [wheelRotation, setWheelRotation] = useState(0)
@@ -216,73 +217,85 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments }: 
 
   const currentEditingEntry = playerEntries.find((e) => e.id === editingEntryId)
 
-  return (
-    <div className="flex flex-col items-center gap-y-4">
-      {/* Roulette Wheel */}
-      <div className="relative h-[260px] w-[260px]">
-        {/* Outer gold ring */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-b from-amber-400 via-amber-600 to-amber-800 p-1.5 shadow-2xl">
-          {/* Inner dark ring */}
-          <div className="h-full w-full rounded-full bg-gradient-to-b from-gray-800 to-gray-900 p-1.5">
-            {/* Wheel with numbers */}
-            <div
-              className="relative h-full w-full rounded-full shadow-inner overflow-hidden"
-              style={{
-                transform: `rotate(${wheelRotation}deg)`,
-                transition: isSpinning ? "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)" : "none",
-                background: generateRouletteGradient(),
-              }}
-            >
-              {/* Numbers positioned radially */}
-              {WHEEL_NUMBERS.map((num, i) => {
-                const segmentAngle = 360 / 37
-                const angle = i * segmentAngle
-                const radius = 42
-                const radians = ((angle - 90) * Math.PI) / 180
-                const x = 50 + radius * Math.cos(radians)
-                const y = 50 + radius * Math.sin(radians)
-                return (
-                  <div
-                    key={i}
-                    className="absolute flex items-center justify-center"
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      width: "20px",
-                      height: "20px",
-                      transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                    }}
-                  >
-                    <span
-                      className="text-[10px] font-bold text-white"
-                      style={{ textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}
-                    >
-                      {num}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
+  // Wheel size based on fullscreen mode
+  const wheelSize = fullscreen ? 500 : 260
+  const centerSize = fullscreen ? 80 : 56
+  const pointerSize = fullscreen ? 40 : 28
+  const numberFontSize = fullscreen ? "text-sm" : "text-[10px]"
 
-        {/* Center piece */}
-        <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-b from-amber-400 to-amber-700 shadow-lg border-2 border-amber-300">
-          <div className="absolute inset-1 rounded-full bg-gradient-to-b from-amber-600 to-amber-900" />
-        </div>
-
-        {/* Pointer/marker */}
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-10">
+  const wheel = (
+    <div className="relative" style={{ height: wheelSize, width: wheelSize }}>
+      {/* Outer gold ring */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-b from-amber-400 via-amber-600 to-amber-800 p-1.5 shadow-2xl">
+        {/* Inner dark ring */}
+        <div className="h-full w-full rounded-full bg-gradient-to-b from-gray-800 to-gray-900 p-1.5">
+          {/* Wheel with numbers */}
           <div
-            className="w-7 h-7 bg-gradient-to-b from-amber-300 to-amber-500 shadow-lg"
+            className="relative h-full w-full rounded-full shadow-inner overflow-hidden"
             style={{
-              clipPath: "polygon(50% 100%, 0% 30%, 50% 0%, 100% 30%)",
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))",
+              transform: `rotate(${wheelRotation}deg)`,
+              transition: isSpinning ? "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)" : "none",
+              background: generateRouletteGradient(),
             }}
-          />
+          >
+            {/* Numbers positioned radially */}
+            {WHEEL_NUMBERS.map((num, i) => {
+              const segmentAngle = 360 / 37
+              const angle = i * segmentAngle
+              const radius = 42
+              const radians = ((angle - 90) * Math.PI) / 180
+              const x = 50 + radius * Math.cos(radians)
+              const y = 50 + radius * Math.sin(radians)
+              return (
+                <div
+                  key={i}
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    width: "20px",
+                    height: "20px",
+                    transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                  }}
+                >
+                  <span
+                    className={`${numberFontSize} font-bold text-white`}
+                    style={{ textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}
+                  >
+                    {num}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
 
+      {/* Center piece */}
+      <div
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-b from-amber-400 to-amber-700 shadow-lg border-2 border-amber-300"
+        style={{ height: centerSize, width: centerSize }}
+      >
+        <div className="absolute inset-1 rounded-full bg-gradient-to-b from-amber-600 to-amber-900" />
+      </div>
+
+      {/* Pointer/marker */}
+      <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-10">
+        <div
+          className="bg-gradient-to-b from-amber-300 to-amber-500 shadow-lg"
+          style={{
+            width: pointerSize,
+            height: pointerSize,
+            clipPath: "polygon(50% 100%, 0% 30%, 50% 0%, 100% 30%)",
+            filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))",
+          }}
+        />
+      </div>
+    </div>
+  )
+
+  const controls = (
+    <div className={`flex flex-col gap-y-4 ${fullscreen ? "w-full" : ""}`}>
       {/* Player Entries List */}
       {playerEntries.length > 0 && (
         <div className="w-full space-y-2">
@@ -434,6 +447,29 @@ export const CasinoRoulette = ({ members = [], groupData, onApplyPunishments }: 
         alreadyApplied={lastCasinoSpin?.applied}
         members={members}
       />
+    </div>
+  )
+
+  if (fullscreen) {
+    return (
+      <div className="h-full flex gap-8 items-center">
+        {/* Left side - Big wheel */}
+        <div className="flex-1 flex items-center justify-center">
+          {wheel}
+        </div>
+        {/* Right side - Controls */}
+        <div className="w-80 h-full flex flex-col gap-y-4 bg-white/10 rounded-2xl p-6 overflow-y-auto">
+          <h3 className="text-lg font-semibold text-white">Spillere</h3>
+          {controls}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-y-4">
+      {wheel}
+      {controls}
     </div>
   )
 }

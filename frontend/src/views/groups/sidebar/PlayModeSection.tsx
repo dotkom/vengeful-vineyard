@@ -1,9 +1,10 @@
 import { FC } from "react"
-import { RouletteWidget } from "../../../components/playmode"
+import { RouletteWidget, FullscreenPlayMode } from "../../../components/playmode"
 import { usePlayMode } from "../../../helpers/context/playModeContext"
 import { SidebarSection } from "./SidebarSection"
 import { Group, GroupUser } from "../../../helpers/types"
 import { AiFillInfoCircle } from "react-icons/ai"
+import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline"
 
 interface PlayModeSectionProps {
   members?: GroupUser[]
@@ -11,7 +12,7 @@ interface PlayModeSectionProps {
 }
 
 export const PlayModeSection: FC<PlayModeSectionProps> = ({ members = [], groupData }) => {
-  const { isPlayModeEnabled, setIsPlayModeEnabled } = usePlayMode()
+  const { isPlayModeEnabled, setIsPlayModeEnabled, setIsFullscreen } = usePlayMode()
 
   return (
     <>
@@ -45,10 +46,25 @@ export const PlayModeSection: FC<PlayModeSectionProps> = ({ members = [], groupD
       </div>
 
       {isPlayModeEnabled && (
-        <SidebarSection title="Roulette">
+        <SidebarSection
+          title="Roulette"
+          action={
+            <button
+              onClick={() => setIsFullscreen(true)}
+              className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+              title="Åpne i fullskjerm"
+            >
+              <ArrowsPointingOutIcon className="h-4 w-4" />
+              Fullskjerm
+            </button>
+          }
+        >
           <RouletteWidget members={members} groupData={groupData} />
         </SidebarSection>
       )}
+
+      {/* Fullscreen Modal */}
+      <FullscreenPlayMode members={members} groupData={groupData} />
     </>
   )
 }

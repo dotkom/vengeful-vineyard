@@ -76,6 +76,7 @@ interface CustomWheelProps {
   members?: GroupUser[]
   groupData?: Group
   onApplyPunishment?: (player: GroupUser, punishmentType: PunishmentTypeInfo, amount: number) => void
+  fullscreen?: boolean
 }
 
 export const CustomWheel = ({
@@ -84,6 +85,7 @@ export const CustomWheel = ({
   members = [],
   groupData,
   onApplyPunishment,
+  fullscreen = false,
 }: CustomWheelProps) => {
   const { isSpinning, setIsSpinning, setLastResult } = usePlayMode()
   const [mustSpin, setMustSpin] = useState(false)
@@ -204,29 +206,36 @@ export const CustomWheel = ({
     setLastSpinResult(null)
   }
 
-  return (
-    <div className="flex flex-col items-center gap-y-3">
-      {/* Wheel */}
-      <div className="relative" style={{ transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }}>
-        <Wheel
-          mustStartSpinning={mustSpin}
-          prizeNumber={prizeNumber}
-          data={segments}
-          onStopSpinning={handleSpinComplete}
-          backgroundColors={["#4f46e5", "#7c3aed"]}
-          textColors={["white"]}
-          outerBorderColor="#374151"
-          outerBorderWidth={4}
-          innerRadius={15}
-          innerBorderColor="#1f2937"
-          innerBorderWidth={8}
-          radiusLineColor="#374151"
-          radiusLineWidth={1}
-          fontSize={13}
-          spinDuration={0.6}
-        />
-      </div>
+  const wheel = (
+    <div
+      className="relative"
+      style={fullscreen
+        ? { transform: "scale(1.3)", transformOrigin: "center center" }
+        : { transform: "scale(0.65)", transformOrigin: "top center", marginBottom: "-150px" }
+      }
+    >
+      <Wheel
+        mustStartSpinning={mustSpin}
+        prizeNumber={prizeNumber}
+        data={segments}
+        onStopSpinning={handleSpinComplete}
+        backgroundColors={["#4f46e5", "#7c3aed"]}
+        textColors={["white"]}
+        outerBorderColor="#374151"
+        outerBorderWidth={4}
+        innerRadius={15}
+        innerBorderColor="#1f2937"
+        innerBorderWidth={8}
+        radiusLineColor="#374151"
+        radiusLineWidth={1}
+        fontSize={fullscreen ? 16 : 13}
+        spinDuration={0.6}
+      />
+    </div>
+  )
 
+  const controls = (
+    <div className={`flex flex-col gap-y-3 ${fullscreen ? "w-full" : ""}`}>
       {/* Player Queue */}
       {playerQueue.length > 0 && !lastSpinResult && (
         <div className="w-full space-y-2">
@@ -389,6 +398,29 @@ export const CustomWheel = ({
           <PencilIcon className="h-5 w-5" />
         </button>
       </div>
+    </div>
+  )
+
+  if (fullscreen) {
+    return (
+      <div className="h-full flex gap-8 items-center">
+        {/* Left side - Big wheel */}
+        <div className="flex-1 flex items-center justify-center">
+          {wheel}
+        </div>
+        {/* Right side - Controls */}
+        <div className="w-80 h-full flex flex-col gap-y-4 bg-white/10 rounded-2xl p-6 overflow-y-auto">
+          <h3 className="text-lg font-semibold text-white">Spillere</h3>
+          {controls}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-y-3">
+      {wheel}
+      {controls}
     </div>
   )
 }

@@ -15,11 +15,12 @@ type LykkehjulMode = "straff" | "person"
 interface RouletteWidgetProps {
   members?: GroupUser[]
   groupData?: Group
+  fullscreen?: boolean
 }
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
 
-export const RouletteWidget = ({ members = [], groupData }: RouletteWidgetProps) => {
+export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: RouletteWidgetProps) => {
   const [mode, setMode] = useState<WheelMode>("casino")
   const [lykkehjulMode, setLykkehjulMode] = useState<LykkehjulMode>("straff")
   const [segments, setSegments] = useState<WheelSegment[]>([])
@@ -154,76 +155,115 @@ export const RouletteWidget = ({ members = [], groupData }: RouletteWidgetProps)
     }
   }
 
+  const modeSwitcher = (
+    <div className={`flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1 ${fullscreen ? "bg-white/10" : ""}`}>
+      <button
+        onClick={() => setMode("casino")}
+        className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+          mode === "casino"
+            ? fullscreen
+              ? "bg-white/20 text-white shadow-sm"
+              : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
+            : fullscreen
+              ? "text-white/60 hover:text-white"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+        }`}
+      >
+        Casino
+      </button>
+      <button
+        onClick={() => setMode("custom")}
+        className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+          mode === "custom"
+            ? fullscreen
+              ? "bg-white/20 text-white shadow-sm"
+              : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
+            : fullscreen
+              ? "text-white/60 hover:text-white"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+        }`}
+      >
+        Lykkehjul
+      </button>
+    </div>
+  )
+
+  const lykkehjulSubModeSwitcher = mode === "custom" && (
+    <div className={`flex rounded-lg p-0.5 ${fullscreen ? "bg-white/10" : "bg-gray-50 dark:bg-gray-800"}`}>
+      <button
+        onClick={() => setLykkehjulMode("straff")}
+        className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition-all ${
+          lykkehjulMode === "straff"
+            ? fullscreen
+              ? "bg-white/20 text-white"
+              : "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
+            : fullscreen
+              ? "text-white/60 hover:text-white"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+        }`}
+      >
+        Straffe hjul
+      </button>
+      <button
+        onClick={() => setLykkehjulMode("person")}
+        className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition-all ${
+          lykkehjulMode === "person"
+            ? fullscreen
+              ? "bg-white/20 text-white"
+              : "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
+            : fullscreen
+              ? "text-white/60 hover:text-white"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+        }`}
+      >
+        Person hjul
+      </button>
+    </div>
+  )
+
+  const wheelContent = mode === "casino" ? (
+    <CasinoRoulette members={members} groupData={groupData} onApplyPunishments={handleApplyPunishments} fullscreen={fullscreen} />
+  ) : lykkehjulMode === "straff" ? (
+    <CustomWheel
+      segments={segments.length > 0 ? segments : undefined}
+      onEditSegments={() => setShowEditor(true)}
+      members={members}
+      groupData={groupData}
+      onApplyPunishment={handleApplySinglePunishment}
+      fullscreen={fullscreen}
+    />
+  ) : (
+    <PersonWheel
+      members={members}
+      groupData={groupData}
+      onApplyPunishment={handleApplySinglePunishment}
+      fullscreen={fullscreen}
+    />
+  )
+
   return (
-    <div className="flex flex-col gap-y-3">
-      {/* Mode Switcher */}
-      <div className="flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
-        <button
-          onClick={() => setMode("casino")}
-          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
-            mode === "casino"
-              ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          }`}
-        >
-          Casino
-        </button>
-        <button
-          onClick={() => setMode("custom")}
-          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
-            mode === "custom"
-              ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-          }`}
-        >
-          Lykkehjul
-        </button>
+    <>
+      <div className={fullscreen ? "h-full" : "flex flex-col gap-y-3"}>
+        {fullscreen ? (
+          // In fullscreen mode, wheel components handle their own layout
+          // We just need to add mode switchers at the top
+          <div className="h-full flex flex-col">
+            <div className="flex gap-4 mb-4">
+              {modeSwitcher}
+              {lykkehjulSubModeSwitcher}
+            </div>
+            <div className="flex-1">
+              {wheelContent}
+            </div>
+          </div>
+        ) : (
+          <>
+            {modeSwitcher}
+            {lykkehjulSubModeSwitcher}
+            {wheelContent}
+          </>
+        )}
       </div>
-
-      {/* Lykkehjul Sub-Mode Switcher */}
-      {mode === "custom" && (
-        <div className="flex rounded-lg bg-gray-50 dark:bg-gray-800 p-0.5">
-          <button
-            onClick={() => setLykkehjulMode("straff")}
-            className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition-all ${
-              lykkehjulMode === "straff"
-                ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-            }`}
-          >
-            Straffe hjul
-          </button>
-          <button
-            onClick={() => setLykkehjulMode("person")}
-            className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition-all ${
-              lykkehjulMode === "person"
-                ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-            }`}
-          >
-            Person hjul
-          </button>
-        </div>
-      )}
-
-      {/* Wheel Content */}
-      {mode === "casino" ? (
-        <CasinoRoulette members={members} groupData={groupData} onApplyPunishments={handleApplyPunishments} />
-      ) : lykkehjulMode === "straff" ? (
-        <CustomWheel
-          segments={segments.length > 0 ? segments : undefined}
-          onEditSegments={() => setShowEditor(true)}
-          members={members}
-          groupData={groupData}
-          onApplyPunishment={handleApplySinglePunishment}
-        />
-      ) : (
-        <PersonWheel
-          members={members}
-          groupData={groupData}
-          onApplyPunishment={handleApplySinglePunishment}
-        />
-      )}
 
       {/* Segment Editor Modal */}
       <SegmentEditorModal
@@ -233,6 +273,6 @@ export const RouletteWidget = ({ members = [], groupData }: RouletteWidgetProps)
         onSave={setSegments}
         punishmentTypes={punishmentTypes}
       />
-    </div>
+    </>
   )
 }
