@@ -1,12 +1,11 @@
 import { Dispatch, FC, SetStateAction } from "react"
-import { GroupMembersSortAlternative, groupMembersSortAlternatives } from "../../../helpers/sorting"
-import { MultipleToggle, ToggleOption } from "../../../components/toggle/MultipleToggle"
+import { GroupMembersSortAlternative } from "../../../helpers/sorting"
+import { ToggleOption } from "../../../components/toggle/MultipleToggle"
 
 import { CheckBadgeIcon } from "@heroicons/react/20/solid"
 import { Group, GroupUser } from "../../../helpers/types"
 import { GroupJoinRequestsContainer } from "./GroupJoinRequestsContainer"
 import { GroupSettings } from "./GroupSettings"
-import { Listbox } from "../../../components/listbox/Listbox"
 import { PlayModeSection } from "./PlayModeSection"
 import { SidebarSection } from "./SidebarSection"
 import { TextInput } from "../../../components/input/TextInput"
@@ -26,30 +25,10 @@ interface GroupsSidebarProps {
 export const GroupsSidebar: FC<GroupsSidebarProps> = ({
   searchTerm,
   setSearchTerm,
-  toggledPunishmentTypesOptions,
-  setToggledPunishmentTypesOptions,
-  sortingAlternative,
-  setSortingAlternative,
   groupDataIsLoading = false,
   groupData,
   members = [],
 }) => {
-  const getReadableSortingAlternative = (keyword: GroupMembersSortAlternative) => {
-    switch (keyword) {
-      case "total_value":
-        return "Total straffeverdi"
-      case "total_punishments":
-        return "Antall straffer"
-      default:
-        return "Ukjent"
-    }
-  }
-
-  const listboxOptions = groupMembersSortAlternatives.map((alternative) => ({
-    value: alternative,
-    label: getReadableSortingAlternative(alternative),
-  }))
-
   return (
     <div className="min-h-32 max-w-[90%] md:max-w-none h-fit bg-white ring-1 ring-gray-900/5 rounded-xl flex flex-col gap-y-6 px-4 py-6">
       <div className="-mb-2 flex flex-row justify-between items-center">

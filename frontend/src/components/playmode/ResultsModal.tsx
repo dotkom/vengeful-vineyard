@@ -3,7 +3,6 @@ import { XMarkIcon, CheckIcon, ExclamationTriangleIcon, CheckCircleIcon, GiftIco
 import { Button } from "../button"
 import { PlayerResult, WinnerAssignment } from "../../helpers/context/playModeContext"
 import { GroupUser } from "../../helpers/types"
-import { BetType } from "./BettingModal"
 import { WinnerAssignmentModal } from "./WinnerAssignmentModal"
 import { ModalWrapper } from "./shared"
 import { getNumberColor, getBetLabel, calculateWinnings } from "./utils/rouletteUtils"

@@ -4,7 +4,6 @@ import { RequestToJoinGroupModalProvider } from "../../../helpers/context/modal/
 import { EditGroupModalProvider } from "../../../helpers/context/modal/editGroupModalContext"
 import { AdministerGroupJoinRequestsModalProvider } from "../../../helpers/context/modal/administerGroupJoinRequestsModalContext"
 import { EditGroupMembersModalProvider } from "../../../helpers/context/modal/editGroupMembersModalContext"
-import { ConfirmModalProvider } from "../../../helpers/context/modal/confirmModalContext"
 import { PlayModeProvider } from "../../../helpers/context/playModeContext"
 
 import React from "react"

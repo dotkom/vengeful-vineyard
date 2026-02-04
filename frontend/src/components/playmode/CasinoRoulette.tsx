@@ -13,7 +13,7 @@ import { Group, GroupUser } from "../../helpers/types"
 import { UserIcon, XMarkIcon, EyeIcon } from "@heroicons/react/24/solid"
 import { usePunishmentTypes } from "./hooks"
 import { PlayerSearchDropdown, WheelLayout } from "./shared"
-import { WHEEL_NUMBERS, getNumberColor, getBetLabel, checkWin, generateRouletteGradient } from "./utils/rouletteUtils"
+import { WHEEL_NUMBERS, getBetLabel, checkWin, generateRouletteGradient } from "./utils/rouletteUtils"
 
 interface CasinoRouletteProps {
   members?: GroupUser[]

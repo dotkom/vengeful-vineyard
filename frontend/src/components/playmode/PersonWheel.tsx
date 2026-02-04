@@ -31,7 +31,7 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
   const [selectedPunishmentType, setSelectedPunishmentType] = useState<PunishmentTypeInfo | null>(null)
   const [punishmentAmount, setPunishmentAmount] = useState(1)
 
-  const { punishmentTypes, defaultType } = usePunishmentTypes(groupData)
+  const { punishmentTypes } = usePunishmentTypes(groupData)
 
   useEffect(() => {
     if (punishmentTypes.length > 0 && !selectedPunishmentType) {
