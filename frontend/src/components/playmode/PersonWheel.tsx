@@ -39,7 +39,7 @@ export const PersonWheel = ({ members = [], groupData, onApplyPunishment, fullsc
     }
   }, [punishmentTypes, selectedPunishmentType])
 
-  const availableMembers = members.filter((m) => !wheelMembers.some((p) => p.user_id === m.user_id))
+  const availableMembers = members.filter((m) => m.active && !wheelMembers.some((p) => p.user_id === m.user_id))
 
   const segments: PersonSegment[] = useMemo(() => {
     return wheelMembers.map((member, index) => ({

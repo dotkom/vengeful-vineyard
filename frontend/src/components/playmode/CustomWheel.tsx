@@ -84,7 +84,7 @@ export const CustomWheel = ({
 
   const { punishmentTypes, defaultType } = usePunishmentTypes(groupData)
 
-  const availableMembers = members.filter((m) => !playerQueue.some((p) => p.user_id === m.user_id))
+  const availableMembers = members.filter((m) => m.active && !playerQueue.some((p) => p.user_id === m.user_id))
   const currentPlayer = playerQueue[currentPlayerIndex] || null
 
   const addPlayer = (player: GroupUser) => setPlayerQueue([...playerQueue, player])

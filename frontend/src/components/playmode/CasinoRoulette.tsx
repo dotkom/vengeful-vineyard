@@ -43,7 +43,7 @@ export const CasinoRoulette = ({
   const { punishmentTypes, defaultType } = usePunishmentTypes(groupData)
 
   const availableMembers = members.filter(
-    (member) => !playerEntries.some((entry) => entry.player.user_id === member.user_id)
+    (member) => member.active && !playerEntries.some((entry) => entry.player.user_id === member.user_id)
   )
 
   const startAddPlayer = (player: GroupUser) => {
