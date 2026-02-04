@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect, Dispatch, SetStateAction } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import { XMarkIcon } from "@heroicons/react/24/outline"
+import { XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline"
 import { Button } from "../button"
 import { PunishmentTypeInfo } from "../../helpers/context/playModeContext"
 
@@ -60,6 +60,7 @@ export const BettingModal = ({
   onAmountChange,
 }: BettingModalProps) => {
   const [selectedBet, setSelectedBet] = useState<BetType | null>(currentBet)
+  const [showHowItWorks, setShowHowItWorks] = useState(false)
 
   // Reset selected bet when modal opens with a new currentBet
   useEffect(() => {
@@ -150,6 +151,37 @@ export const BettingModal = ({
                   </button>
                 </div>
 
+                {/* How it works info - collapsible */}
+                <div className="mb-4 rounded-lg bg-indigo-950/50 border border-indigo-800">
+                  <button
+                    type="button"
+                    onClick={() => setShowHowItWorks(!showHowItWorks)}
+                    className="w-full flex items-center justify-between p-3 text-left"
+                  >
+                    <span className="text-sm font-medium text-indigo-300">Hvordan fungerer det?</span>
+                    <ChevronDownIcon className={`h-4 w-4 text-indigo-400 transition-transform ${showHowItWorks ? "rotate-180" : ""}`} />
+                  </button>
+                  {showHowItWorks && (
+                    <div className="px-3 pb-3">
+                      <ul className="text-xs text-indigo-200/80 space-y-1.5">
+                        <li><span className="text-red-400">Taper du:</span> Du får straffen du satset</li>
+                        <li><span className="text-green-400">Vinner du:</span> Du kan gi straff til andre basert på odds!</li>
+                      </ul>
+                      <div className="mt-3 pt-2 border-t border-indigo-800/50">
+                        <p className="text-xs font-medium text-indigo-300 mb-1">Eksempel:</p>
+                        <p className="text-xs text-indigo-200/70">
+                          Du satser 2 shots på <span className="text-red-400">rød (1:1)</span>.
+                          Taper du = 2 shots til deg.
+                          Vinner du = gi 2 shots til en annen!
+                        </p>
+                        <p className="text-xs text-indigo-200/70 mt-1">
+                          Satser du på <span className="text-amber-400">nummer 17 (35:1)</span> med 1 shot og vinner = gi 35 shots til andre!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Punishment Type & Amount Selection */}
                 {onPunishmentTypeChange && onAmountChange && (
                   <div className="mb-4 rounded-lg bg-gray-950/50 p-3 border border-gray-700">
@@ -189,7 +221,7 @@ export const BettingModal = ({
 
                 {/* Number Grid */}
                 <div className="mb-4">
-                  <p className="mb-2 text-sm font-medium text-gray-300">Velg et nummer</p>
+                  <p className="mb-2 text-sm font-medium text-gray-300">Velg et nummer (35:1)</p>
                   <div className="grid grid-cols-10 gap-1">
                     {/* Zero - distinct bright green */}
                     <BetButton
@@ -221,7 +253,7 @@ export const BettingModal = ({
 
                 {/* Outside Bets */}
                 <div className="mb-4">
-                  <p className="mb-2 text-sm font-medium text-gray-300">Eller velg type</p>
+                  <p className="mb-2 text-sm font-medium text-gray-300">Eller velg type (1:1 = vinn like mye som du satset)</p>
                   <div className="grid grid-cols-2 gap-2">
                     <BetButton
                       bet={{ type: "color", value: "red" }}
@@ -258,7 +290,7 @@ export const BettingModal = ({
 
                 {/* Dozens */}
                 <div className="mb-4">
-                  <p className="mb-2 text-sm font-medium text-gray-300">Dusin (2:1 utbetaling)</p>
+                  <p className="mb-2 text-sm font-medium text-gray-300">Dusin (2:1 = vinn dobbelt av innsats)</p>
                   <div className="grid grid-cols-3 gap-2">
                     <BetButton
                       bet={{ type: "dozen", value: 1 }}

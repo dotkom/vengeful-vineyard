@@ -22,11 +22,22 @@ export const PlayModeSection: FC<PlayModeSectionProps> = ({ members = [], groupD
           <span className="text-sm text-gray-600">Prøv lekemodus</span>
           <div className="group">
             <AiFillInfoCircle className="h-4 w-4 text-gray-400 cursor-help" />
-            <div className="absolute z-20 top-6 left-0 hidden group-hover:block w-48">
-              <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-                <p className="text-xs text-gray-500">
-                  Aktiver lekemodus for å generere straffer med flaks!
+            <div className="absolute z-20 top-6 left-0 hidden group-hover:block w-72">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                  Hva er lekemodus?
                 </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  Spinn hjulet for å avgjøre hvem som får straff! Perfekt for sosiale samlinger.
+                </p>
+                <div className="space-y-2 text-xs text-gray-600 dark:text-gray-300">
+                  <div>
+                    <span className="font-medium">Casino:</span> Sats straff på roulette. Taper du, får du straffen. Vinner du, kan du gi straff til andre!
+                  </div>
+                  <div>
+                    <span className="font-medium">Lykkehjul:</span> Spinn for tilfeldig straff eller tilfeldig person.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
