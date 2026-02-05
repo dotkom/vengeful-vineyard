@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
 import { CasinoRoulette } from "./CasinoRoulette"
 import { CustomWheel, WheelSegment, DEFAULT_SEGMENTS } from "./CustomWheel"
 import { PersonWheel } from "./PersonWheel"
@@ -9,6 +8,7 @@ import { Group, GroupUser, PunishmentCreate } from "../../helpers/types"
 import { PlayerResult, PunishmentTypeInfo, WinnerAssignment } from "../../helpers/context/playModeContext"
 import { useNotification } from "../../helpers/context/notificationContext"
 import { usePunishmentTypes } from "./hooks"
+import { postPunishments } from "../../helpers/api"
 
 type WheelMode = "casino" | "custom"
 type WheelOfFortuneMode = "straff" | "person"
@@ -18,8 +18,6 @@ interface RouletteWidgetProps {
   groupData?: Group
   fullscreen?: boolean
 }
-
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
 
 export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: RouletteWidgetProps) => {
   const [mode, setMode] = useState<WheelMode>("casino")
@@ -43,9 +41,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
           amount: loser.entry.amount,
         }
 
-        await axios.post(`${BASE_URL}/groups/${groupData.group_id}/users/${loser.entry.player.user_id}/punishments`, [
-          punishmentData,
-        ])
+        await postPunishments(groupData.group_id, loser.entry.player.user_id, [punishmentData])
       }
 
       // Apply punishments from winner assignments
@@ -57,10 +53,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
           amount: assignment.amount,
         }
 
-        await axios.post(
-          `${BASE_URL}/groups/${groupData.group_id}/users/${assignment.targetPlayer.user_id}/punishments`,
-          [punishmentData]
-        )
+        await postPunishments(groupData.group_id, assignment.targetPlayer.user_id, [punishmentData])
       }
 
       // Invalidate queries to refresh the UI
@@ -118,7 +111,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
         amount,
       }
 
-      await axios.post(`${BASE_URL}/groups/${groupData.group_id}/users/${player.user_id}/punishments`, [punishmentData])
+      await postPunishments(groupData.group_id, player.user_id, [punishmentData])
 
       await queryClient.invalidateQueries({
         queryKey: ["groupLeaderboard", groupData.group_id],
