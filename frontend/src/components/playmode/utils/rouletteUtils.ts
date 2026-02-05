@@ -9,6 +9,13 @@ export const WHEEL_NUMBERS = [
   28, 12, 35, 3, 26,
 ]
 
+// Number of segments on European roulette wheel (0-36)
+export const ROULETTE_SEGMENT_COUNT = WHEEL_NUMBERS.length
+
+// Spin animation constants
+export const MIN_EXTRA_SPINS = 5
+export const MAX_EXTRA_SPINS = 8
+
 // Preset colors for wheel segments
 export const PRESET_COLORS = [
   "#4f46e5",
@@ -103,7 +110,7 @@ export const checkWin = (bet: BetType, resultNum: number): boolean => {
 
 // Generate conic gradient for roulette wheel
 export const generateRouletteGradient = () => {
-  const segmentAngle = 360 / 37
+  const segmentAngle = 360 / ROULETTE_SEGMENT_COUNT
   const stops: string[] = []
 
   WHEEL_NUMBERS.forEach((num, i) => {

@@ -13,7 +13,15 @@ import { Group, GroupUser } from "../../helpers/types"
 import { UserIcon, XMarkIcon, EyeIcon } from "@heroicons/react/24/solid"
 import { usePunishmentTypes } from "./hooks"
 import { PlayerSearchDropdown, WheelLayout } from "./shared"
-import { WHEEL_NUMBERS, getBetLabel, checkWin, generateRouletteGradient } from "./utils/rouletteUtils"
+import {
+  WHEEL_NUMBERS,
+  ROULETTE_SEGMENT_COUNT,
+  MIN_EXTRA_SPINS,
+  MAX_EXTRA_SPINS,
+  getBetLabel,
+  checkWin,
+  generateRouletteGradient,
+} from "./utils/rouletteUtils"
 
 interface CasinoRouletteProps {
   members?: GroupUser[]
@@ -93,14 +101,14 @@ export const CasinoRoulette = ({
     if (isSpinning) return
     setIsSpinning(true)
 
-    const resultIndex = Math.floor(Math.random() * 37)
+    const resultIndex = Math.floor(Math.random() * ROULETTE_SEGMENT_COUNT)
     const resultNum = WHEEL_NUMBERS[resultIndex]
-    const segmentAngle = 360 / 37
+    const segmentAngle = 360 / ROULETTE_SEGMENT_COUNT
     const targetRemainder = (360 - resultIndex * segmentAngle + 360) % 360
     const currentRemainder = ((wheelRotation % 360) + 360) % 360
     let delta = targetRemainder - currentRemainder
     if (delta <= 0) delta += 360
-    const extraSpins = Math.floor(5 + Math.random() * 3)
+    const extraSpins = Math.floor(MIN_EXTRA_SPINS + Math.random() * (MAX_EXTRA_SPINS - MIN_EXTRA_SPINS))
     const newRotation = wheelRotation + delta + extraSpins * 360
 
     setWheelRotation(newRotation)
@@ -152,7 +160,7 @@ export const CasinoRoulette = ({
             }}
           >
             {WHEEL_NUMBERS.map((num, i) => {
-              const segmentAngle = 360 / 37
+              const segmentAngle = 360 / ROULETTE_SEGMENT_COUNT
               const angle = i * segmentAngle
               const radians = ((angle - 90) * Math.PI) / 180
               const x = 50 + 42 * Math.cos(radians)

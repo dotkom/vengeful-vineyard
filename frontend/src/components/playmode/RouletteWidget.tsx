@@ -11,7 +11,7 @@ import { useNotification } from "../../helpers/context/notificationContext"
 import { usePunishmentTypes } from "./hooks"
 
 type WheelMode = "casino" | "custom"
-type LykkehjulMode = "straff" | "person"
+type WheelOfFortuneMode = "straff" | "person"
 
 interface RouletteWidgetProps {
   members?: GroupUser[]
@@ -23,7 +23,7 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
 
 export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: RouletteWidgetProps) => {
   const [mode, setMode] = useState<WheelMode>("casino")
-  const [lykkehjulMode, setLykkehjulMode] = useState<LykkehjulMode>("straff")
+  const [wheelOfFortuneMode, setWheelOfFortuneMode] = useState<WheelOfFortuneMode>("straff")
   const [segments, setSegments] = useState<WheelSegment[]>([])
   const [showEditor, setShowEditor] = useState(false)
   const queryClient = useQueryClient()
@@ -172,12 +172,12 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
     </div>
   )
 
-  const lykkehjulSubModeSwitcher = mode === "custom" && (
+  const wheelOfFortuneSubModeSwitcher = mode === "custom" && (
     <div className={`flex rounded-lg p-0.5 ${fullscreen ? "bg-white/10" : "bg-gray-50 dark:bg-gray-800"}`}>
       <button
-        onClick={() => setLykkehjulMode("straff")}
+        onClick={() => setWheelOfFortuneMode("straff")}
         className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition-all ${
-          lykkehjulMode === "straff"
+          wheelOfFortuneMode === "straff"
             ? fullscreen
               ? "bg-white/20 text-white"
               : "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
@@ -189,9 +189,9 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
         Straffe hjul
       </button>
       <button
-        onClick={() => setLykkehjulMode("person")}
+        onClick={() => setWheelOfFortuneMode("person")}
         className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition-all ${
-          lykkehjulMode === "person"
+          wheelOfFortuneMode === "person"
             ? fullscreen
               ? "bg-white/20 text-white"
               : "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
@@ -213,7 +213,7 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
         onApplyPunishments={handleApplyPunishments}
         fullscreen={fullscreen}
       />
-    ) : lykkehjulMode === "straff" ? (
+    ) : wheelOfFortuneMode === "straff" ? (
       <CustomWheel
         segments={segments.length > 0 ? segments : undefined}
         onEditSegments={() => setShowEditor(true)}
@@ -240,14 +240,14 @@ export const RouletteWidget = ({ members = [], groupData, fullscreen = false }: 
           <div className="h-full flex flex-col">
             <div className="flex gap-4 mb-4">
               {modeSwitcher}
-              {lykkehjulSubModeSwitcher}
+              {wheelOfFortuneSubModeSwitcher}
             </div>
             <div className="flex-1">{wheelContent}</div>
           </div>
         ) : (
           <>
             {modeSwitcher}
-            {lykkehjulSubModeSwitcher}
+            {wheelOfFortuneSubModeSwitcher}
             {wheelContent}
           </>
         )}

@@ -62,26 +62,26 @@ export const ModalWrapper = ({
               <Dialog.Panel
                 className={`relative w-full ${maxWidthClasses[maxWidth]} transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl transition-all ${panelClassName}`}
               >
-                {header ? (
-                  header
-                ) : title ? (
-                  <div className={`flex items-center justify-between p-6 pb-0 ${headerClassName}`}>
-                    <div>
-                      <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {title}
-                      </Dialog.Title>
-                      {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
-                    </div>
-                    {showCloseButton && (
-                      <button
-                        onClick={onClose}
-                        className="rounded-full p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
-                      >
-                        <XMarkIcon className="h-5 w-5" />
-                      </button>
+                {header
+                  ? header
+                  : title && (
+                      <div className={`flex items-center justify-between p-6 pb-0 ${headerClassName}`}>
+                        <div>
+                          <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            {title}
+                          </Dialog.Title>
+                          {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
+                        </div>
+                        {showCloseButton && (
+                          <button
+                            onClick={onClose}
+                            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
+                          >
+                            <XMarkIcon className="h-5 w-5" />
+                          </button>
+                        )}
+                      </div>
                     )}
-                  </div>
-                ) : null}
                 {children}
               </Dialog.Panel>
             </Transition.Child>
