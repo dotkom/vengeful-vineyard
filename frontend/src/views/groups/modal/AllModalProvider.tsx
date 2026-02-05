@@ -4,22 +4,24 @@ import { RequestToJoinGroupModalProvider } from "../../../helpers/context/modal/
 import { EditGroupModalProvider } from "../../../helpers/context/modal/editGroupModalContext"
 import { AdministerGroupJoinRequestsModalProvider } from "../../../helpers/context/modal/administerGroupJoinRequestsModalContext"
 import { EditGroupMembersModalProvider } from "../../../helpers/context/modal/editGroupMembersModalContext"
-import { ConfirmModalProvider } from "../../../helpers/context/modal/confirmModalContext"
+import { PlayModeProvider } from "../../../helpers/context/playModeContext"
 
 import React from "react"
 
 export default function ModalProvider({ children }: { children: React.ReactNode }) {
   return (
-    <GivePunishmentModalProvider>
-      <CreateGroupModalProvider>
-        <RequestToJoinGroupModalProvider>
-          <EditGroupModalProvider>
-            <EditGroupMembersModalProvider>
-              <AdministerGroupJoinRequestsModalProvider>{children}</AdministerGroupJoinRequestsModalProvider>
-            </EditGroupMembersModalProvider>
-          </EditGroupModalProvider>
-        </RequestToJoinGroupModalProvider>
-      </CreateGroupModalProvider>
-    </GivePunishmentModalProvider>
+    <PlayModeProvider>
+      <GivePunishmentModalProvider>
+        <CreateGroupModalProvider>
+          <RequestToJoinGroupModalProvider>
+            <EditGroupModalProvider>
+              <EditGroupMembersModalProvider>
+                <AdministerGroupJoinRequestsModalProvider>{children}</AdministerGroupJoinRequestsModalProvider>
+              </EditGroupMembersModalProvider>
+            </EditGroupModalProvider>
+          </RequestToJoinGroupModalProvider>
+        </CreateGroupModalProvider>
+      </GivePunishmentModalProvider>
+    </PlayModeProvider>
   )
 }

@@ -571,6 +571,9 @@ export const patchGroupMemberPermissionsMutation = (
 const addManyPunishments = async (groupId: string, userId: string, punishments: PunishmentCreate[]) =>
   (await axios.post(getAddPunishmentUrl(groupId, userId), punishments)).data
 
+export const postPunishments = async (groupId: string, userId: string, punishments: PunishmentCreate[]) =>
+  axios.post(getAddPunishmentUrl(groupId, userId), punishments)
+
 export const addManyPunishmentsMutation = (punishments: PunishmentCreate[], groupId?: string, userId?: string) => {
   const { setNotification } = useNotification()
   const queryClient = useQueryClient()

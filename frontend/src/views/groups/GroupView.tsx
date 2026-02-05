@@ -67,7 +67,7 @@ export const GroupView = () => {
 
   const { data: user, refetch: myGroupsRefetch, isLoading: userIsLoading, error } = useQuery(userQuery())
 
-  const isLocalhost = window.location.hostname === 'localhost'
+  const isLocalhost = window.location.hostname === "localhost"
 
   useEffect(() => {
     setMyGroupsRefetch(() => myGroupsRefetch as any)
@@ -139,7 +139,8 @@ export const GroupView = () => {
       sortingAlternative={sortingAlternative}
       setSortingAlternative={setSortingAlternative}
       groupDataIsLoading={isLoading}
-      groupData={selectedGroup}
+      groupData={data}
+      members={data?.members}
     />
   )
 

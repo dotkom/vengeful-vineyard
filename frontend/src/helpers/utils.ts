@@ -16,10 +16,10 @@ export function areObjectsEqual(obj1: Record<string, any>, obj2: Record<string, 
 }
 
 export function generatePseudoRandomString(length: number): string {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   return Array.from({ length })
     .map(() => characters.charAt(Math.floor(Math.random() * characters.length)))
-    .join("");
+    .join("")
 }
 
 export async function copyToClipboard(text: string) {

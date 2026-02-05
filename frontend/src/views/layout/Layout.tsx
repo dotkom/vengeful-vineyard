@@ -6,7 +6,6 @@ import { Nav } from "../../components/nav"
 import { Notification } from "../../components/notification"
 import { Spinner } from "../../components/spinner"
 import { CurrentUserProvider } from "../../helpers/context/currentUserContext"
-import { ConfirmModalProvider } from "../../helpers/context/modal/confirmModalContext"
 import { NotificationProvider } from "../../helpers/context/notificationContext"
 import { DarkModeProvider } from "../../DarkModeContext"
 import React, { useEffect } from "react"
@@ -33,7 +32,9 @@ const LayoutFields = () => {
       return <div>Signing you out...</div>
   }
 
-  useEffect(() => { setTimeout(() => checkSigninRedirect(navigate), 100) }, [])
+  useEffect(() => {
+    setTimeout(() => checkSigninRedirect(navigate), 100)
+  }, [])
 
   if (auth.isLoading) {
     return (

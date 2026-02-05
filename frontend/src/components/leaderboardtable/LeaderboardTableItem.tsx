@@ -16,10 +16,9 @@ interface TableItemProps {
   i?: number
 }
 
-export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, dataRefetch, i }: TableItemProps) => {
+export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, i }: TableItemProps) => {
   const displayName = `${leaderboardUser.first_name} ${leaderboardUser.last_name}`
   const { total_value: totalValue, emojis } = leaderboardUser
-
 
   const {
     data: punishments,
