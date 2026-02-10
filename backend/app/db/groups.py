@@ -162,9 +162,9 @@ class Groups:
                 **group,
                 members=members,
                 roles=OW_GROUP_ROLES if is_ow_group else ROLES,  # type: ignore
-                permissions=OW_GROUP_PERMISSIONS_AS_DICT
-                if is_ow_group
-                else PERMISSIONS_AS_DICT,
+                permissions=(
+                    OW_GROUP_PERMISSIONS_AS_DICT if is_ow_group else PERMISSIONS_AS_DICT
+                ),
             )
 
     async def get_public_group_profile(
@@ -181,12 +181,18 @@ class Groups:
                 raise NotFound
 
             if user_id is not None:
-                query = "SELECT 1 FROM group_members WHERE group_id = $1 AND user_id = $2"
+                query = (
+                    "SELECT 1 FROM group_members WHERE group_id = $1 AND user_id = $2"
+                )
                 is_member = bool(await conn.fetchval(query, group["group_id"], user_id))
             else:
                 is_member = False
 
-            return GroupPublic(**group, is_official=group["ow_group_id"] is not None, is_member=is_member)
+            return GroupPublic(
+                **group,
+                is_official=group["ow_group_id"] is not None,
+                is_member=is_member,
+            )
 
     async def get_total_punishment_value(
         self,
@@ -315,9 +321,9 @@ class Groups:
         conn: Optional[Pool] = None,
     ) -> list[GroupMember]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_at)
+            query = """INSERT INTO group_members(group_id, user_id, ow_group_user_id, added_at, inactive_at)
                     (SELECT
-                        m.group_id, m.user_id, m.ow_group_user_id, m.added_at
+                        m.group_id, m.user_id, m.ow_group_user_id, m.added_at, m.inactive_at
                     FROM
                         unnest($1::group_members[]) as m
                     )
@@ -334,12 +340,13 @@ class Groups:
                         x.ow_group_user_id,
                         True,
                         datetime.datetime.utcnow(),
+                        None,
                     )
                     for x in members
                 ],
             )
             return [GroupMember(**row) for row in res]
-    
+
     async def update_invite_code(
         self,
         group_id: GroupId,
