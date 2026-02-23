@@ -53,7 +53,7 @@ const ViewTabs = ({ view, setView, className }: ViewTabsProps) => {
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
             <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Gambling-oversikten</p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              Her ser du kun straffer fra Roulette og Lykkehjulet. Hvilken komité tør å satse mest?
+              Her ser du kun straffer fra Roulette og Lykkehjulet. Hvilken komité tørr å satse mest?
             </p>
             <div className="space-y-2 text-xs text-gray-600 dark:text-gray-300">
               <div>
