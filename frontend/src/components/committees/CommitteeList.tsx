@@ -6,11 +6,15 @@ import { committeesQuery } from "../../helpers/api"
 import { useQuery } from "@tanstack/react-query"
 import { SkeletonCommitteeCard } from "./SkeletonCommitteeCard"
 
-export const CommitteeList = () => {
+interface CommitteeListProps {
+  gamblingOnly?: boolean
+}
+
+export const CommitteeList = ({ gamblingOnly = false }: CommitteeListProps) => {
   const auth = useAuth()
 
   const { data: groupsStatistics, isLoading } = useQuery({
-    ...committeesQuery(),
+    ...committeesQuery(gamblingOnly),
     enabled: auth.isAuthenticated,
   })
 

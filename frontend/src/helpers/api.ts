@@ -696,12 +696,14 @@ export const userQuery = (): UseQueryOptions<MeUser, unknown, MeUser> => {
   }
 }
 
-export const committeesQuery = () => ({
-  queryKey: ["committeesData"],
+export const committeesQuery = (gamblingOnly = false) => ({
+  queryKey: ["committeesData", gamblingOnly.toString()],
   queryFn: () =>
-    axios.get(GROUP_STATISTICS_URL).then((res: AxiosResponse<GroupStatistics[]>) => {
-      return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
-    }),
+    axios
+      .get(GROUP_STATISTICS_URL, { params: gamblingOnly ? { gambling_only: true } : {} })
+      .then((res: AxiosResponse<GroupStatistics[]>) => {
+        return z.array(GroupStatisticsSchema).parse(Array.isArray(res.data) ? res.data : [res.data])
+      }),
   staletime: 1000 * 60,
 })
 

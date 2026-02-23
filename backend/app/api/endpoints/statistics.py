@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from app.api import APIRoute, Request
 
 router = APIRouter(
@@ -9,7 +9,8 @@ router = APIRouter(
 
 @router.get("/groups")
 async def get_group_statistics(
-    request: Request
+    request: Request,
+    gambling_only: bool = Query(False),
 ):
     access_token = request.raise_if_missing_authorization()
 
@@ -23,7 +24,7 @@ async def get_group_statistics(
                 status_code=403, detail="Du har ikke tilgang til denne ressursen"
             )
 
-        return await app.db.statistics.get_all_group_statistics(conn=conn)
+        return await app.db.statistics.get_all_group_statistics(gambling_only=gambling_only, conn=conn)
 
 @router.get("/groups/{group_id}")
 async def get_group_statistics(
