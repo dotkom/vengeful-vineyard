@@ -9,10 +9,14 @@ class Statistics:
         self.db = db
 
     async def get_all_group_statistics(
-        self, conn: Optional[Pool] = None
+        self, gambling_only: bool = False, conn: Optional[Pool] = None
     ) -> dict[str, int]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """
+            gambling_filter = ""
+            if gambling_only:
+                gambling_filter = "AND (gp.reason LIKE 'Roulette%' OR gp.reason LIKE 'Lykkehjul%')"
+
+            query = f"""
            SELECT
                 COALESCE(SUM(gp.amount * pt.value), 0) AS total_value,
                 COALESCE(SUM(CASE WHEN EXTRACT(YEAR FROM gp.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
@@ -26,7 +30,7 @@ class Statistics:
                 g.image AS group_image
             FROM
                 groups g
-                LEFT JOIN group_punishments gp ON g.group_id = gp.group_id
+                LEFT JOIN group_punishments gp ON g.group_id = gp.group_id {gambling_filter}
                 LEFT JOIN punishment_types pt ON gp.punishment_type_id = pt.punishment_type_id
             WHERE g.ow_group_id IS NOT NULL or special
             GROUP BY g.group_id, g.name, g.name_short, g.image
