@@ -58,7 +58,7 @@ docs:
 	poetry run pdoc3 --html --force .
 
 docker-build:
-	docker build -f Dockerfile --platform linux/amd64 -t vengeful-vineyard-server:latest .
+	docker build -f Dockerfile --platform linux/arm64 -t vengeful-vineyard-server:latest .
 
 docker-push-prod:
 	docker tag vengeful-vineyard-server:latest 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard/prod/server:latest && docker push 891459268445.dkr.ecr.eu-north-1.amazonaws.com/vengeful-vineyard/prod/server:latest
