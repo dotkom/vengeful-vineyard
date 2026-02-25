@@ -383,12 +383,27 @@ class Users:
     async def get_minified_leaderboard(
         self,
         this_year: bool,
+        year: Optional[int],
         offset: int,
         limit: int,
         conn: Optional[Pool] = None,
     ) -> list[MinifiedLeaderboardUser]:
+        from datetime import date
+
+        if year is not None:
+            year_start = date(year, 1, 1)
+            year_end = date(year + 1, 1, 1)
+        else:
+            year_start = None
+            year_end = None
+
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """
+            if year is not None:
+                year_filter = "p.created_at >= $3 AND p.created_at < $4"
+            else:
+                year_filter = "p.created_at >= DATE_TRUNC('year', CURRENT_DATE)"
+
+            query = f"""
             SELECT
                 DISTINCT u.user_id,
                 u.first_name,
@@ -411,10 +426,10 @@ class Users:
                     STRING_AGG(REPEAT(pt.emoji, p.amount), '') AS emojis,
                     SUM(p.amount) AS amount_punishments,
                     COUNT(DISTINCT p.punishment_type_id) AS amount_unique_punishments,
-                    SUM(CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN pt.value * p.amount ELSE 0 END) AS total_value_this_year,
-                    STRING_AGG(CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN REPEAT(pt.emoji, p.amount) ELSE '' END, '') AS emojis_this_year,
-                    SUM(CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN p.amount ELSE 0 END) AS amount_punishments_this_year,
-                    COUNT(DISTINCT CASE WHEN p.created_at >= DATE_TRUNC('year', CURRENT_DATE) THEN p.punishment_type_id ELSE NULL END) AS amount_unique_punishments_this_year
+                    SUM(CASE WHEN {year_filter} THEN pt.value * p.amount ELSE 0 END) AS total_value_this_year,
+                    STRING_AGG(CASE WHEN {year_filter} THEN REPEAT(pt.emoji, p.amount) ELSE '' END, '') AS emojis_this_year,
+                    SUM(CASE WHEN {year_filter} THEN p.amount ELSE 0 END) AS amount_punishments_this_year,
+                    COUNT(DISTINCT CASE WHEN {year_filter} THEN p.punishment_type_id ELSE NULL END) AS amount_unique_punishments_this_year
                 FROM group_punishments p
                 LEFT JOIN punishment_types pt
                     ON pt.punishment_type_id = p.punishment_type_id
@@ -430,17 +445,17 @@ class Users:
             WHERE g.ow_group_id IS NOT NULL OR g.special
             """
 
-            if this_year:
+            if this_year or year is not None:
                 query += "ORDER BY total_value_this_year DESC, u.first_name ASC "
             else:
                 query += "ORDER BY total_value DESC, u.first_name ASC "
             query += "OFFSET $1 LIMIT $2"
 
-            res = await conn.fetch(
-                query,
-                offset,
-                limit,
-            )
+            params: list = [offset, limit]
+            if year is not None:
+                params.extend([year_start, year_end])
+
+            res = await conn.fetch(query, *params)
 
         return [MinifiedLeaderboardUser(**r) for r in res]
 

@@ -3,6 +3,7 @@ User endpoints
 """
 
 from functools import partial
+from typing import Optional
 from app.models.punishment import LeaderboardPunishmentRead
 from fastapi import APIRouter, Depends, HTTPException, Query
 
@@ -72,6 +73,7 @@ async def get_leadeboard(
     page: int = Query(title="Page number", default=0, ge=0),
     page_size: int = Query(title="Page size", default=30, ge=1, le=50),
     this_year: bool = Query(title="Only show users from this year", default=True),
+    year: Optional[int] = Query(title="Specific year to filter by", default=None, ge=2000, le=2100),
 ) -> Page[MinifiedLeaderboardUser]:
     access_token = request.raise_if_missing_authorization()
 
@@ -88,8 +90,7 @@ async def get_leadeboard(
         pagination = Pagination[MinifiedLeaderboardUser](
             request=request,
             total_coro=app.db.users.get_leaderboard_count,
-            # results_coro=app.db.users.get_leaderboard,
-            results_coro=partial(app.db.users.get_minified_leaderboard, this_year),
+            results_coro=partial(app.db.users.get_minified_leaderboard, this_year, year),
             page=page,
             page_size=page_size,
         )
