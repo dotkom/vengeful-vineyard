@@ -1095,16 +1095,14 @@ async def post_mark_all_punishments_as_paid_for_user(
                 status_code=404, detail="Gruppen ble ikke funnet"
             ) from exc
 
-        requester_is_group_member = False
-        user_is_group_member = False
-        for member in group.members:
-            if member.user_id == requester_user_id:
-                requester_is_group_member = True
-            if member.user_id == user_id:
-                user_is_group_member = True
-
-            if requester_is_group_member and user_is_group_member:
-                break
+        requester_is_group_member = any(
+            m.user_id == requester_user_id and m.active for m in group.members
+        )
+        user_has_punishments = any(
+            m.user_id == user_id for m in group.members
+        ) or any(
+            m.user_id == user_id for m in group.former_members
+        )
 
         if not requester_is_group_member:
             raise HTTPException(
@@ -1112,10 +1110,10 @@ async def post_mark_all_punishments_as_paid_for_user(
                 detail="Du må være et medlem av gruppen for å utføre denne handlingen",
             )
 
-        if not user_is_group_member:
+        if not user_has_punishments:
             raise HTTPException(
                 status_code=400,
-                detail="Brukeren er ikke et medlem av gruppen",
+                detail="Brukeren ble ikke funnet i gruppen",
             )
 
         is_ow_group = group.ow_group_id is not None

@@ -84,6 +84,7 @@ export type PublicGroup = z.infer<typeof PublicGroupSchema>
 export const GroupSchema = GroupBaseSchema.extend({
   punishment_types: z.record(z.string(), PunishmentTypeSchema),
   members: z.array(GroupUserSchema),
+  former_members: z.array(GroupUserSchema).optional().default([]),
   join_requests: z.array(UserSchema),
   roles: z.array(z.tuple([z.string(), z.string()])),
   permissions: z.record(z.array(z.string())),

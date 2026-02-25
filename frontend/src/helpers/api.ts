@@ -40,7 +40,11 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
 
 const LEADERBOARD_URL = BASE_URL + "/users/leaderboard"
 
-const getLeaderboardUrl = (page: number, this_year: boolean) => `${LEADERBOARD_URL}?page=${page}&this_year=${this_year}`
+const getLeaderboardUrl = (page: number, this_year: boolean, year?: number) => {
+  let url = `${LEADERBOARD_URL}?page=${page}&this_year=${this_year}`
+  if (year !== undefined) url += `&year=${year}`
+  return url
+}
 
 const getPunishmentsLogUrl = (page: number) => `${BASE_URL}/punishments/log?page=${page}`
 
@@ -707,14 +711,15 @@ export const committeesQuery = (gamblingOnly = false) => ({
   staletime: 1000 * 60,
 })
 
-const getLeaderboard = async ({ pageParam = 0, this_year = true }) =>
-  LeaderboardSchema.parse(await axios.get(getLeaderboardUrl(pageParam, this_year)).then((res) => res.data))
+const getLeaderboard = async ({ pageParam = 0, this_year = true, year }: { pageParam?: number; this_year?: boolean; year?: number }) =>
+  LeaderboardSchema.parse(await axios.get(getLeaderboardUrl(pageParam, this_year, year)).then((res) => res.data))
 
 export const leaderboardQuery = (
-  this_year = true
+  this_year = true,
+  year?: number,
 ): UseInfiniteQueryOptions<Leaderboard, unknown, Leaderboard, Leaderboard, string[]> => ({
-  queryKey: ["leaderboard", this_year.toString()],
-  queryFn: ({ pageParam = 0 }) => getLeaderboard({ pageParam, this_year }),
+  queryKey: ["leaderboard", this_year.toString(), year?.toString() ?? ""],
+  queryFn: ({ pageParam = 0 }) => getLeaderboard({ pageParam, this_year, year }),
   getNextPageParam: (lastPage: Leaderboard) => {
     const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
     return nextPage ? Number(nextPage) : undefined
