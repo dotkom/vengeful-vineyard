@@ -55,6 +55,7 @@ class Group(GroupCreate):
     group_id: GroupId
     punishment_types: dict[str, PunishmentTypeRead] = {}
     members: list[GroupUser] = []
+    former_members: list[GroupUser] = []
     join_requests: list[User] = []
     roles: list[tuple[str, PermissionPrivilege]] = []
     permissions: dict[PermissionPrivilege, list[PermissionPrivilege]] = {}

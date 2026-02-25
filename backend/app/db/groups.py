@@ -158,9 +158,17 @@ class Groups:
 
             is_ow_group = group["ow_group_id"] is not None
 
+            former_members = []
+            if is_ow_group and include_members:
+                former_members = await self.db.group_users.get_former_members(
+                    group_id,
+                    conn=conn,
+                )
+
             return Group(
                 **group,
                 members=members,
+                former_members=former_members,
                 roles=OW_GROUP_ROLES if is_ow_group else ROLES,  # type: ignore
                 permissions=(
                     OW_GROUP_PERMISSIONS_AS_DICT if is_ow_group else PERMISSIONS_AS_DICT

@@ -125,3 +125,73 @@ class GroupUsers:
                 GroupUser(**db_group_user, group_id=group_id)
                 for db_group_user in db_group_users
             ]
+
+    async def get_former_members(
+        self,
+        group_id: GroupId,
+        conn: Optional[Pool] = None,
+    ) -> list[GroupUser]:
+        """Get users who have punishments in this group but are not in group_members."""
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """
+                WITH punishments_with_reactions AS (
+                    SELECT
+                        gp.*,
+                        COALESCE(NULLIF(u.first_name, ''), email) || ' ' || u.last_name as created_by_name,
+                        COALESCE(json_agg(json_build_object(
+                            'punishment_reaction_id', pr.punishment_reaction_id,
+                            'punishment_id', pr.punishment_id,
+                            'emoji', pr.emoji,
+                            'created_at', pr.created_at,
+                            'created_by', pr.created_by,
+                            'created_by_name', (SELECT COALESCE(NULLIF(first_name, ''), email) || ' ' || last_name FROM users WHERE user_id = pr.created_by)
+                        )) FILTER (WHERE pr.punishment_reaction_id IS NOT NULL), '[]') as reactions
+                    FROM group_punishments gp
+                    LEFT JOIN punishment_reactions pr
+                    ON pr.punishment_id = gp.punishment_id
+                    LEFT JOIN users u
+                    ON u.user_id = gp.created_by
+                    GROUP BY gp.punishment_id, created_by_name
+                )
+                SELECT
+                       false as active,
+                       null as ow_group_user_id,
+                       null as inactive_at,
+                       u.*,
+                       COALESCE(json_agg(json_build_object(
+                            'punishment_id', pwr.punishment_id,
+                            'group_id', pwr.group_id,
+                            'user_id', pwr.user_id,
+                            'punishment_type_id', pwr.punishment_type_id,
+                            'reason', pwr.reason,
+                            'reason_hidden', pwr.reason_hidden,
+                            'amount', pwr.amount,
+                            'created_at', pwr.created_at,
+                            'created_by', pwr.created_by,
+                            'created_by_name', pwr.created_by_name,
+                            'paid', pwr.paid,
+                            'paid_at', pwr.paid_at,
+                            'marked_paid_by', pwr.marked_paid_by,
+                            'reactions', pwr.reactions
+                       )) FILTER (WHERE pwr.punishment_id IS NOT NULL), '[]') as punishments,
+                       '[]'::json as permissions
+                FROM (
+                    SELECT DISTINCT user_id
+                    FROM group_punishments
+                    WHERE group_id = $1
+                    AND user_id NOT IN (
+                        SELECT user_id FROM group_members WHERE group_id = $1
+                    )
+                ) punished_users
+                JOIN users u ON u.user_id = punished_users.user_id
+                LEFT JOIN punishments_with_reactions pwr
+                    ON u.user_id = pwr.user_id AND pwr.group_id = $1
+                GROUP BY u.user_id
+                """
+
+            db_group_users = await conn.fetch(query, group_id)
+
+            return [
+                GroupUser(**db_group_user, group_id=group_id)
+                for db_group_user in db_group_users
+            ]

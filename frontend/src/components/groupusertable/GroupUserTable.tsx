@@ -18,9 +18,14 @@ interface TableProps {
   ) => Promise<QueryObserverResult<any, any>>
 }
 
+const getLatestPunishmentDate = (user: GroupUser): number => {
+  if (user.punishments.length === 0) return 0
+  return Math.max(...user.punishments.map((p) => new Date(p.created_at).getTime()))
+}
+
 const sortInactiveByYear = (a: GroupUser, b: GroupUser): number => {
-  const aYear = a.inactive_at ? new Date(a.inactive_at).getTime() : 0
-  const bYear = b.inactive_at ? new Date(b.inactive_at).getTime() : 0
+  const aYear = a.inactive_at ? new Date(a.inactive_at).getTime() : getLatestPunishmentDate(a)
+  const bYear = b.inactive_at ? new Date(b.inactive_at).getTime() : getLatestPunishmentDate(b)
   return bYear - aYear // Most recent first
 }
 
@@ -39,7 +44,10 @@ export const GroupUserTable = ({
   }
 
   const activeMembers = groupData?.members.filter((user) => user.active) ?? []
-  const inactiveMembers = groupData?.members.filter((user) => !user.active) ?? []
+  const inactiveMembers = [
+    ...(groupData?.members.filter((user) => !user.active) ?? []),
+    ...(groupData?.former_members ?? []),
+  ]
   const isOwGroup = !!groupData?.ow_group_id
 
   return (
