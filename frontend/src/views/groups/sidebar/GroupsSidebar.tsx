@@ -61,7 +61,7 @@ export const GroupsSidebar: FC<GroupsSidebarProps> = ({
                 )}
               </h1>
               {groupData && (
-                <span className="text-sm font-normal text-gray-900 dark:text-gray-200 ml-auto">
+                <span className="text-sm font-normal text-gray-900 dark:text-gray-200 ml-auto mr-2">
                   {totalUnpaid} kr
                 </span>
               )}
