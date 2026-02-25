@@ -13,6 +13,7 @@ const START_YEAR = 2019
 export const WallOfShame = () => {
   const { setCurrentUser } = useCurrentUser()
   const [filter, setFilter] = useState<Filter>({ type: "year", year: currentYear })
+  const [activeOnly, setActiveOnly] = useState(false)
 
   useQuery({
     ...userQuery(),
@@ -27,13 +28,19 @@ export const WallOfShame = () => {
   const selectedYear = isYearFilter ? filter.year : undefined
   const isCurrentYear = isYearFilter && filter.year === currentYear
 
+  const effectiveActiveOnly = isYearFilter ? false : activeOnly
+
   const { isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(
-    leaderboardQuery(isYearFilter, isCurrentYear ? undefined : selectedYear)
+    leaderboardQuery(isYearFilter, isCurrentYear ? undefined : selectedYear, effectiveActiveOnly)
   )
 
   useEffect(() => {
+    setActiveOnly(false)
+  }, [filter])
+
+  useEffect(() => {
     refetch()
-  }, [filter, refetch])
+  }, [filter, effectiveActiveOnly, refetch])
 
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)
 
@@ -58,6 +65,12 @@ export const WallOfShame = () => {
           <h1 className="text-center md:text-3xl font-medium text-black">Wall of Shame</h1>
           <FilterTabs filter={filter} setFilter={setFilter} className="md:hidden mt-2" />
         </div>
+        {!isYearFilter && (
+          <>
+            <MembershipTabs activeOnly={activeOnly} setActiveOnly={setActiveOnly} className="hidden md:flex" />
+            <MembershipTabs activeOnly={activeOnly} setActiveOnly={setActiveOnly} className="md:hidden mt-2" />
+          </>
+        )}
       </div>
 
       <LeaderboardTable leaderboardUsers={filteredLeaderboardUsers} isFetching={isFetching} dataRefetch={refetch} />
@@ -143,6 +156,35 @@ const FilterTabs = ({ filter, setFilter, className }: FilterTabsProps) => {
         }`}
       >
         All time
+      </button>
+    </div>
+  )
+}
+
+interface MembershipTabsProps {
+  activeOnly: boolean
+  setActiveOnly: React.Dispatch<React.SetStateAction<boolean>>
+  className?: string
+}
+
+const MembershipTabs = ({ activeOnly, setActiveOnly, className }: MembershipTabsProps) => {
+  return (
+    <div className={`absolute right-0 flex space-x-2 text-sm ${className}`}>
+      <button
+        onClick={() => setActiveOnly(true)}
+        className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400 ${
+          activeOnly ? "bg-slate-100 dark:bg-slate-800" : ""
+        }`}
+      >
+        Aktive
+      </button>
+      <button
+        onClick={() => setActiveOnly(false)}
+        className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400 ${
+          !activeOnly ? "bg-slate-100 dark:bg-slate-800" : ""
+        }`}
+      >
+        Alle
       </button>
     </div>
   )

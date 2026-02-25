@@ -74,6 +74,7 @@ async def get_leadeboard(
     page_size: int = Query(title="Page size", default=30, ge=1, le=50),
     this_year: bool = Query(title="Only show users from this year", default=True),
     year: Optional[int] = Query(title="Specific year to filter by", default=None, ge=2000, le=2100),
+    active_only: bool = Query(title="Only show users with active memberships", default=True),
 ) -> Page[MinifiedLeaderboardUser]:
     access_token = request.raise_if_missing_authorization()
 
@@ -89,8 +90,8 @@ async def get_leadeboard(
 
         pagination = Pagination[MinifiedLeaderboardUser](
             request=request,
-            total_coro=app.db.users.get_leaderboard_count,
-            results_coro=partial(app.db.users.get_minified_leaderboard, this_year, year),
+            total_coro=partial(app.db.users.get_leaderboard_count, active_only),
+            results_coro=partial(app.db.users.get_minified_leaderboard, this_year, year, active_only),
             page=page,
             page_size=page_size,
         )
