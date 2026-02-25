@@ -40,7 +40,7 @@ export const WallOfShame = () => {
 
   useEffect(() => {
     refetch()
-  }, [filter, activeOnly, refetch])
+  }, [filter, effectiveActiveOnly, refetch])
 
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)
 
