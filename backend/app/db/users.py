@@ -34,19 +34,33 @@ class Users:
 
     async def get_leaderboard_count(
         self,
+        active_only: bool = True,
         conn: Optional[Pool] = None,
     ) -> int:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            res = await conn.fetchval(
-                """SELECT
-                        count(DISTINCT(user_id))
-                    FROM
-                        group_members
-                        INNER JOIN GROUPS ON group_members.group_id = groups.group_id
-                    WHERE
-                        groups.ow_group_id IS NOT NULL OR groups.special;
-                """,
-            )
+            if active_only:
+                res = await conn.fetchval(
+                    """SELECT
+                            count(DISTINCT(user_id))
+                        FROM
+                            group_members
+                            INNER JOIN groups ON group_members.group_id = groups.group_id
+                        WHERE
+                            (groups.ow_group_id IS NOT NULL OR groups.special)
+                            AND group_members.active = TRUE;
+                    """,
+                )
+            else:
+                res = await conn.fetchval(
+                    """SELECT
+                            count(DISTINCT(gp.user_id))
+                        FROM
+                            group_punishments gp
+                            INNER JOIN groups ON gp.group_id = groups.group_id
+                        WHERE
+                            groups.ow_group_id IS NOT NULL;
+                    """,
+                )
             assert isinstance(res, int)
             return res
 
@@ -384,6 +398,7 @@ class Users:
         self,
         this_year: bool,
         year: Optional[int],
+        active_only: bool,
         offset: int,
         limit: int,
         conn: Optional[Pool] = None,
@@ -403,23 +418,7 @@ class Users:
             else:
                 year_filter = "p.created_at >= DATE_TRUNC('year', CURRENT_DATE)"
 
-            query = f"""
-            SELECT
-                DISTINCT u.user_id,
-                u.first_name,
-                u.last_name,
-                u.email,
-                u.ow_user_id,
-                COALESCE(p.total_value, 0) AS total_value,
-                COALESCE(p.emojis, '') AS emojis,
-                COALESCE(p.amount_punishments, 0) AS amount_punishments,
-                COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments,
-                COALESCE(p.total_value_this_year, 0) AS total_value_this_year,
-                COALESCE(p.emojis_this_year, '') AS emojis_this_year,
-                COALESCE(p.amount_punishments_this_year, 0) AS amount_punishments_this_year,
-                COALESCE(p.amount_unique_punishments_this_year, 0) AS amount_unique_punishments_this_year
-            FROM users u
-            LEFT JOIN (
+            punishment_subquery = f"""
                 SELECT
                     p.user_id,
                     SUM(pt.value * p.amount) AS total_value,
@@ -437,13 +436,58 @@ class Users:
                     ON g.group_id = p.group_id
                 WHERE g.ow_group_id IS NOT NULL
                 GROUP BY p.user_id
-            ) p ON p.user_id = u.user_id
-            LEFT JOIN group_members gm
-                ON gm.user_id = u.user_id
-            LEFT JOIN groups g
-                ON g.group_id = gm.group_id
-            WHERE g.ow_group_id IS NOT NULL OR g.special
             """
+
+            if active_only:
+                query = f"""
+                SELECT
+                    DISTINCT u.user_id,
+                    u.first_name,
+                    u.last_name,
+                    u.email,
+                    u.ow_user_id,
+                    COALESCE(p.total_value, 0) AS total_value,
+                    COALESCE(p.emojis, '') AS emojis,
+                    COALESCE(p.amount_punishments, 0) AS amount_punishments,
+                    COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments,
+                    COALESCE(p.total_value_this_year, 0) AS total_value_this_year,
+                    COALESCE(p.emojis_this_year, '') AS emojis_this_year,
+                    COALESCE(p.amount_punishments_this_year, 0) AS amount_punishments_this_year,
+                    COALESCE(p.amount_unique_punishments_this_year, 0) AS amount_unique_punishments_this_year
+                FROM users u
+                LEFT JOIN ({punishment_subquery}) p ON p.user_id = u.user_id
+                LEFT JOIN group_members gm
+                    ON gm.user_id = u.user_id
+                LEFT JOIN groups g
+                    ON g.group_id = gm.group_id
+                WHERE (g.ow_group_id IS NOT NULL OR g.special)
+                    AND gm.active = TRUE
+                """
+            else:
+                query = f"""
+                SELECT
+                    DISTINCT u.user_id,
+                    u.first_name,
+                    u.last_name,
+                    u.email,
+                    u.ow_user_id,
+                    COALESCE(p.total_value, 0) AS total_value,
+                    COALESCE(p.emojis, '') AS emojis,
+                    COALESCE(p.amount_punishments, 0) AS amount_punishments,
+                    COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments,
+                    COALESCE(p.total_value_this_year, 0) AS total_value_this_year,
+                    COALESCE(p.emojis_this_year, '') AS emojis_this_year,
+                    COALESCE(p.amount_punishments_this_year, 0) AS amount_punishments_this_year,
+                    COALESCE(p.amount_unique_punishments_this_year, 0) AS amount_unique_punishments_this_year
+                FROM users u
+                INNER JOIN (
+                    SELECT DISTINCT gp.user_id
+                    FROM group_punishments gp
+                    JOIN groups g ON g.group_id = gp.group_id
+                    WHERE g.ow_group_id IS NOT NULL
+                ) eligible ON eligible.user_id = u.user_id
+                LEFT JOIN ({punishment_subquery}) p ON p.user_id = u.user_id
+                """
 
             if this_year or year is not None:
                 query += "ORDER BY total_value_this_year DESC, u.first_name ASC "
