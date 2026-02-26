@@ -136,7 +136,7 @@ export const PunishmentItem = ({
               )}
             </span>
             <span className="block text-gray-500 text-xs whitespace-nowrap md:text-sm w-40 md:w-48 overflow-hidden text-ellipsis">
-              - Gitt av {punishment.created_by_name}
+              - Gitt av {punishment.created_by_name ?? "Ukjent"}
             </span>
           </p>
         </div>

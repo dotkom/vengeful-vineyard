@@ -30,8 +30,8 @@ class PunishmentOut(PunishmentCreate):
         GroupId
     ]  # Optional because we dont want this information on wall of shame
     created_at: datetime
-    created_by: UserId
-    created_by_name: str
+    created_by: Optional[UserId]
+    created_by_name: Optional[str]
     paid: bool
     paid_at: Optional[datetime]
     marked_paid_by: Optional[UserId]
