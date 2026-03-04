@@ -18,6 +18,12 @@ export const CommitteeList = ({ gamblingOnly = false }: CommitteeListProps) => {
     enabled: auth.isAuthenticated,
   })
 
+  // Ref: Notion - Møtereferat: January 28, 2026 - Dotkom Kron eller Mynt gambling
+  const isDotkom = (group: GroupStatistics) => gamblingOnly && group.group_name_short === "Dotkom"
+  const dotkomExtraAllTime = (group: GroupStatistics) => (isDotkom(group) ? 5158 : 0)
+  const dotkomExtraThisYear = (group: GroupStatistics) =>
+    isDotkom(group) && new Date().getFullYear() === 2026 ? 5158 : 0
+
   return (
     <div className="flex flex-wrap -m-2 gap-16 justify-center">
       {groupsStatistics?.length == 0 ? (
@@ -26,13 +32,13 @@ export const CommitteeList = ({ gamblingOnly = false }: CommitteeListProps) => {
         </div>
       ) : (
         groupsStatistics
-          ?.sort((a, b) => b.total_value_this_year - a.total_value_this_year)
+          ?.sort((a, b) => b.total_value_this_year + dotkomExtraThisYear(b) - (a.total_value_this_year + dotkomExtraThisYear(a)))
           ?.map((groupStatistic: GroupStatistics, index) => (
             <CommitteeCard
               image={groupStatistic.group_image === "NoImage" ? (NoImage as string) : groupStatistic.group_image}
               name={groupStatistic.group_name_short}
-              total_value={groupStatistic.total_value}
-              total_value_this_year={groupStatistic.total_value_this_year}
+              total_value={groupStatistic.total_value + dotkomExtraAllTime(groupStatistic)}
+              total_value_this_year={groupStatistic.total_value_this_year + dotkomExtraThisYear(groupStatistic)}
               key={index}
             />
           ))
