@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Optional
 from asyncpg import Pool
 
 from app.exceptions import NotFound
-from app.models.punishment import PunishmentCreate, PunishmentRead
+from app.models.punishment import PunishmentCreate, PunishmentRead, TopStreaker
 from app.models.punishment_reaction import PunishmentReactionRead
 from app.models.user import LogPunishmentOut
 from app.types import GroupId, PunishmentId, UserId
@@ -294,3 +294,58 @@ class Punishments:
 
             if len(res) == 0:
                 raise NotFound
+
+    async def get_top_streakers(
+        self,
+        conn: Optional[Pool] = None,
+    ) -> list[TopStreaker]:
+        async with MaybeAcquire(conn, self.db.pool) as conn:
+            query = """
+            WITH punishment_weeks AS (
+                SELECT DISTINCT
+                    gp.user_id,
+                    gp.group_id,
+                    EXTRACT(EPOCH FROM date_trunc('week', gp.created_at AT TIME ZONE 'Europe/Oslo'))::bigint / 604800 AS abs_week
+                FROM group_punishments gp
+                JOIN groups g ON g.group_id = gp.group_id
+                WHERE g.ow_group_id IS NOT NULL
+            ),
+            ranked AS (
+                SELECT
+                    user_id,
+                    group_id,
+                    abs_week,
+                    abs_week + ROW_NUMBER() OVER (PARTITION BY user_id, group_id ORDER BY abs_week DESC) AS streak_group,
+                    ROW_NUMBER() OVER (PARTITION BY user_id, group_id ORDER BY abs_week DESC) AS rn
+                FROM punishment_weeks
+            ),
+            newest AS (
+                SELECT user_id, group_id, streak_group, abs_week
+                FROM ranked
+                WHERE rn = 1
+            ),
+            current_streaks AS (
+                SELECT
+                    r.user_id,
+                    r.group_id,
+                    COUNT(*) AS streak_length
+                FROM ranked r
+                JOIN newest n ON r.user_id = n.user_id AND r.group_id = n.group_id AND r.streak_group = n.streak_group
+                WHERE n.abs_week >= (EXTRACT(EPOCH FROM date_trunc('week', NOW() AT TIME ZONE 'Europe/Oslo'))::bigint / 604800) - 1
+                GROUP BY r.user_id, r.group_id
+                HAVING COUNT(*) >= 3
+            )
+            SELECT
+                cs.user_id,
+                TRIM(CONCAT(COALESCE(NULLIF(u.first_name, ''), u.email), ' ', u.last_name)) AS display_name,
+                g.name_short AS group_name,
+                cs.streak_length
+            FROM current_streaks cs
+            JOIN users u ON u.user_id = cs.user_id
+            JOIN groups g ON g.group_id = cs.group_id
+            ORDER BY cs.streak_length DESC
+            LIMIT 3
+            """
+            res = await conn.fetch(query)
+
+            return [TopStreaker(**dict(row)) for row in res]

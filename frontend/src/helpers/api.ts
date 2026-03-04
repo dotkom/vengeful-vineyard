@@ -4,11 +4,13 @@ import {
   type MeUser,
   type PunishmentCreate,
   type GroupStatistics,
+  type TopStreaker,
   GroupStatisticsSchema,
   LeaderboardSchema,
   MeUserSchema,
   GroupSchema,
   PublicGroupSchema,
+  TopStreakerSchema,
   type GroupBase,
   type GroupCreateType,
   type EditGroupType,
@@ -45,6 +47,16 @@ const getLeaderboardUrl = (page: number, this_year: boolean, year?: number, acti
   if (year !== undefined) url += `&year=${year}`
   return url
 }
+
+const TOP_STREAKERS_URL = BASE_URL + "/punishments/top-streakers"
+
+export const topStreakersQuery = () => ({
+  queryKey: ["topStreakers"],
+  queryFn: () => axios.get<TopStreaker[]>(TOP_STREAKERS_URL).then((res) =>
+    res.data.map((s) => TopStreakerSchema.parse(s))
+  ),
+  staleTime: 1000 * 60 * 5,
+})
 
 const getPunishmentsLogUrl = (page: number) => `${BASE_URL}/punishments/log?page=${page}`
 

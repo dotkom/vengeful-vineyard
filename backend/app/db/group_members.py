@@ -5,10 +5,8 @@ from asyncpg import Pool
 
 from app.exceptions import NotFound
 from app.models.group_member import GroupMember, GroupMemberUpdate
-from app.models.punishment import PunishmentStreaks
 from app.types import GroupId, UserId
 from app.utils.db import MaybeAcquire
-from app.utils.streaks import calculate_punishment_streaks
 
 if TYPE_CHECKING:
     from app.db.core import Database
@@ -17,40 +15,6 @@ if TYPE_CHECKING:
 class GroupMembers:
     def __init__(self, db: "Database"):
         self.db = db
-
-    async def get_punishment_streaks(
-        self,
-        group_id: GroupId,
-        user_id: UserId,
-        conn: Optional[Pool] = None,
-    ) -> PunishmentStreaks:
-        async with MaybeAcquire(conn, self.db.pool) as conn:
-            query = """SELECT created_at FROM group_punishments
-                    WHERE group_id = $1 AND user_id = $2
-                    ORDER BY created_at DESC"""
-            res = await conn.fetch(
-                query,
-                group_id,
-                user_id,
-            )
-
-            compare_to = None
-            if not res:
-                query = """SELECT added_at FROM group_members
-                        WHERE group_id = $1 AND user_id = $2"""
-                compare_to = await conn.fetchval(
-                    query,
-                    group_id,
-                    user_id,
-                )
-                if compare_to is None:
-                    raise NotFound
-
-        streaks = calculate_punishment_streaks(
-            res,
-            compare_to=compare_to,
-        )
-        return PunishmentStreaks(**streaks)
 
     async def get_all(
         self,

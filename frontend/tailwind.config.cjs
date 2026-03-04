@@ -40,11 +40,16 @@ module.exports = {
           "20%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         slideDown: "slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1)",
         slideUp: "slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1)",
         fadeIn: "fadeIn 800ms ease-out forwards",
+        marquee: "marquee 20s linear infinite",
       },
     },
   },
