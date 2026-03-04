@@ -80,7 +80,7 @@ const LatestPunishmentRow: FC<{
   return (
     <li
       className={`flex items-center gap-x-2.5 px-2 py-2 text-sm ${
-        !isLast ? "border-b border-gray-100" : ""
+        !isLast ? "border-b border-gray-100 dark:border-gray-700" : ""
       }`}
     >
       <span className="text-base shrink-0" title={type?.name}>
