@@ -154,7 +154,7 @@ export const BettingModal = ({
                 >
                   {punishmentTypes.map((pt) => (
                     <option key={pt.punishment_type_id} value={pt.punishment_type_id}>
-                      {pt.name} {pt.emoji}
+                      {pt.value}kr - {pt.name} {pt.emoji}
                     </option>
                   ))}
                 </select>

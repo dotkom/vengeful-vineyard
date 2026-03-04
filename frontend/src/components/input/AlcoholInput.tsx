@@ -57,7 +57,7 @@ export const AlcoholInput = ({
                 value={ptype.punishment_type_id}
                 title={`Verdi: ${ptype.value}kr`}
               >
-                {ptype.name} {ptype.emoji}
+                {ptype.value}kr - {ptype.name} {ptype.emoji}
               </option>
             ))}
           </select>

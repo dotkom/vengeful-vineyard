@@ -117,7 +117,7 @@ export const SegmentEditorModal = ({
                   <option value="none">Ingen straff</option>
                   {punishmentTypes.map((pt) => (
                     <option key={pt.punishment_type_id} value={pt.punishment_type_id}>
-                      {pt.name} {pt.emoji}
+                      {pt.value}kr - {pt.name} {pt.emoji}
                     </option>
                   ))}
                 </select>
