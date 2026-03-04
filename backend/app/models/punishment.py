@@ -47,11 +47,11 @@ class LeaderboardPunishmentRead(PunishmentRead):
     punishment_type: PunishmentTypeRead
 
 
-class PunishmentStreaks(BaseModel):
-    current_streak: int
-    longest_streak: int
-    current_inverse_streak: int
-    longest_inverse_streak: int
+class TopStreaker(BaseModel):
+    user_id: UserId
+    display_name: str
+    group_name: str
+    streak_length: int
 
 
 class TotalPunishmentValue(BaseModel):

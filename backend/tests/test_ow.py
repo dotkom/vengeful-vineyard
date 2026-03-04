@@ -1191,64 +1191,6 @@ class TestWithDB_OW:
         assert hidden_count == 1
 
     @pytest.mark.asyncio
-    async def test_get_group_user_punishment_streaks_by_other_not_in_group(
-        self, client: Any
-    ) -> None:
-        response = await client.get(
-            f"/groups/{GROUP_ID}/users/{SELF_USER_ID}/punishmentStreaks",
-            headers={"Authorization": OTHER_USER_NOT_IN_GROUP_AUTHORIZATION},
-        )
-
-        assert response.status_code == 403
-        check_response_time(response)
-
-    @pytest.mark.asyncio
-    async def test_get_group_user_punishment_streaks_empty(self, client: Any) -> None:
-        response = await client.get(
-            f"/groups/{GROUP_ID}/users/{SELF_USER_ID}/punishmentStreaks",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
-        )
-
-        assert response.status_code == 200
-        check_response_time(response)
-
-        assert response.json() == {
-            "current_streak": 0,
-            "current_inverse_streak": 0,
-            "longest_streak": 0,
-            "longest_inverse_streak": 0,
-        }
-
-    @pytest.mark.asyncio
-    async def test_get_group_user_punishment_streaks(self, client: Any) -> None:
-        response = await client.post(
-            f"/groups/{GROUP_ID}/users/{SELF_USER_ID}/punishments",
-            json=[
-                {
-                    "punishment_type_id": PUNISHMENT_TYPE_1_ID,
-                    "reason": "Test",
-                    "reason_hidden": False,
-                    "amount": 1,
-                }
-            ],
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
-        )
-        assert response.status_code == 200
-        check_response_time(response)
-
-        response = await client.get(
-            f"/groups/{GROUP_ID}/users/{SELF_USER_ID}/punishmentStreaks",
-            headers={"Authorization": SELF_USER_AUTHORIZATION},
-        )
-        assert response.status_code == 200
-        assert response.json() == {
-            "current_streak": 1,
-            "current_inverse_streak": 0,
-            "longest_streak": 1,
-            "longest_inverse_streak": 0,
-        }
-
-    @pytest.mark.asyncio
     async def test_leaderboard(self, client: Any) -> None:
         response = await client.get(
             f"/users/leaderboard?page_size=3",

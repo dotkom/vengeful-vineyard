@@ -154,13 +154,13 @@ export const GroupStatisticsSchema = z.object({
 })
 export type GroupStatistics = z.infer<typeof GroupStatisticsSchema>
 
-export const PunishmentStreaksSchema = z.object({
-  current_streak: z.number(),
-  longest_streak: z.number(),
-  current_inverse_streak: z.number(),
-  longest_inverse_streak: z.number(),
+export const TopStreakerSchema = z.object({
+  user_id: z.string(),
+  display_name: z.string(),
+  group_name: z.string(),
+  streak_length: z.number(),
 })
-export type PunishmentStreaks = z.infer<typeof PunishmentStreaksSchema>
+export type TopStreaker = z.infer<typeof TopStreakerSchema>
 
 export const GroupCreate = z.object({
   name: z.string().trim().min(3, { message: "Navn må være minst tre tegn" }),

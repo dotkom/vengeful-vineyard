@@ -26,7 +26,6 @@ from app.models.group_user import GroupUser
 from app.models.permission import GroupMemberPermissionPatch
 from app.models.punishment import (
     PunishmentCreate,
-    PunishmentStreaks,
     TotalPunishmentValue,
 )
 from app.models.punishment_type import PunishmentTypeCreate, PunishmentTypeRead
@@ -144,44 +143,6 @@ async def get_group_user(
 
         assert isinstance(ret, GroupUser)
         return ret
-
-
-@router.get(
-    "/{group_id}/users/{user_id}/punishmentStreaks",
-    response_model=PunishmentStreaks,
-    dependencies=[Depends(oidc)],
-)
-async def get_group_user_punishment_streaks(
-    request: Request,
-    group_id: GroupId,
-    user_id: UserId,
-) -> PunishmentStreaks:
-    """
-    Endpoint to get a user's punishment streaks in the context of a group.
-    """
-    access_token = request.raise_if_missing_authorization()
-
-    app = request.app
-    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
-
-    async with app.db.pool.acquire() as conn:
-        res = await app.db.groups.is_in_group(
-            user_id,
-            group_id,
-            conn=conn,
-        )
-        if not res:
-            raise HTTPException(
-                status_code=403, detail="Du er ikke et medlem av gruppen"
-            )
-
-        try:
-            return await app.db.group_members.get_punishment_streaks(group_id, user_id)
-        except NotFound as exc:
-            raise HTTPException(
-                status_code=404,
-                detail="Brukeren ble ikke funnet eller er ikke i gruppen",
-            ) from exc
 
 
 @router.get(

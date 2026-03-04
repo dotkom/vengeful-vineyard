@@ -11,14 +11,11 @@ export function weeklyStreak(dates: Date[]) {
   const sortedDates = [...dates].sort((a, b) => b.getTime() - a.getTime())
   const currentDate = new Date()
   const newest = sortedDates[0]
-
   // Streaks can either start this week or last week
   if (!isInWeekBefore(newest, currentDate) && !isSameWeek(currentDate, newest)) {
     return 0
   }
-
   const newestIsThisWeek = isSameWeek(currentDate, newest)
-
   let streak = newestIsThisWeek ? 1 : 0
   let lastDate = newestIsThisWeek ? newest : currentDate
 
@@ -26,17 +23,13 @@ export function weeklyStreak(dates: Date[]) {
     if (isSameWeek(date, lastDate)) {
       continue
     }
-
     if (isInWeekBefore(date, lastDate)) {
       streak++
       lastDate = date
-
       continue
     }
-
     break
   }
-
   return streak
 }
 

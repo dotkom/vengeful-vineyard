@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api import APIRoute, Request, oidc
 from app.exceptions import NotFound
+from app.models.punishment import TopStreaker
 from app.models.punishment_reaction import (
     PunishmentReactionCreate,
     PunishmentReactionRead,
@@ -20,6 +21,31 @@ router = APIRouter(
     tags=["Punishments"],
     route_class=APIRoute,
 )
+
+
+@router.get(
+    "/top-streakers",
+    response_model=list[TopStreaker],
+    dependencies=[Depends(oidc)],
+)
+async def get_top_streakers(request: Request) -> list[TopStreaker]:
+    """
+    Get the top 3 people with the longest active punishment streaks across all OW groups.
+    Only returns streaks of 3+ weeks.
+    """
+    access_token = request.raise_if_missing_authorization()
+
+    app = request.app
+    user_id, _ = await app.ow_sync.sync_for_access_token(access_token)
+
+    async with app.db.pool.acquire() as conn:
+        is_in_any_ow_group = await app.db.groups.is_in_any_ow_group(user_id, conn=conn)
+        if not is_in_any_ow_group:
+            raise HTTPException(
+                status_code=403, detail="Du har ikke tilgang til denne ressursen"
+            )
+
+        return await app.db.punishments.get_top_streakers(conn=conn)
 
 
 @router.get(
