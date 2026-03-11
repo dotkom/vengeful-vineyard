@@ -132,9 +132,6 @@ export const Nav = ({ auth }: NavProps) => {
                   >
                     <figure className="relative group">
                       <BugIcon className="w-10 h-10 text-black" />
-                      <figcaption className="absolute text-center top-[50px] left-[-40px] right-[-40px] py-2 text-xs text-gray-700 hidden group-hover:block bg-white p-1 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                        Rapporter bug
-                      </figcaption>
                     </figure>
                   </Link>
                 </div>
