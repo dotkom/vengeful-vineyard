@@ -58,7 +58,14 @@ export const topStreakersQuery = () => ({
   staleTime: 1000 * 60 * 5,
 })
 
-const getPunishmentsLogUrl = (page: number) => `${BASE_URL}/punishments/log?page=${page}`
+const getPunishmentsLogUrl = (page: number, groupId?: string, dateFrom?: string, dateTo?: string, search?: string) => {
+  let url = `${BASE_URL}/punishments/log?page=${page}`
+  if (groupId) url += `&group_id=${groupId}`
+  if (dateFrom) url += `&date_from=${dateFrom}`
+  if (dateTo) url += `&date_to=${dateTo}`
+  if (search) url += `&search=${encodeURIComponent(search)}`
+  return url
+}
 
 export const getLeaderboardUserPunishmentsUrl = (userId: string) => `${LEADERBOARD_URL}/punishments/${userId}`
 
@@ -740,18 +747,18 @@ export const leaderboardQuery = (
   staleTime: 1000 * 60,
 })
 
-const getPunishmentsLog = async ({ pageParam = 0 }) =>
-  PunishmentsLogSchema.parse(await axios.get(getPunishmentsLogUrl(pageParam)).then((res) => res.data))
+const getPunishmentsLog = async (pageParam: number, groupId?: string, dateFrom?: string, dateTo?: string, search?: string) =>
+  PunishmentsLogSchema.parse(await axios.get(getPunishmentsLogUrl(pageParam, groupId, dateFrom, dateTo, search)).then((res) => res.data))
 
-export const punishmentsQuery = (): UseInfiniteQueryOptions<
+export const punishmentsQuery = (groupId?: string, dateFrom?: string, dateTo?: string, search?: string): UseInfiniteQueryOptions<
   PunishmentsLog,
   unknown,
   PunishmentsLog,
   PunishmentsLog,
   string[]
 > => ({
-  queryKey: ["punishmentsLog"],
-  queryFn: getPunishmentsLog,
+  queryKey: ["punishmentsLog", groupId ?? "all", dateFrom ?? "all", dateTo ?? "all", search ?? "all"],
+  queryFn: ({ pageParam = 0 }) => getPunishmentsLog(pageParam, groupId, dateFrom, dateTo, search),
   getNextPageParam: (lastPage: PunishmentsLog) => {
     const nextPage = lastPage.next ? new URL(lastPage.next).searchParams.get("page") : undefined
     return nextPage ? Number(nextPage) : undefined

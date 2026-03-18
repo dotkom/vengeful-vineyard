@@ -2,6 +2,10 @@
 Punishment endpoints
 """
 
+import datetime
+from functools import partial
+from typing import Optional
+
 from emoji import is_emoji
 from fastapi import APIRouter, Depends, HTTPException, Query
 
@@ -14,7 +18,7 @@ from app.models.punishment_reaction import (
 )
 from app.models.user import LogPunishmentOut
 from app.utils.pagination import Page, Pagination
-from app.types import PunishmentId
+from app.types import GroupId, PunishmentId
 
 router = APIRouter(
     prefix="/punishments",
@@ -57,9 +61,13 @@ async def get_punishments_log(
     request: Request,
     page: int = Query(title="Page number", default=0, ge=0),
     page_size: int = Query(title="Page size", default=30, ge=1, le=50),
+    group_id: Optional[GroupId] = Query(title="Group ID", default=None),
+    date_from: Optional[datetime.date] = Query(title="From date", default=None),
+    date_to: Optional[datetime.date] = Query(title="To date", default=None),
+    search: Optional[str] = Query(title="Search by name", default=None, min_length=1),
 ) -> Page[LogPunishmentOut]:
     """
-    Endpoint to get all punishments.
+    Endpoint to get all punishments, optionally filtered by group, date range, and/or user name.
     """
     access_token = request.raise_if_missing_authorization()
 
@@ -75,8 +83,8 @@ async def get_punishments_log(
 
         pagination = Pagination[LogPunishmentOut](
             request=request,
-            total_coro=app.db.punishments.get_all_count,  # use partial with group_id if you want to filter by group
-            results_coro=app.db.punishments.get_all,  # use partial with group_id if you want to filter by group
+            total_coro=partial(app.db.punishments.get_all_count, group_id=group_id, date_from=date_from, date_to=date_to, search=search),
+            results_coro=partial(app.db.punishments.get_all, group_id=group_id, date_from=date_from, date_to=date_to, search=search),
             page=page,
             page_size=page_size,
         )

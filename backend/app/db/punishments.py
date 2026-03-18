@@ -64,19 +64,56 @@ class Punishments:
 
         return PunishmentRead(**res)
 
+    @staticmethod
+    def _build_where(
+        group_id: Optional[GroupId],
+        date_from: Optional[datetime.date] = None,
+        date_to: Optional[datetime.date] = None,
+        search: Optional[str] = None,
+    ) -> tuple[str, list, str]:
+        """Returns (where_clause, params, extra_joins)."""
+        conditions = ["(g.ow_group_id IS NOT NULL OR g.special)"]
+        params: list = []
+        extra_joins = ""
+
+        if group_id is not None:
+            params.append(group_id)
+            conditions = [f"g.group_id = ${len(params)}"]
+
+        if date_from is not None:
+            params.append(date_from)
+            conditions.append(f"gp.created_at >= ${len(params)}::date")
+
+        if date_to is not None:
+            params.append(date_to)
+            conditions.append(f"gp.created_at < (${len(params)}::date + interval '1 day')")
+
+        if search is not None:
+            params.append(f"%{search}%")
+            extra_joins = "LEFT JOIN users search_user ON gp.user_id = search_user.user_id"
+            conditions.append(
+                f"CONCAT(COALESCE(NULLIF(search_user.first_name, ''), search_user.email), ' ', search_user.last_name) ILIKE ${len(params)}"
+            )
+
+        return "WHERE " + " AND ".join(conditions), params, extra_joins
+
     async def get_all(
         self,
         offset: int,
         limit: int,
         group_id: Optional[GroupId] = None,
+        date_from: Optional[datetime.date] = None,
+        date_to: Optional[datetime.date] = None,
+        search: Optional[str] = None,
         conn: Optional[Pool] = None,
     ) -> list[LogPunishmentOut]:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            where_clause = (
-                "WHERE g.ow_group_id IS NOT NULL OR g.special"
-                if group_id is None
-                else "WHERE g.group_id = $1"
-            )
+            where_clause, params, extra_joins = self._build_where(group_id, date_from, date_to, search)
+
+            params.append(offset)
+            offset_param = f"${len(params)}"
+            params.append(limit)
+            limit_param = f"${len(params)}"
 
             query = f"""
             SELECT
@@ -104,7 +141,7 @@ class Punishments:
             LEFT JOIN punishment_types pt
                 ON pt.punishment_type_id = gp.punishment_type_id
             LEFT JOIN (
-                SELECT 
+                SELECT
                 pr1.*,
                 CONCAT(COALESCE(NULLIF(u1.first_name, ''), u1.email), ' ', u1.last_name) AS created_by_name
                 FROM punishment_reactions pr1
@@ -114,42 +151,37 @@ class Punishments:
             ) pr ON pr.punishment_id = gp.punishment_id
             LEFT JOIN groups g ON gp.group_id = g.group_id
             LEFT JOIN users created_by_user ON gp.created_by = created_by_user.user_id
-            LEFT JOIN users given_to_user ON gp.user_id = given_to_user.user_id 
+            LEFT JOIN users given_to_user ON gp.user_id = given_to_user.user_id
+            {extra_joins}
             {where_clause}
             GROUP BY gp.punishment_id, created_by_user.first_name, created_by_user.email, created_by_user.last_name, pt.punishment_type_id, given_to_user.user_id, g.name_short
             ORDER BY gp.created_at DESC
-            OFFSET $1
-            LIMIT $2
+            OFFSET {offset_param}
+            LIMIT {limit_param}
             """
 
-            if group_id is None:
-                res = await conn.fetch(query, offset, limit)
-            else:
-                res = await conn.fetch(query, offset, limit, group_id)
+            res = await conn.fetch(query, *params)
 
         return [LogPunishmentOut(**r) for r in res]
 
     async def get_all_count(
         self,
         group_id: Optional[GroupId] = None,
+        date_from: Optional[datetime.date] = None,
+        date_to: Optional[datetime.date] = None,
+        search: Optional[str] = None,
         conn: Optional[Pool] = None,
     ) -> int:
         async with MaybeAcquire(conn, self.db.pool) as conn:
-            where_clause = (
-                "WHERE g.ow_group_id IS NOT NULL OR g.special"
-                if group_id is None
-                else "WHERE g.group_id = $1"
-            )
+            where_clause, params, extra_joins = self._build_where(group_id, date_from, date_to, search)
             query = f"""
                 SELECT COUNT(*) FROM group_punishments gp
                 LEFT JOIN groups g ON gp.group_id = g.group_id
+                {extra_joins}
                 {where_clause}
                 """
 
-            if group_id is None:
-                res = await conn.fetchval(query)
-            else:
-                res = await conn.fetchval(query, group_id)
+            res = await conn.fetchval(query, *params)
 
         return res
 
