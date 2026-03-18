@@ -399,6 +399,7 @@ class Users:
         this_year: bool,
         year: Optional[int],
         active_only: bool,
+        sort_by: str,
         offset: int,
         limit: int,
         conn: Optional[Pool] = None,
@@ -422,10 +423,14 @@ class Users:
                 SELECT
                     p.user_id,
                     SUM(pt.value * p.amount) AS total_value,
+                    SUM(CASE WHEN p.paid THEN pt.value * p.amount ELSE 0 END) AS paid_value,
+                    SUM(CASE WHEN NOT p.paid THEN pt.value * p.amount ELSE 0 END) AS unpaid_value,
                     STRING_AGG(REPEAT(pt.emoji, p.amount), '') AS emojis,
                     SUM(p.amount) AS amount_punishments,
                     COUNT(DISTINCT p.punishment_type_id) AS amount_unique_punishments,
                     SUM(CASE WHEN {year_filter} THEN pt.value * p.amount ELSE 0 END) AS total_value_this_year,
+                    SUM(CASE WHEN {year_filter} AND p.paid THEN pt.value * p.amount ELSE 0 END) AS paid_value_this_year,
+                    SUM(CASE WHEN {year_filter} AND NOT p.paid THEN pt.value * p.amount ELSE 0 END) AS unpaid_value_this_year,
                     STRING_AGG(CASE WHEN {year_filter} THEN REPEAT(pt.emoji, p.amount) ELSE '' END, '') AS emojis_this_year,
                     SUM(CASE WHEN {year_filter} THEN p.amount ELSE 0 END) AS amount_punishments_this_year,
                     COUNT(DISTINCT CASE WHEN {year_filter} THEN p.punishment_type_id ELSE NULL END) AS amount_unique_punishments_this_year
@@ -447,10 +452,14 @@ class Users:
                     u.email,
                     u.ow_user_id,
                     COALESCE(p.total_value, 0) AS total_value,
+                    COALESCE(p.paid_value, 0) AS paid_value,
+                    COALESCE(p.unpaid_value, 0) AS unpaid_value,
                     COALESCE(p.emojis, '') AS emojis,
                     COALESCE(p.amount_punishments, 0) AS amount_punishments,
                     COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments,
                     COALESCE(p.total_value_this_year, 0) AS total_value_this_year,
+                    COALESCE(p.paid_value_this_year, 0) AS paid_value_this_year,
+                    COALESCE(p.unpaid_value_this_year, 0) AS unpaid_value_this_year,
                     COALESCE(p.emojis_this_year, '') AS emojis_this_year,
                     COALESCE(p.amount_punishments_this_year, 0) AS amount_punishments_this_year,
                     COALESCE(p.amount_unique_punishments_this_year, 0) AS amount_unique_punishments_this_year
@@ -472,10 +481,14 @@ class Users:
                     u.email,
                     u.ow_user_id,
                     COALESCE(p.total_value, 0) AS total_value,
+                    COALESCE(p.paid_value, 0) AS paid_value,
+                    COALESCE(p.unpaid_value, 0) AS unpaid_value,
                     COALESCE(p.emojis, '') AS emojis,
                     COALESCE(p.amount_punishments, 0) AS amount_punishments,
                     COALESCE(p.amount_unique_punishments, 0) AS amount_unique_punishments,
                     COALESCE(p.total_value_this_year, 0) AS total_value_this_year,
+                    COALESCE(p.paid_value_this_year, 0) AS paid_value_this_year,
+                    COALESCE(p.unpaid_value_this_year, 0) AS unpaid_value_this_year,
                     COALESCE(p.emojis_this_year, '') AS emojis_this_year,
                     COALESCE(p.amount_punishments_this_year, 0) AS amount_punishments_this_year,
                     COALESCE(p.amount_unique_punishments_this_year, 0) AS amount_unique_punishments_this_year
@@ -489,10 +502,11 @@ class Users:
                 LEFT JOIN ({punishment_subquery}) p ON p.user_id = u.user_id
                 """
 
-            if this_year or year is not None:
-                query += "ORDER BY total_value_this_year DESC, u.first_name ASC "
+            if sort_by == "paid":
+                sort_col = "paid_value_this_year" if (this_year or year is not None) else "paid_value"
             else:
-                query += "ORDER BY total_value DESC, u.first_name ASC "
+                sort_col = "total_value_this_year" if (this_year or year is not None) else "total_value"
+            query += f"ORDER BY {sort_col} DESC, u.first_name ASC "
             query += "OFFSET $1 LIMIT $2"
 
             params: list = [offset, limit]

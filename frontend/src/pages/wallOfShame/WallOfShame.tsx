@@ -14,6 +14,7 @@ export const WallOfShame = () => {
   const { setCurrentUser } = useCurrentUser()
   const [filter, setFilter] = useState<Filter>({ type: "year", year: currentYear })
   const [activeOnly, setActiveOnly] = useState(false)
+  const [splitView, setSplitView] = useState(false)
 
   useQuery({
     ...userQuery(),
@@ -29,18 +30,20 @@ export const WallOfShame = () => {
   const isCurrentYear = isYearFilter && filter.year === currentYear
 
   const effectiveActiveOnly = isYearFilter ? false : activeOnly
+  const effectiveSplitView = isYearFilter ? splitView : true
 
   const { isFetching, data, refetch, fetchNextPage } = useInfiniteQuery(
-    leaderboardQuery(isYearFilter, isCurrentYear ? undefined : selectedYear, effectiveActiveOnly)
+    leaderboardQuery(isYearFilter, isCurrentYear ? undefined : selectedYear, effectiveActiveOnly, effectiveSplitView ? "paid" : "total")
   )
 
   useEffect(() => {
     setActiveOnly(false)
+    setSplitView(filter.type === "year" && filter.year !== currentYear)
   }, [filter])
 
   useEffect(() => {
     refetch()
-  }, [filter, effectiveActiveOnly, refetch])
+  }, [filter, effectiveActiveOnly, effectiveSplitView, refetch])
 
   const leaderboardUsers = data?.pages.flatMap((page) => page.results)
 
@@ -49,6 +52,8 @@ export const WallOfShame = () => {
       return {
         ...user,
         total_value: user.total_value_this_year,
+        paid_value: user.paid_value_this_year,
+        unpaid_value: user.unpaid_value_this_year,
         emojis: user.emojis_this_year,
         amount_punishments: user.amount_punishments_this_year,
         amount_unique_punishments: user.amount_unique_punishments_this_year,
@@ -65,7 +70,12 @@ export const WallOfShame = () => {
           <h1 className="text-center md:text-3xl font-medium text-black">Wall of Shame</h1>
           <FilterTabs filter={filter} setFilter={setFilter} className="md:hidden mt-2" />
         </div>
-        {!isYearFilter && (
+        {isYearFilter ? (
+          <>
+            <SplitTabs splitView={splitView} setSplitView={setSplitView} className="hidden md:flex" />
+            <SplitTabs splitView={splitView} setSplitView={setSplitView} className="md:hidden mt-2" />
+          </>
+        ) : (
           <>
             <MembershipTabs activeOnly={activeOnly} setActiveOnly={setActiveOnly} className="hidden md:flex" />
             <MembershipTabs activeOnly={activeOnly} setActiveOnly={setActiveOnly} className="md:hidden mt-2" />
@@ -73,7 +83,7 @@ export const WallOfShame = () => {
         )}
       </div>
 
-      <LeaderboardTable leaderboardUsers={filteredLeaderboardUsers} isFetching={isFetching} dataRefetch={refetch} />
+      <LeaderboardTable leaderboardUsers={filteredLeaderboardUsers} isFetching={isFetching} dataRefetch={refetch} splitView={effectiveSplitView} />
 
       <Button variant="OUTLINE" onClick={() => fetchNextPage().then()} className="mx-auto mt-4">
         Last inn mer
@@ -185,6 +195,35 @@ const MembershipTabs = ({ activeOnly, setActiveOnly, className }: MembershipTabs
         }`}
       >
         Alle
+      </button>
+    </div>
+  )
+}
+
+interface SplitTabsProps {
+  splitView: boolean
+  setSplitView: React.Dispatch<React.SetStateAction<boolean>>
+  className?: string
+}
+
+const SplitTabs = ({ splitView, setSplitView, className }: SplitTabsProps) => {
+  return (
+    <div className={`absolute right-0 flex space-x-2 text-sm ${className}`}>
+      <button
+        onClick={() => setSplitView(false)}
+        className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400 ${
+          !splitView ? "bg-slate-100 dark:bg-slate-800" : ""
+        }`}
+      >
+        Samlet
+      </button>
+      <button
+        onClick={() => setSplitView(true)}
+        className={`w-24 border border-gray-200 dark:border-gray-600 py-1 rounded-lg bg-white dark:text-slate-400 ${
+          splitView ? "bg-slate-100 dark:bg-slate-800" : ""
+        }`}
+      >
+        Fordelt
       </button>
     </div>
   )

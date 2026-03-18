@@ -14,11 +14,12 @@ interface TableItemProps {
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
   i?: number
+  splitView?: boolean
 }
 
-export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, i }: TableItemProps) => {
+export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, i, splitView = false }: TableItemProps) => {
   const displayName = `${leaderboardUser.first_name} ${leaderboardUser.last_name}`
-  const { total_value: totalValue, emojis } = leaderboardUser
+  const { total_value: totalValue, paid_value: paidValue, unpaid_value: unpaidValue, emojis } = leaderboardUser
 
   const {
     data: punishments,
@@ -65,7 +66,18 @@ export const LeaderboardTableItem = ({ leaderboardUser, isCurrentlyExpanded, i }
             >
               {displayName}
             </p>
-            <span className="text-gray-700 text-xs">{totalValue}kr</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {splitView ? (
+                <>
+                  <span>Betalt: {paidValue}kr</span>
+                  {unpaidValue > 0 && (
+                    <span className="ml-2">Ikke betalt: {unpaidValue}kr</span>
+                  )}
+                </>
+              ) : (
+                <span>{totalValue}kr</span>
+              )}
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-x-4">

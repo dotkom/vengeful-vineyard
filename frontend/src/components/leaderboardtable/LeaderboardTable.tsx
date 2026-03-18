@@ -13,9 +13,10 @@ interface LeaderboardTableProps {
   dataRefetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>
+  splitView?: boolean
 }
 
-export const LeaderboardTable = ({ leaderboardUsers, isFetching, dataRefetch }: LeaderboardTableProps) => {
+export const LeaderboardTable = ({ leaderboardUsers, isFetching, dataRefetch, splitView = false }: LeaderboardTableProps) => {
   const [currentlyOpen, setCurrentlyOpen] = useState<string | undefined>(undefined)
 
   return (
@@ -35,6 +36,7 @@ export const LeaderboardTable = ({ leaderboardUsers, isFetching, dataRefetch }: 
             isCurrentlyExpanded={currentlyOpen === user.user_id}
             dataRefetch={dataRefetch}
             i={i}
+            splitView={splitView}
           />
         ))}
 
