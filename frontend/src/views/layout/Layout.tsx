@@ -94,10 +94,14 @@ const LayoutFields = () => {
             <Nav auth={auth} />
             {topStreakers && topStreakers.length > 0 && !bannerDismissed && (
               <div className="relative overflow-hidden bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 py-1.5 text-amber-800 dark:text-amber-200 text-xs font-medium">
-                <div className="animate-marquee whitespace-nowrap">
-                  {[...topStreakers, ...topStreakers].map((s, i) => (
-                    <span key={i} className="mx-8">
-                      🔥 {s.display_name} er i flammer med {s.streak_length} ukers straffe-streak i {s.group_name}!
+                <div className="animate-marquee inline-flex whitespace-nowrap">
+                  {[0, 1].map((copy) => (
+                    <span key={copy} className="inline-flex">
+                      {topStreakers.map((s, i) => (
+                        <span key={i} className="mx-8">
+                          🔥 {s.display_name} er i flammer med {s.streak_length} ukers straffe-streak i {s.group_name}!
+                        </span>
+                      ))}
                     </span>
                   ))}
                 </div>
