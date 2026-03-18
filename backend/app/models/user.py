@@ -45,10 +45,14 @@ class LeaderboardUser(User):
 
 class MinifiedLeaderboardUser(User):
     total_value: int
+    paid_value: int
+    unpaid_value: int
     emojis: str
     amount_punishments: int
     amount_unique_punishments: int
     total_value_this_year: int
+    paid_value_this_year: int
+    unpaid_value_this_year: int
     emojis_this_year: str
     amount_punishments_this_year: int
     amount_unique_punishments_this_year: int
