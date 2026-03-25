@@ -846,17 +846,6 @@ async def add_punishment(
                 detail="Du må være et medlem av gruppen for å utføre denne handlingen",
             )
 
-        res = await app.db.groups.is_in_group(
-            user_id,
-            group_id,
-            conn=conn,
-        )
-        if not res:
-            raise HTTPException(
-                status_code=400,
-                detail="Brukeren er ikke et medlem av gruppen",
-            )
-
         group_punishment_types = await app.db.punishment_types.get_all(group_id)
         # Check that no punishment have too high amount or is not part of group
         for punishment in punishments:

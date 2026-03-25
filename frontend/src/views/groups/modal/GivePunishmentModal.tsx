@@ -58,7 +58,7 @@ export const GivePunishmentModal: FC<GivePunishmentModalProps> = ({ open, setOpe
     ...groupLeaderboardQuery(selectedGroup?.group_id),
     onSuccess: onGroupLeaderboardFetched,
   })
-  const sortedMembers = sortGroupUsersByName([...(data?.members ?? [])])
+  const sortedMembers = sortGroupUsersByName([...(data?.members ?? []), ...(data?.former_members ?? [])])
 
   const { mutate } = useMutation(
     addManyPunishmentsMutation([newPunishmentData], selectedGroup?.group_id, selectedPerson?.user_id)
