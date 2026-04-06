@@ -135,11 +135,12 @@ class HTTPClient:
                 last_name=last_name,
             )
 
-    async def get_ow_groups_by_user_id(self, user_id: str) -> list[OWSyncGroup]:
+    async def get_ow_groups_by_user_id(self, user_id: str, access_token: str) -> list[OWSyncGroup]:
         input = create_trpc_input(user_id)
 
         async with self._session.get(
             f"{BASE_OW5}/group.allByMember?input={input}",
+            headers={"Authorization": f"Bearer {access_token}"},
         ) as response:
             data = await response.json()
 
@@ -163,11 +164,12 @@ class HTTPClient:
                 for item in raw
             ]
 
-    async def get_ow_group_users(self, group_id: str) -> list[OWSyncGroupMember]:
+    async def get_ow_group_users(self, group_id: str, access_token: str) -> list[OWSyncGroupMember]:
         input = create_trpc_input(group_id)
 
         async with self._session.get(
             f"{BASE_OW5}/group.getMembers?input={input}",
+            headers={"Authorization": f"Bearer {access_token}"},
         ) as response:
             if response.status == 404:
                 return []
@@ -224,11 +226,12 @@ class HTTPClient:
 
             return ow_users
 
-    async def get_all_ow_users(self) -> Optional[list[OWSyncUser]]:
+    async def get_all_ow_users(self, access_token: str) -> Optional[list[OWSyncUser]]:
         input = create_trpc_input({"take": 10000000})
 
         async with self._session.get(
             f"{BASE_OW5}/user.all?input={input}",
+            headers={"Authorization": f"Bearer {access_token}"},
         ) as response:
             if response.status == 401 or response.status == 404:
                 return None
