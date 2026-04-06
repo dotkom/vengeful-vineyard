@@ -75,11 +75,12 @@ class OWSync:
         self,
         ow_user_id: OWUserId,
         user_id: UserId,
+        access_token: str,
         wait_for_updates: bool = True,
     ) -> None:
         try:
             ow_groups_data, groups_data = await asyncio.gather(
-                self.app.http.get_ow_groups_by_user_id(ow_user_id),
+                self.app.http.get_ow_groups_by_user_id(ow_user_id, access_token),
                 self.app.db.users.get_groups(user_id),
             )
             filtered_groups_data = [
@@ -95,7 +96,7 @@ class OWSync:
             ]
 
             regular_sync_tasks = [
-                asyncio.create_task(self.sync_group_for_user(ow_user_id, g))
+                asyncio.create_task(self.sync_group_for_user(ow_user_id, g, access_token))
                 for g in filtered_groups_data
             ]
 
@@ -332,8 +333,9 @@ class OWSync:
         self,
         ow_user_id: OWUserId,
         group_data: OWSyncGroup,
+        access_token: str,
     ) -> None:
-        ow_group_users = await self.app.http.get_ow_group_users(group_data.slug)
+        ow_group_users = await self.app.http.get_ow_group_users(group_data.slug, access_token)
 
         image_data = group_data.imageUrl
         group_create = GroupCreate(

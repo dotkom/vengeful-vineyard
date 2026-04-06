@@ -47,6 +47,7 @@ async def get_me(
         await app.ow_sync.sync_for_user(
             ow_user_id,
             user_id,
+            access_token,
             wait_for_updates=wait_for_updates,
         )
 
