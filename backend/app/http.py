@@ -136,7 +136,7 @@ class HTTPClient:
             )
 
     async def get_ow_groups_by_user_id(self, user_id: str, access_token: str) -> list[OWSyncGroup]:
-        input = create_trpc_input(user_id)
+        input = create_trpc_input({"userId": user_id})
 
         async with self._session.get(
             f"{BASE_OW5}/group.allByMember?input={input}",
