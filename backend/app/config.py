@@ -103,6 +103,8 @@ class Settings(BaseSettings):
     ow4_base_url: str = "https://dev.online.ntnu.no"
     # Assuming Vengeful Vineyard is ran inside a Docker container
     ow5_base_url: str = "http://host.docker.internal:4444/api/trpc"
+    http_request_source_header: str = "X-Request-Source"
+    rpc_request_source: str = "vinstraff"
     auth0_issuer: str = "https://auth.dev.online.ntnu.no"
     auth0_client_id: str = ""
 
