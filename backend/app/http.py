@@ -95,6 +95,12 @@ def create_aiohttp_closed_event(session: ClientSession) -> asyncio.Event:
 class HTTPClient:
     _session: ClientSession
 
+    def _rpc_headers(self, access_token: str) -> dict[str, str]:
+        return {
+            "Authorization": f"Bearer {access_token}",
+            settings.http_request_source_header: settings.rpc_request_source,
+        }
+
     async def async_init(self) -> None:
         self._session = ClientSession()
 
@@ -113,7 +119,7 @@ class HTTPClient:
     ) -> Optional[OWSyncUser]:
         async with self._session.get(
             f"{BASE_OW5}/user.getMe",
-            headers={"Authorization": f"Bearer {access_token}"},
+            headers=self._rpc_headers(access_token),
         ) as response:
             if response.status == 401 or response.status == 404:
                 return None
@@ -140,7 +146,7 @@ class HTTPClient:
 
         async with self._session.get(
             f"{BASE_OW5}/group.allByMember?input={input}",
-            headers={"Authorization": f"Bearer {access_token}"},
+            headers=self._rpc_headers(access_token),
         ) as response:
             data = await response.json()
 
@@ -169,7 +175,7 @@ class HTTPClient:
 
         async with self._session.get(
             f"{BASE_OW5}/group.getMembers?input={input}",
-            headers={"Authorization": f"Bearer {access_token}"},
+            headers=self._rpc_headers(access_token),
         ) as response:
             if response.status == 404:
                 return []
@@ -231,7 +237,7 @@ class HTTPClient:
 
         async with self._session.get(
             f"{BASE_OW5}/user.all?input={input}",
-            headers={"Authorization": f"Bearer {access_token}"},
+            headers=self._rpc_headers(access_token),
         ) as response:
             if response.status == 401 or response.status == 404:
                 return None
