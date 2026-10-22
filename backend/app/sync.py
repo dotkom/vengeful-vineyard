@@ -84,7 +84,7 @@ class OWSync:
                 self.app.db.users.get_groups(user_id),
             )
             filtered_groups_data = [
-                g for g in ow_groups_data if g.type in ("COMMITTEE", "NODE_COMMITTEE")
+                g for g in ow_groups_data if g.type in ("COMMITTEE", "NODE_COMMITTEE", "ASSOCIATED")
             ]
             ow_group_ids = set(g.slug for g in filtered_groups_data)
             group_ids_not_in_ow_group_anymore = [
