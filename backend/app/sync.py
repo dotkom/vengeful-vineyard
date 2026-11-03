@@ -21,6 +21,10 @@ from .types import (
     UserId,
 )
 from .utils.db import MaybeAcquire
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 if TYPE_CHECKING:
     from .api import FastAPI
@@ -126,8 +130,8 @@ class OWSync:
                 if sum_ow_groups != len(filtered_groups_data):
                     await asyncio.gather(*regular_sync_tasks, *not_in_ow_group_tasks)
         except Exception as e:
+            logger.exception("OW group sync failed")
             sentry_sdk.capture_exception(e)
-            print("Error reported to Sentry")
 
     async def create_user_if_not_exists(
         self,
